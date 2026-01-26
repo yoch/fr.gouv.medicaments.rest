@@ -2,7 +2,6 @@
 
 Cette API permet d'accéder aux données officielles des médicaments en France (BDPM).
 
-**Base URL**: `http://localhost:3000/api`
 
 ## Endpoints
 

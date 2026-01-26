@@ -8,8 +8,8 @@ const options = {
             version: '1.0.0',
             description: 'API REST pour accéder aux données officielles des médicaments en France (BDPM).',
             contact: {
-                name: 'Mathieu Vedie',
-                url: 'https://github.com/Gizmo091/fr.gouv.medicaments.rest'
+                name: 'Yoch Melka',
+                url: 'https://github.com/yoch/fr.gouv.medicaments.rest'
             },
             license: {
                 name: 'MIT',
@@ -18,8 +18,8 @@ const options = {
         },
         servers: [
             {
-                url: 'http://localhost:3000/api',
-                description: 'Serveur de développement'
+                url: 'https://bdpm.galiensante.fr/api',
+                description: 'Serveur de production'
             }
         ],
         components: {

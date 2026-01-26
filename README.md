@@ -6,17 +6,11 @@
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Contributions](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)
 
-[![GitHub latest commit](https://badgen.net/github/last-commit/Gizmo091/fr.gouv.medicaments.rest)](https://github.com/Gizmo091/fr.gouv.medicaments.rest/commit/)
+[![GitHub latest commit](https://badgen.net/github/last-commit/yoch/fr.gouv.medicaments.rest)](https://github.com/yoch/fr.gouv.medicaments.rest/commit/)
 
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/mathieuvedie)
 
 API REST publique pour exploiter les données de la base de données publique des médicaments du gouvernement français.
-
-## 🌐 Démo en ligne
-
-**Service hébergé à titre d'exemple :** [bdpmgf.vedielaute.fr](http://bdpmgf.vedielaute.fr)
-
-> ⚠️ Ce service de démonstration est fourni à titre d'exemple uniquement. Pour un usage en production, nous recommandons d'héberger votre propre instance.
 
 ## Fonctionnalités
 
@@ -53,37 +47,6 @@ API REST publique pour exploiter les données de la base de données publique de
 - `limit` - Nombre d'éléments par page (défaut: 100, max: 1000)
 - `pretty` - Formatage JSON (true/1 pour JSON indenté)
 
-## Démarrage avec Docker
-
-### Méthode rapide (sans cloner le repo)
-
-```bash
-# Télécharger uniquement le docker-compose.yml
-curl -O https://raw.githubusercontent.com/Gizmo091/fr.gouv.medicaments.rest/main/docker-compose.yml
-
-# Lancer le service (le repo sera cloné automatiquement dans le conteneur)
-docker-compose up -d
-
-# Vérifier le status
-curl http://localhost:3000/api/health
-
-# Voir les logs
-docker-compose logs -f
-```
-
-#### Utiliser un port personnalisé
-
-```bash
-# Méthode 1 : Avec un fichier .env
-echo "PORT=8080" > .env
-docker-compose up -d
-
-# Méthode 2 : Variable d'environnement
-PORT=8080 docker-compose up -d
-
-# Vérifier sur le nouveau port
-curl http://localhost:8080/api/health
-```
 
 ### Notes
 
