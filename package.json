@@ -7,8 +7,8 @@
     "node": ">= 20"
   },
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "node --env-file=.env src/server.js",
+    "dev": "nodemon --exec 'node --env-file=.env' src/server.js",
     "download-data": "node src/scripts/download-initial-data.js",
     "test": "jest"
   },
