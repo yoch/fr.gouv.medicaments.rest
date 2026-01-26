@@ -78,3 +78,5 @@ npm run dev
 ## Attribution
 
 Cette API utilise la "base de données publique des médicaments" fournie par le gouvernement français.
+
+Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le dépôt [Gizmo091/fr.gouv.medicaments.rest](https://github.com/Gizmo091/fr.gouv.medicaments.rest).
