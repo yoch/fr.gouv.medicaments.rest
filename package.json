@@ -4,7 +4,7 @@
   "description": "API REST pour la base de données publique des médicaments du gouvernement français",
   "main": "src/server.js",
   "engines": {
-    "node": ">= 22"
+    "node": ">= 20"
   },
   "scripts": {
     "start": "node src/server.js",

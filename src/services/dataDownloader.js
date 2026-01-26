@@ -7,11 +7,11 @@ const execAsync = promisify(exec);
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const META_FILE = path.join(DATA_DIR, 'meta.json');
-const BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/telechargement.php';
+const BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/download/file/';
 
 const FILES = [
   'CIS_bdpm.txt',
-  'CIS_CIP_bdpm.txt', 
+  'CIS_CIP_bdpm.txt',
   'CIS_COMPO_bdpm.txt',
   'CIS_HAS_SMR_bdpm.txt',
   'CIS_HAS_ASMR_bdpm.txt',
@@ -47,24 +47,24 @@ async function checkAndConvertToUTF8(filepath) {
     // Vérifier l'encodage du fichier
     const { stdout } = await execAsync(`file -b --mime-encoding "${filepath}"`);
     const encoding = stdout.trim();
-    
+
     if (encoding !== 'utf-8' && encoding !== 'us-ascii') {
       console.log(`  → Conversion de ${path.basename(filepath)} de ${encoding} vers UTF-8...`);
-      
+
       // Créer une copie temporaire
       const tempFile = filepath + '.tmp';
-      
+
       // Déterminer l'encodage source
       let sourceEncoding = encoding;
       if (encoding === 'unknown-8bit' || encoding === 'binary') {
         // Essayer de détecter si c'est du latin1 ou windows-1252
         sourceEncoding = 'ISO-8859-1';
       }
-      
+
       try {
         // Convertir le fichier en UTF-8
         await execAsync(`iconv -f ${sourceEncoding} -t UTF-8 "${filepath}" > "${tempFile}"`);
-        
+
         // Remplacer le fichier original
         await fs.move(tempFile, filepath, { overwrite: true });
         console.log(`  ✓ Conversion réussie`);
@@ -77,7 +77,7 @@ async function checkAndConvertToUTF8(filepath) {
         } catch (err2) {
           console.error(`  ✗ Impossible de convertir le fichier, il sera utilisé tel quel`);
           // Nettoyer le fichier temporaire s'il existe
-          await fs.remove(tempFile).catch(() => {});
+          await fs.remove(tempFile).catch(() => { });
         }
       }
     }
@@ -87,9 +87,9 @@ async function checkAndConvertToUTF8(filepath) {
 }
 
 async function downloadFile(filename) {
-  const url = `${BASE_URL}?fichier=${filename}`;
+  const url = `${BASE_URL}${filename}`;
   const filepath = path.join(DATA_DIR, filename);
-  
+
   try {
     console.log(`Téléchargement de ${filename}...`);
     const response = await axios({
@@ -101,19 +101,19 @@ async function downloadFile(filename) {
       },
       timeout: 30000
     });
-    
+
     await fs.ensureDir(DATA_DIR);
     const writer = fs.createWriteStream(filepath);
     response.data.pipe(writer);
-    
+
     await new Promise((resolve, reject) => {
       writer.on('finish', resolve);
       writer.on('error', reject);
     });
-    
+
     // Vérifier et convertir en UTF-8 si nécessaire
     await checkAndConvertToUTF8(filepath);
-    
+
   } catch (error) {
     console.error(`Erreur téléchargement ${filename}:`, error.message);
     throw error;
@@ -122,7 +122,7 @@ async function downloadFile(filename) {
 
 async function isFileOlderThan24Hours(filepath, filename) {
   const metadata = await loadMetadata();
-  
+
   // Vérifier d'abord dans les métadonnées
   if (metadata[filename] && metadata[filename].downloadedAt) {
     const downloadTime = new Date(metadata[filename].downloadedAt);
@@ -130,7 +130,7 @@ async function isFileOlderThan24Hours(filepath, filename) {
     const diffHours = (now - downloadTime) / (1000 * 60 * 60);
     return diffHours > 24;
   }
-  
+
   // Si pas de métadonnées, vérifier le fichier physique
   try {
     const stats = fs.statSync(filepath);
@@ -147,15 +147,15 @@ async function downloadDataIfNeeded() {
   await fs.ensureDir(DATA_DIR);
   let metadata = await loadMetadata();
   let metadataUpdated = false;
-  
+
   for (const filename of FILES) {
     const filepath = path.join(DATA_DIR, filename);
-    
+
     if (!fs.existsSync(filepath) || await isFileOlderThan24Hours(filepath, filename)) {
       try {
         await downloadFile(filename);
         console.log(`✓ ${filename} téléchargé`);
-        
+
         // Mettre à jour les métadonnées
         metadata[filename] = {
           downloadedAt: new Date().toISOString(),
@@ -174,7 +174,7 @@ async function downloadDataIfNeeded() {
       }
     } else {
       console.log(`✓ ${filename} à jour`);
-      
+
       // S'assurer que les métadonnées existent
       if (!metadata[filename]) {
         // Première fois qu'on voit ce fichier, vérifier l'encodage
@@ -194,7 +194,7 @@ async function downloadDataIfNeeded() {
       // Si les métadonnées existent et l'encodage est UTF-8, on ne fait rien
     }
   }
-  
+
   // Sauvegarder les métadonnées si nécessaire
   if (metadataUpdated) {
     await saveMetadata(metadata);
