@@ -89,6 +89,20 @@ curl http://localhost:8080/api/health
 
 - Le conteneur clone automatiquement la dernière version du repository depuis GitHub
 - L'application se met à jour automatiquement au redémarrage du conteneur
+## Documentation
+
+- **[API Reference (Markdown)](API_REFERENCE.md)**
+- **Swagger UI**: `http://localhost:3000/api-docs`
+- **OpenAPI Spec**: `http://localhost:3000/api-docs.json`
+
+## Fonctionnalités Clés
+- **Recherche avancée** avec wildcards (`*`, `?`).
+- **Informations de sécurité** et alertes ANSM.
+- **Recherche par substance** active.
+- **Mise à jour automatique** des données toutes les 24h.
+- **Performance** élevée (données en mémoire).
+
+## Installation
 - Aucune installation locale de Node.js n'est requise
 
 ## Développement local

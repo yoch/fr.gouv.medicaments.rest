@@ -18,7 +18,8 @@ const FILES = [
   'CIS_GENER_bdpm.txt',
   'CIS_CPD_bdpm.txt',
   'CIS_CIP_Dispo_Spec.txt',
-  'CIS_MITM.txt'
+  'CIS_MITM.txt',
+  'CIS_InfoImportantes_bdpm.txt'
 ];
 
 async function loadMetadata() {
@@ -143,11 +144,13 @@ async function isFileOlderThan24Hours(filepath, filename) {
   }
 }
 
+
 async function downloadDataIfNeeded() {
   await fs.ensureDir(DATA_DIR);
   let metadata = await loadMetadata();
   let metadataUpdated = false;
 
+  // Download static files
   for (const filename of FILES) {
     const filepath = path.join(DATA_DIR, filename);
 

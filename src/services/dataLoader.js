@@ -13,6 +13,8 @@ let dataCache = {
   generiques: [],
   conditions: [],
   ruptures: [],
+  infos: [],
+  substances: [],
   mitm: [],
   metadata: {
     last_updated: null,
@@ -22,12 +24,12 @@ let dataCache = {
 
 function parseFile(filename, columns) {
   const filepath = path.join(DATA_DIR, filename);
-  
+
   if (!fs.existsSync(filepath)) {
     console.warn(`Fichier ${filename} non trouvé`);
     return [];
   }
-  
+
   try {
     // Tous les fichiers sont maintenant en UTF-8
     const content = fs.readFileSync(filepath, { encoding: 'utf8' });
@@ -41,32 +43,32 @@ function parseFile(filename, columns) {
       relax_quotes: true,
       relax_column_count: true
     });
-    
+
     return records;
   } catch (error) {
     console.error(`Erreur parsing ${filename}:`, error.message);
     console.warn(`Tentative de parsing ligne par ligne pour ${filename}...`);
-    
+
     try {
       // Tous les fichiers sont maintenant en UTF-8
       const content = fs.readFileSync(filepath, { encoding: 'utf8' });
       const lines = content.split('\n');
       const records = [];
-      
+
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line) continue;
-        
+
         const values = line.split('\t');
         const record = {};
-        
+
         for (let j = 0; j < columns.length && j < values.length; j++) {
           record[columns[j]] = values[j] || '';
         }
-        
+
         records.push(record);
       }
-      
+
       console.log(`✓ Parsing ligne par ligne réussi pour ${filename}: ${records.length} entrées`);
       return records;
     } catch (fallbackError) {
@@ -114,8 +116,9 @@ async function loadData() {
     'agrement_collectivite',
     'taux_remboursement',
     'prix_medicament',
-    'prix_honoraires',
-    'autre'
+    'prix_public',
+    'honoraires',
+    'indications'
   ]);
 
   console.log('Chargement des compositions...');
@@ -144,11 +147,10 @@ async function loadData() {
   dataCache.avis_asmr = parseFile('CIS_HAS_ASMR_bdpm.txt', [
     'cis',
     'has_dossier',
-    'motif_evaluation', 
+    'motif_evaluation',
     'date_avis',
     'valeur_asmr',
-    'libelle_asmr',
-    'commentaire'
+    'libelle_asmr'
   ]);
 
   console.log('Chargement des groupes génériques...');
@@ -169,36 +171,60 @@ async function loadData() {
   console.log('Chargement des ruptures...');
   dataCache.ruptures = parseFile('CIS_CIP_Dispo_Spec.txt', [
     'cis',
-    'cip7',
-    'libelle',
-    'classement_remboursement',
-    'etat_commercialisation',
+    'cip13',
+    'code_statut',
+    'libelle_statut',
     'date_debut',
-    'date_fin',
-    'type_etat',
-    'motif'
+    'date_mise_a_jour',
+    'date_remise_dispo',
+    'lien_ansm'
   ]);
 
   console.log('Chargement MITM...');
   dataCache.mitm = parseFile('CIS_MITM.txt', [
     'cis',
+    'code_atc',
     'denomination',
-    'date_debut',
-    'date_fin'
+    'lien_fi'
   ]);
+
+  console.log('Chargement des informations importantes...');
+  dataCache.infos = parseFile('CIS_InfoImportantes_bdpm.txt', [
+    'cis',
+    'date_debut',
+    'date_fin',
+    'texte_affichage'
+  ]);
+
+  console.log('Génération de l\'index des substances...');
+  const substancesMap = new Map();
+  dataCache.compositions.forEach(comp => {
+    if (comp.code_substance && comp.denomination_substance) {
+      if (!substancesMap.has(comp.code_substance)) {
+        substancesMap.set(comp.code_substance, {
+          code: comp.code_substance,
+          denomination: comp.denomination_substance,
+          medicaments_count: 0
+        });
+      }
+      substancesMap.get(comp.code_substance).medicaments_count++;
+    }
+  });
+  dataCache.substances = Array.from(substancesMap.values());
+  console.log(`Substances indexées: ${dataCache.substances.length}`);
 
   console.log(`Données chargées: ${dataCache.specialites.length} spécialités`);
 }
 
 function searchInData(dataset, query, fields) {
   if (!query) return dataset;
-  
+
   const searchTerm = query.toLowerCase();
   const wildcardRegex = new RegExp(
-    searchTerm.replace(/\*/g, '.*').replace(/\?/g, '.'), 
+    searchTerm.replace(/\*/g, '.*').replace(/\?/g, '.'),
     'i'
   );
-  
+
   return dataset.filter(item => {
     return fields.some(field => {
       const value = item[field];
@@ -216,9 +242,9 @@ function getMetadata() {
   return dataCache.metadata;
 }
 
-module.exports = { 
-  loadData, 
-  getData, 
+module.exports = {
+  loadData,
+  getData,
   searchInData,
   getMetadata
 };
