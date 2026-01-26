@@ -89,6 +89,17 @@ const options = {
                         numero_ordre: { type: 'string' }
                     }
                 },
+                GroupeGeneriqueDetail: {
+                    type: 'object',
+                    properties: {
+                        id_groupe: { type: 'string' },
+                        libelle_groupe: { type: 'string' },
+                        items: {
+                            type: 'array',
+                            items: { $ref: '#/components/schemas/GroupeGenerique' }
+                        }
+                    }
+                },
                 Condition: {
                     type: 'object',
                     properties: {

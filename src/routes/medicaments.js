@@ -115,6 +115,8 @@ router.get('/specialites', (req, res) => {
  *                       type: array
  *                       items:
  *                         $ref: '#/components/schemas/Composition'
+ *                     generiques:
+ *                       $ref: '#/components/schemas/GroupeGeneriqueDetail'
  *       404:
  *         description: Spécialité non trouvée
  */
@@ -134,6 +136,19 @@ router.get('/specialites/:cis', (req, res) => {
   const avis_asmr = getData('avis_asmr').filter(a => a.cis === cis);
   const conditions = getData('conditions').filter(c => c.cis === cis);
 
+  // Enrichir avec le groupe générique et tous ses membres
+  const drugGeneriques = getData('generiques').filter(g => g.cis === cis);
+  let generiques = null;
+  if (drugGeneriques.length > 0) {
+    const id_groupe = drugGeneriques[0].id_groupe;
+    const items = getData('generiques').filter(g => g.id_groupe === id_groupe);
+    generiques = {
+      id_groupe,
+      libelle_groupe: drugGeneriques[0].libelle_groupe,
+      items
+    };
+  }
+
   const metadata = getMetadata();
   sendResponse(res, {
     ...specialite,
@@ -142,6 +157,7 @@ router.get('/specialites/:cis', (req, res) => {
     avis_smr,
     avis_asmr,
     conditions,
+    generiques,
     metadata: {
       last_updated: metadata.last_updated,
       source: metadata.source
