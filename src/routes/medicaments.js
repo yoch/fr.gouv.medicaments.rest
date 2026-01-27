@@ -1,5 +1,5 @@
 const express = require('express');
-const { getData, searchInData, getMetadata } = require('../services/dataLoader');
+const { getData, search, getMetadata } = require('../services/dataLoader');
 
 const router = express.Router();
 
@@ -77,7 +77,7 @@ router.get('/specialites', (req, res) => {
   let data = getData('specialites');
 
   if (q) {
-    data = searchInData(data, q, ['denomination', 'forme_pharma', 'titulaire']);
+    data = search('specialites', q);
   }
 
   sendResponse(res, paginate(data, page, limit), pretty);
@@ -207,7 +207,7 @@ router.get('/presentations', (req, res) => {
   let data = getData('presentations');
 
   if (q) {
-    data = searchInData(data, q, ['libelle', 'cip7', 'cip13']);
+    data = search('presentations', q);
   }
 
   sendResponse(res, paginate(data, page, limit), pretty);
@@ -255,7 +255,7 @@ router.get('/compositions', (req, res) => {
   let data = getData('compositions');
 
   if (q) {
-    data = searchInData(data, q, ['denomination_substance', 'dosage']);
+    data = search('compositions', q);
   }
 
   sendResponse(res, paginate(data, page, limit), pretty);
@@ -303,7 +303,7 @@ router.get('/avis-smr', (req, res) => {
   let data = getData('avis_smr');
 
   if (q) {
-    data = searchInData(data, q, ['valeur_smr', 'libelle_smr']);
+    data = search('avis_smr', q);
   }
 
   sendResponse(res, paginate(data, page, limit), pretty);
@@ -351,7 +351,7 @@ router.get('/avis-asmr', (req, res) => {
   let data = getData('avis_asmr');
 
   if (q) {
-    data = searchInData(data, q, ['valeur_asmr', 'libelle_asmr']);
+    data = search('avis_asmr', q);
   }
 
   sendResponse(res, paginate(data, page, limit), pretty);
@@ -399,7 +399,7 @@ router.get('/groupes-generiques', (req, res) => {
   let data = getData('generiques');
 
   if (q) {
-    data = searchInData(data, q, ['libelle_groupe']);
+    data = search('generiques', q);
   }
 
   sendResponse(res, paginate(data, page, limit), pretty);
@@ -447,7 +447,7 @@ router.get('/conditions', (req, res) => {
   let data = getData('conditions');
 
   if (q) {
-    data = searchInData(data, q, ['condition']);
+    data = search('conditions', q);
   }
 
   sendResponse(res, paginate(data, page, limit), pretty);
@@ -495,7 +495,7 @@ router.get('/disponibilite', (req, res) => {
   let data = getData('ruptures');
 
   if (q) {
-    data = searchInData(data, q, ['libelle_statut']);
+    data = search('ruptures', q);
   }
 
   sendResponse(res, paginate(data, page, limit), pretty);
@@ -543,7 +543,7 @@ router.get('/interet-therapeutique-majeur', (req, res) => {
   let data = getData('mitm');
 
   if (q) {
-    data = searchInData(data, q, ['denomination']);
+    data = search('mitm', q);
   }
 
   sendResponse(res, paginate(data, page, limit), pretty);
@@ -575,7 +575,7 @@ router.get('/substances', (req, res) => {
   let data = getData('substances');
 
   if (q) {
-    data = searchInData(data, q, ['denomination']);
+    data = search('substances', q);
   }
 
   sendResponse(res, paginate(data, page, limit), pretty);
@@ -607,7 +607,7 @@ router.get('/infos-importantes', (req, res) => {
   let data = getData('infos');
 
   if (q) {
-    data = searchInData(data, q, ['texte_affichage']);
+    data = search('infos', q);
   }
 
   sendResponse(res, paginate(data, page, limit), pretty);
@@ -653,9 +653,9 @@ router.get('/search', (req, res) => {
     return res.status(400).json({ error: 'Paramètre de recherche "q" requis' });
   }
 
-  const specialites = searchInData(getData('specialites'), q, ['denomination', 'forme_pharma', 'titulaire']);
-  const presentations = searchInData(getData('presentations'), q, ['libelle']);
-  const compositions = searchInData(getData('compositions'), q, ['denomination_substance']);
+  const specialites = search('specialites', q);
+  const presentations = search('presentations', q);
+  const compositions = search('compositions', q);
 
   const results = [
     ...specialites.map(item => ({ ...item, type: 'specialite' })),
