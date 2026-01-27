@@ -1,17 +1,41 @@
+61200510		1	Rupture de stock	22/10/2025	26/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/tetracaine-1-thea-collyre-en-solution-en-recipient-unidose-chlorhydrate-de-tetracaine
+60990496		1	Rupture de stock	26/01/2026	26/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/ogivri-150-mg-poudre-pour-solution-a-diluer-pour-perfusion-trastuzumab
+60284142		2	Tension d'approvisionnement	13/08/2025	26/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/piperacilline-panpharma-4-g-poudre-pour-solution-injectable-i-m-i-v-piperacilline-sodique
+67475965		1	Rupture de stock	29/12/2025	23/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/locametz-25-microgrammes-trousse-pour-preparation-radiopharmaceutique-gozetotide
+61951090		2	Tension d'approvisionnement	09/01/2026	23/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/emend-125-mg-poudre-pour-suspension-buvable-aprepitant
+65952065		2	Tension d'approvisionnement	06/01/2026	23/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/rovamycine-1-5-millions-ui-lyophilisat-pour-usage-parenteral-spiramycine
+65012445		2	Tension d'approvisionnement	14/01/2026	23/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/ketoprofene-pharmy-ii-100-mg-2-ml-solution-injectable-intramusculaire-i-m-ketoprofene
+66631817		2	Tension d'approvisionnement	12/01/2026	22/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/lepticur-10-mg-comprime-tropatepine-chlorhydrate-de
+67122698		2	Tension d'approvisionnement	27/11/2025	22/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
+63003440		2	Tension d'approvisionnement	27/11/2025	22/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
+67954061		2	Tension d'approvisionnement	27/11/2025	22/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
+63003440		2	Tension d'approvisionnement	27/11/2025	22/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
+67954061		2	Tension d'approvisionnement	27/11/2025	22/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
+66415335		2	Tension d'approvisionnement	27/11/2025	22/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
+66415335		2	Tension d'approvisionnement	27/11/2025	22/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
+67122698		2	Tension d'approvisionnement	27/11/2025	22/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
+65135519		2	Tension d'approvisionnement	27/11/2025	22/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
+65135519		2	Tension d'approvisionnement	27/11/2025	22/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
+65676987		4	Remise à disposition	22/01/2026	22/01/2026	22/01/2026	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/largactil-25-mg-comprime-pellicule-chlorpromazine-chlorhydrate-de
+68572748		4	Remise à disposition	16/01/2026	21/01/2026	16/01/2026	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/persantine-10-mg-2-ml-solution-injectable-ampoule-dipyridamole
+62991472		2	Tension d'approvisionnement	08/07/2025	20/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/fluvoxamine-100-mg-comprime-pellicule-secable-fluvoxamine-maleate-de
 62110699		2	Tension d'approvisionnement	07/01/2026	19/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/lyrica-20-mg-ml-solution-buvable-pregabaline
+66287152		4	Remise à disposition	12/01/2026	19/01/2026	12/01/2026	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/champix-0-5-mg-et-1-mg-comprime-pellicule-varenicline-tartrate-de
+64208131		2	Tension d'approvisionnement	21/03/2024	19/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/rifater-comprime-enrobe-isoniazide-pyrazinamid-rifampicine
+67876901		2	Tension d'approvisionnement	21/03/2024	19/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/rifadine-300-mg-gelule-rifampicine
 67613291		2	Tension d'approvisionnement	01/10/2025	16/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/izalgi-500-mg-25-mg-gelule-opium-poudre-d-paracetamol
+69959452		4	Remise à disposition	16/01/2026	16/01/2026	16/01/2026	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/laroscorbine-1-g-5-ml-solution-injectable-i-v-en-ampoule-acide-ascorbique
+63775634		2	Tension d'approvisionnement	27/05/2025	16/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/bendamustine-hikma-2-5-mg-ml-poudre-pour-solution-a-diluer-pour-perfusion-bendamustine-chlorhydrate-de-monohydrate
+69622218		1	Rupture de stock	13/01/2026	15/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/holoxan-1000-mg-poudre-pour-solution-injectable-et-2000-mg-poudre-pour-usage-parenteral-ifosfamide
+61848140		1	Rupture de stock	13/01/2026	15/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/holoxan-1000-mg-poudre-pour-solution-injectable-et-2000-mg-poudre-pour-usage-parenteral-ifosfamide
+67619892		2	Tension d'approvisionnement	02/10/2024	15/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/repevax-suspension-injectable-en-seringue-preremplie-vaccin-diphterique-tetanique-coquelucheux-acellulaire-multicompose-et-poliomyelitique-inactive-adsorbe-a-teneur-reduite-en-antigene-s-1
+62404793		4	Remise à disposition	31/12/2025	15/01/2026	31/12/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/boostrixtetra-suspension-injectable-en-seringue-preremplie-vaccin-diphterique-tetanique-coquelucheux-acellulaire-multicompose-et-poliomyelitique-inactive-adsorbe-a-teneur-reduite-en-antigenes-1
+68065346		2	Tension d'approvisionnement	12/11/2025	14/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylphenidate-eg-lp-18-mg-et-36-mg-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
+68501345		2	Tension d'approvisionnement	12/11/2025	14/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylphenidate-eg-lp-18-mg-et-36-mg-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
+65013629		2	Tension d'approvisionnement	12/11/2025	14/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylphenidate-eg-lp-18-mg-et-36-mg-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
+63908675		2	Tension d'approvisionnement	30/09/2025	14/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/xenpozyme-20-mg-poudre-pour-solution-a-diluer-pour-perfusion-olipudase-alfa
 63918096		1	Rupture de stock	04/04/2024	12/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/azactam-1-g-poudre-et-solution-pour-usage-parenteral-aztreonam
 68578562		1	Rupture de stock	02/01/2026	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/un-alfa-1-microgramme-0-5-ml-solution-injectable-iv-en-ampoule-alfacalcidol
-67122698		2	Tension d'approvisionnement	27/11/2025	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
-63003440		2	Tension d'approvisionnement	27/11/2025	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
-67954061		2	Tension d'approvisionnement	27/11/2025	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
-63003440		2	Tension d'approvisionnement	27/11/2025	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
-67954061		2	Tension d'approvisionnement	27/11/2025	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
-66415335		2	Tension d'approvisionnement	27/11/2025	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
-66415335		2	Tension d'approvisionnement	27/11/2025	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
-67122698		2	Tension d'approvisionnement	27/11/2025	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
-65135519		2	Tension d'approvisionnement	27/11/2025	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
-65135519		2	Tension d'approvisionnement	27/11/2025	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-propranolol-40-mg-comprime-chlorhydrate-de-propranolol
 69379595		2	Tension d'approvisionnement	08/06/2023	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylphenidate-viatris-lp-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
 68296221		2	Tension d'approvisionnement	08/06/2023	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylphenidate-viatris-lp-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
 67844330		2	Tension d'approvisionnement	08/06/2023	09/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylphenidate-viatris-lp-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
@@ -60,7 +84,7 @@
 63930084		2	tension d'approvisionnement	09/06/2022	29/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/concerta-lp-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
 60756917		2	tension d'approvisionnement	09/06/2022	29/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/concerta-lp-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
 60047182		2	tension d'approvisionnement	09/06/2022	29/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/concerta-lp-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
-62816804		2	Tension d'approvisionnement	02/10/2025	29/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/largactil-100-mg-comprime-pellicule-secable-chlorpromazine-chlorhydrate-de
+62816804		4	Remise à disposition	22/01/2026	22/01/2026	22/01/2026	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/largactil-100-mg-comprime-pellicule-secable-chlorpromazine-chlorhydrate-de
 64174946		1	Rupture de stock	23/07/2025	24/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/lenalidomide-mylan-gelule-lenalidomide
 69436263		1	Rupture de stock	23/07/2025	24/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/lenalidomide-mylan-gelule-lenalidomide
 60401186		1	Rupture de stock	23/07/2025	24/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/lenalidomide-mylan-gelule-lenalidomide
@@ -107,9 +131,7 @@
 68496649		2	Tension d'approvisionnement	12/12/2023	19/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/quasym-l-p-gelule-a-liberation-modifiee-methylphenidate
 64588580		2	Tension d'approvisionnement	12/12/2023	19/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/quasym-l-p-gelule-a-liberation-modifiee-methylphenidate
 63814140		2	Tension d'approvisionnement	12/12/2023	19/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/quasym-l-p-gelule-a-liberation-modifiee-methylphenidate
-69622218		1	Rupture de stock	13/01/2026	15/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/holoxan-1000-mg-poudre-pour-solution-injectable-et-2000-mg-poudre-pour-usage-parenteral-ifosfamide
 62582326		2	Tension d'approvisionnement	08/08/2025	18/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/depo-prodasone-500-mg-suspension-injectable-medroxyprogesterone
-61848140		1	Rupture de stock	13/01/2026	15/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/holoxan-1000-mg-poudre-pour-solution-injectable-et-2000-mg-poudre-pour-usage-parenteral-ifosfamide
 62018628		2	Tension d'approvisionnement	21/10/2025	17/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/tildiem-25-mg-poudre-et-solution-pour-preparation-injectable-i-v-diltiazem-chlorhydrate-de
 68973004		3	Arrêt de commercialisation	30/06/2025	17/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/vitamine-a-dulcis-25-000-u-i-pour-100-g-pommade-ophtalmique-concentrat-de-vitamine-a-synthetique-forme-huileuse
 65991171		2	Tension d'approvisionnement	01/12/2023	17/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/zophren-2-mg-ml-solution-injectable-en-ampoule-iv-ondansetron
@@ -178,7 +200,6 @@
 61181266		2	Tension d'approvisionnement	01/04/2021	08/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/immunoglobuline-humaine-normale-iv-et-sc-a-base-de-immunoglobuline-humaine-normale-igg
 60730566		2	Tension d'approvisionnement	01/04/2021	08/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/immunoglobuline-humaine-normale-iv-et-sc-a-base-de-immunoglobuline-humaine-normale-igg
 60616687		2	Tension d'approvisionnement	01/04/2021	08/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/immunoglobuline-humaine-normale-iv-et-sc-a-base-de-immunoglobuline-humaine-normale-igg
-66287152		4	Remise à disposition	12/01/2026	19/01/2026	12/01/2026	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/champix-0-5-mg-et-1-mg-comprime-pellicule-varenicline-tartrate-de
 62124478		2	Tension d'approvisionnement	17/09/2025	08/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/teralithe-250-mg-comprime-secable-lithium-carbonate-de
 69235342		4	Remise à disposition	01/11/2025	08/12/2025	01/11/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/anafranil-25-mg-comprime-enrobe-clomipramine-chlorhydrate-de
 69497711		2	Tension d'approvisionnement	20/10/2025	05/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/fluoresceine-faure-0-5-collyre-en-solution-en-recipient-unidose-fluoresceine-sodique
@@ -202,12 +223,11 @@
 64366900		2	Tension d'approvisionnement	04/07/2025	04/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/fiasp-pumpcart-100-unites-ml-solution-injectable-en-cartouche-insuline-asparte-levure-saccharomyces-cerevisiae
 62119207		1	Rupture de stock	25/11/2025	02/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/befizal-l-p-400-mg-comprime-enrobe-a-liberation-prolongee-bezafibrate
 63898512		2	Tension d'approvisionnement	15/02/2024	02/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/rifinah-300-mg-150-mg-comprime-enrobe-isoniazid-rifampicine
-64208131		2	Tension d'approvisionnement	21/03/2024	19/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/rifater-comprime-enrobe-isoniazide-pyrazinamid-rifampicine
 62436200		1	Rupture de stock	01/10/2025	01/12/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/dilantin-250-mg-5-ml-solution-injectable-phenytoine-sodique
 60423791		4	Remise à disposition	01/12/2025	01/12/2025	01/12/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/vitamine-b12-delagrange-1000-microgrammes-2-ml-solution-injectable-im-et-buvable-cyanocobalamine
 65919229		2	Tension d'approvisionnement	24/11/2025	28/11/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/cufence-200-mg-gelule-trientine-dichlorhydrate-de
 67313123		1	Rupture de stock	13/10/2025	28/11/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/neosynephrine-10-faure-collyre-en-recipient-unidose-phenylephrine
-64506829		1	Rupture de stock	03/07/2025	28/11/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/tercian-50-mg-5-ml-solution-injectable-en-ampoule-cyamemazine
+64506829		4	Remise à disposition	26/01/2026	26/01/2026	26/01/2026	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/tercian-50-mg-5-ml-solution-injectable-en-ampoule-cyamemazine
 61846627		4	Remise à disposition	28/11/2025	28/11/2025	28/11/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/epipen-solution-injectable-en-stylo-pre-rempli-adrenaline
 68293517		4	Remise à disposition	28/11/2025	28/11/2025	28/11/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/epipen-solution-injectable-en-stylo-pre-rempli-adrenaline
 61396361		1	Rupture de stock	17/08/2020	28/11/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/octim-150-microgrammes-dose-solution-pour-pulverisation-nasale-acetate-de-desmopressine-trihydrate
@@ -216,7 +236,6 @@
 62148415		4	Remise à disposition	26/11/2025	27/11/2025	26/11/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/ritonavir-arrow-100-mg-comprime-pellicule-ritonavir
 68501338		1	Rupture de stock	26/11/2025	26/11/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/fivasa-400-mg-comprime-enrobe-gastroresistant-mesalazine
 62416105		1	Rupture de stock	02/10/2024	26/11/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/tranxene-20-mg-2-ml-lyophilisat-et-solution-pour-usage-parenteral-clorazepate-dipotassique
-67876901		2	Tension d'approvisionnement	21/03/2024	19/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/rifadine-300-mg-gelule-rifampicine
 63096551		4	Remise à disposition	01/11/2025	26/11/2025	01/11/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/rifadine-iv-600-mg-poudre-et-solvant-pour-solution-pour-perfusion-rifampicine
 63828371		2	Tension d'approvisionnement	28/02/2024	24/11/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/rifamycine-chibret-1000-000-ui-pour-cent-collyre-en-solution-rifamycine-sodique
 65618215		1	Rupture de stock	24/09/2025	21/11/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/risperidone-4-mg-comprime-orodispersible-risperidone
@@ -248,9 +267,6 @@
 60616445		4	Remise à disposition	14/11/2025	14/11/2025	14/11/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/diprivan-10-mg-ml-emulsion-injectable-en-seringue-pre-remplie-propofol
 62010414		4	Remise à disposition	14/11/2025	14/11/2025	14/11/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/diprivan-20-mg-ml-emulsion-injectable-en-seringue-pre-remplie-propofol
 67448384		1	Rupture de stock	04/11/2025	13/11/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/megace-160-mg-comprime-megestrol-acetate-de
-68065346		2	Tension d'approvisionnement	12/11/2025	14/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylphenidate-eg-lp-18-mg-et-36-mg-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
-68501345		2	Tension d'approvisionnement	12/11/2025	14/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylphenidate-eg-lp-18-mg-et-36-mg-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
-65013629		2	Tension d'approvisionnement	12/11/2025	14/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylphenidate-eg-lp-18-mg-et-36-mg-comprime-a-liberation-prolongee-methylphenidate-chlorhydrate-de
 69512405		1	Rupture de stock	03/07/2025	10/11/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/tolvaptan-biogaran-15-mg-comprime-tolvaptan-biogaran-45-mg-comprime-tolvaptan
 67178992		4	Remise à disposition	05/11/2025	07/11/2025	05/11/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/phesgo-1200-mg-600-mg-solution-injectable-pertuzumab-trastuzumab
 60998977		3	Arrêt de commercialisation	30/09/2025	07/11/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/tildiem-100-mg-poudre-pour-solution-injectable-iv-diltiazem-chlorhydrate-de
@@ -295,7 +311,6 @@
 61904023		4	Remise à disposition	31/10/2025	31/10/2025	31/10/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/clarithromycine-250-et-500-mg-comprime-pellicule-a-liberation-modifiee-et-comprime-pellicule-clarithromycine
 64762878	3400958086175	4	Remise à disposition	30/10/2025	30/10/2025	30/10/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/cytarabine-sandoz-100-mg-ml-solution-injectable-1-flacon-s-en-verre-de-50-ml-cytarabine
 60565723		2	Tension d'approvisionnement	08/07/2025	30/10/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/tobi-podhaler-28-mg-poudre-pour-inhalation-en-gelule-tobramycine
-69959452		4	Remise à disposition	16/01/2026	16/01/2026	16/01/2026	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/laroscorbine-1-g-5-ml-solution-injectable-i-v-en-ampoule-acide-ascorbique
 67292476		2	Tension d'approvisionnement	14/02/2025	29/10/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/teralithe-lp-400-mg-comprime-secable-a-liberation-prolongee-lithium-carbonate-de
 65195181		4	remise à disposition	29/10/2025	29/10/2025	29/10/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylprednisolone-hikma-40-mg-poudre-pour-solution-injectable-methylprednisolone-hydrogenosuccinate-sodique-de
 62190115		2	Tension d'approvisionnement	26/06/2025	28/10/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylprednisolone-hikma-500-mg-poudre-pour-solution-injectable-methylprednisolone-hydrogenosuccinate-sodique-de
@@ -336,9 +351,6 @@
 69481664		4	Remise à disposition	20/10/2025	20/10/2025	20/10/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialite-a-base-demtricitabine-tenofovir-disoproxil-200-mg-245-mg-comprime-pellicule-emtricitabine-tenofovir-disoproxil
 69543888		4	Remise à disposition	20/10/2025	20/10/2025	20/10/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialite-a-base-demtricitabine-tenofovir-disoproxil-200-mg-245-mg-comprime-pellicule-emtricitabine-tenofovir-disoproxil
 69990800		2	Tension d'approvisionnement	03/10/2025	17/10/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/combantrin-125-mg-comprime-pyrantel-embonate-de-1
-63908675		2	Tension d'approvisionnement	30/09/2025	14/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/xenpozyme-20-mg-poudre-pour-solution-a-diluer-pour-perfusion-olipudase-alfa
-68572748		2	Tension d'approvisionnement	26/08/2025	15/10/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/persantine-10-mg-2-ml-solution-injectable-ampoule-dipyridamole
-65676987		2	Tension d'approvisionnement	02/10/2025	13/10/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/largactil-25-mg-comprime-pellicule-chlorpromazine-chlorhydrate-de
 65207541	3400955073802	4	Remise à disposition	13/10/2025	13/10/2025	13/10/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/eskesia-5-mg-ml-solution-injectable-pour-perfusion-10-ampoule-s-en-verre-de-5-ml-esketamine-chlorhydrate-d
 64984843	3400930012284	2	Tension d'approvisionnement	13/10/2023	08/10/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/eurobiol-40-000-u-gelule-gastro-resistante-poudre-de-pancreas
 67134227		4	Remise à disposition	06/10/2025	06/10/2025	06/10/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/pegasys-90-microgrammes-135-microgrammes-et-180-microgrammes-solution-injectable-en-seringue-preremplie-peginterferon-alfa-2a
@@ -417,7 +429,7 @@
 60754631		4	Remise à disposition	18/08/2025	19/08/2025	18/08/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/micafungine-viatris-50-mg-poudre-pour-solution-a-diluer-pour-perfusion-micafungine-sodique
 68944294		4	Remise à disposition	14/08/2025	14/08/2025	14/08/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/simulect-20-mg-poudre-et-solvant-pour-solution-injectable-ou-pour-perfusion-basiliximab-mammifere-souris-sp2-o
 60084049		2	Tension d'approvisionnement	11/06/2025	14/08/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/glucagen-kit-1-mg-ml-poudre-et-solvant-pour-solution-injectable-glucagon-chlorhydrate-de
-67672560		2	Tension d'approvisionnement	19/08/2024	13/08/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylprednisolone-hikma-40-mg-poudre-pour-solution-injectable-methylprednisolone-hydrogenosuccinate-sodique-de
+67672560		2	Tension d'approvisionnement	19/08/2024	23/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylprednisolone-viatris-40-mg-poudre-pour-solution-injectable-im-iv-methylprednisolone-hydrogenosuccinate-de
 62964361		4	Remise à disposition	13/08/2025	13/08/2025	13/08/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/moventig-25-mg-comprime-pellicule-naloxegol-oxalate-de
 62119972		4	Remise à disposition	13/08/2025	13/08/2025	13/08/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/moventig-12-5-mg-comprime-pellicule-naloxegol-oxalate-de
 64834509		1	Rupture de stock	03/02/2025	13/08/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylprednisolone-viatris-20-mg-poudre-pour-solution-injectable-im-iv-methylprednisolone-hydrogenosuccinate-de
@@ -440,7 +452,7 @@
 60326538		4	Remise à disposition	11/08/2025	11/08/2025	11/08/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/specialites-a-base-de-levofloxacine-500-mg-en-comprime-pellicule-secable-levofloxacine
 69176399		4	Remise à disposition	08/08/2025	11/08/2025	08/08/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/bosentan-viatris-125-mg-comprime-pellicule-bosentan-monohydrate
 68430688		4	Remise à disposition	08/08/2025	08/08/2025	08/08/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/tadalafil-quiver-20-mg-comprime-pellicule-tadalafil
-61569781		2	Tension d'approvisionnement	05/08/2025	08/08/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylprednisolone-viatris-120-mg-poudre-pour-solution-injectable-im-iv-methylprednisolone-hydrogenosuccinate-de
+61569781		2	Tension d'approvisionnement	05/08/2025	23/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/methylprednisolone-viatris-120-mg-poudre-pour-solution-injectable-im-iv-methylprednisolone-hydrogenosuccinate-de
 62518996		4	Remise à disposition	25/04/2025	07/08/2025	07/08/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/zophren-4-mg-5-ml-sirop-ondansetron
 64755271		1	Rupture de stock	17/02/2023	04/08/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/arsenic-trioxide-accord-1-mg-ml-solution-a-diluer-pour-perfusion-trioxyde-darsenic
 61716295		2	Tension d'approvisionnement	01/08/2025	01/08/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/protexel-50-ui-ml-poudre-et-solvant-pour-solution-injectable-proteine-c-humaine
@@ -492,7 +504,6 @@
 64637807		2	Tension d'approvisionnement	10/03/2021	15/07/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/visudyne-15-mg-poudre-pour-solution-pour-perfusion-verteporfine
 63063487		4	Remise à disposition	10/07/2025	10/07/2025	10/07/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/rythmodan-100-mg-gelule-disopyramide-phosphate-de
 65172663		4	Remise à disposition	01/07/2025	10/07/2025	01/07/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/recarbrio-500-mg-500-mg-250-mg-poudre-pour-solution-pour-perfusion-cilastatine-sodique-imipenem-monohydrate-relebactam-monohydrate
-63775634		2	Tension d'approvisionnement	27/05/2025	16/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/bendamustine-hikma-2-5-mg-ml-poudre-pour-solution-a-diluer-pour-perfusion-bendamustine-chlorhydrate-de-monohydrate
 69260153		4	Remise à disposition	18/06/2025	08/07/2025	18/06/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/isentress-100-mg-granules-pour-suspension-buvable-raltegravir-potassique
 68182431		4	Remise à disposition	02/04/2025	08/07/2025	02/04/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/novomix-50-flexpen-100-unites-ml-suspension-injectable-en-stylo-prerempli-insuline-asparte-isophane-biphasique-levure-saccharomyces-cerevisiae
 62583314		2	Tension d'approvisionnement	03/07/2025	04/07/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/vitamine-a-provepharm-100-000-u-i-2-ml-solution-injectable-i-m-palmitate-de-retinol
@@ -500,8 +511,6 @@
 62278832		2	Tension d'approvisionnement	20/06/2025	03/07/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/novorapid-pumpcart-100-unites-ml-solution-injectable-en-cartouche-insuline-asparte-levure-saccharomyces-cerevisiae
 68106914		2	Tension d'approvisionnement	05/03/2025	02/07/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/dexocol-1-mg-ml-collyre-en-solution-dexamethasone-phosphate-sodique-de
 68693244		4	Remise à disposition	30/06/2025	30/06/2025	30/06/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/diamox-250-mg-comprime-secable-acetazolamide
-67619892		2	Tension d'approvisionnement	02/10/2024	15/01/2026		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/repevax-suspension-injectable-en-seringue-preremplie-vaccin-diphterique-tetanique-coquelucheux-acellulaire-multicompose-et-poliomyelitique-inactive-adsorbe-a-teneur-reduite-en-antigene-s-1
-62404793		4	Remise à disposition	31/12/2025	15/01/2026	31/12/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/boostrixtetra-suspension-injectable-en-seringue-preremplie-vaccin-diphterique-tetanique-coquelucheux-acellulaire-multicompose-et-poliomyelitique-inactive-adsorbe-a-teneur-reduite-en-antigenes-1
 60260166		4	Remise à disposition	26/06/2025	26/06/2025	26/06/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/toxicarb-suspension-buvable-charbon-active
 62149015		1	Rupture de stock	15/02/2024	26/06/2025		https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/ozalin-2-mg-ml-solution-buvable-en-recipient-unidose-midazolam
 65979151		4	Remise à disposition	25/06/2025	25/06/2025	25/06/2025	https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/lantus-solostar-100-unites-ml-solution-injectable-en-stylo-prerempli-insuline-glargine

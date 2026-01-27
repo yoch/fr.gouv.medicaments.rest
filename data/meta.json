@@ -1,51 +1,51 @@
 {
   "CIS_bdpm.txt": {
-    "downloadedAt": "2026-01-26T14:31:43.012Z",
+    "downloadedAt": "2026-01-27T22:52:23.078Z",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_CIP_bdpm.txt": {
-    "downloadedAt": "2026-01-26T14:31:43.466Z",
+    "downloadedAt": "2026-01-27T22:53:05.415Z",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_COMPO_bdpm.txt": {
-    "downloadedAt": "2026-01-26T14:31:44.158Z",
+    "downloadedAt": "2026-01-27T22:53:28.167Z",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_HAS_SMR_bdpm.txt": {
-    "downloadedAt": "2026-01-26T14:31:44.671Z",
+    "downloadedAt": "2026-01-27T22:54:03.708Z",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_HAS_ASMR_bdpm.txt": {
-    "downloadedAt": "2026-01-26T14:31:45.202Z",
+    "downloadedAt": "2026-01-27T22:54:36.437Z",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_GENER_bdpm.txt": {
-    "downloadedAt": "2026-01-26T14:31:45.545Z",
+    "downloadedAt": "2026-01-27T22:54:45.692Z",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_CPD_bdpm.txt": {
-    "downloadedAt": "2026-01-26T14:31:45.749Z",
+    "downloadedAt": "2026-01-27T22:54:56.618Z",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_CIP_Dispo_Spec.txt": {
-    "downloadedAt": "2026-01-26T14:31:45.859Z",
+    "downloadedAt": "2026-01-27T22:54:58.804Z",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_MITM.txt": {
-    "downloadedAt": "2026-01-26T14:31:46.061Z",
+    "downloadedAt": "2026-01-27T22:55:12.155Z",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_InfoImportantes_bdpm.txt": {
-    "downloadedAt": "2026-01-26T15:24:23.221Z",
+    "downloadedAt": "2026-01-27T22:55:12.248Z",
     "source": "remote",
     "encoding": "utf-8"
   }

@@ -23,14 +23,7 @@ function paginate(data, page = 1, limit = 100) {
   };
 }
 
-function sendResponse(res, data, pretty = false) {
-  if (pretty === 'true' || pretty === '1') {
-    res.set('Content-Type', 'application/json; charset=utf-8');
-    res.send(JSON.stringify(data, null, 2));
-  } else {
-    res.json(data);
-  }
-}
+
 
 // GET /api/medicaments/specialites
 /**
@@ -44,7 +37,7 @@ function sendResponse(res, data, pretty = false) {
  *         name: q
  *         schema:
  *           type: string
- *         description: Terme de recherche (supporte * et ?)
+ *         description: Terme de recherche (recherche par début de mot et approximative)
  *       - in: query
  *         name: page
  *         schema:
@@ -73,14 +66,14 @@ function sendResponse(res, data, pretty = false) {
  *                         $ref: '#/components/schemas/Medicament'
  */
 router.get('/specialites', (req, res) => {
-  const { q, page = 1, limit = 100, pretty } = req.query;
+  const { q, page = 1, limit = 100 } = req.query;
   let data = getData('specialites');
 
   if (q) {
     data = search('specialites', q);
   }
 
-  sendResponse(res, paginate(data, page, limit), pretty);
+  res.json(paginate(data, page, limit));
 });
 
 // GET /api/medicaments/specialites/:cis
@@ -122,7 +115,6 @@ router.get('/specialites', (req, res) => {
  */
 router.get('/specialites/:cis', (req, res) => {
   const { cis } = req.params;
-  const { pretty } = req.query;
   const specialite = getData('specialites').find(item => item.cis === cis);
 
   if (!specialite) {
@@ -150,7 +142,7 @@ router.get('/specialites/:cis', (req, res) => {
   }
 
   const metadata = getMetadata();
-  sendResponse(res, {
+  res.json({
     ...specialite,
     presentations,
     compositions,
@@ -162,7 +154,7 @@ router.get('/specialites/:cis', (req, res) => {
       last_updated: metadata.last_updated,
       source: metadata.source
     }
-  }, pretty);
+  });
 });
 
 // GET /api/medicaments/presentations
@@ -203,14 +195,14 @@ router.get('/specialites/:cis', (req, res) => {
  *                         $ref: '#/components/schemas/Presentation'
  */
 router.get('/presentations', (req, res) => {
-  const { q, page = 1, limit = 100, pretty } = req.query;
+  const { q, page = 1, limit = 100 } = req.query;
   let data = getData('presentations');
 
   if (q) {
     data = search('presentations', q);
   }
 
-  sendResponse(res, paginate(data, page, limit), pretty);
+  res.json(paginate(data, page, limit));
 });
 
 // GET /api/medicaments/compositions
@@ -251,14 +243,14 @@ router.get('/presentations', (req, res) => {
  *                         $ref: '#/components/schemas/Composition'
  */
 router.get('/compositions', (req, res) => {
-  const { q, page = 1, limit = 100, pretty } = req.query;
+  const { q, page = 1, limit = 100 } = req.query;
   let data = getData('compositions');
 
   if (q) {
     data = search('compositions', q);
   }
 
-  sendResponse(res, paginate(data, page, limit), pretty);
+  res.json(paginate(data, page, limit));
 });
 
 // GET /api/medicaments/avis-smr
@@ -299,14 +291,14 @@ router.get('/compositions', (req, res) => {
  *                         $ref: '#/components/schemas/AvisSMR'
  */
 router.get('/avis-smr', (req, res) => {
-  const { q, page = 1, limit = 100, pretty } = req.query;
+  const { q, page = 1, limit = 100 } = req.query;
   let data = getData('avis_smr');
 
   if (q) {
     data = search('avis_smr', q);
   }
 
-  sendResponse(res, paginate(data, page, limit), pretty);
+  res.json(paginate(data, page, limit));
 });
 
 // GET /api/medicaments/avis-asmr
@@ -347,14 +339,14 @@ router.get('/avis-smr', (req, res) => {
  *                         $ref: '#/components/schemas/AvisASMR'
  */
 router.get('/avis-asmr', (req, res) => {
-  const { q, page = 1, limit = 100, pretty } = req.query;
+  const { q, page = 1, limit = 100 } = req.query;
   let data = getData('avis_asmr');
 
   if (q) {
     data = search('avis_asmr', q);
   }
 
-  sendResponse(res, paginate(data, page, limit), pretty);
+  res.json(paginate(data, page, limit));
 });
 
 // GET /api/medicaments/groupes-generiques
@@ -395,14 +387,14 @@ router.get('/avis-asmr', (req, res) => {
  *                         $ref: '#/components/schemas/GroupeGenerique'
  */
 router.get('/groupes-generiques', (req, res) => {
-  const { q, page = 1, limit = 100, pretty } = req.query;
+  const { q, page = 1, limit = 100 } = req.query;
   let data = getData('generiques');
 
   if (q) {
     data = search('generiques', q);
   }
 
-  sendResponse(res, paginate(data, page, limit), pretty);
+  res.json(paginate(data, page, limit));
 });
 
 // GET /api/medicaments/conditions
@@ -443,14 +435,14 @@ router.get('/groupes-generiques', (req, res) => {
  *                         $ref: '#/components/schemas/Condition'
  */
 router.get('/conditions', (req, res) => {
-  const { q, page = 1, limit = 100, pretty } = req.query;
+  const { q, page = 1, limit = 100 } = req.query;
   let data = getData('conditions');
 
   if (q) {
     data = search('conditions', q);
   }
 
-  sendResponse(res, paginate(data, page, limit), pretty);
+  res.json(paginate(data, page, limit));
 });
 
 // GET /api/medicaments/disponibilite
@@ -491,14 +483,14 @@ router.get('/conditions', (req, res) => {
  *                         $ref: '#/components/schemas/Disponibilite'
  */
 router.get('/disponibilite', (req, res) => {
-  const { q, page = 1, limit = 100, pretty } = req.query;
+  const { q, page = 1, limit = 100 } = req.query;
   let data = getData('ruptures');
 
   if (q) {
     data = search('ruptures', q);
   }
 
-  sendResponse(res, paginate(data, page, limit), pretty);
+  res.json(paginate(data, page, limit));
 });
 
 // GET /api/medicaments/interet-therapeutique-majeur
@@ -539,14 +531,14 @@ router.get('/disponibilite', (req, res) => {
  *                         $ref: '#/components/schemas/MITM'
  */
 router.get('/interet-therapeutique-majeur', (req, res) => {
-  const { q, page = 1, limit = 100, pretty } = req.query;
+  const { q, page = 1, limit = 100 } = req.query;
   let data = getData('mitm');
 
   if (q) {
     data = search('mitm', q);
   }
 
-  sendResponse(res, paginate(data, page, limit), pretty);
+  res.json(paginate(data, page, limit));
 });
 
 // GET /api/medicaments/substances
@@ -571,14 +563,14 @@ router.get('/interet-therapeutique-majeur', (req, res) => {
  *                 - $ref: '#/components/schemas/ApiResponse'
  */
 router.get('/substances', (req, res) => {
-  const { q, page = 1, limit = 100, pretty } = req.query;
+  const { q, page = 1, limit = 100 } = req.query;
   let data = getData('substances');
 
   if (q) {
     data = search('substances', q);
   }
 
-  sendResponse(res, paginate(data, page, limit), pretty);
+  res.json(paginate(data, page, limit));
 });
 
 // GET /api/medicaments/infos-importantes
@@ -603,14 +595,14 @@ router.get('/substances', (req, res) => {
  *                 - $ref: '#/components/schemas/ApiResponse'
  */
 router.get('/infos-importantes', (req, res) => {
-  const { q, page = 1, limit = 100, pretty } = req.query;
+  const { q, page = 1, limit = 100 } = req.query;
   let data = getData('infos');
 
   if (q) {
     data = search('infos', q);
   }
 
-  sendResponse(res, paginate(data, page, limit), pretty);
+  res.json(paginate(data, page, limit));
 });
 
 // GET /api/medicaments/search - Recherche globale
@@ -647,7 +639,7 @@ router.get('/infos-importantes', (req, res) => {
  *                 - $ref: '#/components/schemas/ApiResponse'
  */
 router.get('/search', (req, res) => {
-  const { q, page = 1, limit = 50, pretty } = req.query;
+  const { q, page = 1, limit = 50 } = req.query;
 
   if (!q) {
     return res.status(400).json({ error: 'Paramètre de recherche "q" requis' });
@@ -663,7 +655,7 @@ router.get('/search', (req, res) => {
     ...compositions.map(item => ({ ...item, type: 'composition' }))
   ];
 
-  sendResponse(res, paginate(results, page, limit), pretty);
+  res.json(paginate(results, page, limit));
 });
 
 module.exports = router;
