@@ -34,10 +34,22 @@ describe('API Medicaments', () => {
             expect(res.body.pagination).toBeDefined();
         });
 
-        it('should filter by query', async () => {
-            const res = await request(app).get('/api/medicaments/specialites?q=doliprane*&limit=1');
+        it('should filter by query (prefix match)', async () => {
+            const res = await request(app).get('/api/medicaments/specialites?q=doli&limit=1');
             expect(res.statusCode).toEqual(200);
             expect(res.body.data[0].denomination).toMatch(/DOLIPRANE/);
+        });
+
+        it('should perform fuzzy search', async () => {
+            const res = await request(app).get('/api/medicaments/specialites?q=dolipranr&limit=1');
+            expect(res.statusCode).toEqual(200);
+            expect(res.body.data[0].denomination).toMatch(/DOLIPRANE/);
+        });
+
+        it('should perform exact numerical match (CIS)', async () => {
+            const res = await request(app).get('/api/medicaments/specialites?q=60234100&limit=1');
+            expect(res.statusCode).toEqual(200);
+            expect(res.body.data[0].cis).toBe('60234100');
         });
     });
 
