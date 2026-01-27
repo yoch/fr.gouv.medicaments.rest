@@ -301,7 +301,7 @@ function search(type, query) {
     // Note: startsWith est très efficace, on l'utilise pour garantir que les résultats pertinents sont en haut
     else if (value.startsWith(normalizedQuery)) priority = 1;
 
-    return { item, score: res.score, priority, length: value.length };
+    return { item, score: res.score, priority };
   });
 
   // Tri: Priorité > Score (si diff significative) > Longueur (plus court = mieux)
@@ -309,11 +309,8 @@ function search(type, query) {
     // 1. Priorité absolue (Exact Match / Starts With)
     if (b.priority !== a.priority) return b.priority - a.priority;
 
-    // 2. Score textuel (seulement si différence significative > 0.2)
-    if (Math.abs(b.score - a.score) > 0.2) return b.score - a.score;
-
-    // 3. Concision (pour départager "Spasfon" vs "Spasfon Lyoc")
-    return a.length - b.length;
+    // 2. Score textuel
+    return b.score - a.score;
   });
 
   return rankedResults.map(r => r.item);
