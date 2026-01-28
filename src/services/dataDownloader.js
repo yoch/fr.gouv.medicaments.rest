@@ -1,13 +1,17 @@
 const axios = require('axios');
+const crypto = require('crypto');
 const fs = require('fs-extra');
 const path = require('path');
+const os = require('os');
 const { exec } = require('child_process');
 const { promisify } = require('util');
+
 const execAsync = promisify(exec);
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const META_FILE = path.join(DATA_DIR, 'meta.json');
 const BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/download/file/';
+const CHECK_INTERVAL_HOURS = 24;
 
 const FILES = [
   'CIS_bdpm.txt',
@@ -87,12 +91,9 @@ async function checkAndConvertToUTF8(filepath) {
   }
 }
 
-async function downloadFile(filename) {
-  const url = `${BASE_URL}${filename}`;
-  const filepath = path.join(DATA_DIR, filename);
-
+async function downloadFile(url, filepath) {
   try {
-    console.log(`Téléchargement de ${filename}...`);
+    console.log(`Téléchargement de ${path.basename(filepath)}...`);
     const response = await axios({
       method: 'GET',
       url: url,
@@ -103,7 +104,9 @@ async function downloadFile(filename) {
       timeout: 30000
     });
 
-    await fs.ensureDir(DATA_DIR);
+    await fs.ensureDir(path.dirname(filepath));
+
+    // 1. Download to file
     const writer = fs.createWriteStream(filepath);
     response.data.pipe(writer);
 
@@ -112,96 +115,109 @@ async function downloadFile(filename) {
       writer.on('error', reject);
     });
 
-    // Vérifier et convertir en UTF-8 si nécessaire
-    await checkAndConvertToUTF8(filepath);
+    // 2. Compute hash from file
+    const hash = crypto.createHash('sha256');
+    const reader = fs.createReadStream(filepath);
+    reader.pipe(hash);
 
+    await new Promise((resolve, reject) => {
+      hash.on('finish', resolve);
+      reader.on('error', reject);
+    });
+
+    return hash.digest('hex');
   } catch (error) {
-    console.error(`Erreur téléchargement ${filename}:`, error.message);
+    console.error(`Erreur téléchargement ${path.basename(filepath)}:`, error.message);
     throw error;
   }
 }
 
-async function isFileOlderThan24Hours(filepath, filename) {
-  const metadata = await loadMetadata();
+function shouldCheckFile(filename, metadata) {
+  const meta = metadata[filename];
+  if (!meta) return true;
 
-  // Vérifier d'abord dans les métadonnées
-  if (metadata[filename] && metadata[filename].downloadedAt) {
-    const downloadTime = new Date(metadata[filename].downloadedAt);
+  // Si on a une date de vérification récente (< 24h), on ne retélécharge pas
+  const lastCheck = meta.checkedAt || meta.downloadedAt;
+  if (lastCheck) {
+    const checkDate = new Date(lastCheck);
     const now = new Date();
-    const diffHours = (now - downloadTime) / (1000 * 60 * 60);
-    return diffHours > 24;
-  }
+    const diffHours = (now - checkDate) / (1000 * 60 * 60);
 
-  // Si pas de métadonnées, vérifier le fichier physique
-  try {
-    const stats = fs.statSync(filepath);
-    const now = new Date();
-    const fileTime = new Date(stats.mtime);
-    const diffHours = (now - fileTime) / (1000 * 60 * 60);
-    return diffHours > 24;
-  } catch (error) {
-    return true; // File doesn't exist, needs download
+    if (diffHours < CHECK_INTERVAL_HOURS) {
+      return false;
+    }
   }
+  return true;
 }
-
 
 async function downloadDataIfNeeded() {
   await fs.ensureDir(DATA_DIR);
   let metadata = await loadMetadata();
-  let metadataUpdated = false;
 
   // Download static files
   for (const filename of FILES) {
-    const filepath = path.join(DATA_DIR, filename);
+    const finalPath = path.join(DATA_DIR, filename);
+    const tempPath = path.join(os.tmpdir(), filename);
+    const url = `${BASE_URL}${filename}`;
 
-    if (!fs.existsSync(filepath) || await isFileOlderThan24Hours(filepath, filename)) {
-      try {
-        await downloadFile(filename);
-        console.log(`✓ ${filename} téléchargé`);
+    // Vérification de la fraîcheur (24h)
+    if (!shouldCheckFile(filename, metadata) && fs.existsSync(finalPath)) {
+      console.log(`✓ ${filename} vérifié récemment (< ${CHECK_INTERVAL_HOURS}h)`);
+      continue;
+    }
 
-        // Mettre à jour les métadonnées
+    // On télécharge toujours pour vérifier si le fichier a changé (le serveur ne donne pas d'ETag fiable)
+    // On télécharge dans un fichier temporaire
+    try {
+      const fileHash = await downloadFile(url, tempPath);
+      const existingHash = metadata[filename]?.hash;
+
+      if (existingHash && fileHash === existingHash && fs.existsSync(finalPath)) {
+        console.log(`✓ ${filename} inchangé (hash identique)`);
+        // On met juste à jour la date de vérification
+        metadata[filename].checkedAt = new Date().toISOString();
+        // On supprime le fichier temporaire
+        await fs.remove(tempPath);
+        await saveMetadata(metadata);
+      } else {
+        if (existingHash) {
+          console.log(`⟳ ${filename} a été mis à jour par le serveur (hash différent)`);
+        } else {
+          console.log(`+ ${filename} nouvelle ressource`);
+        }
+
+        // Le fichier a changé ou est nouveau
+        // 1. Convertir en UTF-8 le fichier temporaire
+        await checkAndConvertToUTF8(tempPath);
+
+        // 2. Déplacer vers la destination finale
+        await fs.move(tempPath, finalPath, { overwrite: true });
+
+        // 3. Mettre à jour les métadonnées
         metadata[filename] = {
           downloadedAt: new Date().toISOString(),
+          checkedAt: new Date().toISOString(),
+          hash: fileHash,
           source: 'remote',
-          encoding: 'utf-8' // Le fichier a été converti lors du téléchargement
+          encoding: 'utf-8'
         };
-        metadataUpdated = true;
-      } catch (error) {
-        console.error(`✗ Échec téléchargement ${filename}:`, error.message);
-        if (!fs.existsSync(filepath)) {
-          console.log(`Le fichier ${filename} n'existe pas localement et le téléchargement a échoué`);
-          console.log(`Le service utilisera les fichiers inclus dans le repository`);
-        } else {
-          console.log(`Utilisation de l'ancienne version de ${filename}`);
-        }
+        await saveMetadata(metadata);
+        console.log(`✓ ${filename} mis à jour et converti`);
       }
-    } else {
-      console.log(`✓ ${filename} à jour`);
+    } catch (error) {
+      console.error(`✗ Échec traitement ${filename}:`, error.message);
+      // Nettoyage
+      await fs.remove(tempPath).catch(() => { });
 
-      // S'assurer que les métadonnées existent
-      if (!metadata[filename]) {
-        // Première fois qu'on voit ce fichier, vérifier l'encodage
-        await checkAndConvertToUTF8(filepath);
-        metadata[filename] = {
-          downloadedAt: new Date(fs.statSync(filepath).mtime).toISOString(),
-          source: 'existing',
-          encoding: 'utf-8' // Après conversion
-        };
-        metadataUpdated = true;
-      } else if (!metadata[filename].encoding || metadata[filename].encoding !== 'utf-8') {
-        // Le fichier existe mais n'a pas été converti en UTF-8
-        await checkAndConvertToUTF8(filepath);
-        metadata[filename].encoding = 'utf-8';
-        metadataUpdated = true;
+      if (!fs.existsSync(finalPath)) {
+        console.log(`Le fichier ${filename} n'existe pas localement et le téléchargement a échoué`);
+      } else {
+        console.log(`Conservation de la version locale de ${filename}`);
       }
-      // Si les métadonnées existent et l'encodage est UTF-8, on ne fait rien
     }
   }
 
-  // Sauvegarder les métadonnées si nécessaire
-  if (metadataUpdated) {
-    await saveMetadata(metadata);
-  }
+
 }
 
 module.exports = { downloadDataIfNeeded };
