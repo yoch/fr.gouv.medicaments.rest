@@ -1,71 +1,71 @@
 {
   "CIS_bdpm.txt": {
     "downloadedAt": "2026-01-27T23:35:37.596Z",
-    "checkedAt": "2026-01-27T23:58:48.371Z",
+    "checkedAt": "2026-01-28T00:24:34.152Z",
     "hash": "df02c528b92b1ce30d2a90500bcc069e484cc0d1d3bf8f46d5da69c1dc2197c9",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_CIP_bdpm.txt": {
-    "downloadedAt": "2026-01-27T23:38:48.583Z",
-    "checkedAt": "2026-01-27T23:58:48.845Z",
-    "hash": "59cf5bd71e272b271396283774ca80a990852d58fec85d5e5cdaa6469bd51af3",
+    "downloadedAt": "2026-01-28T00:19:10.058Z",
+    "checkedAt": "2026-01-28T00:24:34.639Z",
+    "hash": "4ef984dc67dcb6a188795e575afc4f4938209a943b3d0f1d6c2b5553fd856473",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_COMPO_bdpm.txt": {
     "downloadedAt": "2026-01-27T23:57:06.696Z",
-    "checkedAt": "2026-01-27T23:58:49.252Z",
+    "checkedAt": "2026-01-28T00:24:35.095Z",
     "hash": "8684fa036f76e8456994844e5aec466c84f9a60a08ad38366ab971765bf3b901",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_HAS_SMR_bdpm.txt": {
     "downloadedAt": "2026-01-27T23:57:07.365Z",
-    "checkedAt": "2026-01-27T23:58:49.899Z",
+    "checkedAt": "2026-01-28T00:24:35.726Z",
     "hash": "af0f1fb00e002616179cff0d41b2941999ea7c4a4c0a23e47955bc424dda94e9",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_HAS_ASMR_bdpm.txt": {
     "downloadedAt": "2026-01-27T23:57:08.146Z",
-    "checkedAt": "2026-01-27T23:58:50.501Z",
+    "checkedAt": "2026-01-28T00:24:36.425Z",
     "hash": "e402137ee01e448c280969502bbebdbd8c4ef7aad3d3fe356305a75b5d536590",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_GENER_bdpm.txt": {
     "downloadedAt": "2026-01-27T23:57:08.446Z",
-    "checkedAt": "2026-01-27T23:58:50.759Z",
+    "checkedAt": "2026-01-28T00:24:36.690Z",
     "hash": "22db002d5a3297e95b83ed5213c85ff32d05d8f02c6c62e28341bbd69e17cc15",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_CPD_bdpm.txt": {
     "downloadedAt": "2026-01-27T23:57:08.754Z",
-    "checkedAt": "2026-01-27T23:58:51.018Z",
+    "checkedAt": "2026-01-28T00:24:36.943Z",
     "hash": "174e9529dcdf790c5c2e67560415bff5b52c32bf7049730d031950edc10921fd",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_CIP_Dispo_Spec.txt": {
     "downloadedAt": "2026-01-27T23:34:13.195Z",
-    "checkedAt": "2026-01-27T23:58:51.112Z",
+    "checkedAt": "2026-01-28T00:24:37.035Z",
     "hash": "661a89f65d1f0e0d4727b6c341f5acd19efeff1bac2293c272ceb680d17799e3",
     "source": "remote",
     "encoding": "utf-8"
   },
   "CIS_MITM.txt": {
     "downloadedAt": "2026-01-27T23:57:09.125Z",
-    "checkedAt": "2026-01-27T23:58:51.359Z",
+    "checkedAt": "2026-01-28T00:24:37.286Z",
     "hash": "1836a994bb6554592e606a6a62d22e18410c21aae87172f112986ceb8814dad0",
     "source": "remote",
     "encoding": "utf-8"
   },
-  "CIS_InfoImportantes_bdpm.txt": {
-    "downloadedAt": "2026-01-27T23:57:09.222Z",
-    "checkedAt": "2026-01-27T23:58:51.448Z",
-    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "CIS_InfoImportantes.txt": {
+    "downloadedAt": "2026-01-28T00:21:42.013Z",
+    "checkedAt": "2026-01-28T00:24:38.106Z",
+    "hash": "903e5847ee22c7bf7b30db1e4915baf67cb2a9ff5c54b3aa7097b9a4b30d3728",
     "source": "remote",
     "encoding": "utf-8"
   }

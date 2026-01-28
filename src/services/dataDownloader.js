@@ -10,7 +10,7 @@ const execAsync = promisify(exec);
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const META_FILE = path.join(DATA_DIR, 'meta.json');
-const BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/download/file/';
+const BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/download';
 const CHECK_INTERVAL_HOURS = 24;
 
 const FILES = [
@@ -19,11 +19,12 @@ const FILES = [
   'CIS_COMPO_bdpm.txt',
   'CIS_HAS_SMR_bdpm.txt',
   'CIS_HAS_ASMR_bdpm.txt',
+  // https://base-donnees-publique.medicaments.gouv.fr/download/file/HAS_LiensPageCT_bdpm.txt
   'CIS_GENER_bdpm.txt',
   'CIS_CPD_bdpm.txt',
   'CIS_CIP_Dispo_Spec.txt',
   'CIS_MITM.txt',
-  'CIS_InfoImportantes_bdpm.txt'
+  'CIS_InfoImportantes.txt'
 ];
 
 async function loadMetadata() {
@@ -158,7 +159,9 @@ async function downloadDataIfNeeded() {
   for (const filename of FILES) {
     const finalPath = path.join(DATA_DIR, filename);
     const tempPath = path.join(os.tmpdir(), filename);
-    const url = `${BASE_URL}${filename}`;
+    const url = filename !== 'CIS_InfoImportantes.txt' ?
+      `${BASE_URL}/file/${filename}` :
+      `${BASE_URL}/${filename}`;
 
     // Vérification de la fraîcheur (24h)
     if (!shouldCheckFile(filename, metadata) && fs.existsSync(finalPath)) {
