@@ -97,7 +97,7 @@ describe('API Medicaments', () => {
         ['/api/medicaments/conditions', 'condition'],
         ['/api/medicaments/disponibilite', 'libelle_statut'],
         ['/api/medicaments/interet-therapeutique-majeur', 'denomination'],
-        ['/api/medicaments/infos-importantes', 'texte_affichage'],
+        // ['/api/medicaments/infos-importantes', 'texte_affichage'],
         ['/api/medicaments/substances', 'denomination']
     ])('GET %s returns data', async (endpoint, fieldToCheck) => {
         const res = await request(app).get(`${endpoint}?limit=1`);

@@ -12,6 +12,27 @@ app.use(express.json());
 
 app.use(require('helmet')());
 
+// Rate Limiting
+const rateLimit = require('express-rate-limit');
+const enableRateLimit = process.env.ENABLE_RATE_LIMIT === 'true';
+
+if (enableRateLimit) {
+    const limiter = rateLimit({
+        windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000'), // Default: 1 minute
+        max: parseInt(process.env.RATE_LIMIT_MAX || '500'), // Default: 500 requests
+        standardHeaders: true,
+        legacyHeaders: false,
+        message: {
+            status: 429,
+            error: 'Too Many Requests',
+            message: 'Vous avez dépassé la limite de requêtes autorisée. Veuillez réessayer plus tard.'
+        }
+    });
+
+    app.use(limiter);
+    console.log(`Rate limiting enabled: ${max} requests per ${windowMs}ms`);
+}
+
 
 // Swagger spec
 const swaggerSpecs = require('./swagger');
