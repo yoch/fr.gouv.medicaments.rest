@@ -24,7 +24,7 @@ const FILES = [
   'CIS_CPD_bdpm.txt',
   'CIS_CIP_Dispo_Spec.txt',
   'CIS_MITM.txt',
-  'CIS_InfoImportantes.txt'
+  // 'CIS_InfoImportantes.txt'
 ];
 
 async function loadMetadata() {

@@ -575,7 +575,7 @@ router.get('/substances', (req, res) => {
 
 // GET /api/medicaments/infos-importantes
 /**
- * @swagger
+ * @/swagger
  * /medicaments/infos-importantes:
  *   get:
  *     summary: Informations de sécurité importantes
@@ -594,6 +594,7 @@ router.get('/substances', (req, res) => {
  *               allOf:
  *                 - $ref: '#/components/schemas/ApiResponse'
  */
+/*
 router.get('/infos-importantes', (req, res) => {
   const { q, page = 1, limit = 100 } = req.query;
   let data = getData('infos');
@@ -604,6 +605,7 @@ router.get('/infos-importantes', (req, res) => {
 
   res.json(paginate(data, page, limit));
 });
+*/
 
 // GET /api/medicaments/search - Recherche globale
 /**

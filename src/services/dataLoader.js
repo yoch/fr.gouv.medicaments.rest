@@ -64,7 +64,8 @@ const miniSearchOptions = {
       }
       // Sinon, fuzzy avec tolérance de 0.2
       return 0.2;
-    }
+    },
+    //weights: { fuzzy: 0.42, prefix: 0.375 },
   }
 };
 
@@ -230,13 +231,15 @@ async function loadData() {
   );
 
   // Chargement et indexation des infos importantes
-  dataCache.infos = parseFile('CIS_InfoImportantes_bdpm.txt', [
+  /*
+  dataCache.infos = parseFile('CIS_InfoImportantes.txt', [
     'cis', 'date_debut', 'date_fin', 'texte_affichage'
   ]);
   createIndex('infos',
     ['cis', 'texte_affichage'],
     { texte_affichage: 3, cis: 2 }
   );
+  */
 
   // Génération de l'index des substances
   console.log('Génération de l\'index des substances...');

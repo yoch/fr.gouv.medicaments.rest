@@ -129,6 +129,7 @@ const options = {
                         lien_fi: { type: 'string' }
                     }
                 },
+                /*
                 InfoImportante: {
                     type: 'object',
                     properties: {
@@ -138,6 +139,7 @@ const options = {
                         texte_affichage: { type: 'string' }
                     }
                 },
+                */
                 Substance: {
                     type: 'object',
                     properties: {
