@@ -12,15 +12,12 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 
 ## Fonctionnalités
 
+- ✅ Fichiers de données inclus dans le repo (fallback si source indisponible)
 - ✅ Téléchargement automatique des données (mise à jour toutes les 24h)
-- ✅ Fichiers de données inclus dans le repo (fallback si serveur indisponible)
-- ✅ Métadonnées de téléchargement stockées dans `data/meta.json`
 - ✅ Conversion automatique en UTF-8 pour tous les fichiers
 - ✅ Recherche par préfixe et fuzzy (tolérance aux fautes de frappe)
 - ✅ Pagination
-- ✅ API sans clé d'authentification
 - ✅ Réponses JSON
-- ✅ Attribution correcte des données gouvernementales
 
 ## Endpoints disponibles
 
@@ -44,26 +41,11 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 - `page` - Numéro de page (défaut: 1)
 - `limit` - Nombre d'éléments par page (défaut: 100, max: 1000)
 
-
-### Notes
-
-- Le conteneur clone automatiquement la dernière version du repository depuis GitHub
-- L'application se met à jour automatiquement au redémarrage du conteneur
 ## Documentation
 
 - **[API Reference (Markdown)](API_REFERENCE.md)**
 - **Swagger UI**: `http://localhost:3000/api-docs`
 - **OpenAPI Spec**: `http://localhost:3000/api-docs.json`
-
-## Fonctionnalités Clés
-- **Recherche avancée** (supporte prefix search et fuzzy search).
-- **Informations de sécurité** et alertes ANSM.
-- **Recherche par substance** active.
-- **Mise à jour automatique** des données toutes les 24h.
-- **Performance** élevée (données en mémoire).
-
-## Installation
-- Aucune installation locale de Node.js n'est requise
 
 ## Développement local
 
@@ -74,4 +56,4 @@ npm run dev
 
 ## Attribution
 
-Cette API utilise la "base de données publique des médicaments" fournie par le gouvernement français.
+Cette API utilise la ["base de données publique des médicaments"](https://www.data.gouv.fr/datasets/base-de-donnees-publique-des-medicaments-base-officielle) fournie par le gouvernement français.

@@ -633,12 +633,32 @@ router.get('/infos-importantes', (req, res) => {
  *           default: 50
  *     responses:
  *       200:
- *         description: Résultats de recherche
+ *         description: Résultats de recherche (Liste structurée de médicaments avec leurs présentations et compositions)
  *         content:
  *           application/json:
  *             schema:
  *               allOf:
  *                 - $ref: '#/components/schemas/ApiResponse'
+ *                 - type: object
+ *                   properties:
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         allOf:
+ *                           - $ref: '#/components/schemas/Medicament'
+ *                           - type: object
+ *                             properties:
+ *                               type:
+ *                                 type: string
+ *                                 example: "medicament"
+ *                               presentations:
+ *                                 type: array
+ *                                 items:
+ *                                   $ref: '#/components/schemas/Presentation'
+ *                               compositions:
+ *                                 type: array
+ *                                 items:
+ *                                   $ref: '#/components/schemas/Composition'
  */
 router.get('/search', (req, res) => {
   const { q, page = 1, limit = 50 } = req.query;

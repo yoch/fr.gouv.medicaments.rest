@@ -634,12 +634,11 @@
 109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	62098492	1	2
 109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	69457211	1	3
 109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	66751033	1	4
-109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	69344548	1	5
-109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	64412162	1	6
-109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	61820358	1	7
-109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	65435445	1	8
-109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	61729741	1	9
-109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	66531838	1	10
+109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	64412162	1	5
+109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	61820358	1	6
+109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	65435445	1	7
+109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	61729741	1	8
+109	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, crème.	66531838	1	9
 110	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, émulsion fluide pour application locale.	65063233	0	1
 110	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, émulsion fluide pour application locale.	64190434	1	2
 110	ECONAZOLE (NITRATE D') 1 % - PEVARYL 1 POUR CENT, émulsion fluide pour application locale.	66798645	1	3
@@ -716,10 +715,9 @@
 124	PROGESTERONE 200 mg - UTROGESTAN 200 mg, capsule molle orale ou vaginale	68025857	1	3
 124	PROGESTERONE 200 mg - UTROGESTAN 200 mg, capsule molle orale ou vaginale	66426680	1	4
 125	NOMEGESTROL (ACETATE DE) 5 mg - LUTENYL, comprimé sécable	63408595	0	1
-125	NOMEGESTROL (ACETATE DE) 5 mg - LUTENYL, comprimé sécable	62673690	1	2
-125	NOMEGESTROL (ACETATE DE) 5 mg - LUTENYL, comprimé sécable	60661312	1	3
-125	NOMEGESTROL (ACETATE DE) 5 mg - LUTENYL, comprimé sécable	61087799	1	4
-125	NOMEGESTROL (ACETATE DE) 5 mg - LUTENYL, comprimé sécable	64671670	1	5
+125	NOMEGESTROL (ACETATE DE) 5 mg - LUTENYL, comprimé sécable	60661312	1	2
+125	NOMEGESTROL (ACETATE DE) 5 mg - LUTENYL, comprimé sécable	61087799	1	3
+125	NOMEGESTROL (ACETATE DE) 5 mg - LUTENYL, comprimé sécable	64671670	1	4
 127	CHLORMADINONE (ACETATE DE) 5 mg - LUTERAN 5 mg, comprimé	65701038	0	1
 127	CHLORMADINONE (ACETATE DE) 5 mg - LUTERAN 5 mg, comprimé	68765170	1	2
 128	CHLORMADINONE (ACETATE DE) 10 mg - LUTERAN 10 mg, comprimé	68054823	0	1
@@ -965,9 +963,8 @@
 164	CEFUROXIME AXETIL équivalant à CEFUROXIME 250 mg - ZINNAT 250 mg, comprimé pelliculé.	68209152	1	8
 164	CEFUROXIME AXETIL équivalant à CEFUROXIME 250 mg - ZINNAT 250 mg, comprimé pelliculé.	67005129	1	9
 164	CEFUROXIME AXETIL équivalant à CEFUROXIME 250 mg - ZINNAT 250 mg, comprimé pelliculé.	66169467	1	10
-164	CEFUROXIME AXETIL équivalant à CEFUROXIME 250 mg - ZINNAT 250 mg, comprimé pelliculé.	66892945	1	11
-164	CEFUROXIME AXETIL équivalant à CEFUROXIME 250 mg - ZINNAT 250 mg, comprimé pelliculé.	67104586	1	12
-164	CEFUROXIME AXETIL équivalant à CEFUROXIME 250 mg - ZINNAT 250 mg, comprimé pelliculé.	63992335	1	13
+164	CEFUROXIME AXETIL équivalant à CEFUROXIME 250 mg - ZINNAT 250 mg, comprimé pelliculé.	67104586	1	11
+164	CEFUROXIME AXETIL équivalant à CEFUROXIME 250 mg - ZINNAT 250 mg, comprimé pelliculé.	63992335	1	12
 165	CEFUROXIME AXETIL équivalant à CEFUROXIME 500 mg - ZINNAT 500 mg, comprimé pelliculé.	67642478	0	1
 165	CEFUROXIME AXETIL équivalant à CEFUROXIME 500 mg - ZINNAT 500 mg, comprimé pelliculé.	62454440	1	2
 165	CEFUROXIME AXETIL équivalant à CEFUROXIME 500 mg - ZINNAT 500 mg, comprimé pelliculé.	68297693	1	3
@@ -977,7 +974,6 @@
 165	CEFUROXIME AXETIL équivalant à CEFUROXIME 500 mg - ZINNAT 500 mg, comprimé pelliculé.	62655190	1	7
 165	CEFUROXIME AXETIL équivalant à CEFUROXIME 500 mg - ZINNAT 500 mg, comprimé pelliculé.	64017927	1	8
 165	CEFUROXIME AXETIL équivalant à CEFUROXIME 500 mg - ZINNAT 500 mg, comprimé pelliculé.	64731103	1	9
-165	CEFUROXIME AXETIL équivalant à CEFUROXIME 500 mg - ZINNAT 500 mg, comprimé pelliculé.	61664368	1	10
 168	CEFACLOR 250 mg/5 ml - ALFATIL 250 mg/5 ml, poudre pour suspension buvable	61926913	0	1
 168	CEFACLOR 250 mg/5 ml - ALFATIL 250 mg/5 ml, poudre pour suspension buvable	62375231	1	2
 169	CEFADROXIL 125 mg/5 ml - ORACEFAL 125 mg/5 ml, poudre pour suspension buvable	67480229	0	1
@@ -1186,8 +1182,7 @@
 207	DICLOFENAC SODIQUE 50 mg - VOLTARENE 50 mg, comprimé enrobé gastro-résistant	62431527	0	1
 207	DICLOFENAC SODIQUE 50 mg - VOLTARENE 50 mg, comprimé enrobé gastro-résistant	67411717	1	2
 207	DICLOFENAC SODIQUE 50 mg - VOLTARENE 50 mg, comprimé enrobé gastro-résistant	62504861	1	3
-207	DICLOFENAC SODIQUE 50 mg - VOLTARENE 50 mg, comprimé enrobé gastro-résistant	66584214	1	4
-207	DICLOFENAC SODIQUE 50 mg - VOLTARENE 50 mg, comprimé enrobé gastro-résistant	67436923	1	5
+207	DICLOFENAC SODIQUE 50 mg - VOLTARENE 50 mg, comprimé enrobé gastro-résistant	67436923	1	4
 212	PIROXICAM 10 mg - FELDENE 10 mg, gélule	64874891	0	1
 212	PIROXICAM 10 mg - FELDENE 10 mg, gélule	68659391	1	2
 212	PIROXICAM 10 mg - FELDENE 10 mg, gélule	60288614	1	3
@@ -1206,7 +1201,8 @@
 217	IBUPROFENE 400 mg - BRUFEN 400 mg, comprimé enrobé.	66785733	0	1
 217	IBUPROFENE 400 mg - BRUFEN 400 mg, comprimé enrobé.	64684319	1	2
 217	IBUPROFENE 400 mg - BRUFEN 400 mg, comprimé enrobé.	60550988	1	3
-217	IBUPROFENE 400 mg - BRUFEN 400 mg, comprimé enrobé.	65205177	1	4
+217	IBUPROFENE 400 mg - BRUFEN 400 mg, comprimé enrobé.	66255382	1	4
+217	IBUPROFENE 400 mg - BRUFEN 400 mg, comprimé enrobé.	65205177	1	5
 221	NAPROXENE SODIQUE 550 mg - APRANAX 550 mg, comprimé pelliculé sécable	63738842	0	1
 221	NAPROXENE SODIQUE 550 mg - APRANAX 550 mg, comprimé pelliculé sécable	69488210	1	2
 221	NAPROXENE SODIQUE 550 mg - APRANAX 550 mg, comprimé pelliculé sécable	61990606	1	3
@@ -1527,22 +1523,21 @@
 284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	64205758	1	2
 284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	64941258	1	3
 284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	65058275	1	4
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	66275029	1	5
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	65320578	1	6
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	67057229	1	7
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	64854287	1	8
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	60943030	1	9
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	60524064	1	10
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	67889927	1	11
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	66176497	1	12
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	69188939	1	13
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	60945451	1	14
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	63808123	1	15
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	65668830	1	16
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	61726243	1	17
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	60546662	1	18
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	69314170	1	19
-284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	64657756	1	20
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	65320578	1	5
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	67057229	1	6
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	64854287	1	7
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	60943030	1	8
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	60524064	1	9
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	67889927	1	10
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	66176497	1	11
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	69188939	1	12
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	60945451	1	13
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	63808123	1	14
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	65668830	1	15
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	61726243	1	16
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	60546662	1	17
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	69314170	1	18
+284	PAROXETINE (CHLORHYDRATE DE) équivalant à PAROXETINE 20 mg - DEROXAT 20 mg, comprimé pelliculé sécable.	64657756	1	19
 285	FLUVOXAMINE (MALEATE DE) 50 mg - FLOXYFRAL 50 mg, comprimé pelliculé sécable.	65470567	0	1
 285	FLUVOXAMINE (MALEATE DE) 50 mg - FLOXYFRAL 50 mg, comprimé pelliculé sécable.	68288712	1	2
 285	FLUVOXAMINE (MALEATE DE) 50 mg - FLOXYFRAL 50 mg, comprimé pelliculé sécable.	61460248	1	3
@@ -1832,7 +1827,6 @@
 332	IBUPROFENE 400 mg - ADVILMED 400 mg, comprimé enrobé.	63980518	1	8
 332	IBUPROFENE 400 mg - ADVILMED 400 mg, comprimé enrobé.	64573315	1	9
 333	ALENDRONATE MONOSODIQUE équivalant à ACIDE ALENDRONIQUE 10 mg  FOSAMAX 10 mg, comprimé.	68333591	0	1
-333	ALENDRONATE MONOSODIQUE équivalant à ACIDE ALENDRONIQUE 10 mg  FOSAMAX 10 mg, comprimé.	65028022	1	2
 337	ESTRADIOL HEMIHYDRATE équivalant à ESTRADIOL ANHYDRE 1 mg - ESTROFEM 1 mg, comprimé pelliculé.	66189217	0	1
 337	ESTRADIOL HEMIHYDRATE équivalant à ESTRADIOL ANHYDRE 1 mg - ESTROFEM 1 mg, comprimé pelliculé.	66690363	1	2
 338	ESTRADIOL HEMIHYDRATE équivalant à ESTRADIOL ANHYDRE 2 mg - ESTROFEM 2 mg, comprimé pelliculé.	64183183	0	1
@@ -1902,13 +1896,12 @@
 349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	60176113	1	6
 349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	69095463	1	7
 349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	65475176	1	8
-349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	60512336	1	9
-349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	66538291	1	10
-349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	60071190	1	11
-349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	67709496	1	12
-349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	62667004	1	13
-349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	68748502	1	14
-349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	61510021	1	15
+349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	66538291	1	9
+349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	60071190	1	10
+349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	67709496	1	11
+349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	62667004	1	12
+349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	68748502	1	13
+349	SIMVASTATINE 10 mg - ZOCOR 10 mg, comprimé enrobé - LODALES 10 mg, comprimé enrobé.	61510021	1	14
 350	OMEPRAZOLE 10 mg - MOPRAL 10 mg, gélule gastro-résistante - ZOLTUM 10 mg, gélule gastro-résistante	69606819	0	1
 350	OMEPRAZOLE 10 mg - MOPRAL 10 mg, gélule gastro-résistante - ZOLTUM 10 mg, gélule gastro-résistante	69276588	0	2
 350	OMEPRAZOLE 10 mg - MOPRAL 10 mg, gélule gastro-résistante - ZOLTUM 10 mg, gélule gastro-résistante	68413450	1	3
@@ -2335,23 +2328,22 @@
 410	FLUOROURACILE 50 mg/ml - FLUORO-URACILE MEDA PHARMA 250 mg/5 ml, solution injectable en flacon (FLACON de 5 ml).	65502207	1	2
 411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	60683198	0	1
 411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	68728154	1	2
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	60863367	1	3
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	64276748	1	4
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	63063793	1	5
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	60398167	1	6
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	61343825	1	7
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	61358656	1	8
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	61323160	1	9
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	68652347	1	10
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	68009365	1	11
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	68693027	1	12
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	69187164	1	13
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	65490121	1	14
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	63417060	1	15
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	69185423	1	16
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	68353989	1	17
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	62677849	1	18
-411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	60996271	1	19
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	64276748	1	3
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	63063793	1	4
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	60398167	1	5
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	61343825	1	6
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	61358656	1	7
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	61323160	1	8
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	68652347	1	9
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	68009365	1	10
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	68693027	1	11
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	69187164	1	12
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	65490121	1	13
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	63417060	1	14
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	69185423	1	15
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	68353989	1	16
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	62677849	1	17
+411	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, gélule.	60996271	1	18
 413	MIRTAZAPINE 15 mg - NORSET 15 mg, comprimé pelliculé.	65124914	0	1
 413	MIRTAZAPINE 15 mg - NORSET 15 mg, comprimé pelliculé.	65512856	1	2
 413	MIRTAZAPINE 15 mg - NORSET 15 mg, comprimé pelliculé.	69084246	1	3
@@ -3281,8 +3273,7 @@
 600	LANSOPRAZOLE 15 mg - OGASTORO 15 mg, comprimé orodispersible.	66769501	1	3
 600	LANSOPRAZOLE 15 mg - OGASTORO 15 mg, comprimé orodispersible.	64368132	1	4
 600	LANSOPRAZOLE 15 mg - OGASTORO 15 mg, comprimé orodispersible.	64726711	1	5
-600	LANSOPRAZOLE 15 mg - OGASTORO 15 mg, comprimé orodispersible.	68321824	1	6
-600	LANSOPRAZOLE 15 mg - OGASTORO 15 mg, comprimé orodispersible.	66513612	1	7
+600	LANSOPRAZOLE 15 mg - OGASTORO 15 mg, comprimé orodispersible.	66513612	1	6
 601	LANSOPRAZOLE 30 mg - OGASTORO 30 mg, comprimé orodispersible.	68088245	0	1
 601	LANSOPRAZOLE 30 mg - OGASTORO 30 mg, comprimé orodispersible.	61340462	1	2
 601	LANSOPRAZOLE 30 mg - OGASTORO 30 mg, comprimé orodispersible.	63062321	1	3
@@ -3354,21 +3345,20 @@
 615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	60071952	0	1
 615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	67560860	0	2
 615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	64510496	1	3
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	64728826	1	4
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	66440064	1	5
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	67626221	1	6
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	60238853	1	7
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	62034970	1	8
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	68538895	1	9
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	68203174	1	10
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	66595239	1	11
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	60576207	1	12
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	63387090	1	13
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	61101010	1	14
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	62731574	1	15
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	64853979	1	16
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	64891296	1	17
-615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	62541436	1	18
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	66440064	1	4
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	67626221	1	5
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	60238853	1	6
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	62034970	1	7
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	68538895	1	8
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	68203174	1	9
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	66595239	1	10
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	60576207	1	11
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	63387090	1	12
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	61101010	1	13
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	62731574	1	14
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	64853979	1	15
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	64891296	1	16
+615	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 40 mg - EUPANTOL 40 mg, comprimé gastro-résistant - INIPOMP 40 mg, comprimé gastro-résistant - PANTIPP 40 mg, comprimé gastro-résistant.	62541436	1	17
 616	DICLOFENAC DE DIETHYLAMINE équivalant à DICLOFENAC SODIQUE 1g/100 g - VOLTARENE EMULGEL 1 %, gel.	63855240	0	1
 616	DICLOFENAC DE DIETHYLAMINE équivalant à DICLOFENAC SODIQUE 1g/100 g - VOLTARENE EMULGEL 1 %, gel.	66284708	1	2
 616	DICLOFENAC DE DIETHYLAMINE équivalant à DICLOFENAC SODIQUE 1g/100 g - VOLTARENE EMULGEL 1 %, gel.	69979597	1	3
@@ -3471,37 +3461,34 @@
 629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	61403425	0	1
 629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	66976215	1	2
 629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	64959295	1	3
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	62632843	1	4
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	65018658	1	5
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	61422183	1	6
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	65462588	1	7
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	61499240	1	8
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	61598594	1	9
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	68412722	1	10
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	64393420	1	11
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	68181404	1	12
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	69347028	1	13
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	63118574	1	14
-629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	68832758	1	15
+629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	65018658	1	4
+629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	61422183	1	5
+629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	65462588	1	6
+629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	61499240	1	7
+629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	61598594	1	8
+629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	68412722	1	9
+629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	64393420	1	10
+629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	68181404	1	11
+629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	69347028	1	12
+629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	63118574	1	13
+629	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE 75 mg - EFFEXOR L.P. 75 mg, gélule à libération prolongée.	68832758	1	14
 630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	66430942	0	1
 630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	62538618	1	2
 630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	63326881	1	3
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	60075192	1	4
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	69427168	1	5
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	65301147	1	6
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	66340014	1	7
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	64847937	1	8
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	60234214	1	9
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	61556809	1	10
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	65074475	1	11
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	67164971	1	12
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	64860361	1	13
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	67280381	1	14
-630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	60767155	1	15
+630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	69427168	1	4
+630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	65301147	1	5
+630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	66340014	1	6
+630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	64847937	1	7
+630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	60234214	1	8
+630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	61556809	1	9
+630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	65074475	1	10
+630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	67164971	1	11
+630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	64860361	1	12
+630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	67280381	1	13
+630	VENLAFAXINE (CHLORHYDRATE DE) équivalant à VENLAFAXINE  37,5 mg - EFFEXOR L.P. 37,5 mg, gélule à libération prolongée.	60767155	1	14
 632	LIDOCAINE (CHLORHYDRATE DE) 20 mg/mL - XYLOCAINE 20 mg/mL SANS CONSERVATEUR, solution injectable.	61751079	0	1
 632	LIDOCAINE (CHLORHYDRATE DE) 20 mg/mL - XYLOCAINE 20 mg/mL SANS CONSERVATEUR, solution injectable.	66290522	1	2
-632	LIDOCAINE (CHLORHYDRATE DE) 20 mg/mL - XYLOCAINE 20 mg/mL SANS CONSERVATEUR, solution injectable.	62471742	1	3
-632	LIDOCAINE (CHLORHYDRATE DE) 20 mg/mL - XYLOCAINE 20 mg/mL SANS CONSERVATEUR, solution injectable.	61164434	1	4
+632	LIDOCAINE (CHLORHYDRATE DE) 20 mg/mL - XYLOCAINE 20 mg/mL SANS CONSERVATEUR, solution injectable.	61164434	1	3
 635	LEVODOPA 50 mg + BENSERAZIDE (CHLORHYDRATE DE) équivalant à BENSERAZIDE 12,50 mg - MODOPAR 62,5 (50 mg/12,5 mg), gélule.	65065736	0	1
 635	LEVODOPA 50 mg + BENSERAZIDE (CHLORHYDRATE DE) équivalant à BENSERAZIDE 12,50 mg - MODOPAR 62,5 (50 mg/12,5 mg), gélule.	64786092	1	2
 636	LEVODOPA 200 mg + BENSERAZIDE (CHLORHYDRATE DE) équivalant à BENSERAZIDE 50 mg - MODOPAR 250 (200 mg/50 mg), gélule.	60485953	0	1
@@ -3893,28 +3880,27 @@
 711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	60388778	0	3
 711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	69424492	1	4
 711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	63873893	1	5
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	65309165	1	6
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	66870977	1	7
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	67655664	1	8
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	65109848	1	9
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	60789970	1	10
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	66187344	1	11
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	60905873	1	12
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	65479580	1	13
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	67471874	1	14
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	64033881	1	15
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	62257471	1	16
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	67719654	1	17
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	67490401	1	18
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	63973299	1	19
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	63896963	1	20
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	64544018	1	21
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	66350332	1	22
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	65410328	1	23
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	64895526	1	24
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	60670457	1	25
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	60065294	1	26
-711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	64121178	1	27
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	66870977	1	6
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	67655664	1	7
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	65109848	1	8
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	60789970	1	9
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	66187344	1	10
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	60905873	1	11
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	65479580	1	12
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	67471874	1	13
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	64033881	1	14
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	62257471	1	15
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	67719654	1	16
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	67490401	1	17
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	63973299	1	18
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	63896963	1	19
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	64544018	1	20
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	66350332	1	21
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	65410328	1	22
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	64895526	1	23
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	60670457	1	24
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	60065294	1	25
+711	PANTOPRAZOLE SODIQUE SESQUIHYDRATE équivalant à PANTOPRAZOLE 20 mg - EUPANTOL 20 mg, comprimé gastro-résistant - INIPOMP 20 mg, comprimé gastro-résistant - PANTIPP 20 mg, comprimé gastro-résistant - PANTOZOL CONTROL 20 mg, comprimé gastro-résistant	64121178	1	26
 712	TRAMADOL (CHLORHYDRATE DE) 50 mg - CONTRAMAL LP 50 mg, comprimé à libération prolongée - TOPALGIC LP 50 mg, comprimé à libération prolongée.	64475248	0	1
 712	TRAMADOL (CHLORHYDRATE DE) 50 mg - CONTRAMAL LP 50 mg, comprimé à libération prolongée - TOPALGIC LP 50 mg, comprimé à libération prolongée.	62872450	0	2
 712	TRAMADOL (CHLORHYDRATE DE) 50 mg - CONTRAMAL LP 50 mg, comprimé à libération prolongée - TOPALGIC LP 50 mg, comprimé à libération prolongée.	65387769	1	3
@@ -4107,11 +4093,10 @@
 747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	63615576	0	2
 747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	64226503	1	3
 747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	62043026	1	4
-747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	65921931	1	5
-747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	69480060	1	6
-747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	61536144	1	7
-747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	66565790	1	8
-747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	60719986	1	9
+747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	69480060	1	5
+747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	61536144	1	6
+747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	66565790	1	7
+747	GESTODENE  0,06 mg +  ETHINYLESTRADIOL 0,015 mg - MELODIA 60 microgrammes/15 microgrammes, comprimé pelliculé - MINESSE 60 microgrammes/15 microgrammes, comprimé pelliculé	60719986	1	8
 748	CEFEPIME (DICHLORHYDRATE DE) MONOHYDRATE équivalant à CEFEPIME 1 g - AXEPIM 1 g, poudre pour usage parentéral.	60804995	0	1
 748	CEFEPIME (DICHLORHYDRATE DE) MONOHYDRATE équivalant à CEFEPIME 1 g - AXEPIM 1 g, poudre pour usage parentéral.	64339173	1	2
 748	CEFEPIME (DICHLORHYDRATE DE) MONOHYDRATE équivalant à CEFEPIME 1 g - AXEPIM 1 g, poudre pour usage parentéral.	65372571	1	3
@@ -4346,22 +4331,21 @@
 795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	69863646	0	1
 795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	68077576	1	2
 795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	62423007	1	3
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	67341610	1	4
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	67627533	1	5
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	63735807	1	6
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	68501612	1	7
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	67917554	1	8
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	65291297	1	9
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	61392480	1	10
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	62880372	1	11
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	67040436	1	12
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	63468069	1	13
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	64391177	1	14
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	64723206	1	15
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	65936883	1	16
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	67633493	1	17
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	66370235	1	18
-795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	64431294	1	19
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	67627533	1	4
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	63735807	1	5
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	68501612	1	6
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	67917554	1	7
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	65291297	1	8
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	61392480	1	9
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	62880372	1	10
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	67040436	1	11
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	63468069	1	12
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	64391177	1	13
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	64723206	1	14
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	65936883	1	15
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	67633493	1	16
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	66370235	1	17
+795	MONTELUKAST SODIQUE équivalant à MONTELUKAST 10 mg - SINGULAIR 10 mg, comprimé pelliculé.	64431294	1	18
 796	OLANZAPINE 15 mg - ZYPREXA VELOTAB 15 mg, comprimé orodispersible.	67376675	0	1
 796	OLANZAPINE 15 mg - ZYPREXA VELOTAB 15 mg, comprimé orodispersible.	68268955	1	2
 796	OLANZAPINE 15 mg - ZYPREXA VELOTAB 15 mg, comprimé orodispersible.	64385103	1	3
@@ -4689,12 +4673,11 @@
 849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	61614493	1	7
 849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	62871220	1	8
 849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	65065818	1	9
-849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	63809022	1	10
-849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	66566668	1	11
-849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	65922894	1	12
-849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	69969418	1	13
-849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	68684658	1	14
-849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	65200162	1	15
+849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	66566668	1	10
+849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	65922894	1	11
+849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	69969418	1	12
+849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	68684658	1	13
+849	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 160 mg/12,5 mg, comprimé pelliculé - NISISCO 160 mg/12,5 mg, comprimé pelliculé.	65200162	1	14
 850	VALSARTAN 80 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 80 mg/12,5 mg, comprimé pelliculé - NISISCO 80 mg/12,5 mg, comprimé pelliculé.	63139718	0	1
 850	VALSARTAN 80 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 80 mg/12,5 mg, comprimé pelliculé - NISISCO 80 mg/12,5 mg, comprimé pelliculé.	62422784	0	2
 850	VALSARTAN 80 mg + HYDROCHLOROTHIAZIDE 12,5 mg - COTAREG 80 mg/12,5 mg, comprimé pelliculé - NISISCO 80 mg/12,5 mg, comprimé pelliculé.	62791450	1	3
@@ -4718,11 +4701,10 @@
 851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	64487357	1	7
 851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	65061780	1	8
 851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	61644248	1	9
-851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	60407883	1	10
-851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	68522318	1	11
-851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	63374805	1	12
-851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	69008387	1	13
-851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	61272488	1	14
+851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	68522318	1	10
+851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	63374805	1	11
+851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	69008387	1	12
+851	VALSARTAN 160 mg + HYDROCHLOROTHIAZIDE 25 mg - COTAREG 160 mg/25 mg, comprimé pelliculé - NISISCO 160 mg/25 mg, comprimé pelliculé.	61272488	1	13
 852	GLYCÉROL 15 %  +  VASELINE 8 %  +  PARAFFINE LIQUIDE 2 % - EXEDIEM, crème.	62334028	0	1
 852	GLYCÉROL 15 %  +  VASELINE 8 %  +  PARAFFINE LIQUIDE 2 % - EXEDIEM, crème.	62395668	1	2
 852	GLYCÉROL 15 %  +  VASELINE 8 %  +  PARAFFINE LIQUIDE 2 % - EXEDIEM, crème.	65410050	1	3
@@ -4774,12 +4756,11 @@
 859	MOMETASONE (FUROATE DE) 1 mg/1 g - ELOCOME 0,1 POUR CENT, pommade.	61763583	0	1
 859	MOMETASONE (FUROATE DE) 1 mg/1 g - ELOCOME 0,1 POUR CENT, pommade.	64298641	1	2
 861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	65209987	0	1
-861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	68371745	1	2
-861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	64127672	1	3
-861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	65803331	1	4
-861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	67093136	1	5
-861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	60946941	1	6
-861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	67901945	1	7
+861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	64127672	1	2
+861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	65803331	1	3
+861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	67093136	1	4
+861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	60946941	1	5
+861	ACARBOSE 100 mg, - GLUCOR 100 mg, comprimé sécable.	67901945	1	6
 862	ACARBOSE 50 mg - GLUCOR 50 mg, comprimé.	63951114	0	1
 862	ACARBOSE 50 mg - GLUCOR 50 mg, comprimé.	63958735	1	2
 862	ACARBOSE 50 mg - GLUCOR 50 mg, comprimé.	69116854	1	3
@@ -5052,13 +5033,14 @@
 902	NEVIRAPINE ANHYDRE 200 mg - VIRAMUNE 200 mg, comprimé.	65490281	1	4
 902	NEVIRAPINE ANHYDRE 200 mg - VIRAMUNE 200 mg, comprimé.	65256474	1	5
 903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	68747126	0	1
-903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	69205527	1	2
-903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	62784356	1	3
-903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	68043798	1	4
-903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	69896678	1	5
-903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	67657188	1	6
-903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	65483582	1	7
-903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	66069082	1	8
+903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	67882975	1	2
+903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	69205527	1	3
+903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	62784356	1	4
+903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	68043798	1	5
+903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	69896678	1	6
+903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	67657188	1	7
+903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	65483582	1	8
+903	ACÉTYLCYSTÉINE 200 mg - FLUIMUCIL 200 mg, granulés pour solution buvable en sachet édulcorés au sorbitol et à l'aspartam	66069082	1	9
 908	NEFOPAM (CHLORHYDRATE DE) 20 mg/2 ml - ACUPAN, solution injectable.	62580656	0	1
 908	NEFOPAM (CHLORHYDRATE DE) 20 mg/2 ml - ACUPAN, solution injectable.	68701965	1	2
 908	NEFOPAM (CHLORHYDRATE DE) 20 mg/2 ml - ACUPAN, solution injectable.	61120249	1	3
@@ -5635,21 +5617,19 @@
 996	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLECONTINU 0,02 mg/3 mg, comprimé pelliculé	68946021	1	6
 996	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLECONTINU 0,02 mg/3 mg, comprimé pelliculé	65651329	1	7
 997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	65052799	0	1
-997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	64115976	1	2
-997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	60106848	1	3
-997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	68710067	1	4
-997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	64759558	1	5
-997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	67825052	1	6
-997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	60555469	1	7
-997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	61755914	1	8
+997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	60106848	1	2
+997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	68710067	1	3
+997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	64759558	1	4
+997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	67825052	1	5
+997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	60555469	1	6
+997	ETHINYLESTRADIOL BETADEX-CLATHRATE équivalant à ETHINYLESTRADIOL 0,02 mg + DROSPIRENONE 3 mg - JASMINELLE 0,02 mg/3 mg, comprimé pelliculé.	61755914	1	7
 998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	64392076	0	1
-998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	68259696	1	2
-998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	68646198	1	3
-998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	63068064	1	4
-998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	69827148	1	5
-998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	66879969	1	6
-998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	68751765	1	7
-998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	62449361	1	8
+998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	68646198	1	2
+998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	63068064	1	3
+998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	69827148	1	4
+998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	66879969	1	5
+998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	68751765	1	6
+998	ETHINYLESTRADIOL 0,03 mg + DROSPIRENONE 3 mg - JASMINE 0,03 mg/3 mg, comprimé pelliculé	62449361	1	7
 1002	TIANEPTINE SODIQUE 12,5 mg - STABLON 12,5 mg, comprimé enrobé.	65411280	0	1
 1002	TIANEPTINE SODIQUE 12,5 mg - STABLON 12,5 mg, comprimé enrobé.	64713443	1	2
 1002	TIANEPTINE SODIQUE 12,5 mg - STABLON 12,5 mg, comprimé enrobé.	60197972	1	3
@@ -5670,9 +5650,8 @@
 1005	LIDOCAÏNE (CHLORHYDRATE DE) 10 mg/mL - XYLOCAINE 10mg/mL SANS CONSERVATEUR, solution injectable.	60181733	0	1
 1005	LIDOCAÏNE (CHLORHYDRATE DE) 10 mg/mL - XYLOCAINE 10mg/mL SANS CONSERVATEUR, solution injectable.	69036269	1	2
 1005	LIDOCAÏNE (CHLORHYDRATE DE) 10 mg/mL - XYLOCAINE 10mg/mL SANS CONSERVATEUR, solution injectable.	68001023	1	3
-1005	LIDOCAÏNE (CHLORHYDRATE DE) 10 mg/mL - XYLOCAINE 10mg/mL SANS CONSERVATEUR, solution injectable.	62631549	1	4
-1005	LIDOCAÏNE (CHLORHYDRATE DE) 10 mg/mL - XYLOCAINE 10mg/mL SANS CONSERVATEUR, solution injectable.	65471110	1	5
-1005	LIDOCAÏNE (CHLORHYDRATE DE) 10 mg/mL - XYLOCAINE 10mg/mL SANS CONSERVATEUR, solution injectable.	62793992	1	6
+1005	LIDOCAÏNE (CHLORHYDRATE DE) 10 mg/mL - XYLOCAINE 10mg/mL SANS CONSERVATEUR, solution injectable.	65471110	1	4
+1005	LIDOCAÏNE (CHLORHYDRATE DE) 10 mg/mL - XYLOCAINE 10mg/mL SANS CONSERVATEUR, solution injectable.	62793992	1	5
 1006	METOCLOPRAMIDE (CHLORHYDRATE DE) 10 mg/2 ml - PRIMPERAN 10 mg/2 ml, solution injectable en ampoule.	61729093	0	1
 1006	METOCLOPRAMIDE (CHLORHYDRATE DE) 10 mg/2 ml - PRIMPERAN 10 mg/2 ml, solution injectable en ampoule.	63670380	1	2
 1006	METOCLOPRAMIDE (CHLORHYDRATE DE) 10 mg/2 ml - PRIMPERAN 10 mg/2 ml, solution injectable en ampoule.	63423227	1	3
@@ -6102,13 +6081,11 @@
 1086	ACIDE ZOLÉDRONIQUE MONOHYDRATÉ équivalant à ACIDE ZOLÉDRONIQUE 4 mg/5ml - ZOMETA 4 mg/5 ml, solution à diluer pour perfusion	69694737	1	7
 1087	DROPÉRIDOL 2,5 mg/1 ml - DROLEPTAN 2,5 mg/1 ml, solution injectable (IV)	69026129	0	1
 1087	DROPÉRIDOL 2,5 mg/1 ml - DROLEPTAN 2,5 mg/1 ml, solution injectable (IV)	63578074	1	2
-1087	DROPÉRIDOL 2,5 mg/1 ml - DROLEPTAN 2,5 mg/1 ml, solution injectable (IV)	60828455	1	3
-1087	DROPÉRIDOL 2,5 mg/1 ml - DROLEPTAN 2,5 mg/1 ml, solution injectable (IV)	64057843	1	4
-1087	DROPÉRIDOL 2,5 mg/1 ml - DROLEPTAN 2,5 mg/1 ml, solution injectable (IV)	67527433	1	5
+1087	DROPÉRIDOL 2,5 mg/1 ml - DROLEPTAN 2,5 mg/1 ml, solution injectable (IV)	64057843	1	3
+1087	DROPÉRIDOL 2,5 mg/1 ml - DROLEPTAN 2,5 mg/1 ml, solution injectable (IV)	67527433	1	4
 1088	DROPÉRIDOL 5 mg/2 ml - DROLEPTAN 5 mg/2 ml, solution injectable (I.M.)	68358114	0	1
 1088	DROPÉRIDOL 5 mg/2 ml - DROLEPTAN 5 mg/2 ml, solution injectable (I.M.)	68810459	1	2
-1088	DROPÉRIDOL 5 mg/2 ml - DROLEPTAN 5 mg/2 ml, solution injectable (I.M.)	61756877	1	3
-1088	DROPÉRIDOL 5 mg/2 ml - DROLEPTAN 5 mg/2 ml, solution injectable (I.M.)	66682612	1	4
+1088	DROPÉRIDOL 5 mg/2 ml - DROLEPTAN 5 mg/2 ml, solution injectable (I.M.)	66682612	1	3
 1089	MILRINONE 10 mg/10 ml - COROTROPE 10 mg/10 ml, solution injectable IV	61448776	0	1
 1089	MILRINONE 10 mg/10 ml - COROTROPE 10 mg/10 ml, solution injectable IV	65725263	1	2
 1089	MILRINONE 10 mg/10 ml - COROTROPE 10 mg/10 ml, solution injectable IV	64507226	1	3
@@ -6400,12 +6377,11 @@
 1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	69550690	1	9
 1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	61005065	1	10
 1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	67509104	1	11
-1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	69418436	1	12
-1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	66638701	1	13
-1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	65291272	1	14
-1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	67351394	1	15
-1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	66804443	1	16
-1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	68909329	1	17
+1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	66638701	1	12
+1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	65291272	1	13
+1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	67351394	1	14
+1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	66804443	1	15
+1132	ALGINATE DE SODIUM 0,5 g +  BICARBONATE DE SODIUM 0,267 g - GAVISCON, suspension buvable en sachet, GAVISCONELL MENTHE SANS SUCRE, suspension buvable en sachet-dose édulcorée à la saccharine sodique	68909329	1	16
 1133	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 25 mg - ZOLOFT 25 mg, comprimé pelliculé	63985006	0	1
 1133	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 25 mg - ZOLOFT 25 mg, comprimé pelliculé	69708254	1	2
 1134	SERTRALINE (CHLORHYDRATE DE) équivalant à SERTRALINE 50 mg - ZOLOFT 50 mg, comprimé pelliculé sécable	67241909	0	1
@@ -6509,11 +6485,12 @@
 1158	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 2 mg - NICORETTE MENTHE FRAICHE 2 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	67666657	1	6
 1158	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 2 mg - NICORETTE MENTHE FRAICHE 2 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	65443214	1	7
 1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	61430002	0	1
-1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	66196012	1	2
-1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	69949682	1	3
-1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	69656188	1	4
-1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	67523118	1	5
-1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	60545083	1	6
+1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	63069180	1	2
+1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	66196012	1	3
+1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	69949682	1	4
+1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	69656188	1	5
+1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	67523118	1	6
+1159	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NICORETTE MENTHE FRAICHE 4 mg SANS SUCRE, gomme à mâcher médicamenteuse édulcorée au xylitol et à l'acésulfame potassique	60545083	1	7
 1161	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NIQUITINMINIS MENTHE FRAÎCHE 4 mg SANS SUCRE, comprimé à sucer édulcoré à l'acésulfame potassique	69183696	0	1
 1161	NICOTINE (RÉSINATE DE) équivalant à NICOTINE 4 mg - NIQUITINMINIS MENTHE FRAÎCHE 4 mg SANS SUCRE, comprimé à sucer édulcoré à l'acésulfame potassique	68301184	1	2
 1162	NICOTINE 7 mg/24 h - NICOTINELL TTS 7 mg/24 H, dispositif transdermique	60401745	0	1
@@ -6557,17 +6534,16 @@
 1176	DEXPANTHÉNOL 5% - BEPANTHEN 5 %, pommade	68370337	1	6
 1176	DEXPANTHÉNOL 5% - BEPANTHEN 5 %, pommade	66172278	1	7
 1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	63566855	0	1
-1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	67136694	1	2
-1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	67751851	1	3
-1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	63865252	1	4
-1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	61100467	1	5
-1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	66865026	1	6
-1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	67061829	1	7
-1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	63609769	1	8
-1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	60877018	1	9
-1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	68906169	1	10
-1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	69161828	1	11
-1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	63491598	1	12
+1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	67751851	1	2
+1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	63865252	1	3
+1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	61100467	1	4
+1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	66865026	1	5
+1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	67061829	1	6
+1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	63609769	1	7
+1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	60877018	1	8
+1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	68906169	1	9
+1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	69161828	1	10
+1178	MOMÉTASONE (FUROATE DE) MONOHYDRATÉ équivalant à MOMÉTASONE (FUROATE DE) 50 microgrammes/dose - NASONEX 50 microgrammes/dose, suspension pour pulvérisation nasale	63491598	1	11
 1179	ATOSIBAN (ACÉTATE D') équivalant à ATOSIBAN 6,75 mg pour 0,9 ml - TRACTOCILE 6,75 mg/0,9 ml, solution injectable	62476853	0	1
 1179	ATOSIBAN (ACÉTATE D') équivalant à ATOSIBAN 6,75 mg pour 0,9 ml - TRACTOCILE 6,75 mg/0,9 ml, solution injectable	68389896	1	2
 1179	ATOSIBAN (ACÉTATE D') équivalant à ATOSIBAN 6,75 mg pour 0,9 ml - TRACTOCILE 6,75 mg/0,9 ml, solution injectable	61955644	1	3
@@ -6585,9 +6561,11 @@
 1183	IBUPROFÈNE (LYSINATE D') équivalant à IBUPROFÈNE 200 mg - NUROFENFLASH 200 mg, comprimé pelliculé	61183484	1	2
 1184	IBUPROFÈNE (LYSINATE D') équivalant à IBUPROFÈNE 400 mg - NUROFENFLASH 400 mg, comprimé pelliculé	69543863	0	1
 1184	IBUPROFÈNE (LYSINATE D') équivalant à IBUPROFÈNE 400 mg - NUROFENFLASH 400 mg, comprimé pelliculé	65780135	1	2
-1184	IBUPROFÈNE (LYSINATE D') équivalant à IBUPROFÈNE 400 mg - NUROFENFLASH 400 mg, comprimé pelliculé	68645178	1	3
-1184	IBUPROFÈNE (LYSINATE D') équivalant à IBUPROFÈNE 400 mg - NUROFENFLASH 400 mg, comprimé pelliculé	64594722	1	4
-1184	IBUPROFÈNE (LYSINATE D') équivalant à IBUPROFÈNE 400 mg - NUROFENFLASH 400 mg, comprimé pelliculé	64481322	1	5
+1184	IBUPROFÈNE (LYSINATE D') équivalant à IBUPROFÈNE 400 mg - NUROFENFLASH 400 mg, comprimé pelliculé	67410202	1	3
+1184	IBUPROFÈNE (LYSINATE D') équivalant à IBUPROFÈNE 400 mg - NUROFENFLASH 400 mg, comprimé pelliculé	68645178	1	4
+1184	IBUPROFÈNE (LYSINATE D') équivalant à IBUPROFÈNE 400 mg - NUROFENFLASH 400 mg, comprimé pelliculé	64594722	1	5
+1184	IBUPROFÈNE (LYSINATE D') équivalant à IBUPROFÈNE 400 mg - NUROFENFLASH 400 mg, comprimé pelliculé	64481322	1	6
+1184	IBUPROFÈNE (LYSINATE D') équivalant à IBUPROFÈNE 400 mg - NUROFENFLASH 400 mg, comprimé pelliculé	69341616	1	7
 1185	LÉVÉTIRACÉTAM 750 mg - KEPPRA 750 mg, comprimé pelliculé	68754537	0	1
 1185	LÉVÉTIRACÉTAM 750 mg - KEPPRA 750 mg, comprimé pelliculé	60248000	1	2
 1185	LÉVÉTIRACÉTAM 750 mg - KEPPRA 750 mg, comprimé pelliculé	62975906	1	3
@@ -6599,52 +6577,50 @@
 1189	PARACÉTAMOL  500 mg +  CHLORPHÉNAMINE (MALÉATE DE) 4 mg - HUMEXLIB PARACETAMOL CHLORPHENAMINE 500 mg/4 mg, gélule	68144352	0	1
 1189	PARACÉTAMOL  500 mg +  CHLORPHÉNAMINE (MALÉATE DE) 4 mg - HUMEXLIB PARACETAMOL CHLORPHENAMINE 500 mg/4 mg, gélule	60473805	1	2
 1190	OXYCODONE (CHLORHYDRATE D') 5 mg - OXYCONTIN L.P. 5 mg, comprimé pelliculé à libération prolongée	68490105	0	1
-1190	OXYCODONE (CHLORHYDRATE D') 5 mg - OXYCONTIN L.P. 5 mg, comprimé pelliculé à libération prolongée	68179168	1	2
-1190	OXYCODONE (CHLORHYDRATE D') 5 mg - OXYCONTIN L.P. 5 mg, comprimé pelliculé à libération prolongée	69894054	1	3
-1190	OXYCODONE (CHLORHYDRATE D') 5 mg - OXYCONTIN L.P. 5 mg, comprimé pelliculé à libération prolongée	69118136	1	4
-1190	OXYCODONE (CHLORHYDRATE D') 5 mg - OXYCONTIN L.P. 5 mg, comprimé pelliculé à libération prolongée	67426982	1	5
+1190	OXYCODONE (CHLORHYDRATE D') 5 mg - OXYCONTIN L.P. 5 mg, comprimé pelliculé à libération prolongée	65706238	1	2
+1190	OXYCODONE (CHLORHYDRATE D') 5 mg - OXYCONTIN L.P. 5 mg, comprimé pelliculé à libération prolongée	68179168	1	3
+1190	OXYCODONE (CHLORHYDRATE D') 5 mg - OXYCONTIN L.P. 5 mg, comprimé pelliculé à libération prolongée	69894054	1	4
+1190	OXYCODONE (CHLORHYDRATE D') 5 mg - OXYCONTIN L.P. 5 mg, comprimé pelliculé à libération prolongée	69118136	1	5
 1190	OXYCODONE (CHLORHYDRATE D') 5 mg - OXYCONTIN L.P. 5 mg, comprimé pelliculé à libération prolongée	66830566	1	6
 1191	OXYCODONE (CHLORHYDRATE D') 10 mg - OXYCONTIN LP 10 mg, comprimé pelliculé à libération prolongée	61200108	0	1
-1191	OXYCODONE (CHLORHYDRATE D') 10 mg - OXYCONTIN LP 10 mg, comprimé pelliculé à libération prolongée	66036342	1	2
-1191	OXYCODONE (CHLORHYDRATE D') 10 mg - OXYCONTIN LP 10 mg, comprimé pelliculé à libération prolongée	61243351	1	3
-1191	OXYCODONE (CHLORHYDRATE D') 10 mg - OXYCONTIN LP 10 mg, comprimé pelliculé à libération prolongée	64391907	1	4
-1191	OXYCODONE (CHLORHYDRATE D') 10 mg - OXYCONTIN LP 10 mg, comprimé pelliculé à libération prolongée	69810469	1	5
+1191	OXYCODONE (CHLORHYDRATE D') 10 mg - OXYCONTIN LP 10 mg, comprimé pelliculé à libération prolongée	66238027	1	2
+1191	OXYCODONE (CHLORHYDRATE D') 10 mg - OXYCONTIN LP 10 mg, comprimé pelliculé à libération prolongée	66036342	1	3
+1191	OXYCODONE (CHLORHYDRATE D') 10 mg - OXYCONTIN LP 10 mg, comprimé pelliculé à libération prolongée	61243351	1	4
+1191	OXYCODONE (CHLORHYDRATE D') 10 mg - OXYCONTIN LP 10 mg, comprimé pelliculé à libération prolongée	64391907	1	5
 1191	OXYCODONE (CHLORHYDRATE D') 10 mg - OXYCONTIN LP 10 mg, comprimé pelliculé à libération prolongée	67733508	1	6
 1192	OXYCODONE (CHLORHYDRATE D') 15 mg - OXYCONTIN LP 15 mg, comprimé pelliculé à libération prolongée	62557732	0	1
 1192	OXYCODONE (CHLORHYDRATE D') 15 mg - OXYCONTIN LP 15 mg, comprimé pelliculé à libération prolongée	61915863	1	2
 1192	OXYCODONE (CHLORHYDRATE D') 15 mg - OXYCONTIN LP 15 mg, comprimé pelliculé à libération prolongée	66744380	1	3
 1192	OXYCODONE (CHLORHYDRATE D') 15 mg - OXYCONTIN LP 15 mg, comprimé pelliculé à libération prolongée	69840149	1	4
-1192	OXYCODONE (CHLORHYDRATE D') 15 mg - OXYCONTIN LP 15 mg, comprimé pelliculé à libération prolongée	65207121	1	5
-1192	OXYCODONE (CHLORHYDRATE D') 15 mg - OXYCONTIN LP 15 mg, comprimé pelliculé à libération prolongée	65341316	1	6
+1192	OXYCODONE (CHLORHYDRATE D') 15 mg - OXYCONTIN LP 15 mg, comprimé pelliculé à libération prolongée	65341316	1	5
 1193	OXYCODONE (CHLORHYDRATE D') 20 mg - OXYCONTIN LP 20 mg, comprimé pelliculé à libération prolongée	67467071	0	1
-1193	OXYCODONE (CHLORHYDRATE D') 20 mg - OXYCONTIN LP 20 mg, comprimé pelliculé à libération prolongée	62892823	1	2
-1193	OXYCODONE (CHLORHYDRATE D') 20 mg - OXYCONTIN LP 20 mg, comprimé pelliculé à libération prolongée	68426120	1	3
-1193	OXYCODONE (CHLORHYDRATE D') 20 mg - OXYCONTIN LP 20 mg, comprimé pelliculé à libération prolongée	67055370	1	4
-1193	OXYCODONE (CHLORHYDRATE D') 20 mg - OXYCONTIN LP 20 mg, comprimé pelliculé à libération prolongée	61942287	1	5
+1193	OXYCODONE (CHLORHYDRATE D') 20 mg - OXYCONTIN LP 20 mg, comprimé pelliculé à libération prolongée	67101049	1	2
+1193	OXYCODONE (CHLORHYDRATE D') 20 mg - OXYCONTIN LP 20 mg, comprimé pelliculé à libération prolongée	62892823	1	3
+1193	OXYCODONE (CHLORHYDRATE D') 20 mg - OXYCONTIN LP 20 mg, comprimé pelliculé à libération prolongée	68426120	1	4
+1193	OXYCODONE (CHLORHYDRATE D') 20 mg - OXYCONTIN LP 20 mg, comprimé pelliculé à libération prolongée	67055370	1	5
 1193	OXYCODONE (CHLORHYDRATE D') 20 mg - OXYCONTIN LP 20 mg, comprimé pelliculé à libération prolongée	66016628	1	6
 1194	OXYCODONE (CHLORHYDRATE D') 30 mg - OXYCONTIN LP 30 mg, comprimé pelliculé à libération prolongée	64681077	0	1
-1194	OXYCODONE (CHLORHYDRATE D') 30 mg - OXYCONTIN LP 30 mg, comprimé pelliculé à libération prolongée	68191373	1	2
-1194	OXYCODONE (CHLORHYDRATE D') 30 mg - OXYCONTIN LP 30 mg, comprimé pelliculé à libération prolongée	68167080	1	3
-1194	OXYCODONE (CHLORHYDRATE D') 30 mg - OXYCONTIN LP 30 mg, comprimé pelliculé à libération prolongée	68282830	1	4
-1194	OXYCODONE (CHLORHYDRATE D') 30 mg - OXYCONTIN LP 30 mg, comprimé pelliculé à libération prolongée	66614682	1	5
+1194	OXYCODONE (CHLORHYDRATE D') 30 mg - OXYCONTIN LP 30 mg, comprimé pelliculé à libération prolongée	65725338	1	2
+1194	OXYCODONE (CHLORHYDRATE D') 30 mg - OXYCONTIN LP 30 mg, comprimé pelliculé à libération prolongée	68191373	1	3
+1194	OXYCODONE (CHLORHYDRATE D') 30 mg - OXYCONTIN LP 30 mg, comprimé pelliculé à libération prolongée	68167080	1	4
+1194	OXYCODONE (CHLORHYDRATE D') 30 mg - OXYCONTIN LP 30 mg, comprimé pelliculé à libération prolongée	68282830	1	5
 1194	OXYCODONE (CHLORHYDRATE D') 30 mg - OXYCONTIN LP 30 mg, comprimé pelliculé à libération prolongée	62054275	1	6
 1195	OXYCODONE (CHLORHYDRATE D') 40 mg - OXYCONTIN LP 40 mg, comprimé pelliculé à libération prolongée	67619878	0	1
 1195	OXYCODONE (CHLORHYDRATE D') 40 mg - OXYCONTIN LP 40 mg, comprimé pelliculé à libération prolongée	67851524	1	2
 1195	OXYCODONE (CHLORHYDRATE D') 40 mg - OXYCONTIN LP 40 mg, comprimé pelliculé à libération prolongée	66146970	1	3
 1195	OXYCODONE (CHLORHYDRATE D') 40 mg - OXYCONTIN LP 40 mg, comprimé pelliculé à libération prolongée	60698008	1	4
-1195	OXYCODONE (CHLORHYDRATE D') 40 mg - OXYCONTIN LP 40 mg, comprimé pelliculé à libération prolongée	63276446	1	5
-1195	OXYCODONE (CHLORHYDRATE D') 40 mg - OXYCONTIN LP 40 mg, comprimé pelliculé à libération prolongée	64964591	1	6
+1195	OXYCODONE (CHLORHYDRATE D') 40 mg - OXYCONTIN LP 40 mg, comprimé pelliculé à libération prolongée	64964591	1	5
 1196	OXYCODONE (CHLORHYDRATE D') 60 mg - OXYCONTIN LP 60 mg, comprimé pelliculé à libération prolongée	65129174	0	1
-1196	OXYCODONE (CHLORHYDRATE D') 60 mg - OXYCONTIN LP 60 mg, comprimé pelliculé à libération prolongée	65527559	1	2
-1196	OXYCODONE (CHLORHYDRATE D') 60 mg - OXYCONTIN LP 60 mg, comprimé pelliculé à libération prolongée	63434704	1	3
-1196	OXYCODONE (CHLORHYDRATE D') 60 mg - OXYCONTIN LP 60 mg, comprimé pelliculé à libération prolongée	69599253	1	4
-1196	OXYCODONE (CHLORHYDRATE D') 60 mg - OXYCONTIN LP 60 mg, comprimé pelliculé à libération prolongée	62916936	1	5
+1196	OXYCODONE (CHLORHYDRATE D') 60 mg - OXYCONTIN LP 60 mg, comprimé pelliculé à libération prolongée	68065061	1	2
+1196	OXYCODONE (CHLORHYDRATE D') 60 mg - OXYCONTIN LP 60 mg, comprimé pelliculé à libération prolongée	65527559	1	3
+1196	OXYCODONE (CHLORHYDRATE D') 60 mg - OXYCONTIN LP 60 mg, comprimé pelliculé à libération prolongée	63434704	1	4
+1196	OXYCODONE (CHLORHYDRATE D') 60 mg - OXYCONTIN LP 60 mg, comprimé pelliculé à libération prolongée	69599253	1	5
 1196	OXYCODONE (CHLORHYDRATE D') 60 mg - OXYCONTIN LP 60 mg, comprimé pelliculé à libération prolongée	63810633	1	6
 1197	OXYCODONE (CHLORHYDRATE D') 80 mg - OXYCONTIN LP 80 mg, comprimé pelliculé à libération prolongée	66424640	0	1
-1197	OXYCODONE (CHLORHYDRATE D') 80 mg - OXYCONTIN LP 80 mg, comprimé pelliculé à libération prolongée	64498453	1	2
-1197	OXYCODONE (CHLORHYDRATE D') 80 mg - OXYCONTIN LP 80 mg, comprimé pelliculé à libération prolongée	60694853	1	3
-1197	OXYCODONE (CHLORHYDRATE D') 80 mg - OXYCONTIN LP 80 mg, comprimé pelliculé à libération prolongée	67338386	1	4
-1197	OXYCODONE (CHLORHYDRATE D') 80 mg - OXYCONTIN LP 80 mg, comprimé pelliculé à libération prolongée	68801079	1	5
+1197	OXYCODONE (CHLORHYDRATE D') 80 mg - OXYCONTIN LP 80 mg, comprimé pelliculé à libération prolongée	63970958	1	2
+1197	OXYCODONE (CHLORHYDRATE D') 80 mg - OXYCONTIN LP 80 mg, comprimé pelliculé à libération prolongée	64498453	1	3
+1197	OXYCODONE (CHLORHYDRATE D') 80 mg - OXYCONTIN LP 80 mg, comprimé pelliculé à libération prolongée	60694853	1	4
+1197	OXYCODONE (CHLORHYDRATE D') 80 mg - OXYCONTIN LP 80 mg, comprimé pelliculé à libération prolongée	67338386	1	5
 1197	OXYCODONE (CHLORHYDRATE D') 80 mg - OXYCONTIN LP 80 mg, comprimé pelliculé à libération prolongée	67540950	1	6
 1198	DIOSMECTITE 3 g - SMECTA 3 g, suspension buvable en sachet	65396608	0	1
 1198	DIOSMECTITE 3 g - SMECTA 3 g, suspension buvable en sachet	65118886	1	2
@@ -6737,9 +6713,10 @@
 1216	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 25 mg/2,5 ml (1 POUR CENT), solution injectable en ampoule	60406781	1	3
 1216	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 25 mg/2,5 ml (1 POUR CENT), solution injectable en ampoule	64612088	1	4
 1217	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 50 mg/5 ml (1 POUR CENT), solution injectable en ampoule	64773102	0	1
-1217	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 50 mg/5 ml (1 POUR CENT), solution injectable en ampoule	67466119	1	2
-1217	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 50 mg/5 ml (1 POUR CENT), solution injectable en ampoule	60406781	1	3
-1217	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 50 mg/5 ml (1 POUR CENT), solution injectable en ampoule	64612088	1	4
+1217	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 50 mg/5 ml (1 POUR CENT), solution injectable en ampoule	66810503	1	2
+1217	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 50 mg/5 ml (1 POUR CENT), solution injectable en ampoule	67466119	1	3
+1217	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 50 mg/5 ml (1 POUR CENT), solution injectable en ampoule	60406781	1	4
+1217	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 50 mg/5 ml (1 POUR CENT), solution injectable en ampoule	64612088	1	5
 1218	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 250 mg/25 ml, solution injectable	61429943	0	1
 1218	BÉSILATE D'ATRACURIUM 10 mg/ml - TRACRIUM 250 mg/25 ml, solution injectable	64612088	1	2
 1219	CHOLÉCALCIFÉROL 100 000 UI - UVEDOSE 100 000 UI, solution buvable en ampoule	63489259	0	1
@@ -6839,7 +6816,6 @@
 1238	LÉVOBUPIVACAÏNE (CHLORHYDRATE DE) 1,25 mg/mL - CHIROCAÏNE 1,25 mg/ml, solution pour perfusion	60661814	0	1
 1238	LÉVOBUPIVACAÏNE (CHLORHYDRATE DE) 1,25 mg/mL - CHIROCAÏNE 1,25 mg/ml, solution pour perfusion	66681599	1	2
 1238	LÉVOBUPIVACAÏNE (CHLORHYDRATE DE) 1,25 mg/mL - CHIROCAÏNE 1,25 mg/ml, solution pour perfusion	62150722	1	3
-1238	LÉVOBUPIVACAÏNE (CHLORHYDRATE DE) 1,25 mg/mL - CHIROCAÏNE 1,25 mg/ml, solution pour perfusion	60041884	1	4
 1239	LÉVOBUPIVACAÏNE (CHLORHYDRATE DE) 2,5 mg/mL - CHIROCAÏNE 2,5 mg/ml, solution injectable ou solution à diluer pour perfusion	66840005	0	1
 1239	LÉVOBUPIVACAÏNE (CHLORHYDRATE DE) 2,5 mg/mL - CHIROCAÏNE 2,5 mg/ml, solution injectable ou solution à diluer pour perfusion	66497617	1	2
 1239	LÉVOBUPIVACAÏNE (CHLORHYDRATE DE) 2,5 mg/mL - CHIROCAÏNE 2,5 mg/ml, solution injectable ou solution à diluer pour perfusion	68637391	1	3
@@ -7175,20 +7151,19 @@
 1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	66852477	0	1
 1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	60457719	1	2
 1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	64460239	1	3
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	65221726	1	4
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	64468759	1	5
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	69407386	1	6
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	62443668	1	7
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	63954135	1	8
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	61704193	1	9
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	60354021	1	10
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	66982271	1	11
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	63606680	1	12
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	63301789	1	13
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	68774810	1	14
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	60890617	1	15
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	67885003	1	16
-1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	69020635	1	17
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	64468759	1	4
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	69407386	1	5
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	62443668	1	6
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	63954135	1	7
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	61704193	1	8
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	60354021	1	9
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	66982271	1	10
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	63606680	1	11
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	63301789	1	12
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	68774810	1	13
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	60890617	1	14
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	67885003	1	15
+1266	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 30 mg - CYMBALTA 30 mg, gélule gastro-résistante	69020635	1	16
 1267	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 60 mg - CYMBALTA 60 mg, gélule gastro-résistante	68263545	0	1
 1267	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 60 mg - CYMBALTA 60 mg, gélule gastro-résistante	64381382	1	2
 1267	DULOXÉTINE (CHLORHYDRATE DE) équivalant à DULOXÉTINE 60 mg - CYMBALTA 60 mg, gélule gastro-résistante	60299831	1	3
@@ -7540,20 +7515,19 @@
 1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	60981789	0	1
 1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	63964962	1	2
 1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	60887592	1	3
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	65303899	1	4
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	65639202	1	5
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	69068516	1	6
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	69062997	1	7
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	65825737	1	8
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	69510055	1	9
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	68139818	1	10
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	68607455	1	11
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	60771787	1	12
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	66718898	1	13
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	66999267	1	14
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	67451779	1	15
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	60977940	1	16
-1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	64894794	1	17
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	65639202	1	4
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	69068516	1	5
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	69062997	1	6
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	65825737	1	7
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	69510055	1	8
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	68139818	1	9
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	68607455	1	10
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	60771787	1	11
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	66718898	1	12
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	66999267	1	13
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	67451779	1	14
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	60977940	1	15
+1332	EZETIMIBE 10 mg - EZETROL 10 mg, comprimé	64894794	1	16
 1333	IBUPROFENE 200 mg - ADVIL 200 mg, comprimé enrobé	68634000	0	1
 1333	IBUPROFENE 200 mg - ADVIL 200 mg, comprimé enrobé	65437229	1	2
 1333	IBUPROFENE 200 mg - ADVIL 200 mg, comprimé enrobé	67095030	1	3
@@ -7575,12 +7549,11 @@
 1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	69157915	1	9
 1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	68665113	1	10
 1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	64296537	1	11
-1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	64842687	1	12
-1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	61843531	1	13
-1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	62533172	1	14
-1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	65078623	1	15
-1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	69323365	1	16
-1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	61628475	1	17
+1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	61843531	1	12
+1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	62533172	1	13
+1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	65078623	1	14
+1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	69323365	1	15
+1336	IVERMECTINE 3 mg - STROMECTOL 3 mg, comprimé	61628475	1	16
 1337	GANIRELIX (ACETATE DE) équivalant à GANIRELIX 0,25 mg/0,5 mL - ORGALUTRAN 0,25 mg/0,5 ml, solution injectable	62225235	0	1
 1337	GANIRELIX (ACETATE DE) équivalant à GANIRELIX 0,25 mg/0,5 mL - ORGALUTRAN 0,25 mg/0,5 ml, solution injectable	61462270	1	2
 1337	GANIRELIX (ACETATE DE) équivalant à GANIRELIX 0,25 mg/0,5 mL - ORGALUTRAN 0,25 mg/0,5 ml, solution injectable	61125958	1	3
@@ -7825,9 +7798,8 @@
 1381	CASPOFUNGINE (ACETATE DE) ((CHAMPIGNONS/GLAREA LOZOYENSIS)) équivalant à CAPSOFUNGINE 70 mg - CANCIDAS 70 mg, poudre pour solution à diluer pour perfusion	60789956	1	7
 1381	CASPOFUNGINE (ACETATE DE) ((CHAMPIGNONS/GLAREA LOZOYENSIS)) équivalant à CAPSOFUNGINE 70 mg - CANCIDAS 70 mg, poudre pour solution à diluer pour perfusion	63197689	1	8
 1381	CASPOFUNGINE (ACETATE DE) ((CHAMPIGNONS/GLAREA LOZOYENSIS)) équivalant à CAPSOFUNGINE 70 mg - CANCIDAS 70 mg, poudre pour solution à diluer pour perfusion	67108093	1	9
-1381	CASPOFUNGINE (ACETATE DE) ((CHAMPIGNONS/GLAREA LOZOYENSIS)) équivalant à CAPSOFUNGINE 70 mg - CANCIDAS 70 mg, poudre pour solution à diluer pour perfusion	69061411	1	10
-1381	CASPOFUNGINE (ACETATE DE) ((CHAMPIGNONS/GLAREA LOZOYENSIS)) équivalant à CAPSOFUNGINE 70 mg - CANCIDAS 70 mg, poudre pour solution à diluer pour perfusion	63609267	1	11
-1381	CASPOFUNGINE (ACETATE DE) ((CHAMPIGNONS/GLAREA LOZOYENSIS)) équivalant à CAPSOFUNGINE 70 mg - CANCIDAS 70 mg, poudre pour solution à diluer pour perfusion	61215042	1	12
+1381	CASPOFUNGINE (ACETATE DE) ((CHAMPIGNONS/GLAREA LOZOYENSIS)) équivalant à CAPSOFUNGINE 70 mg - CANCIDAS 70 mg, poudre pour solution à diluer pour perfusion	63609267	1	10
+1381	CASPOFUNGINE (ACETATE DE) ((CHAMPIGNONS/GLAREA LOZOYENSIS)) équivalant à CAPSOFUNGINE 70 mg - CANCIDAS 70 mg, poudre pour solution à diluer pour perfusion	61215042	1	11
 1382	CICLOPIROX OLAMINE 1,5 g pour 100 g - SEBIPROX 1,5 %, shampooing	64391992	0	1
 1382	CICLOPIROX OLAMINE 1,5 g pour 100 g - SEBIPROX 1,5 %, shampooing	60655327	1	2
 1383	CINACALCET (CHLORHYDRATE DE) équivalant à CINACALCET 30 mg - MIMPARA 30 mg, comprimé pelliculé	63023578	0	1
@@ -8000,10 +7972,10 @@
 1408	HYDROCORTISONE (HEMISUCCINATE SODIQUE D') équivalant à HYDROCORTISONE 100 mg - HYDROCORTISONE UPJOHN 100 mg, préparation injectable	61581417	0	1
 1408	HYDROCORTISONE (HEMISUCCINATE SODIQUE D') équivalant à HYDROCORTISONE 100 mg - HYDROCORTISONE UPJOHN 100 mg, préparation injectable	68615007	1	2
 1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	63591602	0	1
-1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	64272874	1	2
-1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	65035846	1	3
-1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	60934017	1	4
-1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	65561390	1	5
+1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	65561390	1	2
+1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	64272874	1	3
+1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	65035846	1	4
+1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	60934017	1	5
 1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	62300481	1	6
 1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	63278319	1	7
 1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	63725282	0	8
@@ -8011,10 +7983,10 @@
 1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	60648756	1	10
 1409	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 2800 UI - FOSAVANCE 70 mg/2800 UI, comprimé - ADROVANCE 70 mg/2800 UI, comprimé -	65383557	1	11
 1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	68300050	0	1
-1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	63001941	1	2
-1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	69242155	1	3
-1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	66407096	1	4
-1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	66677946	1	5
+1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	66677946	1	2
+1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	63001941	1	3
+1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	69242155	1	4
+1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	66407096	1	5
 1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	62999597	1	6
 1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	64079238	1	7
 1410	ALENDRONATE MONOSODIQUE TRIHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - ALENDRONATE DE SODIUM MONOHYDRATE équivalant à ACIDE ALENDRONIQUE 70 mg + CHOLECALCIFEROL 5600 UI - FOSAVANCE 70 mg/5600 UI, comprimé -  ADROVANCE 70 mg/5600 UI, comprimé	63230395	0	8
@@ -8048,6 +8020,7 @@
 1414	EFAVIRENZ 600 mg + EMTRICITABINE 200 mg + TENOFOVIR DISOPROXIL (FUMARATE DE) équivalant à TENOFOVIR DISOPROXIL 245 mg  - EFAVIRENZ 600 mg + EMTRICITABINE 200 mg + TENOFOVIR DISOPROXIL (PHOSPHATE DE) équivalant à TENOFOVIR DISOPROXIL 245 mg - EFAVIRENZ 600 mg + EMTRICITABINE 2	61814540	1	10
 1414	EFAVIRENZ 600 mg + EMTRICITABINE 200 mg + TENOFOVIR DISOPROXIL (FUMARATE DE) équivalant à TENOFOVIR DISOPROXIL 245 mg  - EFAVIRENZ 600 mg + EMTRICITABINE 200 mg + TENOFOVIR DISOPROXIL (PHOSPHATE DE) équivalant à TENOFOVIR DISOPROXIL 245 mg - EFAVIRENZ 600 mg + EMTRICITABINE 2	69244131	1	11
 1414	EFAVIRENZ 600 mg + EMTRICITABINE 200 mg + TENOFOVIR DISOPROXIL (FUMARATE DE) équivalant à TENOFOVIR DISOPROXIL 245 mg  - EFAVIRENZ 600 mg + EMTRICITABINE 200 mg + TENOFOVIR DISOPROXIL (PHOSPHATE DE) équivalant à TENOFOVIR DISOPROXIL 245 mg - EFAVIRENZ 600 mg + EMTRICITABINE 2	65999410	1	12
+1414	EFAVIRENZ 600 mg + EMTRICITABINE 200 mg + TENOFOVIR DISOPROXIL (FUMARATE DE) équivalant à TENOFOVIR DISOPROXIL 245 mg  - EFAVIRENZ 600 mg + EMTRICITABINE 200 mg + TENOFOVIR DISOPROXIL (PHOSPHATE DE) équivalant à TENOFOVIR DISOPROXIL 245 mg - EFAVIRENZ 600 mg + EMTRICITABINE 2	68752269	1	13
 1415	ENTECAVIR 0,5 mg - BARACLUDE 0,5 mg, comprimé pelliculé	69469719	0	1
 1415	ENTECAVIR 0,5 mg - BARACLUDE 0,5 mg, comprimé pelliculé	60110896	1	2
 1415	ENTECAVIR 0,5 mg - BARACLUDE 0,5 mg, comprimé pelliculé	63520701	1	3
@@ -8076,35 +8049,33 @@
 1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	60371679	0	1
 1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	69366854	1	2
 1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	66535078	1	3
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	62444948	1	4
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	60286296	1	5
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	66397549	1	6
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	60849677	1	7
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	61367363	1	8
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	69624646	1	9
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	64639263	1	10
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	69226336	1	11
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	67626755	1	12
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	69439793	1	13
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	65727499	1	14
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	68823378	1	15
-1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	68759769	1	16
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	60286296	1	4
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	66397549	1	5
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	60849677	1	6
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	61367363	1	7
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	69624646	1	8
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	64639263	1	9
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	69226336	1	10
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	67626755	1	11
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	69439793	1	12
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	65727499	1	13
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	68823378	1	14
+1417	EZETIMIBE 10 mg + SIMVASTATINE 20 mg - INEGY 10 mg/20 mg, comprimé	68759769	1	15
 1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	65057814	0	1
 1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	69288170	1	2
 1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	61537673	1	3
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	67065998	1	4
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	65133660	1	5
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	64071818	1	6
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	67277944	1	7
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	65654186	1	8
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	62562380	1	9
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	67729292	1	10
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	63813120	1	11
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	65261628	1	12
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	65096870	1	13
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	65985122	1	14
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	68100377	1	15
-1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	69252929	1	16
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	65133660	1	4
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	64071818	1	5
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	67277944	1	6
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	65654186	1	7
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	62562380	1	8
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	67729292	1	9
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	63813120	1	10
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	65261628	1	11
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	65096870	1	12
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	65985122	1	13
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	68100377	1	14
+1418	EZETIMIBE 10 mg + SIMVASTATINE 40 mg - INEGY 10 mg/40 mg, comprimé	69252929	1	15
 1419	FEBUXOSTAT 80 mg - ADENURIC 80 mg, comprimé pelliculé	61871331	0	1
 1419	FEBUXOSTAT 80 mg - ADENURIC 80 mg, comprimé pelliculé	63862669	1	2
 1419	FEBUXOSTAT 80 mg - ADENURIC 80 mg, comprimé pelliculé	67041972	1	3
@@ -8286,16 +8257,15 @@
 1448	DAPTOMYCINE 500 mg - CUBICIN 500 mg, poudre pour solution injectable ou pour perfusion	61279408	1	15
 1449	FENTICONAZOLE (NITRATE DE) 2% - LOMEXIN 2 POUR CENT, crème	63987103	0	1
 1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	60892792	0	1
-1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	61327301	1	2
-1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	69899592	1	3
-1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	64011319	1	4
-1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	67874551	1	5
-1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	60148110	1	6
-1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	65547501	1	7
-1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	60004932	1	8
-1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	68377328	1	9
-1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	61238831	1	10
-1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	65800164	1	11
+1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	69899592	1	2
+1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	64011319	1	3
+1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	67874551	1	4
+1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	60148110	1	5
+1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	65547501	1	6
+1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	60004932	1	7
+1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	68377328	1	8
+1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	61238831	1	9
+1451	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - EUCREAS 50 mg/1000 mg, comprimé pelliculé	65800164	1	10
 1452	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 850 mg  - EUCREAS 50 mg/850 mg, comprimé pelliculé	62091971	0	1
 1452	VILDAGLIPTINE 50 mg + METFORMINE (CHLORHYDRATE DE) 850 mg  - EUCREAS 50 mg/850 mg, comprimé pelliculé	62260396	1	2
 1453	NITISINONE 2 mg - ORFADIN 2 mg, gélule	64748145	0	1
@@ -8649,6 +8619,7 @@
 1500	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 25 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 25 mg - JANUVIA 25 mg, comprimé pelliculé	68707174	1	4
 1500	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 25 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 25 mg - JANUVIA 25 mg, comprimé pelliculé	64582271	1	5
 1500	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 25 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 25 mg - JANUVIA 25 mg, comprimé pelliculé	68468692	1	6
+1500	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 25 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 25 mg - JANUVIA 25 mg, comprimé pelliculé	61484719	1	7
 1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	60595727	0	1
 1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	65818301	1	2
 1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	65179775	1	3
@@ -8664,12 +8635,13 @@
 1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	67330546	1	13
 1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	64243837	1	14
 1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	65382996	1	15
-1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	69252822	1	16
-1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	67947540	1	17
-1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	61698826	1	18
-1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	69588627	1	19
-1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	62018795	1	20
-1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	61797226	1	21
+1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	64673397	1	16
+1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	69252822	1	17
+1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	67947540	1	18
+1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	61698826	1	19
+1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	69588627	1	20
+1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	62018795	1	21
+1501	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 50 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 50 mg - JANUVIA 50 mg, comprimé pelliculé	61797226	1	22
 1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	64889982	0	1
 1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	65823227	1	2
 1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	61393123	1	3
@@ -8685,12 +8657,13 @@
 1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	66801671	1	13
 1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	64512351	1	14
 1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	69688606	1	15
-1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	62678189	1	16
-1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	62145198	1	17
-1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	63735305	1	18
-1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	63912200	1	19
-1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	66164986	1	20
-1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	63219840	1	21
+1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	62528271	1	16
+1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	62678189	1	17
+1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	62145198	1	18
+1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	63735305	1	19
+1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	63912200	1	20
+1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	66164986	1	21
+1502	SITAGLIPTINE (PHOSPHATE DE) MONOHYDRATE équivalant à SITAGLIPTINE 100 mg - SITAGLIPTINE (MALATE DE) équivalant à SITAGLIPTINE 100 mg - JANUVIA 100 mg, comprimé pelliculé	63219840	1	22
 1503	LACOSAMIDE 150 mg - VIMPAT 150 mg, comprimé pelliculé	62229123	0	1
 1503	LACOSAMIDE 150 mg - VIMPAT 150 mg, comprimé pelliculé	68217868	1	2
 1503	LACOSAMIDE 150 mg - VIMPAT 150 mg, comprimé pelliculé	63751971	1	3
@@ -9493,10 +9466,11 @@
 1707	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 100 mg - DUOPLAVIN 75 mg/100 mg, comprimé pelliculé	64848868	0	1
 1707	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 100 mg - DUOPLAVIN 75 mg/100 mg, comprimé pelliculé	69107392	1	2
 1708	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 75 mg - DUOPLAVIN 75 mg/75 mg, comprimé pelliculé	61952274	0	1
-1708	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 75 mg - DUOPLAVIN 75 mg/75 mg, comprimé pelliculé	63415515	1	2
-1708	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 75 mg - DUOPLAVIN 75 mg/75 mg, comprimé pelliculé	62175120	1	3
-1708	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 75 mg - DUOPLAVIN 75 mg/75 mg, comprimé pelliculé	65519167	1	4
-1708	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 75 mg - DUOPLAVIN 75 mg/75 mg, comprimé pelliculé	62103929	1	5
+1708	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 75 mg - DUOPLAVIN 75 mg/75 mg, comprimé pelliculé	68284429	1	2
+1708	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 75 mg - DUOPLAVIN 75 mg/75 mg, comprimé pelliculé	63415515	1	3
+1708	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 75 mg - DUOPLAVIN 75 mg/75 mg, comprimé pelliculé	62175120	1	4
+1708	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 75 mg - DUOPLAVIN 75 mg/75 mg, comprimé pelliculé	65519167	1	5
+1708	CLOPIDOGREL (HYDROGENOSULFATE DE) équivalant à CLOPIDOGREL 75 mg + ACIDE ACETYLSALICYLIQUE 75 mg - DUOPLAVIN 75 mg/75 mg, comprimé pelliculé	62103929	1	6
 1709	ACIDE URSODESOXYCHOLIQUE 500 mg - DELURSAN 500 mg, comprimé pelliculé sécable	69674026	0	1
 1709	ACIDE URSODESOXYCHOLIQUE 500 mg - DELURSAN 500 mg, comprimé pelliculé sécable	69307489	1	2
 1709	ACIDE URSODESOXYCHOLIQUE 500 mg - DELURSAN 500 mg, comprimé pelliculé sécable	61225182	1	3
@@ -9740,20 +9714,21 @@
 1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	62024905	1	3
 1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	63462988	1	4
 1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	67935602	0	5
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	60886615	1	6
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	64383846	1	7
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	65346174	1	8
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	67553353	1	9
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	60913329	1	10
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	69883079	1	11
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	69542124	1	12
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	61904144	1	13
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	61141880	1	14
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	66390946	1	15
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	60437225	1	16
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	62406495	1	17
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	66388233	1	18
-1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	60427398	1	19
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	60628159	1	6
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	60886615	1	7
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	64383846	1	8
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	65346174	1	9
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	67553353	1	10
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	60913329	1	11
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	69883079	1	12
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	69542124	1	13
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	61904144	1	14
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	61141880	1	15
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	66390946	1	16
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	60437225	1	17
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	62406495	1	18
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	66388233	1	19
+1751	SITAGLIPTINE + METFORMINE (CHLORHYDRATE DE) 50 mg + 1000 mg - JANUMET 50 mg/1000 mg, comprimé pelliculé - VELMETIA 50 mg/1000 mg, comprimé pelliculé	60427398	1	20
 1752	RISPERIDONE 25 mg/2 mL - RISPERDALCONSTA L.P. 25 mg/2 ml, poudre et solvant pour suspension injectable à libération prolongée en seringue préremplie	68878549	0	1
 1752	RISPERIDONE 25 mg/2 mL - RISPERDALCONSTA L.P. 25 mg/2 ml, poudre et solvant pour suspension injectable à libération prolongée en seringue préremplie	61515919	1	2
 1753	RISPERIDONE 37,5 mg/2 mL - RISPERDALCONSTA L.P. 37,5 mg/2 ml, poudre et solvant pour suspension injectable à libération prolongée en seringue préremplie	68901873	0	1
@@ -9817,12 +9792,11 @@
 1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	63023425	1	4
 1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	60443897	1	5
 1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	69224794	1	6
-1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	67785871	1	7
-1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	61629890	1	8
-1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	61528642	1	9
-1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	62217548	1	10
-1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	60202750	1	11
-1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	61110155	1	12
+1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	61629890	1	7
+1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	61528642	1	8
+1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	62217548	1	9
+1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	60202750	1	10
+1775	BILASTINE 20 mg - BILASKA 20 mg, comprimé - INORIAL 20 mg, comprimé	61110155	1	11
 1776	FESOTERODINE (FUMARATE DE) 4 mg - TOVIAZ 4 mg, comprimé à libération prolongée	68479557	0	1
 1776	FESOTERODINE (FUMARATE DE) 4 mg - TOVIAZ 4 mg, comprimé à libération prolongée	69848594	1	2
 1776	FESOTERODINE (FUMARATE DE) 4 mg - TOVIAZ 4 mg, comprimé à libération prolongée	64038921	1	3
@@ -9944,15 +9918,13 @@
 1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	65890400	1	10
 1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	60822363	1	11
 1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	64714680	1	12
-1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	61397659	1	13
-1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	66742326	1	14
-1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	68011619	1	15
-1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	60929148	1	16
-1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	64164546	1	17
-1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	61905794	1	18
-1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	60488262	1	19
-1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	62639211	1	20
-1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	68633806	1	21
+1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	66742326	1	13
+1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	68011619	1	14
+1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	60929148	1	15
+1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	64164546	1	16
+1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	60488262	1	17
+1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	62639211	1	18
+1798	SUGAMMADEX SODIQUE équivalant à SUGAMMADEX 100 mg/mL - BRIDION 100 mg/ml, solution injectable	68633806	1	19
 1799	ESMOLOL (CHLORHYDRATE D') 10mg/mL - BREVIBLOC 10 mg/ml, solution pour perfusion	61177887	0	1
 1799	ESMOLOL (CHLORHYDRATE D') 10mg/mL - BREVIBLOC 10 mg/ml, solution pour perfusion	64343150	1	2
 1800	IBUPROFENE 400 mg - ADVILCAPS 400 mg, capsule molle	61959735	0	1
@@ -9972,8 +9944,8 @@
 1803	THIOTEPA 15 mg - TEPADINA 15 mg, poudre pour concentré pour solution pour perfusion	64287342	1	6
 1804	CEFIXIME TRIHYDRATE équivalent à 100 mg/5 ml CEFIXIME - OROKEN ENFANTS 100 mg/5 ml, poudre pour suspension buvable en flacon	66907450	0	1
 1804	CEFIXIME TRIHYDRATE équivalent à 100 mg/5 ml CEFIXIME - OROKEN ENFANTS 100 mg/5 ml, poudre pour suspension buvable en flacon	67547553	1	2
-1805	ISOPRENALINE (CHLORHYDRATE D') 0,2 mg/1 mL - ISUPREL 0,20 mg/1 ml, solution injectable en ampoule	68886179	0	1
-1805	ISOPRENALINE (CHLORHYDRATE D') 0,2 mg/1 mL - ISUPREL 0,20 mg/1 ml, solution injectable en ampoule	64163298	1	2
+1805	ISOPRENALINE (CHLORHYDRATE D') 0,2 mg/1 mL - ISUPREL 0,20 mg/1 ml, solution injectable en ampoule  (FLACON de 1 mL).	68886179	0	1
+1805	ISOPRENALINE (CHLORHYDRATE D') 0,2 mg/1 mL - ISUPREL 0,20 mg/1 ml, solution injectable en ampoule  (FLACON de 1 mL).	64163298	1	2
 1807	ACIDE FOLIQUE 0,4 mg - SPECIAFOLDINE 0,4 mg, comprimé	64732689	0	1
 1807	ACIDE FOLIQUE 0,4 mg - SPECIAFOLDINE 0,4 mg, comprimé	60369895	1	2
 1808	BEXAROTENE 75 mg - TARGRETIN 75 mg, capsule molle	69197468	0	1
@@ -9994,10 +9966,10 @@
 1811	TRABECTEDINE 0,25 mg - YONDELIS 0,25 mg, poudre pour solution à diluer pour perfusion	68539189	1	5
 1811	TRABECTEDINE 0,25 mg - YONDELIS 0,25 mg, poudre pour solution à diluer pour perfusion	66547080	1	6
 1812	VINORELBINE (DITARTRATE DE) équivalent à VINORELBINE 80 mg - VINORELBINE (TARTRATE DE) équivalent à VINORELBINE 80 mg - NAVELBINE 80 mg, capsule molle	61869113	0	1
-1815	AMIFAMPRIDINE (PHOSPHATE DE) équivalant à10 mg - FIRDAPSE 10 mg, comprimé	69935992	0	1
-1815	AMIFAMPRIDINE (PHOSPHATE DE) équivalant à10 mg - FIRDAPSE 10 mg, comprimé	66821186	1	2
-1815	AMIFAMPRIDINE (PHOSPHATE DE) équivalant à10 mg - FIRDAPSE 10 mg, comprimé	69785998	1	3
-1815	AMIFAMPRIDINE (PHOSPHATE DE) équivalant à10 mg - FIRDAPSE 10 mg, comprimé	65825598	1	4
+1815	AMIFAMPRIDINE (PHOSPHATE DE) équivalant à AMIFAMPRIDINE 10 mg - FIRDAPSE 10 mg, comprimé	69935992	0	1
+1815	AMIFAMPRIDINE (PHOSPHATE DE) équivalant à AMIFAMPRIDINE 10 mg - FIRDAPSE 10 mg, comprimé	66821186	1	2
+1815	AMIFAMPRIDINE (PHOSPHATE DE) équivalant à AMIFAMPRIDINE 10 mg - FIRDAPSE 10 mg, comprimé	69785998	1	3
+1815	AMIFAMPRIDINE (PHOSPHATE DE) équivalant à AMIFAMPRIDINE 10 mg - FIRDAPSE 10 mg, comprimé	65825598	1	4
 1816	CHOLÉCALCIFÉROL 200 000 UI - ZYMAD 200 000 UI, solution buvable en ampoule	64328821	0	1
 1816	CHOLÉCALCIFÉROL 200 000 UI - ZYMAD 200 000 UI, solution buvable en ampoule	60722053	1	2
 1816	CHOLÉCALCIFÉROL 200 000 UI - ZYMAD 200 000 UI, solution buvable en ampoule	64784230	1	3
@@ -10265,41 +10237,45 @@
 1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	67261146	1	3
 1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	66463419	1	4
 1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	64324004	1	5
-1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	69789217	1	6
-1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	62476935	1	7
-1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	65497094	1	8
-1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	62770748	1	9
-1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	65454285	1	10
+1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	63159934	1	6
+1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	69789217	1	7
+1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	62476935	1	8
+1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	65497094	1	9
+1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	62770748	1	10
+1887	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 10 mg - LIPTRUZET 10 mg/10 mg, comprimé pelliculé	65454285	1	11
 1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	69289176	0	1
 1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	64901598	1	2
 1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	62162596	1	3
 1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	63943669	1	4
 1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	69427360	1	5
-1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	69826637	1	6
-1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	60233945	1	7
-1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	68133110	1	8
-1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	60747658	1	9
-1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	63330082	1	10
+1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	68730319	1	6
+1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	69826637	1	7
+1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	60233945	1	8
+1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	68133110	1	9
+1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	60747658	1	10
+1888	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 20 mg - LIPTRUZET 10 mg/20 mg, comprimé pelliculé	63330082	1	11
 1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	68921356	0	1
 1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	68156536	1	2
 1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	69281820	1	3
 1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	67675859	1	4
 1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	64277476	1	5
-1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	67638686	1	6
-1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	67451341	1	7
-1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	66105920	1	8
-1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	65957856	1	9
-1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	64657293	1	10
+1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	67230930	1	6
+1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	67638686	1	7
+1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	67451341	1	8
+1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	66105920	1	9
+1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	65957856	1	10
+1889	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 40 mg - LIPTRUZET 10 mg/40 mg, comprimé pelliculé	64657293	1	11
 1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	69177024	0	1
 1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	68640042	1	2
 1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	67185410	1	3
 1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	68936988	1	4
 1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	65929846	1	5
-1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	66250645	1	6
-1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	62239078	1	7
-1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	69280024	1	8
-1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	67684146	1	9
-1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	65056121	1	10
+1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	66042943	1	6
+1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	66250645	1	7
+1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	62239078	1	8
+1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	69280024	1	9
+1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	67684146	1	10
+1890	EZETIMIBE 10 mg + ATORVASTATINE CALCIQUE TRIHYDRATEE équivalent à ATORVASTATINE 80 mg - LIPTRUZET 10 mg/80 mg, comprimé pelliculé	65056121	1	11
 1891	BOSUTINIB MONOHYDRATE équivalent à BOSUTINIB 500 mg - BOSUTINIB 500 mg - BOSULIF 500 mg, comprimé pelliculé	63150294	0	1
 1891	BOSUTINIB MONOHYDRATE équivalent à BOSUTINIB 500 mg - BOSUTINIB 500 mg - BOSULIF 500 mg, comprimé pelliculé	66415794	1	2
 1891	BOSUTINIB MONOHYDRATE équivalent à BOSUTINIB 500 mg - BOSUTINIB 500 mg - BOSULIF 500 mg, comprimé pelliculé	61270163	1	3
@@ -10591,8 +10567,11 @@
 1956	TOLVAPTAN 30 mg - JINARC 30 mg, comprimé	60806583	1	2
 1956	TOLVAPTAN 30 mg - JINARC 30 mg, comprimé	63744464	1	3
 1957	RUFINAMIDE 100 mg - INOVELON 100 mg, comprimé pelliculé	67454800	0	1
+1957	RUFINAMIDE 100 mg - INOVELON 100 mg, comprimé pelliculé	60960834	1	2
 1958	RUFINAMIDE 200 mg - INOVELON 200 mg, comprimé pelliculé	65037644	0	1
+1958	RUFINAMIDE 200 mg - INOVELON 200 mg, comprimé pelliculé	63561484	1	2
 1959	RUFINAMIDE 400 mg - INOVELON 400 mg, comprimé pelliculé	65869160	0	1
+1959	RUFINAMIDE 400 mg - INOVELON 400 mg, comprimé pelliculé	67978137	1	2
 1960	LENVATINIB (BESILATE DE) équivalent à LENVATINIB 10 mg - LENVIMA 10 mg, gélule	64456664	0	1
 1960	LENVATINIB (BESILATE DE) équivalent à LENVATINIB 10 mg - LENVIMA 10 mg, gélule	68226422	1	2
 1960	LENVATINIB (BESILATE DE) équivalent à LENVATINIB 10 mg - LENVIMA 10 mg, gélule	65277625	1	3
@@ -10604,11 +10583,29 @@
 1964	DAPAGLIFLOZINE (PROPYLENE GLYCOL DE) MONOHYDRATE équivalent à DAPAGLIFLOZINE 5 mg - DAPAGLIFLOZINE PROPANEDIOL MONOHYDRATE équivalent à DAPAGLIFLOZINE 5 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - XIGDUO 5 mg/1000 mg, comprimé pelliculé	60267506	0	1
 1964	DAPAGLIFLOZINE (PROPYLENE GLYCOL DE) MONOHYDRATE équivalent à DAPAGLIFLOZINE 5 mg - DAPAGLIFLOZINE PROPANEDIOL MONOHYDRATE équivalent à DAPAGLIFLOZINE 5 mg + METFORMINE (CHLORHYDRATE DE) 1000 mg - XIGDUO 5 mg/1000 mg, comprimé pelliculé	60913756	1	2
 1965	SACUBITRIL SODIQUE équivalent à SACUBITRIL 24 mg + VALSARTAN DISODIQUE équivalent à VALSARTAN 26 mg - ENTRESTO 24 mg/26 mg, comprimé pelliculé	65122144	0	1
+1965	SACUBITRIL SODIQUE équivalent à SACUBITRIL 24 mg + VALSARTAN DISODIQUE équivalent à VALSARTAN 26 mg - ENTRESTO 24 mg/26 mg, comprimé pelliculé	64060704	1	2
 1966	SACUBITRIL SODIQUE équivalent à SACUBITRIL 49 mg + VALSARTAN DISODIQUE équivalent à VALSARTAN 51 mg - ENTRESTO 49 mg/51 mg, comprimé pelliculé	61816438	0	1
+1966	SACUBITRIL SODIQUE équivalent à SACUBITRIL 49 mg + VALSARTAN DISODIQUE équivalent à VALSARTAN 51 mg - ENTRESTO 49 mg/51 mg, comprimé pelliculé	65788438	1	2
 1967	SACUBITRIL SODIQUE équivalent à SACUBITRIL 97 mg + VALSARTAN DISODIQUE équivalent à VALSARTAN 103 mg - ENTRESTO 97 mg/103 mg, comprimé pelliculé	65849001	0	1
+1967	SACUBITRIL SODIQUE équivalent à SACUBITRIL 97 mg + VALSARTAN DISODIQUE équivalent à VALSARTAN 103 mg - ENTRESTO 97 mg/103 mg, comprimé pelliculé	65744274	1	2
 1968	HALOPERIDOL (DECANOATE D') équivalent à HALOPERIDOL 50 mg/mL - HALDOL DECANOAS 50 mg/ml, solution injectable	61505095	0	1
 1968	HALOPERIDOL (DECANOATE D') équivalent à HALOPERIDOL 50 mg/mL - HALDOL DECANOAS 50 mg/ml, solution injectable	66205970	1	2
 1969	BOSENTAN MONOHYDRATÉ équivalent à BOSENTAN 32 mg - TRACLEER 32 mg, comprimé dispersible	64186770	0	1
 1970	DAPAGLIFLOZINE (PROPYLENE GLYCOL DE) MONOHYDRATE équivalent à DAPAGLIFLOZINE 5mg + METFORMINE (CHLORHYDRATE DE) 850 mg - XIGDUO 5 mg/850 mg, comprimé pelliculé	61250837	0	1
 1970	DAPAGLIFLOZINE (PROPYLENE GLYCOL DE) MONOHYDRATE équivalent à DAPAGLIFLOZINE 5mg + METFORMINE (CHLORHYDRATE DE) 850 mg - XIGDUO 5 mg/850 mg, comprimé pelliculé	67769618	1	2
 1971	CHOLÉCALCIFÉROL 50 000 UI - UVEDOSE 50 000 UI, solution buvable en ampoule	62104543	0	1
+1971	CHOLÉCALCIFÉROL 50 000 UI - UVEDOSE 50 000 UI, solution buvable en ampoule	65622320	1	2
+1972	MACITENTAN 10 mg - OPSUMIT 10 mg, comprimé pelliculé	64744086	0	1
+1973	PERAMPANEL 10 mg - FYCOMPA 10 mg, comprimé pelliculé	69856153	0	1
+1974	PERAMPANEL 12 mg - FYCOMPA 12 mg, comprimé pelliculé	61849146	0	1
+1975	PERAMPANEL 2 mg - FYCOMPA 2 mg, comprimé pelliculé	68328199	0	1
+1976	PERAMPANEL 8 mg - FYCOMPA 8 mg, comprimé pelliculé	65931110	0	1
+1977	PERAMPANEL 6 mg - FYCOMPA 6 mg, comprimé pelliculé	64387360	0	1
+1978	PERAMPANEL 4 mg - FYCOMPA 4 mg, comprimé pelliculé	63602479	0	1
+1979	TOPIRAMATE 15 mg - EPITOMAX 15 mg, gélule	69104026	0	1
+1980	TOPIRAMATE 50 mg - EPITOMAX 50 mg, gélule	69710351	0	1
+1981	CYAMEMAZINE 40 mg/mL - TARTRATE DE CYAMEMAZINE équivalent à CYAMEMAZINE 40 mg/mL - TERCIAN 40 mg/ml, solution buvable en gouttes	66615713	0	1
+1982	SAXAGLIPTINE (CHLORHYDRATE DE) équivalent à SAXAGLIPTINE 2,5 mg + CHLORHYDRATE DE METFORMINE 1000 mg - KOMBOGLYZE 2,5 mg/1000 mg, comprimé pelliculé	68674913	0	1
+1983	EMTRICITABINE 200 mg + TENOFOVIR ALAFENAMIDE (FUMARATE DE) équivalent à TENOFOVIR ALAFENAMIDE 10 mg - DESCOVY 200 mg/10 mg, comprime pelliculé	69342796	0	1
+1983	EMTRICITABINE 200 mg + TENOFOVIR ALAFENAMIDE (FUMARATE DE) équivalent à TENOFOVIR ALAFENAMIDE 10 mg - DESCOVY 200 mg/10 mg, comprime pelliculé	69521009	1	2
+1984	EMTRICITABINE 200 mg + TENOFOVIR ALAFENAMIDE (FUMARATE DE) équivalent à TENOFOVIR ALAFENAMIDE 25 mg - DESCOVY 200 mg/25 mg, comprime pelliculé	66325208	0	1
