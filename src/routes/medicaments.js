@@ -651,11 +651,45 @@ router.get('/search', (req, res) => {
   const presentations = search('presentations', q);
   const compositions = search('compositions', q);
 
-  const results = [
-    ...specialites.map(item => ({ ...item, type: 'specialite' })),
-    ...presentations.map(item => ({ ...item, type: 'presentation' })),
-    ...compositions.map(item => ({ ...item, type: 'composition' }))
-  ];
+  // Regrouper par CIS (Code Identifiant de Spécialité) pour reconstruire la hiérarchie du médicament
+  const matchedCis = new Set();
+  specialites.forEach(item => matchedCis.add(item.cis));
+  presentations.forEach(item => matchedCis.add(item.cis));
+  compositions.forEach(item => matchedCis.add(item.cis));
+
+  const allSpecialites = getData('specialites');
+  const allPresentations = getData('presentations');
+  const allCompositions = getData('compositions');
+
+  // Optimisation: regrouper les données associées en une seule passe
+  const specialitesByCis = {};
+  const presentationsByCis = {};
+  const compositionsByCis = {};
+
+  if (matchedCis.size > 0) {
+    for (const s of allSpecialites) {
+      if (matchedCis.has(s.cis)) specialitesByCis[s.cis] = s;
+    }
+    for (const p of allPresentations) {
+      if (matchedCis.has(p.cis)) {
+        if (!presentationsByCis[p.cis]) presentationsByCis[p.cis] = [];
+        presentationsByCis[p.cis].push(p);
+      }
+    }
+    for (const c of allCompositions) {
+      if (matchedCis.has(c.cis)) {
+        if (!compositionsByCis[c.cis]) compositionsByCis[c.cis] = [];
+        compositionsByCis[c.cis].push(c);
+      }
+    }
+  }
+
+  const results = Array.from(matchedCis).map(cis => ({
+    type: 'medicament',
+    ...(specialitesByCis[cis] || { cis }),
+    presentations: presentationsByCis[cis] || [],
+    compositions: compositionsByCis[cis] || []
+  }));
 
   res.json(paginate(results, page, limit));
 });
