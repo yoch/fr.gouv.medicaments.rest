@@ -37,6 +37,16 @@ let searchIndexes = {
   mitm: null
 };
 
+let cisIndexes = null;
+
+const RELATED_BY_CIS_MAPS = {
+  presentations: 'presentationsByCis',
+  compositions: 'compositionsByCis',
+  avis_smr: 'avisSmrByCis',
+  avis_asmr: 'avisAsmrByCis',
+  conditions: 'conditionsByCis'
+};
+
 function normalizeSearchText(value) {
   return String(value)
     .normalize('NFD')
@@ -150,6 +160,62 @@ function createIndex(type, fields, boost = null) {
   searchIndexes[type] = index;
 }
 
+function appendToCisList(map, cis, item) {
+  if (!cis) return;
+  if (!map.has(cis)) map.set(cis, []);
+  map.get(cis).push(item);
+}
+
+function buildCisIndexes() {
+  const specialitesByCis = new Map();
+  for (const item of dataCache.specialites) {
+    if (item.cis) specialitesByCis.set(item.cis, item);
+  }
+
+  const presentationsByCis = new Map();
+  for (const item of dataCache.presentations) {
+    appendToCisList(presentationsByCis, item.cis, item);
+  }
+
+  const compositionsByCis = new Map();
+  for (const item of dataCache.compositions) {
+    appendToCisList(compositionsByCis, item.cis, item);
+  }
+
+  const avisSmrByCis = new Map();
+  for (const item of dataCache.avis_smr) {
+    appendToCisList(avisSmrByCis, item.cis, item);
+  }
+
+  const avisAsmrByCis = new Map();
+  for (const item of dataCache.avis_asmr) {
+    appendToCisList(avisAsmrByCis, item.cis, item);
+  }
+
+  const conditionsByCis = new Map();
+  for (const item of dataCache.conditions) {
+    appendToCisList(conditionsByCis, item.cis, item);
+  }
+
+  const generiquesByCis = new Map();
+  const generiquesByGroupe = new Map();
+  for (const item of dataCache.generiques) {
+    appendToCisList(generiquesByCis, item.cis, item);
+    appendToCisList(generiquesByGroupe, item.id_groupe, item);
+  }
+
+  cisIndexes = {
+    specialitesByCis,
+    presentationsByCis,
+    compositionsByCis,
+    avisSmrByCis,
+    avisAsmrByCis,
+    conditionsByCis,
+    generiquesByCis,
+    generiquesByGroupe
+  };
+}
+
 function clearLoadedData() {
   for (const key of Object.keys(searchIndexes)) {
     searchIndexes[key] = null;
@@ -158,6 +224,7 @@ function clearLoadedData() {
     if (key === 'metadata') continue;
     dataCache[key] = [];
   }
+  cisIndexes = null;
 }
 
 async function loadData() {
@@ -271,7 +338,34 @@ async function loadData() {
   createIndex('substances', ['denomination']);
   console.log(`Substances indexées: ${dataCache.substances.length}`);
 
+  buildCisIndexes();
   console.log(`Données chargées et indexées: ${dataCache.specialites.length} spécialités`);
+}
+
+function getSpecialiteByCis(cis) {
+  if (!cisIndexes) return undefined;
+  return cisIndexes.specialitesByCis.get(cis);
+}
+
+function getRelatedByCis(type, cis) {
+  if (!cisIndexes || !cis) return [];
+  const mapKey = RELATED_BY_CIS_MAPS[type];
+  if (!mapKey) return [];
+  return cisIndexes[mapKey].get(cis) || [];
+}
+
+function getGeneriquesForCis(cis) {
+  if (!cisIndexes || !cis) return null;
+  const drugGeneriques = cisIndexes.generiquesByCis.get(cis);
+  if (!drugGeneriques || drugGeneriques.length === 0) return null;
+
+  const id_groupe = drugGeneriques[0].id_groupe;
+  const items = cisIndexes.generiquesByGroupe.get(id_groupe) || [];
+  return {
+    id_groupe,
+    libelle_groupe: drugGeneriques[0].libelle_groupe,
+    items
+  };
 }
 
 // Champs prioritaires pour le boosting "Commence par"
@@ -348,5 +442,8 @@ module.exports = {
   loadData,
   getData,
   search,
-  getMetadata
+  getMetadata,
+  getSpecialiteByCis,
+  getRelatedByCis,
+  getGeneriquesForCis
 };

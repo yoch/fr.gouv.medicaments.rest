@@ -92,6 +92,17 @@ async function checkAndConvertToUTF8(filepath) {
   }
 }
 
+function hashFile(filepath) {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    const reader = fs.createReadStream(filepath);
+    reader.pipe(hash);
+    hash.on('finish', () => resolve(hash.digest('hex')));
+    reader.on('error', reject);
+    hash.on('error', reject);
+  });
+}
+
 async function downloadFile(url, filepath) {
   try {
     console.log(`Téléchargement de ${path.basename(filepath)}...`);
@@ -107,7 +118,6 @@ async function downloadFile(url, filepath) {
 
     await fs.ensureDir(path.dirname(filepath));
 
-    // 1. Download to file
     const writer = fs.createWriteStream(filepath);
     response.data.pipe(writer);
 
@@ -116,17 +126,7 @@ async function downloadFile(url, filepath) {
       writer.on('error', reject);
     });
 
-    // 2. Compute hash from file
-    const hash = crypto.createHash('sha256');
-    const reader = fs.createReadStream(filepath);
-    reader.pipe(hash);
-
-    await new Promise((resolve, reject) => {
-      hash.on('finish', resolve);
-      reader.on('error', reject);
-    });
-
-    return hash.digest('hex');
+    return hashFile(filepath);
   } catch (error) {
     console.error(`Erreur téléchargement ${path.basename(filepath)}:`, error.message);
     throw error;
@@ -170,11 +170,20 @@ async function downloadDataIfNeeded() {
       continue;
     }
 
-    // On télécharge toujours pour vérifier si le fichier a changé (le serveur ne donne pas d'ETag fiable)
-    // On télécharge dans un fichier temporaire
     try {
-      const fileHash = await downloadFile(url, tempPath);
       const existingHash = metadata[filename]?.hash;
+
+      if (existingHash && fs.existsSync(finalPath)) {
+        const localHash = await hashFile(finalPath);
+        if (localHash === existingHash) {
+          console.log(`✓ ${filename} inchangé (hash local identique)`);
+          metadata[filename].checkedAt = new Date().toISOString();
+          await saveMetadata(metadata);
+          continue;
+        }
+      }
+
+      const fileHash = await downloadFile(url, tempPath);
 
       if (existingHash && fileHash === existingHash && fs.existsSync(finalPath)) {
         console.log(`✓ ${filename} inchangé (hash identique)`);

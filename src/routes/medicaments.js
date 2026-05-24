@@ -1,5 +1,12 @@
 const express = require('express');
-const { getData, search, getMetadata } = require('../services/dataLoader');
+const {
+  getData,
+  search,
+  getMetadata,
+  getSpecialiteByCis,
+  getRelatedByCis,
+  getGeneriquesForCis
+} = require('../services/dataLoader');
 
 const router = express.Router();
 
@@ -119,31 +126,18 @@ router.get('/specialites', (req, res) => {
  */
 router.get('/specialites/:cis', (req, res) => {
   const { cis } = req.params;
-  const specialite = getData('specialites').find(item => item.cis === cis);
+  const specialite = getSpecialiteByCis(cis);
 
   if (!specialite) {
     return res.status(404).json({ error: 'Spécialité non trouvée' });
   }
 
-  // Enrichir avec les données liées
-  const presentations = getData('presentations').filter(p => p.cis === cis);
-  const compositions = getData('compositions').filter(c => c.cis === cis);
-  const avis_smr = getData('avis_smr').filter(a => a.cis === cis);
-  const avis_asmr = getData('avis_asmr').filter(a => a.cis === cis);
-  const conditions = getData('conditions').filter(c => c.cis === cis);
-
-  // Enrichir avec le groupe générique et tous ses membres
-  const drugGeneriques = getData('generiques').filter(g => g.cis === cis);
-  let generiques = null;
-  if (drugGeneriques.length > 0) {
-    const id_groupe = drugGeneriques[0].id_groupe;
-    const items = getData('generiques').filter(g => g.id_groupe === id_groupe);
-    generiques = {
-      id_groupe,
-      libelle_groupe: drugGeneriques[0].libelle_groupe,
-      items
-    };
-  }
+  const presentations = getRelatedByCis('presentations', cis);
+  const compositions = getRelatedByCis('compositions', cis);
+  const avis_smr = getRelatedByCis('avis_smr', cis);
+  const avis_asmr = getRelatedByCis('avis_asmr', cis);
+  const conditions = getRelatedByCis('conditions', cis);
+  const generiques = getGeneriquesForCis(cis);
 
   const metadata = getMetadata();
   res.json({
@@ -684,42 +678,15 @@ router.get('/search', (req, res) => {
     }
   }
 
-  // Regrouper par CIS (Code Identifiant de Spécialité) pour reconstruire la hiérarchie du médicament
+  // Ordre des CIS : insertion via specialites puis presentations puis compositions (inchangé)
   const matchedCis = new Set(Object.keys(matchQualityByCis));
-
-  const allSpecialites = getData('specialites');
-  const allPresentations = getData('presentations');
-  const allCompositions = getData('compositions');
-
-  // Optimisation: regrouper les données associées en une seule passe
-  const specialitesByCis = {};
-  const presentationsByCis = {};
-  const compositionsByCis = {};
-
-  if (matchedCis.size > 0) {
-    for (const s of allSpecialites) {
-      if (matchedCis.has(s.cis)) specialitesByCis[s.cis] = s;
-    }
-    for (const p of allPresentations) {
-      if (matchedCis.has(p.cis)) {
-        if (!presentationsByCis[p.cis]) presentationsByCis[p.cis] = [];
-        presentationsByCis[p.cis].push(p);
-      }
-    }
-    for (const c of allCompositions) {
-      if (matchedCis.has(c.cis)) {
-        if (!compositionsByCis[c.cis]) compositionsByCis[c.cis] = [];
-        compositionsByCis[c.cis].push(c);
-      }
-    }
-  }
 
   const results = Array.from(matchedCis).map(cis => ({
     type: 'medicament',
     match_quality: matchQualityByCis[cis],
-    ...(specialitesByCis[cis] || { cis }),
-    presentations: presentationsByCis[cis] || [],
-    compositions: compositionsByCis[cis] || []
+    ...(getSpecialiteByCis(cis) || { cis }),
+    presentations: getRelatedByCis('presentations', cis),
+    compositions: getRelatedByCis('compositions', cis)
   }));
 
   const response = paginate(results, page, limit);
