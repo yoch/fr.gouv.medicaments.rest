@@ -10,10 +10,10 @@ Cette API permet d'accéder aux données officielles des médicaments en France 
 #### `GET /medicaments/specialites`
 Liste les spécialités pharmaceutiques.
 - **Paramètres**:
-  - `q` (string): Terme de recherche (supporte `*` et `?`). Ex: `doliprane*`
+  - `q` (string): Terme de recherche (préfixe + fuzzy sur le texte). Ex: `doliprane`
   - `page` (int): Numéro de page (défaut: 1)
   - `limit` (int): Nombre d'éléments par page (défaut: 100)
-- **Réponse**: Liste d'objets `Medicament`.
+- **Réponse**: Liste d'objets `Medicament` (avec `match_quality` si `q` est fourni).
 
 #### `GET /medicaments/specialites/:cis`
 Détail complet d'une spécialité.
@@ -59,10 +59,19 @@ Tous ces endpoints acceptent les paramètres standards :
 - **MITM**: `code_atc`, `denomination`, `lien_fi` (Lien Fiche Info).
 
 #### `GET /medicaments/search`
-Recherche globale multi-critères.
+Recherche globale multi-critères (spécialités, présentations, compositions agrégées par CIS).
 - **Paramètres**:
   - `q` (string, requis): Terme de recherche.
-- **Réponse**: Liste mixte d'objets typés (`specialite`, `presentation`, `composition`).
+- **Réponse**: Objets `medicament` agrégés par `cis`, avec `presentations` et `compositions`.
+- **Métadonnées** (`search` à la racine) : `query` (terme recherché).
+
+#### Qualité de correspondance (`match_quality`)
+Présent sur toute réponse filtrée par `q` :
+- `exact` : le libellé principal correspond exactement à la requête (après normalisation des accents).
+- `prefix` : le libellé principal commence par la requête.
+- `fuzzy` : correspondance approximative (tolérance ~20 % via MiniSearch).
+
+**Limites connues** : le fuzzy est désactivé uniquement pour les termes de requête purement numériques. Les codes alphanumériques (ex. `code_atc` type `N02BE01`) peuvent encore produire des correspondances fuzzy. La qualité indiquée (`match_quality`) reflète le libellé principal du type de données, pas le champ exact qui a déclenché le match.
 
 ## Format de Réponse
 

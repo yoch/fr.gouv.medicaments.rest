@@ -44,12 +44,20 @@ describe('API Medicaments', () => {
             const res = await request(app).get('/api/medicaments/specialites?q=dolipranr&limit=1');
             expect(res.statusCode).toEqual(200);
             expect(res.body.data[0].denomination).toMatch(/DOLIPRANE/);
+            expect(res.body.data[0].match_quality).toBe('fuzzy');
+        });
+
+        it('should mark prefix search on denomination', async () => {
+            const res = await request(app).get('/api/medicaments/specialites?q=doli&limit=1');
+            expect(res.statusCode).toEqual(200);
+            expect(res.body.data[0].match_quality).toBe('prefix');
         });
 
         it('should perform exact numerical match (CIS)', async () => {
             const res = await request(app).get('/api/medicaments/specialites?q=60234100&limit=1');
             expect(res.statusCode).toEqual(200);
             expect(res.body.data[0].cis).toBe('60234100');
+            expect(res.body.data[0].match_quality).toBe('exact');
         });
     });
 
@@ -84,6 +92,13 @@ describe('API Medicaments', () => {
         it('should require q parameter', async () => {
             const res = await request(app).get('/api/medicaments/search');
             expect(res.statusCode).toEqual(400);
+        });
+
+        it('should expose search query and match_quality on global search', async () => {
+            const res = await request(app).get('/api/medicaments/search?q=paracetamol&limit=5');
+            expect(res.statusCode).toEqual(200);
+            expect(res.body.search).toEqual({ query: 'paracetamol' });
+            expect(res.body.data[0].match_quality).toBeDefined();
         });
     });
 

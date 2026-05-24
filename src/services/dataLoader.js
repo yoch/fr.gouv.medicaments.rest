@@ -278,6 +278,8 @@ const PRIMARY_FIELDS = {
   substances: 'denomination'
 };
 
+const MATCH_QUALITY = ['fuzzy', 'prefix', 'exact'];
+
 /**
  * Recherche dans un dataset via MiniSearch
  * @param {string} type - Le type de données
@@ -299,12 +301,14 @@ function search(type, query) {
       String(item[primaryField]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
 
     // Détermination de la priorité (0=Autre, 1=Commence par, 2=Exact)
+    const normalizedCis =
+      item && item.cis ? String(item.cis).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') : '';
     let priority = 0;
-    if (value === normalizedQuery) priority = 2;
+    if (value === normalizedQuery || normalizedCis === normalizedQuery) priority = 2;
     // Note: startsWith est très efficace, on l'utilise pour garantir que les résultats pertinents sont en haut
-    else if (value.startsWith(normalizedQuery)) priority = 1;
+    else if (value.startsWith(normalizedQuery) || normalizedCis.startsWith(normalizedQuery)) priority = 1;
 
-    return { item, score: res.score, priority };
+    return { item, score: res.score, priority, match_quality: MATCH_QUALITY[priority] };
   });
 
   // Tri: Priorité > Score (si diff significative) > Longueur (plus court = mieux)
@@ -316,7 +320,10 @@ function search(type, query) {
     return b.score - a.score;
   });
 
-  return rankedResults.map(r => r.item);
+  return rankedResults.map((r) => ({
+    ...r.item,
+    match_quality: r.match_quality
+  }));
 }
 
 

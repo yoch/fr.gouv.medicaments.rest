@@ -671,11 +671,17 @@ router.get('/search', (req, res) => {
   const presentations = search('presentations', q);
   const compositions = search('compositions', q);
 
+  const matchQualityRank = { exact: 3, prefix: 2, fuzzy: 1 };
+  const matchQualityByCis = {};
+  for (const item of [...specialites, ...presentations, ...compositions]) {
+    const previous = matchQualityByCis[item.cis];
+    if (!previous || matchQualityRank[item.match_quality] > matchQualityRank[previous]) {
+      matchQualityByCis[item.cis] = item.match_quality;
+    }
+  }
+
   // Regrouper par CIS (Code Identifiant de Spécialité) pour reconstruire la hiérarchie du médicament
-  const matchedCis = new Set();
-  specialites.forEach(item => matchedCis.add(item.cis));
-  presentations.forEach(item => matchedCis.add(item.cis));
-  compositions.forEach(item => matchedCis.add(item.cis));
+  const matchedCis = new Set(Object.keys(matchQualityByCis));
 
   const allSpecialites = getData('specialites');
   const allPresentations = getData('presentations');
@@ -706,12 +712,15 @@ router.get('/search', (req, res) => {
 
   const results = Array.from(matchedCis).map(cis => ({
     type: 'medicament',
+    match_quality: matchQualityByCis[cis],
     ...(specialitesByCis[cis] || { cis }),
     presentations: presentationsByCis[cis] || [],
     compositions: compositionsByCis[cis] || []
   }));
 
-  res.json(paginate(results, page, limit));
+  const response = paginate(results, page, limit);
+  response.search = { query: q };
+  res.json(response);
 });
 
 module.exports = router;
