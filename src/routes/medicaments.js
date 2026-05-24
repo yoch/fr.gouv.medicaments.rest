@@ -3,18 +3,22 @@ const { getData, search, getMetadata } = require('../services/dataLoader');
 
 const router = express.Router();
 
+const MAX_LIMIT = 1000;
+
 function paginate(data, page = 1, limit = 100) {
-  const offset = (page - 1) * limit;
-  const paginatedData = data.slice(offset, offset + limit);
+  const safePage = Math.max(1, parseInt(page, 10) || 1);
+  const safeLimit = Math.min(MAX_LIMIT, Math.max(1, parseInt(limit, 10) || 100));
+  const offset = (safePage - 1) * safeLimit;
+  const paginatedData = data.slice(offset, offset + safeLimit);
   const metadata = getMetadata();
 
   return {
     data: paginatedData,
     pagination: {
       total: data.length,
-      page: parseInt(page),
-      limit: parseInt(limit),
-      pages: Math.ceil(data.length / limit)
+      page: safePage,
+      limit: safeLimit,
+      pages: Math.ceil(data.length / safeLimit)
     },
     metadata: {
       last_updated: metadata.last_updated,

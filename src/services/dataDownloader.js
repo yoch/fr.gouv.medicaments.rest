@@ -154,6 +154,7 @@ function shouldCheckFile(filename, metadata) {
 async function downloadDataIfNeeded() {
   await fs.ensureDir(DATA_DIR);
   let metadata = await loadMetadata();
+  let changed = false;
 
   // Download static files
   for (const filename of FILES) {
@@ -205,6 +206,7 @@ async function downloadDataIfNeeded() {
           encoding: 'utf-8'
         };
         await saveMetadata(metadata);
+        changed = true;
         console.log(`✓ ${filename} mis à jour et converti`);
       }
     } catch (error) {
@@ -220,7 +222,7 @@ async function downloadDataIfNeeded() {
     }
   }
 
-
+  return { changed };
 }
 
 module.exports = { downloadDataIfNeeded };

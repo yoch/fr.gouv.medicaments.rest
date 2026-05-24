@@ -37,24 +37,18 @@ let searchIndexes = {
   mitm: null
 };
 
-// Champs de codes numériques qui nécessitent une recherche exacte (pas de fuzzy)
-const EXACT_MATCH_FIELDS = new Set(['cis', 'cip7', 'cip13', 'code_atc', 'code_substance']);
+function normalizeSearchText(value) {
+  return String(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
 
 // Configuration des options de recherche pour ignorer les accents
 const miniSearchOptions = {
-  processTerm: (term, _fieldName) => {
-    return term
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase();
-  },
+  processTerm: (term) => normalizeSearchText(term),
   searchOptions: {
-    processTerm: (term) => {
-      return term
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .toLowerCase();
-    },
+    processTerm: (term) => normalizeSearchText(term),
     prefix: true,
     // Fuzzy sélectif : désactivé pour les codes numériques, activé pour le texte
     fuzzy: (term) => {
@@ -140,14 +134,30 @@ function createIndex(type, fields, boost = null) {
 
   const index = new MiniSearch(indexConfig);
 
-  // On ajoute un champ "id" artificiel qui correspond à l'index dans le tableau dataCache
-  const processedData = dataCache[type].map((item, index) => ({
-    id: index,
-    ...item
-  }));
+  // Documents réduits : uniquement id + champs indexés (données complètes dans dataCache)
+  const indexDocuments = dataCache[type].map((item, rowIndex) => {
+    const doc = { id: rowIndex };
+    for (const field of fields) {
+      const value = item[field];
+      if (value != null && value !== '') {
+        doc[field] = value;
+      }
+    }
+    return doc;
+  });
 
-  index.addAll(processedData);
+  index.addAll(indexDocuments);
   searchIndexes[type] = index;
+}
+
+function clearLoadedData() {
+  for (const key of Object.keys(searchIndexes)) {
+    searchIndexes[key] = null;
+  }
+  for (const key of Object.keys(dataCache)) {
+    if (key === 'metadata') continue;
+    dataCache[key] = [];
+  }
 }
 
 async function loadData() {
@@ -161,6 +171,7 @@ async function loadData() {
   }
 
   console.log('Chargement des données...');
+  clearLoadedData();
 
   // Chargement et indexation des spécialités
   dataCache.specialites = parseFile('CIS_bdpm.txt', [
@@ -291,18 +302,16 @@ function search(type, query) {
   if (!searchIndexes[type]) return [];
 
   const results = searchIndexes[type].search(query);
-  const normalizedQuery = query.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const normalizedQuery = normalizeSearchText(query);
   const primaryField = PRIMARY_FIELDS[type];
 
   // On pré-calcule les critères de tri pour éviter de le faire à chaque comparaison
   const rankedResults = results.map(res => {
     const item = dataCache[type][res.id];
-    const value = (item && item[primaryField]) ?
-      String(item[primaryField]).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") : "";
+    const value = item && item[primaryField] ? normalizeSearchText(item[primaryField]) : '';
 
     // Détermination de la priorité (0=Autre, 1=Commence par, 2=Exact)
-    const normalizedCis =
-      item && item.cis ? String(item.cis).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') : '';
+    const normalizedCis = item && item.cis ? normalizeSearchText(item.cis) : '';
     let priority = 0;
     if (value === normalizedQuery || normalizedCis === normalizedQuery) priority = 2;
     // Note: startsWith est très efficace, on l'utilise pour garantir que les résultats pertinents sont en haut

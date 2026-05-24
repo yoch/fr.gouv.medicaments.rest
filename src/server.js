@@ -17,9 +17,11 @@ const rateLimit = require('express-rate-limit');
 const enableRateLimit = process.env.ENABLE_RATE_LIMIT === 'true';
 
 if (enableRateLimit) {
+    const windowMs = parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10);
+    const max = parseInt(process.env.RATE_LIMIT_MAX || '500', 10);
     const limiter = rateLimit({
-        windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000'), // Default: 1 minute
-        max: parseInt(process.env.RATE_LIMIT_MAX || '500'), // Default: 500 requests
+        windowMs,
+        max,
         standardHeaders: true,
         legacyHeaders: false,
         message: {
@@ -119,7 +121,11 @@ async function startServer() {
         setInterval(async () => {
             console.log('🔄 Rafraîchissement périodique des données...');
             try {
-                await downloadDataIfNeeded();
+                const { changed } = await downloadDataIfNeeded();
+                if (!changed) {
+                    console.log('✓ Données inchangées, rechargement mémoire ignoré');
+                    return;
+                }
                 await loadData();
                 console.log('✅ Données rafraîchies avec succès');
             } catch (err) {
