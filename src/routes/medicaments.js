@@ -6,7 +6,8 @@ const {
   getSpecialiteByCis,
   getRelatedByCis,
   getGeneriquesForCis,
-  bdpmExtraitUrl
+  bdpmExtraitUrl,
+  DETAIL_HYDRATE_RELATED_LIMIT
 } = require('../services/dataLoader');
 const { executeHybridSearch } = require('../services/searchOrchestrator');
 
@@ -131,11 +132,12 @@ router.get('/specialites/:cis', (req, res) => {
     return res.status(404).json({ error: 'Spécialité non trouvée' });
   }
 
-  const presentations = getRelatedByCis('presentations', cis);
-  const compositions = getRelatedByCis('compositions', cis);
-  const avis_smr = getRelatedByCis('avis_smr', cis);
-  const avis_asmr = getRelatedByCis('avis_asmr', cis);
-  const conditions = getRelatedByCis('conditions', cis);
+  const detailLimit = DETAIL_HYDRATE_RELATED_LIMIT;
+  const presentations = getRelatedByCis('presentations', cis, detailLimit);
+  const compositions = getRelatedByCis('compositions', cis, detailLimit);
+  const avis_smr = getRelatedByCis('avis_smr', cis, detailLimit);
+  const avis_asmr = getRelatedByCis('avis_asmr', cis, detailLimit);
+  const conditions = getRelatedByCis('conditions', cis, detailLimit);
   const generiques = getGeneriquesForCis(cis);
 
   const metadata = getMetadata();

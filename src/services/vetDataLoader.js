@@ -401,12 +401,28 @@ function appendToNumList(map, num, item) {
   map.get(num).push(item);
 }
 
+const RELATED_BY_NUM_MAPS = {
+  compositions: 'compositionsByNum',
+  presentations: 'presentationsByNum'
+};
+
 function buildNumIndexes() {
   const medicamentsByNum = new Map();
   for (const item of vetCache.medicaments) {
     if (item.num) medicamentsByNum.set(item.num, item);
   }
-  numIndexes = { medicamentsByNum };
+
+  const compositionsByNum = new Map();
+  for (const item of vetCache.compositions) {
+    appendToNumList(compositionsByNum, item.num, item);
+  }
+
+  const presentationsByNum = new Map();
+  for (const item of vetCache.presentations) {
+    appendToNumList(presentationsByNum, item.num, item);
+  }
+
+  numIndexes = { medicamentsByNum, compositionsByNum, presentationsByNum };
 }
 
 function clearLoadedData() {
@@ -527,21 +543,19 @@ function getVetMetadata() {
 
 function getMedicamentByNum(num) {
   if (!numIndexes) return undefined;
-  return numIndexes.medicamentsByNum.get(num);
+  return numIndexes.medicamentsByNum.get(normalizeNum(num));
 }
 
 function getRelatedByNum(type, num, limit = 50) {
   if (!num) return [];
-  if (type === 'temps_attente') {
-    return vetCache.tempsAttente.get(num) || [];
-  }
   const normalized = normalizeNum(num);
-  let rows = [];
-  if (type === 'compositions') {
-    rows = vetCache.compositions.filter((item) => item.num === normalized);
-  } else if (type === 'presentations') {
-    rows = vetCache.presentations.filter((item) => item.num === normalized);
+  if (type === 'temps_attente') {
+    return vetCache.tempsAttente.get(normalized) || [];
   }
+  if (!numIndexes) return [];
+  const mapKey = RELATED_BY_NUM_MAPS[type];
+  if (!mapKey) return [];
+  const rows = numIndexes[mapKey].get(normalized) || [];
   return limit > 0 ? rows.slice(0, limit) : rows;
 }
 

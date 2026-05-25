@@ -15,6 +15,12 @@ const HYDRATE_RELATED_LIMIT = Math.max(
   parseInt(process.env.SEARCH_HYDRATE_RELATED_LIMIT || '50', 10)
 );
 
+/** Fiche détail : 0 = pas de troncature (SEARCH_HYDRATE_RELATED_LIMIT reste pour /search). */
+const DETAIL_HYDRATE_RELATED_LIMIT = Math.max(
+  0,
+  parseInt(process.env.DETAIL_HYDRATE_RELATED_LIMIT || '0', 10)
+);
+
 const LOAD_HAS_AVIS = process.env.LOAD_HAS_AVIS !== 'false';
 
 function bdpmExtraitUrl(cis) {
@@ -417,5 +423,6 @@ module.exports = {
   getRelatedByCis,
   getGeneriquesForCis,
   bdpmExtraitUrl,
-  HYDRATE_RELATED_LIMIT
+  HYDRATE_RELATED_LIMIT,
+  DETAIL_HYDRATE_RELATED_LIMIT
 };

@@ -7,6 +7,7 @@ const {
   getRelatedByNum,
   filterPresentationsLinear
 } = require('../services/vetDataLoader');
+const { DETAIL_HYDRATE_RELATED_LIMIT } = require('../services/dataLoader');
 
 const router = express.Router();
 const MAX_LIMIT = 1000;
@@ -59,9 +60,9 @@ router.get('/medicaments/:num', (req, res) => {
   const metadata = getVetMetadata();
   res.json({
     ...medicament,
-    presentations: getRelatedByNum('presentations', req.params.num),
-    compositions: getRelatedByNum('compositions', req.params.num),
-    temps_attente: getRelatedByNum('temps_attente', req.params.num),
+    presentations: getRelatedByNum('presentations', req.params.num, DETAIL_HYDRATE_RELATED_LIMIT),
+    compositions: getRelatedByNum('compositions', req.params.num, DETAIL_HYDRATE_RELATED_LIMIT),
+    temps_attente: getRelatedByNum('temps_attente', req.params.num, DETAIL_HYDRATE_RELATED_LIMIT),
     metadata: {
       last_updated: metadata.last_updated,
       source: metadata.source
