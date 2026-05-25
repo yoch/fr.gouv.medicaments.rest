@@ -1,0 +1,2240 @@
+{
+  "generated_at": "2026-05-25T20:05:32.920Z",
+  "mini": {
+    "backend": "minisearch",
+    "load_profile": "full",
+    "load_ms": 5680,
+    "memory": {
+      "before_load": {
+        "rss_mb": 53.49,
+        "heap_used_mb": 4.47,
+        "heap_total_mb": 7.35,
+        "external_mb": 1.64,
+        "array_buffers_mb": 0.01
+      },
+      "after_load": {
+        "rss_mb": 406.05,
+        "heap_used_mb": 283.86,
+        "heap_total_mb": 345.94,
+        "external_mb": 1.65,
+        "array_buffers_mb": 0.01
+      },
+      "after_searches": {
+        "rss_mb": 603.57,
+        "heap_used_mb": 284.08,
+        "heap_total_mb": 347.94,
+        "external_mb": 1.65,
+        "array_buffers_mb": 0.01
+      },
+      "delta_load_rss_mb": 352.56
+    },
+    "searches": [
+      {
+        "type": "specialites",
+        "q": "doliprane",
+        "category": "nom_complet",
+        "count": 31,
+        "latency_ms": {
+          "avg": 1.71,
+          "p50": 1.6,
+          "p95": 5
+        },
+        "top5": [
+          {
+            "cis": "67119691",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69309629",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "63368332",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "60234100",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "60310861",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 150 mg, suppositoire",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "doli",
+        "category": "prefix",
+        "count": 34,
+        "latency_ms": {
+          "avg": 0.97,
+          "p50": 0.95,
+          "p95": 1.14
+        },
+        "top5": [
+          {
+            "cis": "61903804",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANECAPS 1000 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "67747372",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANEORODOZ 500 mg, comprimé orodispersible",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "60028495",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIRHUMEPRO PARACETAMOL, PSEUDOEPHEDRINE ET DOXYLAMINE, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "66185425",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANETABS 500 mg, comprimé pelliculé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "60641854",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANETABS 1000 mg, comprimé pelliculé",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "dolipranr",
+        "category": "fuzzy",
+        "count": 18,
+        "latency_ms": {
+          "avg": 1.07,
+          "p50": 1,
+          "p95": 1.24
+        },
+        "top5": [
+          {
+            "cis": "67119691",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "69309629",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "63368332",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60234100",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60310861",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 150 mg, suppositoire",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "60234100",
+        "category": "cis_exact",
+        "count": 1,
+        "latency_ms": {
+          "avg": 0.08,
+          "p50": 0.08,
+          "p95": 0.09
+        },
+        "top5": [
+          {
+            "cis": "60234100",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, comprimé",
+            "match_quality": "exact"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "paracetamol",
+        "category": "sans_accent",
+        "count": 123,
+        "latency_ms": {
+          "avg": 2.34,
+          "p50": 2.25,
+          "p95": 3.54
+        },
+        "top5": [
+          {
+            "cis": "62772966",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65335982",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 500 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65621649",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "61158602",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ALMUS 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69767594",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ARROW 1 g, comprimé",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "paracétamol",
+        "category": "avec_accent",
+        "count": 123,
+        "latency_ms": {
+          "avg": 2.06,
+          "p50": 1.9,
+          "p95": 3.11
+        },
+        "top5": [
+          {
+            "cis": "62772966",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65335982",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 500 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65621649",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "61158602",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ALMUS 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69767594",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ARROW 1 g, comprimé",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "pfizer",
+        "category": "titulaire",
+        "count": 293,
+        "latency_ms": {
+          "avg": 3.44,
+          "p50": 3.21,
+          "p95": 4.89
+        },
+        "top5": [
+          {
+            "cis": "66015693",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 50 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "68182495",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 100 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "63206323",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 150 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65880420",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 200 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65262018",
+            "cip13": null,
+            "code": null,
+            "label": "EXEMESTANE PFIZER 25 mg, comprimé enrobé",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "comprimé",
+        "category": "forme_pharma",
+        "count": 8149,
+        "latency_ms": {
+          "avg": 117.4,
+          "p50": 110.52,
+          "p95": 157.62
+        },
+        "top5": [
+          {
+            "cis": "68467163",
+            "cip13": null,
+            "code": null,
+            "label": "ZONISAMIDE NEURAXPHARM 100 mg, comprimésécable",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "63294049",
+            "cip13": null,
+            "code": null,
+            "label": "SPEDRA 50 mg, comprimés",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "69867865",
+            "cip13": null,
+            "code": null,
+            "label": "AFINITOR 5 mg, comprimés",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "66839572",
+            "cip13": null,
+            "code": null,
+            "label": "SPEDRA 200 mg, comprimés",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "64201368",
+            "cip13": null,
+            "code": null,
+            "label": "AFINITOR 10 mg, comprimés",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "presentations",
+        "q": "doliprane",
+        "category": "libelle",
+        "count": 0,
+        "latency_ms": {
+          "avg": 0.25,
+          "p50": 0.24,
+          "p95": 0.33
+        },
+        "top5": []
+      },
+      {
+        "type": "presentations",
+        "q": "migraine",
+        "category": "indications",
+        "count": 1,
+        "latency_ms": {
+          "avg": 0.29,
+          "p50": 0.25,
+          "p95": 0.44
+        },
+        "top5": [
+          {
+            "cis": "69376930",
+            "cip13": "3400937393614",
+            "code": null,
+            "label": "plaquette(s) PVC PVDC aluminium de 90 comprimé(s)",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "compositions",
+        "q": "paracetamol",
+        "category": "substance",
+        "count": 233,
+        "latency_ms": {
+          "avg": 2.05,
+          "p50": 1.9,
+          "p95": 2.83
+        },
+        "top5": [
+          {
+            "cis": "60009573",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60025403",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60028495",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60028495",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60082023",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          }
+        ]
+      },
+      {
+        "type": "compositions",
+        "q": "tramadol",
+        "category": "substance_2",
+        "count": 106,
+        "latency_ms": {
+          "avg": 0.77,
+          "p50": 0.71,
+          "p95": 0.99
+        },
+        "top5": [
+          {
+            "cis": "60152411",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "64045143",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "66006655",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "66357533",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "69141149",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          }
+        ]
+      },
+      {
+        "type": "mitm",
+        "q": "N02BE01",
+        "category": "code_atc",
+        "count": 102,
+        "latency_ms": {
+          "avg": 1.15,
+          "p50": 0.97,
+          "p95": 1.92
+        },
+        "top5": [
+          {
+            "cis": "62772966",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 1 g, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65335982",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 500 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65621649",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 1 g, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60091086",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 500 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "61158602",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ALMUS 1 g, comprimé",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "substances",
+        "q": "paracetamol",
+        "category": "substances_index",
+        "count": 1,
+        "latency_ms": {
+          "avg": 0.29,
+          "p50": 0.26,
+          "p95": 0.4
+        },
+        "top5": [
+          {
+            "cis": null,
+            "cip13": null,
+            "code": "02202",
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          }
+        ]
+      },
+      {
+        "type": "generiques",
+        "q": "amoxicilline",
+        "category": "groupe",
+        "count": 188,
+        "latency_ms": {
+          "avg": 1.19,
+          "p50": 0.99,
+          "p95": 2.07
+        },
+        "top5": [
+          {
+            "cis": "63565244",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "63260043",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "60099738",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69256767",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "66921126",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          }
+        ]
+      }
+    ]
+  },
+  "sqlite": {
+    "backend": "sqlite_fts",
+    "load_profile": "full",
+    "load_ms": 5580,
+    "memory": {
+      "before_load": {
+        "rss_mb": 53.71,
+        "heap_used_mb": 4.47,
+        "heap_total_mb": 7.35,
+        "external_mb": 1.64,
+        "array_buffers_mb": 0.01
+      },
+      "after_load": {
+        "rss_mb": 406.8,
+        "heap_used_mb": 283.87,
+        "heap_total_mb": 346.44,
+        "external_mb": 1.65,
+        "array_buffers_mb": 0.01
+      },
+      "after_searches": {
+        "rss_mb": 638.36,
+        "heap_used_mb": 284.21,
+        "heap_total_mb": 354.19,
+        "external_mb": 1.65,
+        "array_buffers_mb": 0.01
+      },
+      "delta_load_rss_mb": 353.09
+    },
+    "searches": [
+      {
+        "type": "specialites",
+        "q": "doliprane",
+        "category": "nom_complet",
+        "count": 31,
+        "latency_ms": {
+          "avg": 85.57,
+          "p50": 84.1,
+          "p95": 103.44
+        },
+        "top5": [
+          {
+            "cis": "67119691",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69309629",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "63368332",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "60234100",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "61903804",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANECAPS 1000 mg, gélule",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "doli",
+        "category": "prefix",
+        "count": 34,
+        "latency_ms": {
+          "avg": 84.82,
+          "p50": 84.58,
+          "p95": 93.48
+        },
+        "top5": [
+          {
+            "cis": "67119691",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69309629",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "63368332",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "60234100",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "61903804",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANECAPS 1000 mg, gélule",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "dolipranr",
+        "category": "fuzzy",
+        "count": 34,
+        "latency_ms": {
+          "avg": 83.7,
+          "p50": 82.67,
+          "p95": 89.84
+        },
+        "top5": [
+          {
+            "cis": "67119691",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "69309629",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "63368332",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60234100",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60310861",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 150 mg, suppositoire",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "60234100",
+        "category": "cis_exact",
+        "count": 17,
+        "latency_ms": {
+          "avg": 6.16,
+          "p50": 5.82,
+          "p95": 9.24
+        },
+        "top5": [
+          {
+            "cis": "60234100",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, comprimé",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60233913",
+            "cip13": null,
+            "code": null,
+            "label": "IBUFETUM 5 %, gel",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60230550",
+            "cip13": null,
+            "code": null,
+            "label": "TAMOXIFENE BIOGARAN 20 mg, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60236546",
+            "cip13": null,
+            "code": null,
+            "label": "COVERAM 10 mg/5 mg, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60239706",
+            "cip13": null,
+            "code": null,
+            "label": "PHYSIOGINE 0,5 mg, ovule",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "paracetamol",
+        "category": "sans_accent",
+        "count": 123,
+        "latency_ms": {
+          "avg": 84.06,
+          "p50": 82.84,
+          "p95": 91.17
+        },
+        "top5": [
+          {
+            "cis": "62772966",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65335982",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 500 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65621649",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "61158602",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ALMUS 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69767594",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ARROW 1 g, comprimé",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "paracétamol",
+        "category": "avec_accent",
+        "count": 123,
+        "latency_ms": {
+          "avg": 85.37,
+          "p50": 84.21,
+          "p95": 90.96
+        },
+        "top5": [
+          {
+            "cis": "62772966",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65335982",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 500 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65621649",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "61158602",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ALMUS 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69767594",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ARROW 1 g, comprimé",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "pfizer",
+        "category": "titulaire",
+        "count": 293,
+        "latency_ms": {
+          "avg": 92.6,
+          "p50": 89.63,
+          "p95": 117.91
+        },
+        "top5": [
+          {
+            "cis": "66015693",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 50 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "68182495",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 100 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "63206323",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 150 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65880420",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 200 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65262018",
+            "cip13": null,
+            "code": null,
+            "label": "EXEMESTANE PFIZER 25 mg, comprimé enrobé",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "comprimé",
+        "category": "forme_pharma",
+        "count": 8149,
+        "latency_ms": {
+          "avg": 229.37,
+          "p50": 222.66,
+          "p95": 258.23
+        },
+        "top5": [
+          {
+            "cis": "69140061",
+            "cip13": null,
+            "code": null,
+            "label": "FEMI, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "68943687",
+            "cip13": null,
+            "code": null,
+            "label": "ACUPAN, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65323026",
+            "cip13": null,
+            "code": null,
+            "label": "RENNIE, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "67327596",
+            "cip13": null,
+            "code": null,
+            "label": "TAUMEA, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "64034435",
+            "cip13": null,
+            "code": null,
+            "label": "LONVECT, comprimé",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "presentations",
+        "q": "doliprane",
+        "category": "libelle",
+        "count": 0,
+        "latency_ms": {
+          "avg": 114.84,
+          "p50": 113.75,
+          "p95": 128.36
+        },
+        "top5": []
+      },
+      {
+        "type": "presentations",
+        "q": "migraine",
+        "category": "indications",
+        "count": 1,
+        "latency_ms": {
+          "avg": 121.9,
+          "p50": 114.58,
+          "p95": 185.9
+        },
+        "top5": [
+          {
+            "cis": "69376930",
+            "cip13": "3400937393614",
+            "code": null,
+            "label": "plaquette(s) PVC PVDC aluminium de 90 comprimé(s)",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "compositions",
+        "q": "paracetamol",
+        "category": "substance",
+        "count": 233,
+        "latency_ms": {
+          "avg": 110.8,
+          "p50": 108.55,
+          "p95": 123.79
+        },
+        "top5": [
+          {
+            "cis": "60009573",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60025403",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60028495",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60028495",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60082023",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          }
+        ]
+      },
+      {
+        "type": "compositions",
+        "q": "tramadol",
+        "category": "substance_2",
+        "count": 106,
+        "latency_ms": {
+          "avg": 125.93,
+          "p50": 122.76,
+          "p95": 156.53
+        },
+        "top5": [
+          {
+            "cis": "60152411",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "64045143",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "66006655",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "66357533",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "69141149",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          }
+        ]
+      },
+      {
+        "type": "mitm",
+        "q": "N02BE01",
+        "category": "code_atc",
+        "count": 102,
+        "latency_ms": {
+          "avg": 1.51,
+          "p50": 1.5,
+          "p95": 2.49
+        },
+        "top5": [
+          {
+            "cis": "62772966",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 1 g, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65335982",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 500 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65621649",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 1 g, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60091086",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 500 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "61158602",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ALMUS 1 g, comprimé",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "substances",
+        "q": "paracetamol",
+        "category": "substances_index",
+        "count": 1,
+        "latency_ms": {
+          "avg": 0.26,
+          "p50": 0.25,
+          "p95": 0.29
+        },
+        "top5": [
+          {
+            "cis": null,
+            "cip13": null,
+            "code": "02202",
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          }
+        ]
+      },
+      {
+        "type": "generiques",
+        "q": "amoxicilline",
+        "category": "groupe",
+        "count": 188,
+        "latency_ms": {
+          "avg": 1.42,
+          "p50": 1.27,
+          "p95": 2.32
+        },
+        "top5": [
+          {
+            "cis": "63565244",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "63260043",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "60099738",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69256767",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "66921126",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          }
+        ]
+      }
+    ]
+  },
+  "sqlite_lean": {
+    "backend": "sqlite_fts",
+    "load_profile": "sqlite_lean",
+    "load_ms": 3234,
+    "memory": {
+      "before_load": {
+        "rss_mb": 53.62,
+        "heap_used_mb": 4.47,
+        "heap_total_mb": 7.35,
+        "external_mb": 1.64,
+        "array_buffers_mb": 0.01
+      },
+      "after_load": {
+        "rss_mb": 264.93,
+        "heap_used_mb": 142.65,
+        "heap_total_mb": 201.59,
+        "external_mb": 1.65,
+        "array_buffers_mb": 0.01
+      },
+      "after_searches": {
+        "rss_mb": 359.5,
+        "heap_used_mb": 142.98,
+        "heap_total_mb": 203.34,
+        "external_mb": 1.65,
+        "array_buffers_mb": 0.01
+      },
+      "delta_load_rss_mb": 211.31
+    },
+    "searches": [
+      {
+        "type": "specialites",
+        "q": "doliprane",
+        "category": "nom_complet",
+        "count": 27,
+        "latency_ms": {
+          "avg": 90.96,
+          "p50": 87.47,
+          "p95": 106.12
+        },
+        "top5": [
+          {
+            "cis": "67119691",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69309629",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "63368332",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "60234100",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "61903804",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANECAPS 1000 mg, gélule",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "doli",
+        "category": "prefix",
+        "count": 34,
+        "latency_ms": {
+          "avg": 90.58,
+          "p50": 90.33,
+          "p95": 96.96
+        },
+        "top5": [
+          {
+            "cis": "67119691",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69309629",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "63368332",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "60234100",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "61903804",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANECAPS 1000 mg, gélule",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "dolipranr",
+        "category": "fuzzy",
+        "count": 34,
+        "latency_ms": {
+          "avg": 96.62,
+          "p50": 93.1,
+          "p95": 131.33
+        },
+        "top5": [
+          {
+            "cis": "67119691",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "69309629",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "63368332",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 500 mg, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60234100",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60310861",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 150 mg, suppositoire",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "60234100",
+        "category": "cis_exact",
+        "count": 17,
+        "latency_ms": {
+          "avg": 6.67,
+          "p50": 6.48,
+          "p95": 7.49
+        },
+        "top5": [
+          {
+            "cis": "60234100",
+            "cip13": null,
+            "code": null,
+            "label": "DOLIPRANE 1000 mg, comprimé",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60233913",
+            "cip13": null,
+            "code": null,
+            "label": "IBUFETUM 5 %, gel",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60230550",
+            "cip13": null,
+            "code": null,
+            "label": "TAMOXIFENE BIOGARAN 20 mg, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60236546",
+            "cip13": null,
+            "code": null,
+            "label": "COVERAM 10 mg/5 mg, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60239706",
+            "cip13": null,
+            "code": null,
+            "label": "PHYSIOGINE 0,5 mg, ovule",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "paracetamol",
+        "category": "sans_accent",
+        "count": 123,
+        "latency_ms": {
+          "avg": 106.83,
+          "p50": 104.26,
+          "p95": 145.69
+        },
+        "top5": [
+          {
+            "cis": "62772966",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65335982",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 500 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65621649",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "61158602",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ALMUS 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69767594",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ARROW 1 g, comprimé",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "paracétamol",
+        "category": "avec_accent",
+        "count": 123,
+        "latency_ms": {
+          "avg": 120.93,
+          "p50": 132.28,
+          "p95": 153.92
+        },
+        "top5": [
+          {
+            "cis": "62772966",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65335982",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 500 mg, gélule",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "65621649",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "61158602",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ALMUS 1 g, comprimé",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69767594",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ARROW 1 g, comprimé",
+            "match_quality": "prefix"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "pfizer",
+        "category": "titulaire",
+        "count": 293,
+        "latency_ms": {
+          "avg": 107.02,
+          "p50": 104.61,
+          "p95": 133.05
+        },
+        "top5": [
+          {
+            "cis": "66015693",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 50 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "68182495",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 100 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "63206323",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 150 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65880420",
+            "cip13": null,
+            "code": null,
+            "label": "FLUCONAZOLE PFIZER 200 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65262018",
+            "cip13": null,
+            "code": null,
+            "label": "EXEMESTANE PFIZER 25 mg, comprimé enrobé",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "specialites",
+        "q": "comprimé",
+        "category": "forme_pharma",
+        "count": 7977,
+        "latency_ms": {
+          "avg": 252.22,
+          "p50": 240.68,
+          "p95": 329.08
+        },
+        "top5": [
+          {
+            "cis": "69140061",
+            "cip13": null,
+            "code": null,
+            "label": "FEMI, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "68943687",
+            "cip13": null,
+            "code": null,
+            "label": "ACUPAN, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65323026",
+            "cip13": null,
+            "code": null,
+            "label": "RENNIE, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "67327596",
+            "cip13": null,
+            "code": null,
+            "label": "TAUMEA, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "64034435",
+            "cip13": null,
+            "code": null,
+            "label": "LONVECT, comprimé",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "presentations",
+        "q": "doliprane",
+        "category": "libelle",
+        "count": 0,
+        "latency_ms": {
+          "avg": 0.1,
+          "p50": 0.09,
+          "p95": 0.14
+        },
+        "top5": []
+      },
+      {
+        "type": "presentations",
+        "q": "migraine",
+        "category": "indications",
+        "count": 1,
+        "latency_ms": {
+          "avg": 0.3,
+          "p50": 0.26,
+          "p95": 0.47
+        },
+        "top5": [
+          {
+            "cis": "69376930",
+            "cip13": "3400937393614",
+            "code": null,
+            "label": "plaquette(s) PVC PVDC aluminium de 90 comprimé(s)",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "compositions",
+        "q": "paracetamol",
+        "category": "substance",
+        "count": 233,
+        "latency_ms": {
+          "avg": 14.65,
+          "p50": 14.5,
+          "p95": 18.01
+        },
+        "top5": [
+          {
+            "cis": "60009573",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60025403",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60028495",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60028495",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "60082023",
+            "cip13": null,
+            "code": null,
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          }
+        ]
+      },
+      {
+        "type": "compositions",
+        "q": "tramadol",
+        "category": "substance_2",
+        "count": 106,
+        "latency_ms": {
+          "avg": 6.05,
+          "p50": 5.84,
+          "p95": 7.95
+        },
+        "top5": [
+          {
+            "cis": "60152411",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "64045143",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "66006655",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "66357533",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          },
+          {
+            "cis": "69141149",
+            "cip13": null,
+            "code": null,
+            "label": "TRAMADOL",
+            "match_quality": "exact"
+          }
+        ]
+      },
+      {
+        "type": "mitm",
+        "q": "N02BE01",
+        "category": "code_atc",
+        "count": 102,
+        "latency_ms": {
+          "avg": 1.51,
+          "p50": 1.37,
+          "p95": 2.92
+        },
+        "top5": [
+          {
+            "cis": "62772966",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 1 g, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65335982",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL EG 500 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "65621649",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 1 g, comprimé",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "60091086",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL TEVA 500 mg, gélule",
+            "match_quality": "fuzzy"
+          },
+          {
+            "cis": "61158602",
+            "cip13": null,
+            "code": null,
+            "label": "PARACETAMOL ALMUS 1 g, comprimé",
+            "match_quality": "fuzzy"
+          }
+        ]
+      },
+      {
+        "type": "substances",
+        "q": "paracetamol",
+        "category": "substances_index",
+        "count": 1,
+        "latency_ms": {
+          "avg": 0.26,
+          "p50": 0.27,
+          "p95": 0.29
+        },
+        "top5": [
+          {
+            "cis": null,
+            "cip13": null,
+            "code": "02202",
+            "label": "PARACÉTAMOL",
+            "match_quality": "exact"
+          }
+        ]
+      },
+      {
+        "type": "generiques",
+        "q": "amoxicilline",
+        "category": "groupe",
+        "count": 188,
+        "latency_ms": {
+          "avg": 1.52,
+          "p50": 1.35,
+          "p95": 2.54
+        },
+        "top5": [
+          {
+            "cis": "63565244",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "63260043",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "60099738",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "69256767",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          },
+          {
+            "cis": "66921126",
+            "cip13": null,
+            "code": null,
+            "label": "AMOXICILLINE + CLAVULANATE DE POTASSIUM équivalant à AMOXICILLINE + ACIDE CLAVUL",
+            "match_quality": "prefix"
+          }
+        ]
+      }
+    ]
+  },
+  "comparison": {
+    "total": 15,
+    "identicalTop1": 13,
+    "identicalTop5": 11,
+    "identicalCount": 13,
+    "identicalMatchQualityTop1": 15,
+    "pct_top1": 86.7,
+    "pct_top5": 73.3,
+    "pct_count": 86.7,
+    "pct_mq_top1": 100,
+    "rows": [
+      {
+        "category": "nom_complet",
+        "type": "specialites",
+        "q": "doliprane",
+        "mini_count": 31,
+        "sqlite_count": 31,
+        "count_delta": 0,
+        "top1_match": true,
+        "top5_match": false,
+        "match_quality_top1_match": true,
+        "mini_top1": {
+          "cis": "67119691",
+          "cip13": null,
+          "code": null,
+          "label": "DOLIPRANE 500 mg, gélule",
+          "match_quality": "prefix"
+        },
+        "sqlite_top1": {
+          "cis": "67119691",
+          "cip13": null,
+          "code": null,
+          "label": "DOLIPRANE 500 mg, gélule",
+          "match_quality": "prefix"
+        },
+        "mini_latency_p50_ms": 1.6,
+        "sqlite_latency_p50_ms": 84.1,
+        "latency_ratio_mini_over_sqlite": 0.019
+      },
+      {
+        "category": "prefix",
+        "type": "specialites",
+        "q": "doli",
+        "mini_count": 34,
+        "sqlite_count": 34,
+        "count_delta": 0,
+        "top1_match": false,
+        "top5_match": false,
+        "match_quality_top1_match": true,
+        "mini_top1": {
+          "cis": "61903804",
+          "cip13": null,
+          "code": null,
+          "label": "DOLIPRANECAPS 1000 mg, gélule",
+          "match_quality": "prefix"
+        },
+        "sqlite_top1": {
+          "cis": "67119691",
+          "cip13": null,
+          "code": null,
+          "label": "DOLIPRANE 500 mg, gélule",
+          "match_quality": "prefix"
+        },
+        "mini_latency_p50_ms": 0.95,
+        "sqlite_latency_p50_ms": 84.58,
+        "latency_ratio_mini_over_sqlite": 0.011
+      },
+      {
+        "category": "fuzzy",
+        "type": "specialites",
+        "q": "dolipranr",
+        "mini_count": 18,
+        "sqlite_count": 34,
+        "count_delta": 16,
+        "top1_match": true,
+        "top5_match": true,
+        "match_quality_top1_match": true,
+        "mini_top1": {
+          "cis": "67119691",
+          "cip13": null,
+          "code": null,
+          "label": "DOLIPRANE 500 mg, gélule",
+          "match_quality": "fuzzy"
+        },
+        "sqlite_top1": {
+          "cis": "67119691",
+          "cip13": null,
+          "code": null,
+          "label": "DOLIPRANE 500 mg, gélule",
+          "match_quality": "fuzzy"
+        },
+        "mini_latency_p50_ms": 1,
+        "sqlite_latency_p50_ms": 82.67,
+        "latency_ratio_mini_over_sqlite": 0.012
+      },
+      {
+        "category": "cis_exact",
+        "type": "specialites",
+        "q": "60234100",
+        "mini_count": 1,
+        "sqlite_count": 17,
+        "count_delta": 16,
+        "top1_match": true,
+        "top5_match": false,
+        "match_quality_top1_match": true,
+        "mini_top1": {
+          "cis": "60234100",
+          "cip13": null,
+          "code": null,
+          "label": "DOLIPRANE 1000 mg, comprimé",
+          "match_quality": "exact"
+        },
+        "sqlite_top1": {
+          "cis": "60234100",
+          "cip13": null,
+          "code": null,
+          "label": "DOLIPRANE 1000 mg, comprimé",
+          "match_quality": "exact"
+        },
+        "mini_latency_p50_ms": 0.08,
+        "sqlite_latency_p50_ms": 5.82,
+        "latency_ratio_mini_over_sqlite": 0.014
+      },
+      {
+        "category": "forme_pharma",
+        "type": "specialites",
+        "q": "comprimé",
+        "mini_count": 8149,
+        "sqlite_count": 8149,
+        "count_delta": 0,
+        "top1_match": false,
+        "top5_match": false,
+        "match_quality_top1_match": true,
+        "mini_top1": {
+          "cis": "68467163",
+          "cip13": null,
+          "code": null,
+          "label": "ZONISAMIDE NEURAXPHARM 100 mg, comprimésécable",
+          "match_quality": "fuzzy"
+        },
+        "sqlite_top1": {
+          "cis": "69140061",
+          "cip13": null,
+          "code": null,
+          "label": "FEMI, comprimé",
+          "match_quality": "fuzzy"
+        },
+        "mini_latency_p50_ms": 110.52,
+        "sqlite_latency_p50_ms": 222.66,
+        "latency_ratio_mini_over_sqlite": 0.496
+      }
+    ],
+    "all_latency_rows": [
+      {
+        "category": "nom_complet",
+        "type": "specialites",
+        "q": "doliprane",
+        "mini_latency_p50_ms": 1.6,
+        "sqlite_latency_p50_ms": 84.1,
+        "latency_ratio_mini_over_sqlite": 0.019
+      },
+      {
+        "category": "prefix",
+        "type": "specialites",
+        "q": "doli",
+        "mini_latency_p50_ms": 0.95,
+        "sqlite_latency_p50_ms": 84.58,
+        "latency_ratio_mini_over_sqlite": 0.011
+      },
+      {
+        "category": "fuzzy",
+        "type": "specialites",
+        "q": "dolipranr",
+        "mini_latency_p50_ms": 1,
+        "sqlite_latency_p50_ms": 82.67,
+        "latency_ratio_mini_over_sqlite": 0.012
+      },
+      {
+        "category": "cis_exact",
+        "type": "specialites",
+        "q": "60234100",
+        "mini_latency_p50_ms": 0.08,
+        "sqlite_latency_p50_ms": 5.82,
+        "latency_ratio_mini_over_sqlite": 0.014
+      },
+      {
+        "category": "sans_accent",
+        "type": "specialites",
+        "q": "paracetamol",
+        "mini_latency_p50_ms": 2.25,
+        "sqlite_latency_p50_ms": 82.84,
+        "latency_ratio_mini_over_sqlite": 0.027
+      },
+      {
+        "category": "avec_accent",
+        "type": "specialites",
+        "q": "paracétamol",
+        "mini_latency_p50_ms": 1.9,
+        "sqlite_latency_p50_ms": 84.21,
+        "latency_ratio_mini_over_sqlite": 0.023
+      },
+      {
+        "category": "titulaire",
+        "type": "specialites",
+        "q": "pfizer",
+        "mini_latency_p50_ms": 3.21,
+        "sqlite_latency_p50_ms": 89.63,
+        "latency_ratio_mini_over_sqlite": 0.036
+      },
+      {
+        "category": "forme_pharma",
+        "type": "specialites",
+        "q": "comprimé",
+        "mini_latency_p50_ms": 110.52,
+        "sqlite_latency_p50_ms": 222.66,
+        "latency_ratio_mini_over_sqlite": 0.496
+      },
+      {
+        "category": "libelle",
+        "type": "presentations",
+        "q": "doliprane",
+        "mini_latency_p50_ms": 0.24,
+        "sqlite_latency_p50_ms": 113.75,
+        "latency_ratio_mini_over_sqlite": 0.002
+      },
+      {
+        "category": "indications",
+        "type": "presentations",
+        "q": "migraine",
+        "mini_latency_p50_ms": 0.25,
+        "sqlite_latency_p50_ms": 114.58,
+        "latency_ratio_mini_over_sqlite": 0.002
+      },
+      {
+        "category": "substance",
+        "type": "compositions",
+        "q": "paracetamol",
+        "mini_latency_p50_ms": 1.9,
+        "sqlite_latency_p50_ms": 108.55,
+        "latency_ratio_mini_over_sqlite": 0.018
+      },
+      {
+        "category": "substance_2",
+        "type": "compositions",
+        "q": "tramadol",
+        "mini_latency_p50_ms": 0.71,
+        "sqlite_latency_p50_ms": 122.76,
+        "latency_ratio_mini_over_sqlite": 0.006
+      },
+      {
+        "category": "code_atc",
+        "type": "mitm",
+        "q": "N02BE01",
+        "mini_latency_p50_ms": 0.97,
+        "sqlite_latency_p50_ms": 1.5,
+        "latency_ratio_mini_over_sqlite": 0.647
+      },
+      {
+        "category": "substances_index",
+        "type": "substances",
+        "q": "paracetamol",
+        "mini_latency_p50_ms": 0.26,
+        "sqlite_latency_p50_ms": 0.25,
+        "latency_ratio_mini_over_sqlite": 1.04
+      },
+      {
+        "category": "groupe",
+        "type": "generiques",
+        "q": "amoxicilline",
+        "mini_latency_p50_ms": 0.99,
+        "sqlite_latency_p50_ms": 1.27,
+        "latency_ratio_mini_over_sqlite": 0.78
+      }
+    ]
+  },
+  "memory_delta_rss_mb": 0.75,
+  "memory_lean_vs_full_rss_mb": -141.87,
+  "memory_interpretation": "En profil **full**, l'écart RSS après chargement MiniSearch vs SQLite FTS est de **0.75 Mo** (quasi identique) : les deux chargent les tableaux complets et les index MiniSearch.\n\nEn profil **sqlite_lean** (`DATA_LOAD_PROFILE=sqlite_lean` + `SEARCH_BACKEND=sqlite_fts`), l'économie au chargement est d'environ **141.87 Mo RSS** et **141.22 Mo heap** : présentations/compositions ne sont plus en RAM, ni les 3 index MiniSearch lourds.\n\nLa base SQLite sur disque (40.55 Mo) reste ouverte via connexion persistante ; les jointures CIS→présentations/compositions passent par SQL à la demande.\n\nLe fuzzy SQLite est désormais borné aux candidats FTS/prefix (plus de scan intégral), ce qui réduit les pics RAM en recherche par rapport à la version précédente.",
+  "artifacts": {
+    "sqlite_path": "/home/yoch/fr.gouv.medicaments.rest/data/bdpm.sqlite",
+    "sqlite_size": "40.55 Mo"
+  },
+  "recommendations": [
+    "Affiner le ranking FTS5 (poids BM25, fuzzy tokenisé, champs secondaires) avant toute bascule publique.",
+    "Optimiser SQLite FTS : connexion persistante (éviter open/close par requête), cache prepared statements, LIMIT plus strict sur candidats fuzzy.",
+    "Pour réduire la RAM, il faudra une phase 3 sans reconstruction MiniSearch (FTS + lookups SQL uniquement), pas seulement `SEARCH_BACKEND=sqlite_fts`.",
+    "Conserver `SEARCH_BACKEND=compare` en préproduction pour détecter les dérives de ranking après chaque refresh BDPM."
+  ]
+}

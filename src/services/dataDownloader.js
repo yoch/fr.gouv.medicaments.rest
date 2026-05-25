@@ -5,6 +5,11 @@ const path = require('path');
 const os = require('os');
 const { exec } = require('child_process');
 const { promisify } = require('util');
+const {
+  buildBdpmDatabase,
+  isDatabaseUsable,
+  getDefaultDbPath
+} = require('./bdpmDatabase');
 
 const execAsync = promisify(exec);
 
@@ -227,6 +232,20 @@ async function downloadDataIfNeeded() {
       } else {
         console.log(`Conservation de la version locale de ${filename}`);
       }
+    }
+  }
+
+  const dbPath = getDefaultDbPath();
+  if (changed || !isDatabaseUsable(dbPath)) {
+    try {
+      const buildResult = buildBdpmDatabase({
+        dbPath,
+        dataDir: DATA_DIR,
+        metaFilePath: META_FILE
+      });
+      console.log(`✓ Base SQLite BDPM générée: ${buildResult.dbPath}`);
+    } catch (error) {
+      console.error('✗ Échec génération base SQLite BDPM:', error.message);
     }
   }
 

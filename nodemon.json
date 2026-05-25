@@ -1,0 +1,6 @@
+{
+    "ignore": [
+        "data/*"
+    ],
+    "ext": "js,json"
+}

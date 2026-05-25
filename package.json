@@ -10,11 +10,18 @@
     "start": "node --env-file=.env src/server.js",
     "dev": "nodemon --exec 'node --env-file=.env' src/server.js",
     "download-data": "node src/scripts/download-initial-data.js",
+    "build-sqlite": "node src/scripts/build-bdpm-sqlite.js",
+    "benchmark:minisearch": "SEARCH_BACKEND=minisearch BENCHMARK_OUTPUT=benchmark_results_minisearch.json node tests/benchmark_search.js",
+    "benchmark:sqlite": "SEARCH_BACKEND=sqlite_fts BENCHMARK_OUTPUT=benchmark_results_sqlite_fts.json node tests/benchmark_search.js",
+    "benchmark:compare": "node tests/benchmark_compare_backends.js",
+    "audit:backends": "node --expose-gc tests/audit_backend_comparison.js",
+    "start:sqlite-lean": "DATA_LOAD_PROFILE=sqlite_lean SEARCH_BACKEND=sqlite_fts node --env-file=.env src/server.js",
     "test": "jest"
   },
   "dependencies": {
     "7zip-bin": "^5.2.0",
     "axios": "^1.6.0",
+    "better-sqlite3": "^12.10.0",
     "cors": "^2.8.5",
     "csv-parse": "^6.1.0",
     "express": "^5.2.1",
