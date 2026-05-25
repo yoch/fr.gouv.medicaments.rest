@@ -29,11 +29,13 @@ Liste les substances actives indexées. utile pour la recherche par molécule.
   - `q` (string): Recherche par nom de substance. Ex: `paracetamol`
 - **Réponse**: Liste d'objets `Substance`.
 
-#### `GET /medicaments/infos-importantes`
+<!--
+#### `GET /medicaments/infos-importantes` (désactivé dans le code)
 Informations de sécurité importantes (alertes, messages ANSM).
 - **Paramètres**:
   - `q` (string): Recherche dans le texte de l'alerte.
 - **Réponse**: Liste d'objets `InfoImportante`.
+-->
 
 ### Autres Endpoints
 

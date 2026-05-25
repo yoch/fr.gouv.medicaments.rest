@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { downloadDataIfNeeded } = require('./services/dataDownloader');
-const { loadData } = require('./services/dataLoader');
+const { loadData, getMetadata } = require('./services/dataLoader');
 const medicamentRoutes = require('./routes/medicaments');
 
 const app = express();
@@ -85,7 +85,6 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-    const { getMetadata } = require('./services/dataLoader');
     const metadata = getMetadata();
     const { pretty } = req.query;
 

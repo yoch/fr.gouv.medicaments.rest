@@ -160,9 +160,8 @@ async function downloadDataIfNeeded() {
   for (const filename of FILES) {
     const finalPath = path.join(DATA_DIR, filename);
     const tempPath = path.join(os.tmpdir(), filename);
-    const url = filename !== 'CIS_InfoImportantes.txt' ?
-      `${BASE_URL}/file/${filename}` :
-      `${BASE_URL}/${filename}`;
+    const url = `${BASE_URL}/file/${filename}`;
+    // Réactivation CIS_InfoImportantes.txt : `${BASE_URL}/${filename}` (sans /file/)
 
     // Vérification de la fraîcheur (24h)
     if (!shouldCheckFile(filename, metadata) && fs.existsSync(finalPath)) {

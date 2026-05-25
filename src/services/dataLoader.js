@@ -14,7 +14,7 @@ let dataCache = {
   generiques: [],
   conditions: [],
   ruptures: [],
-  infos: [],
+  // infos: [], // désactivé — réactiver avec loadData + route /infos-importantes
   substances: [],
   mitm: [],
   metadata: {
@@ -32,7 +32,7 @@ let searchIndexes = {
   generiques: null,
   conditions: null,
   ruptures: null,
-  infos: null,
+  // infos: null,
   substances: null,
   mitm: null
 };
@@ -81,10 +81,10 @@ function parseFile(filename, columns) {
     return [];
   }
 
+  const content = fs.readFileSync(filepath, { encoding: 'utf8' });
+
   try {
-    // Tous les fichiers sont maintenant en UTF-8
-    const content = fs.readFileSync(filepath, { encoding: 'utf8' });
-    const records = parse(content, {
+    return parse(content, {
       delimiter: '\t',
       columns: columns,
       skip_empty_lines: true,
@@ -94,15 +94,11 @@ function parseFile(filename, columns) {
       relax_quotes: true,
       relax_column_count: true
     });
-
-    return records;
   } catch (error) {
     console.error(`Erreur parsing ${filename}:`, error.message);
     console.warn(`Tentative de parsing ligne par ligne pour ${filename}...`);
 
     try {
-      // Tous les fichiers sont maintenant en UTF-8
-      const content = fs.readFileSync(filepath, { encoding: 'utf8' });
       const lines = content.split('\n');
       const records = [];
 
@@ -379,7 +375,7 @@ const PRIMARY_FIELDS = {
   conditions: 'condition',
   ruptures: 'libelle_statut',
   mitm: 'denomination',
-  infos: 'texte_affichage',
+  // infos: 'texte_affichage',
   substances: 'denomination'
 };
 
@@ -414,12 +410,9 @@ function search(type, query) {
     return { item, score: res.score, priority, match_quality: MATCH_QUALITY[priority] };
   });
 
-  // Tri: Priorité > Score (si diff significative) > Longueur (plus court = mieux)
+  // Tri : priorité (exact > prefix) puis score MiniSearch
   rankedResults.sort((a, b) => {
-    // 1. Priorité absolue (Exact Match / Starts With)
     if (b.priority !== a.priority) return b.priority - a.priority;
-
-    // 2. Score textuel
     return b.score - a.score;
   });
 

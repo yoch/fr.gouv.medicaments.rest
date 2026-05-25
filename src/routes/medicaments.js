@@ -34,7 +34,15 @@ function paginate(data, page = 1, limit = 100) {
   };
 }
 
+const MATCH_QUALITY_RANK = { exact: 3, prefix: 2, fuzzy: 1 };
 
+function listHandler(dataType, defaultLimit = 100) {
+  return (req, res) => {
+    const { q, page = 1, limit = defaultLimit } = req.query;
+    const data = q ? search(dataType, q) : getData(dataType);
+    res.json(paginate(data, page, limit));
+  };
+}
 
 // GET /api/medicaments/specialites
 /**
@@ -76,16 +84,7 @@ function paginate(data, page = 1, limit = 100) {
  *                       items:
  *                         $ref: '#/components/schemas/Medicament'
  */
-router.get('/specialites', (req, res) => {
-  const { q, page = 1, limit = 100 } = req.query;
-  let data = getData('specialites');
-
-  if (q) {
-    data = search('specialites', q);
-  }
-
-  res.json(paginate(data, page, limit));
-});
+router.get('/specialites', listHandler('specialites'));
 
 // GET /api/medicaments/specialites/:cis
 /**
@@ -192,16 +191,7 @@ router.get('/specialites/:cis', (req, res) => {
  *                       items:
  *                         $ref: '#/components/schemas/Presentation'
  */
-router.get('/presentations', (req, res) => {
-  const { q, page = 1, limit = 100 } = req.query;
-  let data = getData('presentations');
-
-  if (q) {
-    data = search('presentations', q);
-  }
-
-  res.json(paginate(data, page, limit));
-});
+router.get('/presentations', listHandler('presentations'));
 
 // GET /api/medicaments/compositions
 /**
@@ -240,16 +230,7 @@ router.get('/presentations', (req, res) => {
  *                       items:
  *                         $ref: '#/components/schemas/Composition'
  */
-router.get('/compositions', (req, res) => {
-  const { q, page = 1, limit = 100 } = req.query;
-  let data = getData('compositions');
-
-  if (q) {
-    data = search('compositions', q);
-  }
-
-  res.json(paginate(data, page, limit));
-});
+router.get('/compositions', listHandler('compositions'));
 
 // GET /api/medicaments/avis-smr
 /**
@@ -288,16 +269,7 @@ router.get('/compositions', (req, res) => {
  *                       items:
  *                         $ref: '#/components/schemas/AvisSMR'
  */
-router.get('/avis-smr', (req, res) => {
-  const { q, page = 1, limit = 100 } = req.query;
-  let data = getData('avis_smr');
-
-  if (q) {
-    data = search('avis_smr', q);
-  }
-
-  res.json(paginate(data, page, limit));
-});
+router.get('/avis-smr', listHandler('avis_smr'));
 
 // GET /api/medicaments/avis-asmr
 /**
@@ -336,16 +308,7 @@ router.get('/avis-smr', (req, res) => {
  *                       items:
  *                         $ref: '#/components/schemas/AvisASMR'
  */
-router.get('/avis-asmr', (req, res) => {
-  const { q, page = 1, limit = 100 } = req.query;
-  let data = getData('avis_asmr');
-
-  if (q) {
-    data = search('avis_asmr', q);
-  }
-
-  res.json(paginate(data, page, limit));
-});
+router.get('/avis-asmr', listHandler('avis_asmr'));
 
 // GET /api/medicaments/groupes-generiques
 /**
@@ -384,16 +347,7 @@ router.get('/avis-asmr', (req, res) => {
  *                       items:
  *                         $ref: '#/components/schemas/GroupeGenerique'
  */
-router.get('/groupes-generiques', (req, res) => {
-  const { q, page = 1, limit = 100 } = req.query;
-  let data = getData('generiques');
-
-  if (q) {
-    data = search('generiques', q);
-  }
-
-  res.json(paginate(data, page, limit));
-});
+router.get('/groupes-generiques', listHandler('generiques'));
 
 // GET /api/medicaments/conditions
 /**
@@ -432,16 +386,7 @@ router.get('/groupes-generiques', (req, res) => {
  *                       items:
  *                         $ref: '#/components/schemas/Condition'
  */
-router.get('/conditions', (req, res) => {
-  const { q, page = 1, limit = 100 } = req.query;
-  let data = getData('conditions');
-
-  if (q) {
-    data = search('conditions', q);
-  }
-
-  res.json(paginate(data, page, limit));
-});
+router.get('/conditions', listHandler('conditions'));
 
 // GET /api/medicaments/disponibilite
 /**
@@ -480,16 +425,7 @@ router.get('/conditions', (req, res) => {
  *                       items:
  *                         $ref: '#/components/schemas/Disponibilite'
  */
-router.get('/disponibilite', (req, res) => {
-  const { q, page = 1, limit = 100 } = req.query;
-  let data = getData('ruptures');
-
-  if (q) {
-    data = search('ruptures', q);
-  }
-
-  res.json(paginate(data, page, limit));
-});
+router.get('/disponibilite', listHandler('ruptures'));
 
 // GET /api/medicaments/interet-therapeutique-majeur
 /**
@@ -528,16 +464,7 @@ router.get('/disponibilite', (req, res) => {
  *                       items:
  *                         $ref: '#/components/schemas/MITM'
  */
-router.get('/interet-therapeutique-majeur', (req, res) => {
-  const { q, page = 1, limit = 100 } = req.query;
-  let data = getData('mitm');
-
-  if (q) {
-    data = search('mitm', q);
-  }
-
-  res.json(paginate(data, page, limit));
-});
+router.get('/interet-therapeutique-majeur', listHandler('mitm'));
 
 // GET /api/medicaments/substances
 /**
@@ -560,50 +487,30 @@ router.get('/interet-therapeutique-majeur', (req, res) => {
  *               allOf:
  *                 - $ref: '#/components/schemas/ApiResponse'
  */
-router.get('/substances', (req, res) => {
-  const { q, page = 1, limit = 100 } = req.query;
-  let data = getData('substances');
+router.get('/substances', listHandler('substances'));
 
-  if (q) {
-    data = search('substances', q);
-  }
-
-  res.json(paginate(data, page, limit));
-});
-
-// GET /api/medicaments/infos-importantes
-/**
- * @/swagger
- * /medicaments/infos-importantes:
- *   get:
- *     summary: Informations de sécurité importantes
- *     tags: [Médicaments]
- *     parameters:
- *       - in: query
- *         name: q
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Liste des informations de sécurité
- *         content:
- *           application/json:
- *             schema:
- *               allOf:
- *                 - $ref: '#/components/schemas/ApiResponse'
- */
-/*
-router.get('/infos-importantes', (req, res) => {
-  const { q, page = 1, limit = 100 } = req.query;
-  let data = getData('infos');
-
-  if (q) {
-    data = search('infos', q);
-  }
-
-  res.json(paginate(data, page, limit));
-});
-*/
+// GET /api/medicaments/infos-importantes (désactivé — réactiver avec dataLoader.infos)
+// /**
+//  * @swagger
+//  * /medicaments/infos-importantes:
+//  *   get:
+//  *     summary: Informations de sécurité importantes
+//  *     tags: [Médicaments]
+//  *     parameters:
+//  *       - in: query
+//  *         name: q
+//  *         schema:
+//  *           type: string
+//  *     responses:
+//  *       200:
+//  *         description: Liste des informations de sécurité
+//  *         content:
+//  *           application/json:
+//  *             schema:
+//  *               allOf:
+//  *                 - $ref: '#/components/schemas/ApiResponse'
+//  */
+// router.get('/infos-importantes', listHandler('infos'));
 
 // GET /api/medicaments/search - Recherche globale
 /**
@@ -669,11 +576,10 @@ router.get('/search', (req, res) => {
   const presentations = search('presentations', q);
   const compositions = search('compositions', q);
 
-  const matchQualityRank = { exact: 3, prefix: 2, fuzzy: 1 };
   const matchQualityByCis = {};
   for (const item of [...specialites, ...presentations, ...compositions]) {
     const previous = matchQualityByCis[item.cis];
-    if (!previous || matchQualityRank[item.match_quality] > matchQualityRank[previous]) {
+    if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
       matchQualityByCis[item.cis] = item.match_quality;
     }
   }

@@ -32,8 +32,13 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 ### Autres endpoints
 - `GET /api/medicaments/presentations` - Présentations
 - `GET /api/medicaments/compositions` - Compositions
-- `GET /api/medicaments/generiques` - Groupes génériques
-- `GET /api/medicaments/ruptures` - Ruptures de stock
+- `GET /api/medicaments/avis-smr` - Avis SMR
+- `GET /api/medicaments/avis-asmr` - Avis ASMR
+- `GET /api/medicaments/groupes-generiques` - Groupes génériques
+- `GET /api/medicaments/conditions` - Conditions de prescription
+- `GET /api/medicaments/disponibilite` - Ruptures de stock
+- `GET /api/medicaments/interet-therapeutique-majeur` - MITM
+- `GET /api/medicaments/substances` - Substances actives
 - `GET /api/medicaments/search?q=aspirine` - Recherche globale
 
 ### Paramètres de requête
