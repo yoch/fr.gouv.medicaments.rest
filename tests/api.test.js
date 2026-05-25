@@ -32,6 +32,9 @@ describe('API Medicaments', () => {
             expect(res.body.data).toBeInstanceOf(Array);
             expect(res.body.data.length).toBe(5);
             expect(res.body.pagination).toBeDefined();
+            expect(res.body.data[0].url_bdpm).toBe(
+                `https://base-donnees-publique.medicaments.gouv.fr/medicament/${res.body.data[0].cis}/extrait`
+            );
         });
 
         it('should filter by query (prefix match)', async () => {
@@ -68,6 +71,9 @@ describe('API Medicaments', () => {
             const res = await request(app).get('/api/medicaments/specialites/60234100');
             expect(res.statusCode).toEqual(200);
             expect(res.body.cis).toBe('60234100');
+            expect(res.body.url_bdpm).toBe(
+                'https://base-donnees-publique.medicaments.gouv.fr/medicament/60234100/extrait'
+            );
             expect(res.body.presentations).toBeDefined();
             expect(res.body.compositions).toBeDefined();
         });

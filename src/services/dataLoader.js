@@ -4,6 +4,11 @@ const { parse } = require('csv-parse/sync');
 const MiniSearch = require('minisearch');
 
 const DATA_DIR = path.join(__dirname, '../../data');
+const BDPM_MEDICAMENT_BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/medicament';
+
+function bdpmExtraitUrl(cis) {
+  return `${BDPM_MEDICAMENT_BASE_URL}/${cis}/extrait`;
+}
 
 let dataCache = {
   specialites: [],
@@ -241,7 +246,10 @@ async function loadData() {
     'cis', 'denomination', 'forme_pharma', 'voies_admin', 'statut_amm',
     'type_amm', 'commercialisation', 'date_amm', 'statut_bdm',
     'num_autorisation_euro', 'titulaire', 'surveillance_renforcee'
-  ]);
+  ]).map((specialite) => ({
+    ...specialite,
+    url_bdpm: bdpmExtraitUrl(specialite.cis)
+  }));
   createIndex('specialites',
     ['cis', 'denomination', 'forme_pharma', 'titulaire'],
     { denomination: 3, cis: 2, forme_pharma: 0.5, titulaire: 1 }
@@ -410,9 +418,12 @@ function search(type, query) {
     return { item, score: res.score, priority, match_quality: MATCH_QUALITY[priority] };
   });
 
-  // Tri : priorité (exact > prefix) puis score MiniSearch
+  // Tri: Priorité > Score (si diff significative) > Longueur (plus court = mieux)
   rankedResults.sort((a, b) => {
+    // 1. Priorité absolue (Exact Match / Starts With)
     if (b.priority !== a.priority) return b.priority - a.priority;
+
+    // 2. Score textuel
     return b.score - a.score;
   });
 
@@ -438,5 +449,6 @@ module.exports = {
   getMetadata,
   getSpecialiteByCis,
   getRelatedByCis,
-  getGeneriquesForCis
+  getGeneriquesForCis,
+  bdpmExtraitUrl
 };

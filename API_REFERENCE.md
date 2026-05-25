@@ -13,7 +13,7 @@ Liste les spécialités pharmaceutiques.
   - `q` (string): Terme de recherche (préfixe + fuzzy sur le texte). Ex: `doliprane`
   - `page` (int): Numéro de page (défaut: 1)
   - `limit` (int): Nombre d'éléments par page (défaut: 100)
-- **Réponse**: Liste d'objets `Medicament` (avec `match_quality` si `q` est fourni).
+- **Réponse**: Liste d'objets `Medicament` (avec `match_quality` si `q` est fourni, et `url_bdpm` vers la fiche officielle).
 
 #### `GET /medicaments/specialites/:cis`
 Détail complet d'une spécialité.
@@ -55,6 +55,7 @@ Tous ces endpoints acceptent les paramètres standards :
 - `pretty`: Formatage JSON
 
 #### Structure des objets (Schémas)
+- **Medicament**: inclut `url_bdpm` — lien vers `https://base-donnees-publique.medicaments.gouv.fr/medicament/{cis}/extrait` (RCP, notice, fiche info).
 - **AvisSMR**: `valeur_smr`, `libelle_smr`, `motif_evaluation`, `date_avis`.
 - **AvisASMR**: `valeur_asmr`, `libelle_asmr`, `motif_evaluation`, `date_avis`.
 - **Disponibilite**: `libelle_statut` (ex: Rupture de stock), `date_debut`, `date_remise_dispo`, `lien_ansm`.

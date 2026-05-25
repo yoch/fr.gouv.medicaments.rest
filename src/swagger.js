@@ -36,7 +36,13 @@ const options = {
                         commercialisation: { type: 'string', description: 'État de commercialisation' },
                         date_amm: { type: 'string', description: 'Date d\'AMM' },
                         titulaire: { type: 'string', description: 'Titulaire de l\'AMM' },
-                        surveillance_renforcee: { type: 'string', description: 'Surveillance renforcée' }
+                        surveillance_renforcee: { type: 'string', description: 'Surveillance renforcée' },
+                        url_bdpm: {
+                            type: 'string',
+                            format: 'uri',
+                            description: 'Lien vers la fiche BDPM (extrait RCP, notice, etc.)',
+                            example: 'https://base-donnees-publique.medicaments.gouv.fr/medicament/60904643/extrait'
+                        }
                     }
                 },
                 Presentation: {

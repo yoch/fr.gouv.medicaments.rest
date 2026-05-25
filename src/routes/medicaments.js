@@ -5,7 +5,8 @@ const {
   getMetadata,
   getSpecialiteByCis,
   getRelatedByCis,
-  getGeneriquesForCis
+  getGeneriquesForCis,
+  bdpmExtraitUrl
 } = require('../services/dataLoader');
 
 const router = express.Router();
@@ -590,7 +591,7 @@ router.get('/search', (req, res) => {
   const results = Array.from(matchedCis).map(cis => ({
     type: 'medicament',
     match_quality: matchQualityByCis[cis],
-    ...(getSpecialiteByCis(cis) || { cis }),
+    ...(getSpecialiteByCis(cis) || { cis, url_bdpm: bdpmExtraitUrl(cis) }),
     presentations: getRelatedByCis('presentations', cis),
     compositions: getRelatedByCis('compositions', cis)
   }));
