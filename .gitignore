@@ -109,3 +109,11 @@ Thumbs.db
 
 # Process management
 .pm2/
+
+rcp/
+rcp_md/
+
+# Données vétérinaires ANMV (téléchargées localement)
+data/veterinaires/*.xml
+data/veterinaires/*.7z
+data/veterinaires/meta.json

@@ -62,11 +62,28 @@ Tous ces endpoints acceptent les paramètres standards :
 - **MITM**: `code_atc`, `denomination`, `lien_fi` (Lien Fiche Info).
 
 #### `GET /medicaments/search`
-Recherche globale multi-critères (spécialités, présentations, compositions agrégées par CIS).
+Recherche globale multi-critères (spécialités, présentations, compositions agrégées par CIS). Peut interroger la BDPM seule, l'ANMV seule, ou les deux selon `source`.
 - **Paramètres**:
   - `q` (string, requis): Terme de recherche.
-- **Réponse**: Objets `medicament` agrégés par `cis`, avec `presentations` et `compositions`.
-- **Métadonnées** (`search` à la racine) : `query` (terme recherché).
+  - `source` (string, optionnel): `auto` (défaut), `human`, `veterinary`, `mixed`.
+    - `auto` : BDPM d'abord ; si aucun résultat, fallback ANMV.
+    - `human` : BDPM uniquement (comportement historique).
+    - `veterinary` : médicaments vétérinaires ANMV uniquement.
+    - `mixed` : fusion des deux référentiels.
+- **Réponse BDPM**: Objets `medicament` agrégés par `cis`, avec `presentations` et `compositions` (inchangé).
+- **Réponse ANMV**: Objets `medicament_veterinaire` agrégés par `num`, avec `presentations` et `compositions`.
+- **Métadonnées** (`search` à la racine) : `query`. Si `source` est fourni ou si le fallback ANMV est utilisé : `source` et `referentiels` (`queried`, `with_results`).
+
+### Médicaments vétérinaires (ANMV)
+
+Namespace dédié : **`/api/veterinaires`**
+
+- `GET /veterinaires/medicaments` — liste / recherche par nom (`q`)
+- `GET /veterinaires/medicaments/:num` — détail (compositions, présentations, temps d'attente)
+- `GET /veterinaires/compositions` — recherche par substance active (`q`)
+- `GET /veterinaires/presentations` — liste filtrable (libellé, GTIN)
+
+Clé primaire : `num` (7 chiffres). Source : [base ANMV sur data.gouv.fr](https://www.data.gouv.fr/datasets/base-de-donnees-publique-des-medicaments-veterinaires-autorises-en-france-1).
 
 #### Qualité de correspondance (`match_quality`)
 Présent sur toute réponse filtrée par `q` :

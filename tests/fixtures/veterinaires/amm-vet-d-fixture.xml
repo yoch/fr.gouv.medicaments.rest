@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<donnees-reference-group><term-nat><entry>
+      <source-code>1</source-code>
+      <source-desc>Chimique</source-desc>
+    </entry>
+    </term-nat><term-tit /><term-typ-proc><entry>
+      <source-code>1</source-code>
+      <source-desc>Nationale</source-desc>
+    </entry>
+    </term-typ-proc><term-stat-auto><entry>
+      <source-code>4</source-code>
+      <source-desc>AMM illimitée</source-desc>
+    </entry>
+    </term-stat-auto><term-fp><entry>
+      <source-code>13</source-code>
+      <source-desc>Comprimé</source-desc>
+    </entry>
+    </term-fp><term-esp><entry>
+      <source-code>16</source-code>
+      <source-desc>Chat</source-desc>
+    </entry>
+    <entry>
+      <source-code>22</source-code>
+      <source-desc>Chien</source-desc>
+    </entry>
+    </term-esp><term-sa><entry>
+      <source-code>1867</source-code>
+      <source-desc>Sulfaméthoxazole</source-desc>
+    </entry>
+    <entry>
+      <source-code>2014</source-code>
+      <source-desc>Triméthoprime</source-desc>
+    </entry>
+    </term-sa><term-va /><term-cd /><term-qsp /><term-denr /><term-pres /><term-unite /><term-titre /></donnees-reference-group>

@@ -1,8 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const { downloadDataIfNeeded } = require('./services/dataDownloader');
+const { downloadVetDataIfNeeded } = require('./services/vetDataDownloader');
 const { loadData, getMetadata } = require('./services/dataLoader');
+const { loadVetData } = require('./services/vetDataLoader');
 const medicamentRoutes = require('./routes/medicaments');
+const veterinaireRoutes = require('./routes/veterinaires');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,6 +50,7 @@ app.get('/api-docs.json', (req, res) => {
 });
 
 app.use('/api/medicaments', medicamentRoutes);
+app.use('/api/veterinaires', veterinaireRoutes);
 
 app.get('/', (req, res) => {
     res.send(`
@@ -77,14 +81,27 @@ app.get('/', (req, res) => {
         </div>
 
         <p style="margin-top: 50px; font-size: 0.9em;">
-            <a href="/api/health" style="color: #666;">Status API</a>
+            <a href="/health" style="color: #666;">Status API</a>
         </p>
     </body>
     </html>
   `);
 });
 
-app.get('/api/health', (req, res) => {
+function memoryUsageMb() {
+    const n = (bytes) => Math.round((bytes / 1024 / 1024) * 10) / 10;
+    const u = process.memoryUsage();
+    return {
+        rss_mb: n(u.rss),
+        heap_used_mb: n(u.heapUsed),
+        heap_total_mb: n(u.heapTotal),
+        external_mb: n(u.external),
+        array_buffers_mb: n(u.arrayBuffers ?? 0),
+        non_heap_mb: n(Math.max(0, u.rss - u.heapUsed))
+    };
+}
+
+function healthHandler(req, res) {
     const metadata = getMetadata();
     const { pretty } = req.query;
 
@@ -95,7 +112,9 @@ app.get('/api/health', (req, res) => {
         metadata: {
             last_updated: metadata.last_updated,
             source: metadata.source
-        }
+        },
+        memory: memoryUsageMb(),
+        uptime_seconds: Math.floor(process.uptime())
     };
 
     if (pretty === 'true' || pretty === '1') {
@@ -104,9 +123,21 @@ app.get('/api/health', (req, res) => {
     } else {
         res.json(responseData);
     }
-});
+}
+
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
 
 const REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
+
+async function loadVetDataSafe() {
+    try {
+        await downloadVetDataIfNeeded();
+        await loadVetData();
+    } catch (err) {
+        console.warn('⚠ Données vétérinaires indisponibles (le serveur continue sans):', err.message);
+    }
+}
 
 async function startServer() {
     try {
@@ -115,26 +146,28 @@ async function startServer() {
 
         console.log('Chargement des données en mémoire...');
         await loadData();
+        await loadVetDataSafe();
 
         // Schedule periodic updates
         setInterval(async () => {
             console.log('🔄 Rafraîchissement périodique des données...');
             try {
-                const { changed } = await downloadDataIfNeeded();
-                if (!changed) {
-                    console.log('✓ Données inchangées, rechargement mémoire ignoré');
-                    return;
-                }
-                await loadData();
-                console.log('✅ Données rafraîchies avec succès');
+                const { changed: bdpmChanged } = await downloadDataIfNeeded();
+                if (bdpmChanged) await loadData();
             } catch (err) {
-                console.error('❌ Erreur lors du rafraîchissement des données:', err);
+                console.error('❌ Erreur rafraîchissement BDPM:', err.message);
+            }
+            try {
+                const { changed: vetChanged } = await downloadVetDataIfNeeded();
+                if (vetChanged) await loadVetData();
+            } catch (err) {
+                console.warn('⚠ Erreur rafraîchissement vétérinaire:', err.message);
             }
         }, REFRESH_INTERVAL);
 
         app.listen(PORT, () => {
             console.log(`Serveur démarré sur le port ${PORT}`);
-            console.log(`Health check: http://localhost:${PORT}/api/health`);
+            console.log(`Health check: http://localhost:${PORT}/health`);
             console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
         });
     } catch (error) {

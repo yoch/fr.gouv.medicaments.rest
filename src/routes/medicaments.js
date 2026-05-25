@@ -8,6 +8,7 @@ const {
   getGeneriquesForCis,
   bdpmExtraitUrl
 } = require('../services/dataLoader');
+const { executeHybridSearch } = require('../services/searchOrchestrator');
 
 const router = express.Router();
 
@@ -34,8 +35,6 @@ function paginate(data, page = 1, limit = 100) {
     }
   };
 }
-
-const MATCH_QUALITY_RANK = { exact: 3, prefix: 2, fuzzy: 1 };
 
 function listHandler(dataType, defaultLimit = 100) {
   return (req, res) => {
@@ -528,6 +527,13 @@ router.get('/substances', listHandler('substances'));
  *           type: string
  *         description: Terme de recherche
  *       - in: query
+ *         name: source
+ *         schema:
+ *           type: string
+ *           enum: [auto, human, veterinary, mixed]
+ *           default: auto
+ *         description: Référentiel(s) à interroger (auto = BDPM puis fallback ANMV)
+ *       - in: query
  *         name: page
  *         schema:
  *           type: integer
@@ -539,7 +545,7 @@ router.get('/substances', listHandler('substances'));
  *           default: 50
  *     responses:
  *       200:
- *         description: Résultats de recherche (Liste structurée de médicaments avec leurs présentations et compositions)
+ *         description: Résultats de recherche (médicaments humains et/ou vétérinaires agrégés avec présentations et compositions)
  *         content:
  *           application/json:
  *             schema:
@@ -567,37 +573,15 @@ router.get('/substances', listHandler('substances'));
  *                                   $ref: '#/components/schemas/Composition'
  */
 router.get('/search', (req, res) => {
-  const { q, page = 1, limit = 50 } = req.query;
+  const { q, page = 1, limit = 50, source } = req.query;
 
   if (!q) {
     return res.status(400).json({ error: 'Paramètre de recherche "q" requis' });
   }
 
-  const specialites = search('specialites', q);
-  const presentations = search('presentations', q);
-  const compositions = search('compositions', q);
-
-  const matchQualityByCis = {};
-  for (const item of [...specialites, ...presentations, ...compositions]) {
-    const previous = matchQualityByCis[item.cis];
-    if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
-      matchQualityByCis[item.cis] = item.match_quality;
-    }
-  }
-
-  // Ordre des CIS : insertion via specialites puis presentations puis compositions (inchangé)
-  const matchedCis = new Set(Object.keys(matchQualityByCis));
-
-  const results = Array.from(matchedCis).map(cis => ({
-    type: 'medicament',
-    match_quality: matchQualityByCis[cis],
-    ...(getSpecialiteByCis(cis) || { cis, url_bdpm: bdpmExtraitUrl(cis) }),
-    presentations: getRelatedByCis('presentations', cis),
-    compositions: getRelatedByCis('compositions', cis)
-  }));
-
+  const { results, search: searchMeta } = executeHybridSearch(q, source);
   const response = paginate(results, page, limit);
-  response.search = { query: q };
+  response.search = searchMeta;
   res.json(response);
 });
 

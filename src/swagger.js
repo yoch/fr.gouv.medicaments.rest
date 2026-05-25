@@ -6,7 +6,7 @@ const options = {
         info: {
             title: 'API Base de Données Publique des Médicaments',
             version: '1.0.0',
-            description: 'API REST pour accéder aux données officielles des médicaments en France (BDPM).',
+            description: 'API REST pour accéder aux données officielles des médicaments humains (BDPM) et vétérinaires (ANMV/ANSES).',
             contact: {
                 name: 'Yoch Melka',
                 url: 'https://github.com/yoch/fr.gouv.medicaments.rest'
@@ -164,6 +164,40 @@ const options = {
                         dosage: { type: 'string' },
                         reference_dosage: { type: 'string' },
                         nature_composant: { type: 'string' }
+                    }
+                },
+                MedicamentVeterinaire: {
+                    type: 'object',
+                    properties: {
+                        num: { type: 'string', description: 'Identifiant produit ANMV (7 chiffres)' },
+                        nom: { type: 'string' },
+                        num_amm: { type: 'string' },
+                        date_amm: { type: 'string' },
+                        titulaire: { type: 'string' },
+                        forme_pharmaceutique: { type: 'string' },
+                        statut_amm: { type: 'string' },
+                        codes_atcvet: { type: 'array', items: { type: 'string' } },
+                        especes: { type: 'array', items: { type: 'string' } },
+                        lien_rcp: { type: 'string', format: 'uri' },
+                        maj_rcp: { type: 'string' }
+                    }
+                },
+                CompositionVeterinaire: {
+                    type: 'object',
+                    properties: {
+                        num: { type: 'string' },
+                        substance: { type: 'string' },
+                        quantite: { type: 'string' },
+                        unite: { type: 'string' }
+                    }
+                },
+                PresentationVeterinaire: {
+                    type: 'object',
+                    properties: {
+                        num: { type: 'string' },
+                        libelle: { type: 'string' },
+                        gtin: { type: 'string' },
+                        conditions_delivrance: { type: 'array', items: { type: 'string' } }
                     }
                 },
                 Pagination: {

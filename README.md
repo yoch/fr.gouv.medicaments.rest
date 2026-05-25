@@ -22,7 +22,7 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 ## Endpoints disponibles
 
 ### Health Check
-- `GET /api/health` - Status de l'API
+- `GET /health` (alias `GET /api/health`) - Status de l'API et mémoire processus
 
 ### Spécialités pharmaceutiques
 - `GET /api/medicaments/specialites` - Liste des spécialités
@@ -39,12 +39,20 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 - `GET /api/medicaments/disponibilite` - Ruptures de stock
 - `GET /api/medicaments/interet-therapeutique-majeur` - MITM
 - `GET /api/medicaments/substances` - Substances actives
-- `GET /api/medicaments/search?q=aspirine` - Recherche globale
+- `GET /api/medicaments/search?q=aspirine` - Recherche globale (BDPM, avec fallback ANMV en `source=auto`)
+- `GET /api/medicaments/search?q=sultrian&source=veterinary` - Recherche vétérinaire uniquement
+
+### Médicaments vétérinaires (ANMV / Anses)
+- `GET /api/veterinaires/medicaments` - Liste / recherche par nom
+- `GET /api/veterinaires/medicaments/:num` - Détail d'un médicament vétérinaire
+- `GET /api/veterinaires/compositions` - Recherche par substance active
+- `GET /api/veterinaires/presentations` - Présentations (filtre libellé / GTIN)
 
 ### Paramètres de requête
 - `q` - Terme de recherche (supporte prefix search et fuzzy search)
 - `page` - Numéro de page (défaut: 1)
 - `limit` - Nombre d'éléments par page (défaut: 100, max: 1000)
+- `source` - Sur `/api/medicaments/search` : `auto` (défaut), `human`, `veterinary`, `mixed`
 
 ## Documentation
 

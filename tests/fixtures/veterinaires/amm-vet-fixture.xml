@@ -1,0 +1,417 @@
+<?xml version='1.0' encoding='utf-8'?>
+<medicinal-product-group><Informations><date-jeu-de-donnees>2026-05-12T06:35:49</date-jeu-de-donnees></Informations><medicinal-product>
+    <src-id>1106</src-id>
+    <nom>SULTRIAN 100</nom>
+    <num>0452300</num>
+    <term-tit>1659</term-tit>
+    <term-nat>1</term-nat>
+    <term-typ-proc>1</term-typ-proc>
+    <term-stat-auto>4</term-stat-auto>
+    <date-amm>01/12/1980</date-amm>
+    <term-fp>13</term-fp>
+    <num-amm>FR/V/9222645 4/1980</num-amm>
+    <especes>
+      <term-esp>16</term-esp>
+      <term-esp>22</term-esp>
+    </especes>
+    <composition>
+      <sa>
+        <term-sa>1867</term-sa>
+        <quantite>100</quantite>
+        <unite>mg</unite>
+      </sa>
+      <sa>
+        <term-sa>2014</term-sa>
+        <quantite>20</quantite>
+        <unite>mg</unite>
+      </sa>
+    </composition>
+    <voie-administration />
+    <condition-delivrance />
+    <conditionnement-primaire>
+      <lib-cond>Plaquette thermoformée pvc-aluminium</lib-cond>
+    </conditionnement-primaire>
+    <modele-destine-vente>
+      <mod-vte>
+        <lib-mod>Boîte de 1 plaquette de 16 comprimés</lib-mod>
+        <code-gtin>03660176013166</code-gtin>
+        <num-amm>FR/V/9222645 4/1980</num-amm>
+      </mod-vte>
+      <mod-vte>
+        <lib-mod>Boîte de 10 plaquettes de 16 comprimés</lib-mod>
+        <code-gtin>03660176017058</code-gtin>
+        <num-amm>FR/V/9222645 4/1980</num-amm>
+      </mod-vte>
+      <mod-vte>
+        <lib-mod>Boîte de 15 plaquettes de 16 comprimés</lib-mod>
+        <code-gtin />
+        <num-amm>FR/V/9222645 4/1980</num-amm>
+      </mod-vte>
+    </modele-destine-vente>
+    <excipient-qsp>
+      <term-qsp>4</term-qsp>
+    </excipient-qsp>
+    <atcvet>
+      <code-atcvet>QJ01EW11</code-atcvet>
+    </atcvet>
+    <paragraphes-rcp>
+      <date-validation>07/11/2025</date-validation>
+      <lien_rcp>http://www.ircp.anmv.anses.fr/rcp.aspx?NomMedicament=SULTRIAN+100</lien_rcp>
+      <para-rcp>
+        <term-titre>63</term-titre>
+        <contenu>SULTRIAN 100</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>64</term-titre>
+        <contenu>\nChaque comprimé contient : \n  \nSubstances actives : \n  \nSulfaméthoxazole........................................100 mg\nTriméthoprime.............................................20 mg\n  \nExcipients :  \nComposition qualitative en excipients et autres composants\nAmidon de maïs\nCellulose microcristalline\nStéarate de magnésium Comprimé rond, sécable, de couleur blanche.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>66</term-titre>
+        <contenu>Chats et chiens.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>67</term-titre>
+        <contenu>Traitement des infections respiratoires, digestives, urogénitales et cutanées dues à des germes sensibles au triméthoprime et au sulfaméthoxazole.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>68</term-titre>
+        <contenu>Ne pas utiliser chez les nouveau-nés, en raison de l'immaturité de leurs systèmes enzymatiques.Ne pas administrer en cas d'insuffisance hépatique ou rénale sévère, d'acidose métabolique ou de déshydratation.Ne pas administrer en cas d'allaitement si le nouveau-né a moins d'un mois (cf. rubrique 3.7).Ne pas utiliser en cas d’hypersensibilité aux substances actives ou à l’un des excipients.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>69</term-titre>
+        <contenu>Eviter de traiter plus de 2 semaines chez le chat.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>70</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>71</term-titre>
+        <contenu>Utiliser avec précautions lors d'insuffisance rénale.Abreuver suffisamment les animaux.Lors de traitements longs chez le chien, surveiller la fonction lacrymale.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>72</term-titre>
+        <contenu>Les personnes présentant une hypersensibilité connue aux substances actives doivent éviter tout contact avec le médicament vétérinaire.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>73</term-titre>
+        <contenu>Sans objet.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>74</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>75</term-titre>
+        <contenu>Chiens et chats : \nRare(1 à 10 animaux / 10 000 animaux traités) :Réaction d'allergie cutanée1 (érythrodermie, urticaire, folliculite)\nTrès rare(&lt; 1 animal / 10 000 animaux traités, y compris les cas isolés) :Diminution de la sécrétion lacrymale1, kérato-conjonctivite sèche1,2\nFréquence indéterminée (ne peut être estimée avec les données disponibles)Polyarthrite immunologique, polymyosite immunologique.Cristallurie3Nécrose épidermique toxique1 Ces signes sont réversibles à l'arrêt du traitement.2 Développement possible lors de traitement long (plus de 2 semaines). Il est plus important chez les chiens de petite taille que chez les chiens de grande taille.3 Du fait de leur faible solubilité dans l'eau, les sulfamides et leurs métabolites peuvent cristalliser dans le rein et la vessie. Ces accidents sont rencontrés lorsque la diurèse est peu importante et que le pH urinaire est acide. Il est important de notifier les effets indésirables. La notification permet un suivi continu de l’innocuité d’un médicament vétérinaire. Les notifications doivent être envoyées, de préférence par l’intermédiaire d’un vétérinaire, soit au titulaire de l’autorisation de mise sur le marché ou à son représentant local, soit à l’autorité nationale compétente par l’intermédiaire du système national de notification. Voir la notice le conditionnement primaire pour les coordonnées respectives.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>76</term-titre>
+        <contenu>Gestation :Les études effectuées chez l'animal ont mis en évidence un effet tératogène à fortes doses.Ne pas utiliser durant toute la gestation. Lactation : Le triméthoprime et le sulfaméthoxazole passent dans le lait maternel, en conséquence, l'administration du médicament vétérinaire pendant la lactation est contre-indiquée, du fait de l'immaturité des systèmes enzymatiques des nouveaux-nés.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>77</term-titre>
+        <contenu>Phénytoïne : du fait du risque d'augmentation des concentrations de phénytoïne jusqu'à des valeurs toxiques (inhibition de son métabolisme), utiliser de préférence une autre classe d'anti-infectieux.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>78</term-titre>
+        <contenu>Voie orale. 12,5 mg de sulfaméthazole et 2,5 mg de triméthoprime par kg de poids corporel toutes les 12 heures pendant au moins 5 jours soit : Chien : Un comprimé matin et soir pour 8 kg de poids corporel, pendant 5 à 20 jours selon l'indication.Chat : Un comprimé matin et soir pour 8 kg de poids corporel, pendant 5 à 10 jours selon l'indication.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>79</term-titre>
+        <contenu>En cas de surdosage par voie orale, massif et rapidement décelé, le traitement consiste en un lavage d'estomac et un traitement symptomatique. Il n'existe pas d'antidote spécifique.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>80</term-titre>
+        <contenu>Sans objet.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>81</term-titre>
+        <contenu>Sans objet.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>82</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>83</term-titre>
+        <contenu>QJ01EW11.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>84</term-titre>
+        <contenu>Le sulfaméthoxazole est un sulfamide à spectre d'activité très large qui présente également des propriétés anticoccidiennes. Il est actif contre les bactéries Gram positif et Gram négatif et certains protozoaires tels que les coccidies.Le triméthoprime appartient à la famille des diaminopyrimidines. Il est actif contre les streptocoques et la plupart des bactéries Gram négatif.En association, ces deux substances actives sont synergiques. La sulfadiméthoxine est potentialisée par une diaminopyrimidine, le triméthoprime. L'association de ces deux principes actifs permet un blocage séquentiel de la biosynthèse de l'acide folique. Ces deux substances agissent de manière séquentielle sur la voie de synthèse de l'acide tétrahydrofolique : le sulfamide en inhibant l'incorporation de l'acide para aminobenzoïque dans l'acide folique, le triméthoprime en inhibant spécifiquement la déhydrofolate réductase microbienne. Le spectre d'activité théorique s'étend à la fois aux germes Gram positif (Staphylococcus, Listeria ...) et aux germes Gram négatif (Escherichia coli, Salmonella, Proteus, Enterobacter, Bordetella ...).</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>85</term-titre>
+        <contenu>Administrés par voie orale, le sulfaméthoxazole et le triméthoprime sont rapidement absorbés à 90%. Les concentrations plasmatiques maximales sont atteintes en 2 à 4 heures. Les deux substances actives diffusent rapidement dans les tissus et dans les sécrétions : le liquide céphalorachidien, l'oreille moyenne, les amygdales et la salive, les poumons et les sécrétions bronchiques, la prostate et le liquide séminal, les sécrétions vaginales, l'os. Le sulfaméthoxazole est en grande partie métabolisé (80%) par acétylation, et par conjugaison avec les sulfates ou l'acide glycuronique. Le triméthoprime est essentiellement éliminé sous forme inchangée. L'élimination de ces substance actives est essentiellement urinaire (80% de la dose administrée en 72 heures) sous forme métabolisée et/ou sous forme inchangée. Une partie est excrétée par la bile ou les concentrations sont proches des concentrations plasmatiques mais, étant donné la réabsorption intestinale, seule une faible fraction de triméthoprime est éliminée dans les fèces.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>86</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>88</term-titre>
+        <contenu>Sans objet.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>89</term-titre>
+        <contenu>Durée de conservation du médicament vétérinaire tel que conditionné pour la vente : 4 ans.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>90</term-titre>
+        <contenu>A conserver à une température ne dépassant pas 25°C.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>91</term-titre>
+        <contenu>Plaquette thermoformée PVC-aluminium</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>92</term-titre>
+        <contenu>Ne pas jeter les médicaments dans les égouts ou dans les ordures ménagères. Utiliser les dispositifs de reprise mis en place pour l’élimination de tout médicament vétérinaire non utilisé ou des déchets qui en dérivent, conformément aux exigences locales et à tout système national de collecte applicable au médicament vétérinaire concerné.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>93</term-titre>
+        <contenu>CEVA SANTE ANIMALE</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>94</term-titre>
+        <contenu>FR/V/9222645 4/1980\n\nBoîte de 1 plaquette de 16 comprimés\nBoîte de 10 plaquettes de 16 comprimés\nBoîte de 15 plaquettes de 16 comprimés\n\nToutes les présentations peuvent ne pas être commercialisées.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>95</term-titre>
+        <contenu>01/12/1980</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>96</term-titre>
+        <contenu>07/11/2025</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>97</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>98</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>99</term-titre>
+        <contenu>Médicament vétérinaire soumis à ordonnance. Des informations détaillées sur ce médicament vétérinaire sont disponibles dans la base de données de l’Union sur les médicaments (https://medicines.health.europa.eu/veterinary).</contenu>
+      </para-rcp>
+    </paragraphes-rcp>
+  </medicinal-product>
+  <medicinal-product>
+    <src-id>1774</src-id>
+    <nom>SULTRIAN 400</nom>
+    <num>0966100</num>
+    <term-tit>1659</term-tit>
+    <term-nat>1</term-nat>
+    <term-typ-proc>1</term-typ-proc>
+    <term-stat-auto>4</term-stat-auto>
+    <date-amm>01/12/1980</date-amm>
+    <term-fp>13</term-fp>
+    <num-amm>FR/V/8177567 1/1980</num-amm>
+    <especes>
+      <term-esp>22</term-esp>
+    </especes>
+    <composition>
+      <sa>
+        <term-sa>1867</term-sa>
+        <quantite>400</quantite>
+        <unite>mg</unite>
+      </sa>
+      <sa>
+        <term-sa>2014</term-sa>
+        <quantite>80</quantite>
+        <unite>mg</unite>
+      </sa>
+    </composition>
+    <voie-administration />
+    <condition-delivrance />
+    <conditionnement-primaire>
+      <lib-cond>Plaquette thermoformée pvc-aluminium</lib-cond>
+      <lib-cond>Plaquette thermoformée pvc-aluminium</lib-cond>
+    </conditionnement-primaire>
+    <modele-destine-vente>
+      <mod-vte>
+        <lib-mod>Boîte de 1 plaquette de 6 comprimés</lib-mod>
+        <code-gtin />
+        <num-amm>FR/V/8177567 1/1980</num-amm>
+      </mod-vte>
+      <mod-vte>
+        <lib-mod>Boîte de 1 plaquette de 10 comprimés</lib-mod>
+        <code-gtin />
+        <num-amm>FR/V/8177567 1/1980</num-amm>
+      </mod-vte>
+      <mod-vte>
+        <lib-mod>Boîte de 2 plaquettes de 10 comprimés</lib-mod>
+        <code-gtin>03660176013197</code-gtin>
+        <num-amm>FR/V/8177567 1/1980</num-amm>
+      </mod-vte>
+      <mod-vte>
+        <lib-mod>Boîte de 4 plaquettes de 10 comprimés</lib-mod>
+        <code-gtin />
+        <num-amm>FR/V/8177567 1/1980</num-amm>
+      </mod-vte>
+      <mod-vte>
+        <lib-mod>Boîte de 10 plaquettes de 10 comprimés</lib-mod>
+        <code-gtin>03660176017065</code-gtin>
+        <num-amm>FR/V/8177567 1/1980</num-amm>
+      </mod-vte>
+      <mod-vte>
+        <lib-mod>Boîte de 20 plaquettes de 10 comprimés</lib-mod>
+        <code-gtin />
+        <num-amm>FR/V/8177567 1/1980</num-amm>
+      </mod-vte>
+    </modele-destine-vente>
+    <excipient-qsp>
+      <term-qsp>4</term-qsp>
+    </excipient-qsp>
+    <atcvet>
+      <code-atcvet>QJ01EW11</code-atcvet>
+    </atcvet>
+    <paragraphes-rcp>
+      <date-validation>07/11/2025</date-validation>
+      <lien_rcp>http://www.ircp.anmv.anses.fr/rcp.aspx?NomMedicament=SULTRIAN+400</lien_rcp>
+      <para-rcp>
+        <term-titre>63</term-titre>
+        <contenu>SULTRIAN 400</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>64</term-titre>
+        <contenu>\nChaque comprimé contient : \n  \nSubstances actives : \n  \nSulfaméthoxazole........................................400 mg\nTriméthoprime.............................................80 mg\n  \nExcipients :  \nComposition qualitative en excipients et autres composants\nAmidon de maïs\nStéarate de magnésium\nCroscarmellose sodique\nCellulose microcristalline Comprimé, rond, sécable, de couleur blanche.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>66</term-titre>
+        <contenu>Chiens.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>67</term-titre>
+        <contenu>Traitement des infections respiratoires, digestives, urogénitales et cutanées dues à des germes sensibles au triméthoprime et au sulfaméthoxazole.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>68</term-titre>
+        <contenu>Ne pas utiliser chez les nouveau-nés, en raison de l'immaturité de leurs systèmes enzymatiques.Ne pas administrer en cas d'insuffisance hépatique ou rénale sévère, d'acidose métabolique ou de déshydratation.Ne pas administrer en cas d'allaitement si le nouveau-né a moins d'un mois (cf. rubrique 3.7).Ne pas utiliser en cas d’hypersensibilité aux substances actives ou à l’un des excipients.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>69</term-titre>
+        <contenu>Aucune.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>70</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>71</term-titre>
+        <contenu>Utiliser avec précautions lors d'insuffisance rénale.Abreuver suffisamment les animaux.Lors de traitements longs chez le chien, surveiller la fonction lacrymale.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>72</term-titre>
+        <contenu>Les personnes présentant une hypersensibilité connue aux substances actives doivent éviter tout contact avec le médicament vétérinaire.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>73</term-titre>
+        <contenu>Sans objet.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>74</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>75</term-titre>
+        <contenu>Chiens : \nRare(1 à 10 animaux / 10 000 animaux traités) :Réaction d'allergie cutanée1 (érythrodermie, urticaire, folliculite)\nTrès rare(&lt; 1 animal / 10 000 animaux traités, y compris les cas isolés) :Diminution de la sécrétion lacrymale1, kérato-conjonctivite sèche1,2\nFréquence indéterminée (ne peut être estimée avec les données disponibles)Polyarthrite immunologique, polymyosite immunologique.Cristallurie3Nécrose épidermique toxique1 Ces signes sont réversibles à l'arrêt du traitement2 Développement possible lors de traitement long (plus de 2 semaines). Il est plus important chez les chiens de petite taille que chez les chiens de grande taille.3 Du fait de leur faible solubilité dans l'eau, les sulfamides et leurs métabolites peuvent cristalliser dans le rein et la vessie. Ces accidents sont rencontrés lorsque la diurèse est peu importante et que le pH urinaire est acide. Il est important de notifier les effets indésirables. La notification permet un suivi continu de l’innocuité d’un médicament vétérinaire. Les notifications doivent être envoyées, de préférence par l’intermédiaire d’un vétérinaire, soit au titulaire de l’autorisation de mise sur le marché ou à son représentant local, soit à l’autorité nationale compétente par l’intermédiaire du système national de notification. Voir la notice le conditionnement primaire pour les coordonnées respectives.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>76</term-titre>
+        <contenu>Gestation : Les études effectuées chez l'animal ont mis en évidence un effet tératogène à fortes doses.Ne pas utiliser durant toute la gestation.Lactation :Le triméthoprime et le sulfaméthoxazole passent dans le lait maternel, en conséquence, l'administration de ce médicament vétérinaire pendant la lactation est contre-indiquée, du fait de l'immaturité des systèmes enzymatiques des nouveaux-nés.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>77</term-titre>
+        <contenu>Phénytoïne : du fait du risque d'augmentation des concentrations de phénytoïne jusqu'à des valeurs toxiques (inhibition de son métabolisme), utiliser de préférence une autre classe d'anti-infectieux.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>78</term-titre>
+        <contenu>Voie orale. 12,5 mg de sulfaméthazole et 2,5 mg de triméthoprime par kg de poids corporel toutes les 12 heures pendant au moins 5 jours soit :Un comprimé matin et soir pour 32 kg de poids corporel, pendant 5 à 20 jours selon l'indication.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>79</term-titre>
+        <contenu>En cas de surdosage par voie orale, massif et rapidement décelé, le traitement consiste en un lavage d'estomac et un traitement symptomatique. Il n'existe pas d'antidote spécifique.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>80</term-titre>
+        <contenu>Sans objet.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>81</term-titre>
+        <contenu>Sans objet.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>82</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>83</term-titre>
+        <contenu>QJ01EW11.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>84</term-titre>
+        <contenu>Le sulfaméthoxazole est un sulfamide à spectre d'activité très large qui présente également des propriétés anticoccidiennes. Il est actif contre les bactéries Gram positif et Gram négatif et certains protozoaires tels que les coccidies.Le triméthoprime appartient à la famille des diaminopyrimidines. Il est actif contre les streptocoques et la plupart des bactéries Gram négatif.En association, ces deux substances actives sont synergiques. La sulfadiméthoxine est potentialisée par une diaminopyrimidine, le triméthoprime. L'association de ces deux substances permet un blocage séquentiel de la biosynthèse de l'acide folique. Elles agissent de manière séquentielle sur la voie de synthèse de l'acide tétrahydrofolique : le sulfamide en inhibant l'incorporation de l'acide para aminobenzoïque dans l'acide folique, le triméthoprime en inhibant spécifiquement la déhydrofolate réductase microbienne. Le spectre d'activité théorique s'étend à la fois aux germes Gram positif (Staphylococcus, Listeria ...) et aux germes Gram négatif (Escherichia coli, Salmonella, Proteus, Enterobacter, Bordetella ...).</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>85</term-titre>
+        <contenu>Administrés par voie orale, le sulfaméthoxazole et le triméthoprime sont rapidement absorbés à 90%. Les concentrations plasmatiques maximales sont atteintes en 2 à 4 heures. Les deux substances actives diffusent rapidement dans les tissus et dans les sécrétions : le liquide céphalorachidien, l'oreille moyenne, les amygdales et la salive, les poumons et les sécrétions bronchiques, la prostate et le liquide séminal, les sécrétions vaginales, l'os. Le sulfaméthoxazole est en grande partie métabolisé (80%) par acétylation, et par conjugaison avec les sulfates ou l'acide glycuronique. Le triméthoprime est essentiellement éliminé sous forme inchangée. L'élimination de ces substance actives est essentiellement urinaire (80% de la dose administrée en 72 heures) sous forme métabolisée et/ou sous forme inchangée. Une partie est excrétée par la bile ou les concentrations sont proches des concentrations plasmatiques mais, étant donné la réabsorption intestinale, seule une faible fraction de triméthoprime est éliminée dans les fèces.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>86</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>88</term-titre>
+        <contenu>Sans objet.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>89</term-titre>
+        <contenu>Durée de conservation du médicament vétérinaire tel que conditionné pour la vente : 4 ans.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>90</term-titre>
+        <contenu>A conserver à une température ne dépassant pas 25°C.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>91</term-titre>
+        <contenu>Plaquette thermoformée PVC-aluminium</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>92</term-titre>
+        <contenu>Ne pas jeter les médicaments dans les égouts ou dans les ordures ménagères. Utiliser les dispositifs de reprise mis en place pour l’élimination de tout médicament vétérinaire non utilisé ou des déchets qui en dérivent, conformément aux exigences locales et à tout système national de collecte applicable au médicament vétérinaire concerné.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>93</term-titre>
+        <contenu>CEVA SANTE ANIMALE</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>94</term-titre>
+        <contenu>FR/V/8177567 1/1980\n\nBoîte de 1 plaquette de 6 comprimés\nBoîte de 1 plaquette de 10 comprimés\nBoîte de 2 plaquettes de 10 comprimés\nBoîte de 4 plaquettes de 10 comprimés\nBoîte de 10 plaquettes de 10 comprimés\nBoîte de 20 plaquettes de 10 comprimés\n\nToutes les présentations peuvent ne pas être commercialisées.</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>95</term-titre>
+        <contenu>01/12/1980</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>96</term-titre>
+        <contenu>07/11/2025</contenu>
+      </para-rcp>
+      <para-rcp>
+        <term-titre>97</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>98</term-titre>
+        <contenu />
+      </para-rcp>
+      <para-rcp>
+        <term-titre>99</term-titre>
+        <contenu>Médicament vétérinaire soumis à ordonnance. Des informations détaillées sur ce médicament vétérinaire sont disponibles dans la base de données de l’Union sur les médicaments (https://medicines.health.europa.eu/veterinary).</contenu>
+      </para-rcp>
+    </paragraphes-rcp>
+  </medicinal-product>
+  </medicinal-product-group>
