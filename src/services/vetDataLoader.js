@@ -2,8 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const { XMLParser } = require('fast-xml-parser');
-const MiniSearch = require('minisearch');
-const { markMemoryPhase, maybeGc } = require('../utils/memoryProfile');
+const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
 const {
   VET_DATA_DIR,
   PRODUCTS_XML_NAME,
@@ -297,18 +296,11 @@ function createIndexIncremental(type, fields, boost = null) {
   };
   if (boost) indexConfig.boost = boost;
 
-  const index = new MiniSearch(indexConfig);
-  const rows = vetCache[type];
-  const batchSize = 2000;
-  for (let start = 0; start < rows.length; start += batchSize) {
-    const batch = [];
-    const end = Math.min(start + batchSize, rows.length);
-    for (let rowIndex = start; rowIndex < end; rowIndex++) {
-      batch.push(buildVetIndexDocument(rows[rowIndex], rowIndex, fields));
-    }
-    index.addAll(batch);
-  }
-  searchIndexes[type] = index;
+  searchIndexes[type] = buildFrozenIndexFromRows(
+    vetCache[type],
+    (item, rowIndex) => buildVetIndexDocument(item, rowIndex, fields),
+    indexConfig
+  );
 }
 
 const PRODUCT_CLOSE = '</medicinal-product>';
@@ -447,7 +439,6 @@ async function loadVetData() {
   }
 
   console.log('Chargement des données vétérinaires (streaming)...');
-  markMemoryPhase('before_vet_load');
   clearLoadedData();
 
   const dict = parseDictionary(fs.readFileSync(dictPath, 'utf8'));
@@ -479,12 +470,9 @@ async function loadVetData() {
     }
   });
 
-  markMemoryPhase('after_vet_parse');
   createIndexIncremental('medicaments', ['nom', 'num'], { nom: 3, num: 2 });
   createIndexIncremental('compositions', ['substance', 'num'], { substance: 3, num: 1 });
   buildNumIndexes();
-  markMemoryPhase('after_vet_indexes');
-  maybeGc('after_vet');
   console.log(`Données vétérinaires chargées: ${vetCache.medicaments.length} médicaments`);
 }
 

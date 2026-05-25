@@ -10,12 +10,11 @@
     "start": "node --env-file=.env src/server.js",
     "dev": "nodemon --exec 'node --env-file=.env' src/server.js",
     "download-data": "node src/scripts/download-initial-data.js",
-    "memory:peak": "node tests/memory_peak_harness.js --runs 3",
-    "memory:peak:refresh": "node tests/memory_peak_harness.js --scenario refresh --runs 2",
     "test": "jest",
     "test:serial": "jest --runInBand"
   },
   "dependencies": {
+    "@yoch/minisearch": "^8.0.0-beta.2",
     "7zip-bin": "^5.2.0",
     "axios": "^1.6.0",
     "cors": "^2.8.5",
@@ -25,7 +24,6 @@
     "fast-xml-parser": "^5.8.0",
     "fs-extra": "^11.1.1",
     "helmet": "^8.1.0",
-    "minisearch": "^7.2.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },

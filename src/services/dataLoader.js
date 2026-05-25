@@ -1,11 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { parse } = require('csv-parse');
-const MiniSearch = require('minisearch');
-const {
-  markMemoryPhase,
-  maybeGc
-} = require('../utils/memoryProfile');
+const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const BDPM_MEDICAMENT_BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/medicament';
@@ -136,18 +132,11 @@ function createIndexIncremental(type, fields, boost = null) {
   };
   if (boost) indexConfig.boost = boost;
 
-  const index = new MiniSearch(indexConfig);
-  const rows = dataCache[type];
-  const batchSize = 2000;
-  for (let start = 0; start < rows.length; start += batchSize) {
-    const batch = [];
-    const end = Math.min(start + batchSize, rows.length);
-    for (let rowIndex = start; rowIndex < end; rowIndex++) {
-      batch.push(buildIndexDocument(rows[rowIndex], rowIndex, fields));
-    }
-    index.addAll(batch);
-  }
-  searchIndexes[type] = index;
+  searchIndexes[type] = buildFrozenIndexFromRows(
+    dataCache[type],
+    (item, rowIndex) => buildIndexDocument(item, rowIndex, fields),
+    indexConfig
+  );
 }
 
 function appendToCisList(map, cis, item) {
@@ -227,16 +216,13 @@ async function loadData() {
   }
 
   console.log('Chargement des données...');
-  markMemoryPhase('before_load');
   clearLoadedData();
-  maybeGc('before_load');
 
   dataCache.specialites = await parseFileStreaming('CIS_bdpm.txt', [
     'cis', 'denomination', 'forme_pharma', 'voies_admin', 'statut_amm',
     'type_amm', 'commercialisation', 'date_amm', 'statut_bdm',
     'num_autorisation_euro', 'titulaire', 'surveillance_renforcee'
   ]);
-  markMemoryPhase('after_bdpm_parse_specialites');
   createIndexIncremental('specialites',
     ['cis', 'denomination', 'forme_pharma', 'titulaire'],
     { denomination: 3, cis: 2, forme_pharma: 0.5, titulaire: 1 }
@@ -260,7 +246,6 @@ async function loadData() {
     ['cis', 'denomination_substance', 'dosage'],
     { denomination_substance: 3, cis: 2, dosage: 1 }
   );
-  markMemoryPhase('after_bdpm_parse_heavy_tables');
 
   if (LOAD_HAS_AVIS) {
     dataCache.avis_smr = await parseFileStreaming('CIS_HAS_SMR_bdpm.txt', [
@@ -316,8 +301,6 @@ async function loadData() {
   createIndexIncremental('substances', ['denomination']);
 
   buildCisIndexes();
-  markMemoryPhase('after_bdpm_indexes');
-  maybeGc('after_bdpm');
   console.log(`Données chargées et indexées: ${dataCache.specialites.length} spécialités`);
 }
 
