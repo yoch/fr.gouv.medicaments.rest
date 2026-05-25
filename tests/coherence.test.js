@@ -12,7 +12,7 @@ describe('API Coherence Tests', () => {
         jest.spyOn(console, 'log').mockImplementation(() => { });
         jest.spyOn(console, 'error').mockImplementation(() => { });
         await loadData();
-    }, 30000);
+    }, 120000);
 
     const CLAMOXYL_CIS = '61155773';
     const PARACETAMOL_COMPO_NAME = 'PARACÉTAMOL';

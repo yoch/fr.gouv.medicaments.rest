@@ -2,7 +2,8 @@ const {
   search,
   getSpecialiteByCis,
   getRelatedByCis,
-  bdpmExtraitUrl
+  bdpmExtraitUrl,
+  HYDRATE_RELATED_LIMIT
 } = require('./dataLoader');
 const {
   searchVet,
@@ -37,8 +38,8 @@ function searchBdpm(q) {
     type: 'medicament',
     match_quality: matchQualityByCis[cis],
     ...(getSpecialiteByCis(cis) || { cis, url_bdpm: bdpmExtraitUrl(cis) }),
-    presentations: getRelatedByCis('presentations', cis),
-    compositions: getRelatedByCis('compositions', cis)
+    presentations: getRelatedByCis('presentations', cis, HYDRATE_RELATED_LIMIT),
+    compositions: getRelatedByCis('compositions', cis, HYDRATE_RELATED_LIMIT)
   }));
 }
 

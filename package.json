@@ -10,7 +10,10 @@
     "start": "node --env-file=.env src/server.js",
     "dev": "nodemon --exec 'node --env-file=.env' src/server.js",
     "download-data": "node src/scripts/download-initial-data.js",
-    "test": "jest"
+    "memory:peak": "node tests/memory_peak_harness.js --runs 3",
+    "memory:peak:refresh": "node tests/memory_peak_harness.js --scenario refresh --runs 2",
+    "test": "jest",
+    "test:serial": "jest --runInBand"
   },
   "dependencies": {
     "7zip-bin": "^5.2.0",

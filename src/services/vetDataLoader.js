@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const readline = require('readline');
 const { XMLParser } = require('fast-xml-parser');
 const MiniSearch = require('minisearch');
+const { markMemoryPhase, maybeGc } = require('../utils/memoryProfile');
 const {
   VET_DATA_DIR,
   PRODUCTS_XML_NAME,
@@ -276,7 +278,18 @@ function parseMedicament(product, dict) {
   };
 }
 
-function createIndex(type, fields, boost = null) {
+function buildVetIndexDocument(item, rowIndex, fields) {
+  const doc = { id: rowIndex };
+  for (const field of fields) {
+    const value = item[field];
+    if (value != null && value !== '') {
+      doc[field] = value;
+    }
+  }
+  return doc;
+}
+
+function createIndexIncremental(type, fields, boost = null) {
   const indexConfig = {
     fields,
     storeFields: ['id'],
@@ -285,19 +298,101 @@ function createIndex(type, fields, boost = null) {
   if (boost) indexConfig.boost = boost;
 
   const index = new MiniSearch(indexConfig);
-  const indexDocuments = vetCache[type].map((item, rowIndex) => {
-    const doc = { id: rowIndex };
-    for (const field of fields) {
-      const value = item[field];
-      if (value != null && value !== '') {
-        doc[field] = value;
-      }
+  const rows = vetCache[type];
+  const batchSize = 2000;
+  for (let start = 0; start < rows.length; start += batchSize) {
+    const batch = [];
+    const end = Math.min(start + batchSize, rows.length);
+    for (let rowIndex = start; rowIndex < end; rowIndex++) {
+      batch.push(buildVetIndexDocument(rows[rowIndex], rowIndex, fields));
     }
-    return doc;
-  });
-
-  index.addAll(indexDocuments);
+    index.addAll(batch);
+  }
   searchIndexes[type] = index;
+}
+
+const PRODUCT_CLOSE = '</medicinal-product>';
+
+function indexOfProductOpen(line, fromIndex = 0) {
+  const marker = '<medicinal-product';
+  let pos = fromIndex;
+  while (pos < line.length) {
+    const idx = line.indexOf(marker, pos);
+    if (idx === -1) return -1;
+    if (line.startsWith('<medicinal-product-group', idx)) {
+      pos = idx + marker.length;
+      continue;
+    }
+    const nextChar = line[idx + marker.length];
+    if (nextChar === '>' || nextChar === ' ' || nextChar === '\t') {
+      return idx;
+    }
+    pos = idx + 1;
+  }
+  return -1;
+}
+
+function extractDateJeuFromHeader(filepath) {
+  try {
+    const fd = fs.openSync(filepath, 'r');
+    const buffer = Buffer.alloc(8192);
+    const bytes = fs.readSync(fd, buffer, 0, buffer.length, 0);
+    fs.closeSync(fd);
+    const header = buffer.slice(0, bytes).toString('utf8');
+    const match = header.match(/<date-jeu-de-donnees>([^<]+)<\/date-jeu-de-donnees>/);
+    return match ? match[1].trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+async function streamMedicinalProducts(productsPath, onProduct) {
+  const stream = fs.createReadStream(productsPath, { encoding: 'utf8' });
+  const rl = readline.createInterface({ input: stream, crlfDelay: Infinity });
+
+  let buffer = '';
+  let inProduct = false;
+
+  for await (const line of rl) {
+    if (!inProduct) {
+      const openIdx = indexOfProductOpen(line);
+      if (openIdx === -1) continue;
+      inProduct = true;
+      buffer = line.slice(openIdx);
+      const closeIdx = buffer.indexOf(PRODUCT_CLOSE);
+      if (closeIdx !== -1) {
+        const block = buffer.slice(0, closeIdx + PRODUCT_CLOSE.length);
+        buffer = '';
+        inProduct = false;
+        await onProduct(block);
+      }
+      continue;
+    }
+
+    buffer += `\n${line}`;
+    const closeIdx = buffer.indexOf(PRODUCT_CLOSE);
+    if (closeIdx === -1) continue;
+
+    const block = buffer.slice(0, closeIdx + PRODUCT_CLOSE.length);
+    buffer = buffer.slice(closeIdx + PRODUCT_CLOSE.length);
+    inProduct = indexOfProductOpen(buffer) !== -1;
+    if (inProduct) {
+      const nextOpen = indexOfProductOpen(buffer);
+      buffer = buffer.slice(nextOpen);
+    } else {
+      buffer = '';
+    }
+    await onProduct(block);
+  }
+}
+
+function parseProductBlock(blockXml, dict) {
+  const wrapped = `<?xml version="1.0" encoding="UTF-8"?><root>${blockXml}</root>`;
+  const parsed = xmlParser.parse(wrapped);
+  const raw = parsed.root?.['medicinal-product'] ?? parsed.root;
+  const product = Array.isArray(raw) ? raw[0] : raw;
+  if (!product || !product.num || !product.nom) return null;
+  return product;
 }
 
 function appendToNumList(map, num, item) {
@@ -311,22 +406,7 @@ function buildNumIndexes() {
   for (const item of vetCache.medicaments) {
     if (item.num) medicamentsByNum.set(item.num, item);
   }
-
-  const compositionsByNum = new Map();
-  for (const item of vetCache.compositions) {
-    appendToNumList(compositionsByNum, item.num, item);
-  }
-
-  const presentationsByNum = new Map();
-  for (const item of vetCache.presentations) {
-    appendToNumList(presentationsByNum, item.num, item);
-  }
-
-  numIndexes = {
-    medicamentsByNum,
-    compositionsByNum,
-    presentationsByNum
-  };
+  numIndexes = { medicamentsByNum };
 }
 
 function clearLoadedData() {
@@ -350,22 +430,21 @@ async function loadVetData() {
     throw new Error(`Dictionnaire vétérinaire introuvable: ${dictPath}`);
   }
 
-  console.log('Chargement des données vétérinaires...');
+  console.log('Chargement des données vétérinaires (streaming)...');
+  markMemoryPhase('before_vet_load');
   clearLoadedData();
 
   const dict = parseDictionary(fs.readFileSync(dictPath, 'utf8'));
-  const parsed = xmlParser.parse(fs.readFileSync(productsPath, 'utf8'));
-  const products = asArray(parsed['medicinal-product-group']?.['medicinal-product']);
-
-  const dateJeu = parsed['medicinal-product-group']?.Informations?.['date-jeu-de-donnees'];
+  const dateJeu = extractDateJeuFromHeader(productsPath);
   if (dateJeu) {
     vetCache.metadata.last_updated = new Date(dateJeu).toISOString();
   } else {
     vetCache.metadata.last_updated = fs.statSync(productsPath).mtime.toISOString();
   }
 
-  for (const product of products) {
-    if (!product.num || !product.nom) continue;
+  await streamMedicinalProducts(productsPath, async (blockXml) => {
+    const product = parseProductBlock(blockXml, dict);
+    if (!product) return;
 
     const medicament = parseMedicament(product, dict);
     vetCache.medicaments.push(medicament);
@@ -382,12 +461,14 @@ async function loadVetData() {
     if (waiting.length > 0) {
       vetCache.tempsAttente.set(medicament.num, waiting);
     }
-  }
+  });
 
-  createIndex('medicaments', ['nom', 'num'], { nom: 3, num: 2 });
-  createIndex('compositions', ['substance', 'num'], { substance: 3, num: 1 });
-
+  markMemoryPhase('after_vet_parse');
+  createIndexIncremental('medicaments', ['nom', 'num'], { nom: 3, num: 2 });
+  createIndexIncremental('compositions', ['substance', 'num'], { substance: 3, num: 1 });
   buildNumIndexes();
+  markMemoryPhase('after_vet_indexes');
+  maybeGc('after_vet');
   console.log(`Données vétérinaires chargées: ${vetCache.medicaments.length} médicaments`);
 }
 
@@ -449,18 +530,19 @@ function getMedicamentByNum(num) {
   return numIndexes.medicamentsByNum.get(num);
 }
 
-function getRelatedByNum(type, num) {
+function getRelatedByNum(type, num, limit = 50) {
   if (!num) return [];
   if (type === 'temps_attente') {
     return vetCache.tempsAttente.get(num) || [];
   }
-  if (!numIndexes) return [];
-  const mapKey = {
-    compositions: 'compositionsByNum',
-    presentations: 'presentationsByNum'
-  }[type];
-  if (!mapKey) return [];
-  return numIndexes[mapKey].get(num) || [];
+  const normalized = normalizeNum(num);
+  let rows = [];
+  if (type === 'compositions') {
+    rows = vetCache.compositions.filter((item) => item.num === normalized);
+  } else if (type === 'presentations') {
+    rows = vetCache.presentations.filter((item) => item.num === normalized);
+  }
+  return limit > 0 ? rows.slice(0, limit) : rows;
 }
 
 module.exports = {

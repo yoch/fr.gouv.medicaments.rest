@@ -3,6 +3,7 @@ const cors = require('cors');
 const { downloadDataIfNeeded } = require('./services/dataDownloader');
 const { downloadVetDataIfNeeded } = require('./services/vetDataDownloader');
 const { loadData, getMetadata } = require('./services/dataLoader');
+const { summarizePhases, snapshotProcessMemory } = require('./utils/memoryProfile');
 const { loadVetData } = require('./services/vetDataLoader');
 const medicamentRoutes = require('./routes/medicaments');
 const veterinaireRoutes = require('./routes/veterinaires');
@@ -104,16 +105,30 @@ function memoryUsageMb() {
 function healthHandler(req, res) {
     const metadata = getMetadata();
     const { pretty } = req.query;
+    const memory = memoryUsageMb();
+    const memorySummary = summarizePhases();
+    let status = 'ok';
+    if (memory.rss_mb >= MEMORY_CRITICAL_RSS_MB) {
+        status = 'degraded';
+    } else if (memory.rss_mb >= MEMORY_ALERT_RSS_MB) {
+        status = 'warning';
+    }
 
     const responseData = {
-        status: 'ok',
+        status,
         message: 'API des médicaments française',
         attribution: 'base de données publique des médicaments - gouv.fr',
         metadata: {
             last_updated: metadata.last_updated,
             source: metadata.source
         },
-        memory: memoryUsageMb(),
+        memory,
+        memory_thresholds_mb: {
+            alert: MEMORY_ALERT_RSS_MB,
+            critical: MEMORY_CRITICAL_RSS_MB
+        },
+        memory_load_phases: memorySummary,
+        reload_strategy: RELOAD_STRATEGY,
         uptime_seconds: Math.floor(process.uptime())
     };
 
@@ -129,6 +144,29 @@ app.get('/health', healthHandler);
 app.get('/api/health', healthHandler);
 
 const REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
+const MEMORY_ALERT_RSS_MB = parseInt(process.env.MEMORY_ALERT_RSS_MB || '450', 10);
+const MEMORY_CRITICAL_RSS_MB = parseInt(process.env.MEMORY_CRITICAL_RSS_MB || '480', 10);
+const RELOAD_STRATEGY = String(process.env.RELOAD_STRATEGY || 'in-process').toLowerCase();
+
+function shouldRestartOnDataChange() {
+  return RELOAD_STRATEGY === 'restart' || RELOAD_STRATEGY === 'exit';
+}
+
+async function reloadBdpmAfterChange() {
+  if (shouldRestartOnDataChange()) {
+    console.log('Données BDPM mises à jour — redémarrage du processus demandé (RELOAD_STRATEGY=restart)');
+    process.exit(0);
+  }
+  await loadData();
+}
+
+async function reloadVetAfterChange() {
+  if (shouldRestartOnDataChange()) {
+    console.log('Données vétérinaires mises à jour — redémarrage du processus demandé (RELOAD_STRATEGY=restart)');
+    process.exit(0);
+  }
+  await loadVetData();
+}
 
 async function loadVetDataSafe() {
     try {
@@ -147,19 +185,23 @@ async function startServer() {
         console.log('Chargement des données en mémoire...');
         await loadData();
         await loadVetDataSafe();
+        const bootMemory = snapshotProcessMemory();
+        console.log(
+            `Mémoire après chargement: rss=${bootMemory.rss_mb}Mo heap=${bootMemory.heap_used_mb}Mo`
+        );
 
         // Schedule periodic updates
         setInterval(async () => {
             console.log('🔄 Rafraîchissement périodique des données...');
             try {
                 const { changed: bdpmChanged } = await downloadDataIfNeeded();
-                if (bdpmChanged) await loadData();
+                if (bdpmChanged) await reloadBdpmAfterChange();
             } catch (err) {
                 console.error('❌ Erreur rafraîchissement BDPM:', err.message);
             }
             try {
                 const { changed: vetChanged } = await downloadVetDataIfNeeded();
-                if (vetChanged) await loadVetData();
+                if (vetChanged) await reloadVetAfterChange();
             } catch (err) {
                 console.warn('⚠ Erreur rafraîchissement vétérinaire:', err.message);
             }

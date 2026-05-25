@@ -113,6 +113,13 @@ Thumbs.db
 rcp/
 rcp_md/
 
+# Artefacts de bench / rapports locaux
+reports/
+benchmark_*.json
+
+# Artefacts locaux divers
+__pycache__/
+fic_cis_cip/
 # Données vétérinaires ANMV (téléchargées localement)
 data/veterinaires/*.xml
 data/veterinaires/*.7z

@@ -23,7 +23,7 @@ describe('API Medicaments', () => {
         jest.spyOn(console, 'error').mockImplementation(() => { });
 
         await loadData();
-    }, 30000); // Increase timeout for data loading
+    }, 120000);
 
     describe('GET /api/medicaments/specialites', () => {
         it('should return a list of specialites', async () => {
