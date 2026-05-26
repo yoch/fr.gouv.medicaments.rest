@@ -62,7 +62,8 @@ describe('searchRanking', () => {
           { id: 0, denomination: 'SULTRIAN 100' },
           { id: 1, denomination: 'FENOFIBRATE TEVA 100 mg, gélule' },
           { id: 2, denomination: 'DOLIPRANE 1000 mg, comprimé' },
-          { id: 3, denomination: 'EFFERALGAN 1000 mg, comprimé' }
+          { id: 3, denomination: 'EFFERALGAN 1000 mg, comprimé' },
+          { id: 4, denomination: 'DOSE 1g' }
         ],
         {
           fields: ['denomination'],

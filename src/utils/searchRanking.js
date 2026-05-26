@@ -34,8 +34,8 @@ function termMatchesAsWord(haystack, term) {
  * - prefix : commence par la requête ou par le 1er terme avec tous les termes présents
  * - fuzzy : match MiniSearch (typo / terme partiel) sans couverture complète
  *
- * Idée non implémentée : rejeter ou restreindre les requêtes purement numériques (ex. q=100),
- * trop peu discriminantes sur la dénomination.
+ * Idée non implémentée : rejeter ou restreindre les requêtes trop "code", par ex. seulement
+ * numériques ou alphanumériques très courts.
  */
 function computeMatchPriority(primaryValue, query, { idValue = '' } = {}) {
   const normalizedQuery = normalizeSearchText(query);
@@ -79,7 +79,7 @@ const miniSearchOptions = {
     processTerm: (term) => normalizeSearchText(term),
     combineWith: AND,
     prefix: (term) => !/^\d+$/.test(term),
-    fuzzy: (term) => (/^\d+$/.test(term) ? false : 0.2)
+    fuzzy: (term) => (/^\d/.test(term) ? false : 0.2)
   }
 };
 
