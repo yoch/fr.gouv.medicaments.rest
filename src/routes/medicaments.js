@@ -7,6 +7,7 @@ const {
   getRelatedByCis,
   getGeneriquesForCis,
   bdpmExtraitUrl,
+  isHasAvisLoaded,
   DETAIL_HYDRATE_RELATED_LIMIT
 } = require('../services/dataLoader');
 const { executeHybridSearch } = require('../services/searchOrchestrator');
@@ -44,6 +45,18 @@ function listHandler(dataType, defaultLimit = 100) {
     const { q, page = 1, limit = defaultLimit } = req.query;
     const data = q ? search(dataType, q) : getData(dataType);
     res.json(paginate(data, page, limit));
+  };
+}
+
+function avisListHandler(dataType) {
+  return (req, res) => {
+    if (!isHasAvisLoaded()) {
+      return res.status(410).json({
+        error:
+          'Les avis HAS (SMR/ASMR) ne sont pas chargés sur ce serveur (LOAD_HAS_AVIS=false).'
+      });
+    }
+    return listHandler(dataType)(req, res);
   };
 }
 
@@ -95,6 +108,12 @@ router.get('/specialites', listHandler('specialites'));
  * /medicaments/specialites/{cis}:
  *   get:
  *     summary: Détail d'une spécialité
+ *     description: |
+ *       Retourne la spécialité avec présentations, compositions, conditions et génériques liés.
+ *       Si le serveur est démarré avec `LOAD_HAS_AVIS=false` (profil allégé), les champs
+ *       `avis_smr` et `avis_asmr` sont **absents** de la réponse. Utiliser les routes
+ *       `/medicaments/avis-smr` et `/medicaments/avis-asmr` uniquement lorsque les avis HAS
+ *       sont chargés (`LOAD_HAS_AVIS` non défini ou `true`).
  *     tags: [Médicaments]
  *     parameters:
  *       - in: path
@@ -121,8 +140,24 @@ router.get('/specialites', listHandler('specialites'));
  *                       type: array
  *                       items:
  *                         $ref: '#/components/schemas/Composition'
+ *                     conditions:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Condition'
  *                     generiques:
  *                       $ref: '#/components/schemas/GroupeGeneriqueDetail'
+ *                     avis_smr:
+ *                       type: array
+ *                       description: |
+ *                         Présent uniquement si `LOAD_HAS_AVIS` n'est pas `false`.
+ *                       items:
+ *                         $ref: '#/components/schemas/AvisSMR'
+ *                     avis_asmr:
+ *                       type: array
+ *                       description: |
+ *                         Présent uniquement si `LOAD_HAS_AVIS` n'est pas `false`.
+ *                       items:
+ *                         $ref: '#/components/schemas/AvisASMR'
  *       404:
  *         description: Spécialité non trouvée
  */
@@ -137,25 +172,28 @@ router.get('/specialites/:cis', (req, res) => {
   const detailLimit = DETAIL_HYDRATE_RELATED_LIMIT;
   const presentations = getRelatedByCis('presentations', cis, detailLimit);
   const compositions = getRelatedByCis('compositions', cis, detailLimit);
-  const avis_smr = getRelatedByCis('avis_smr', cis, detailLimit);
-  const avis_asmr = getRelatedByCis('avis_asmr', cis, detailLimit);
   const conditions = getRelatedByCis('conditions', cis, detailLimit);
   const generiques = getGeneriquesForCis(cis);
 
   const metadata = getMetadata();
-  res.json({
+  const payload = {
     ...specialite,
     presentations,
     compositions,
-    avis_smr,
-    avis_asmr,
     conditions,
     generiques,
     metadata: {
       last_updated: metadata.last_updated,
       source: metadata.source
     }
-  });
+  };
+
+  if (isHasAvisLoaded()) {
+    payload.avis_smr = getRelatedByCis('avis_smr', cis, detailLimit);
+    payload.avis_asmr = getRelatedByCis('avis_asmr', cis, detailLimit);
+  }
+
+  res.json(payload);
 });
 
 // GET /api/medicaments/presentations
@@ -242,6 +280,8 @@ router.get('/compositions', listHandler('compositions'));
  * /medicaments/avis-smr:
  *   get:
  *     summary: Liste les avis SMR (Service Médical Rendu)
+ *     description: |
+ *       Indisponible si `LOAD_HAS_AVIS=false` (réponse **410 Gone**).
  *     tags: [Médicaments]
  *     parameters:
  *       - in: query
@@ -272,8 +312,18 @@ router.get('/compositions', listHandler('compositions'));
  *                       type: array
  *                       items:
  *                         $ref: '#/components/schemas/AvisSMR'
+ *       410:
+ *         description: Avis HAS non chargés (`LOAD_HAS_AVIS=false`)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Les avis HAS (SMR/ASMR) ne sont pas chargés sur ce serveur (LOAD_HAS_AVIS=false).
  */
-router.get('/avis-smr', listHandler('avis_smr'));
+router.get('/avis-smr', avisListHandler('avis_smr'));
 
 // GET /api/medicaments/avis-asmr
 /**
@@ -281,6 +331,8 @@ router.get('/avis-smr', listHandler('avis_smr'));
  * /medicaments/avis-asmr:
  *   get:
  *     summary: Liste les avis ASMR (Amélioration du Service Médical Rendu)
+ *     description: |
+ *       Indisponible si `LOAD_HAS_AVIS=false` (réponse **410 Gone**).
  *     tags: [Médicaments]
  *     parameters:
  *       - in: query
@@ -311,8 +363,18 @@ router.get('/avis-smr', listHandler('avis_smr'));
  *                       type: array
  *                       items:
  *                         $ref: '#/components/schemas/AvisASMR'
+ *       410:
+ *         description: Avis HAS non chargés (`LOAD_HAS_AVIS=false`)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Les avis HAS (SMR/ASMR) ne sont pas chargés sur ce serveur (LOAD_HAS_AVIS=false).
  */
-router.get('/avis-asmr', listHandler('avis_asmr'));
+router.get('/avis-asmr', avisListHandler('avis_asmr'));
 
 // GET /api/medicaments/groupes-generiques
 /**

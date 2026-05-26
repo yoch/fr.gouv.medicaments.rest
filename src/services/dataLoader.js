@@ -419,11 +419,16 @@ function getMetadata() {
   return dataCache.metadata;
 }
 
+function isHasAvisLoaded() {
+  return LOAD_HAS_AVIS;
+}
+
 module.exports = {
   loadData,
   getData,
   search,
   getMetadata,
+  isHasAvisLoaded,
   getSpecialiteByCis,
   getRelatedByCis,
   getGeneriquesForCis,

@@ -19,7 +19,7 @@ Liste les spécialités pharmaceutiques.
 Détail complet d'une spécialité.
 - **Paramètres**:
   - `cis` (string): Code Identifiant de Spécialité (ex: `60234100`)
-- **Réponse**: Objet `Medicament` enrichi avec `presentations`, `compositions`, `avis_smr`, etc.
+- **Réponse**: Objet `Medicament` enrichi avec `presentations`, `compositions`, etc. Si les avis HAS sont chargés (`LOAD_HAS_AVIS=true`, défaut), inclut aussi `avis_smr` et `avis_asmr` ; sinon ces champs sont absents.
 
 ### Informations Pharmaceutiques
 
@@ -41,8 +41,8 @@ Informations de sécurité importantes (alertes, messages ANSM).
 
 - `GET /medicaments/presentations`: Liste des conditionnements.
 - `GET /medicaments/compositions`: Liste des compositions (substances).
-- `GET /medicaments/avis-smr`: Avis du Service Médical Rendu.
-- `GET /medicaments/avis-asmr`: Avis d'Amélioration du SMR.
+- `GET /medicaments/avis-smr`: Avis du Service Médical Rendu (nécessite `LOAD_HAS_AVIS=true`, sinon **410 Gone**).
+- `GET /medicaments/avis-asmr`: Avis d'Amélioration du SMR (idem).
 - `GET /medicaments/groupes-generiques`: Groupes génériques.
 - `GET /medicaments/conditions`: Conditions de prescription/délivrance.
 - `GET /medicaments/disponibilite`: Ruptures de stock et disponibilités.
@@ -88,7 +88,14 @@ En `format=markdown`, les substances sont listées séparées par des virgules ;
 ```
 GET /api/medicaments/search?q={query}&limit=10&format=markdown&detail=summary&source=auto
 ```
-Pour prescription, avis HAS, ruptures ou génériques : noter le `cis` / `num` et appeler `GET /medicaments/specialites/:cis` ou `GET /veterinaires/medicaments/:num`.
+Pour prescription, ruptures ou génériques : noter le `cis` / `num` et appeler `GET /medicaments/specialites/:cis` ou `GET /veterinaires/medicaments/:num`. Pour les avis HAS : `GET /medicaments/avis-smr` / `avis-asmr` (si chargés), ou la fiche spécialité lorsque `LOAD_HAS_AVIS=true`.
+
+#### `LOAD_HAS_AVIS` (variable d'environnement)
+
+| Valeur | Effet |
+|--------|--------|
+| `true` (défaut si non défini ou autre que `false`) | Fichiers HAS chargés ; routes `/avis-smr`, `/avis-asmr` actives ; fiche CIS avec `avis_smr` / `avis_asmr`. |
+| `false` | Pas de chargement HAS (mémoire réduite) ; `/avis-smr` et `/avis-asmr` répondent **410** ; fiche CIS **sans** champs avis. `/search` inchangé (n'utilise pas les avis). |
 
 ### Médicaments vétérinaires (ANMV)
 
