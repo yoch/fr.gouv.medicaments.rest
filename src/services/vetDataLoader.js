@@ -2,7 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 const { XMLParser } = require('fast-xml-parser');
-const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
+const {
+  createFrozenIndexBuilder,
+  freezeFrozenIndexBuilder
+} = require('../utils/frozenMiniSearch');
 const {
   miniSearchOptions,
   normalizeSearchText,
@@ -33,7 +36,8 @@ const ARRAY_TAGS = new Set([
 const xmlParser = new XMLParser({
   ignoreAttributes: true,
   trimValues: true,
-  isArray: (tagName) => ARRAY_TAGS.has(tagName)
+  isArray: (tagName) => ARRAY_TAGS.has(tagName),
+  stopNodes: ['*.paragraphes-rcp']
 });
 
 let vetCache = {
@@ -276,19 +280,14 @@ function buildVetIndexDocument(item, rowIndex, fields) {
   return doc;
 }
 
-function createIndexIncremental(type, fields, boost = null) {
+function vetIndexConfig(fields, boost = null) {
   const indexConfig = {
     fields,
     storeFields: ['id'],
     ...miniSearchOptions
   };
   if (boost) indexConfig.boost = boost;
-
-  searchIndexes[type] = buildFrozenIndexFromRows(
-    vetCache[type],
-    (item, rowIndex) => buildVetIndexDocument(item, rowIndex, fields),
-    indexConfig
-  );
+  return indexConfig;
 }
 
 const PRODUCT_CLOSE = '</medicinal-product>';
@@ -437,15 +436,28 @@ async function loadVetData() {
     vetCache.metadata.last_updated = fs.statSync(productsPath).mtime.toISOString();
   }
 
+  const medicamentFields = ['nom', 'num'];
+  const compositionFields = ['substance', 'num'];
+  const medicamentsBuilder = createFrozenIndexBuilder(
+    vetIndexConfig(medicamentFields, { nom: 3, num: 2 })
+  );
+  const compositionsBuilder = createFrozenIndexBuilder(
+    vetIndexConfig(compositionFields, { substance: 3, num: 1 })
+  );
+
   await streamMedicinalProducts(productsPath, async (blockXml) => {
     const product = parseProductBlock(blockXml, dict);
     if (!product) return;
 
     const medicament = parseMedicament(product, dict);
+    const medRowIndex = vetCache.medicaments.length;
     vetCache.medicaments.push(medicament);
+    medicamentsBuilder.add(buildVetIndexDocument(medicament, medRowIndex, medicamentFields));
 
     for (const line of parseCompositionLines(product, dict)) {
+      const compRowIndex = vetCache.compositions.length;
       vetCache.compositions.push(line);
+      compositionsBuilder.add(buildVetIndexDocument(line, compRowIndex, compositionFields));
     }
 
     for (const presentation of parsePresentations(product, dict)) {
@@ -458,8 +470,8 @@ async function loadVetData() {
     }
   });
 
-  createIndexIncremental('medicaments', ['nom', 'num'], { nom: 3, num: 2 });
-  createIndexIncremental('compositions', ['substance', 'num'], { substance: 3, num: 1 });
+  searchIndexes.medicaments = freezeFrozenIndexBuilder(medicamentsBuilder);
+  searchIndexes.compositions = freezeFrozenIndexBuilder(compositionsBuilder);
   buildNumIndexes();
   console.log(`Données vétérinaires chargées: ${vetCache.medicaments.length} médicaments`);
 }

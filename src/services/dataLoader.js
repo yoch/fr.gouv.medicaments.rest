@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { parse } = require('csv-parse');
-const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
+const { buildFrozenIndexFromAsyncIterable, buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
 const {
   miniSearchOptions,
   normalizeSearchText,
@@ -69,37 +69,17 @@ const RELATED_BY_CIS_MAPS = {
   conditions: 'conditionsByCis'
 };
 
-function parseFileStreaming(filename, columns) {
-  const filepath = path.join(DATA_DIR, filename);
-  if (!fs.existsSync(filepath)) {
-    console.warn(`Fichier ${filename} non trouvé`);
-    return Promise.resolve([]);
-  }
-
-  return new Promise((resolve, reject) => {
-    const records = [];
-    const parser = parse({
-      delimiter: '\t',
-      columns,
-      skip_empty_lines: true,
-      trim: true,
-      quote: false,
-      escape: false,
-      relax_quotes: true,
-      relax_column_count: true
-    });
-
-    parser.on('readable', () => {
-      let record;
-      while ((record = parser.read()) !== null) {
-        records.push(record);
-      }
-    });
-    parser.on('error', reject);
-    parser.on('end', () => resolve(records));
-
-    fs.createReadStream(filepath, { encoding: 'utf8' }).pipe(parser);
-  });
+function csvParserOptions(columns) {
+  return {
+    delimiter: '\t',
+    columns,
+    skip_empty_lines: true,
+    trim: true,
+    quote: false,
+    escape: false,
+    relax_quotes: true,
+    relax_column_count: true
+  };
 }
 
 function buildIndexDocument(item, rowIndex, fields) {
@@ -113,19 +93,55 @@ function buildIndexDocument(item, rowIndex, fields) {
   return doc;
 }
 
-function createIndexIncremental(type, fields, boost = null) {
-  console.log(`Indexation de ${type}...`);
+function indexConfigFor(fields, boost = null) {
   const indexConfig = {
     fields,
     storeFields: ['id'],
     ...miniSearchOptions
   };
   if (boost) indexConfig.boost = boost;
+  return indexConfig;
+}
 
+/**
+ * Une passe fichier : stream CSV → dataCache[type] + index frozen (fromAsyncIterable).
+ */
+async function loadParseAndIndex(type, filename, columns, fields, boost = null) {
+  const filepath = path.join(DATA_DIR, filename);
+  console.log(`Chargement et indexation de ${type}...`);
+
+  dataCache[type] = [];
+  const options = indexConfigFor(fields, boost);
+
+  if (!fs.existsSync(filepath)) {
+    console.warn(`Fichier ${filename} non trouvé`);
+    searchIndexes[type] = null;
+    return;
+  }
+
+  async function* documents() {
+    const parser = fs
+      .createReadStream(filepath, { encoding: 'utf8' })
+      .pipe(parse(csvParserOptions(columns)));
+
+    let rowIndex = 0;
+    for await (const record of parser) {
+      dataCache[type].push(record);
+      yield buildIndexDocument(record, rowIndex, fields);
+      rowIndex++;
+    }
+  }
+
+  searchIndexes[type] = await buildFrozenIndexFromAsyncIterable(documents(), options);
+}
+
+async function indexInMemoryRows(type, rows, fields, boost = null) {
+  console.log(`Indexation de ${type}...`);
+  const options = indexConfigFor(fields, boost);
   searchIndexes[type] = buildFrozenIndexFromRows(
-    dataCache[type],
+    rows,
     (item, rowIndex) => buildIndexDocument(item, rowIndex, fields),
-    indexConfig
+    options
   );
 }
 
@@ -208,45 +224,54 @@ async function loadData() {
   console.log('Chargement des données...');
   clearLoadedData();
 
-  dataCache.specialites = await parseFileStreaming('CIS_bdpm.txt', [
-    'cis', 'denomination', 'forme_pharma', 'voies_admin', 'statut_amm',
-    'type_amm', 'commercialisation', 'date_amm', 'statut_bdm',
-    'num_autorisation_euro', 'titulaire', 'surveillance_renforcee'
-  ]);
-  createIndexIncremental('specialites',
+  await loadParseAndIndex(
+    'specialites',
+    'CIS_bdpm.txt',
+    [
+      'cis', 'denomination', 'forme_pharma', 'voies_admin', 'statut_amm',
+      'type_amm', 'commercialisation', 'date_amm', 'statut_bdm',
+      'num_autorisation_euro', 'titulaire', 'surveillance_renforcee'
+    ],
     ['cis', 'denomination', 'forme_pharma', 'titulaire'],
     { denomination: 3, cis: 2, forme_pharma: 0.5, titulaire: 1 }
   );
 
-  dataCache.presentations = await parseFileStreaming('CIS_CIP_bdpm.txt', [
-    'cis', 'cip7', 'libelle', 'statut_admin', 'etat_commercialisation',
-    'date_declaration', 'cip13', 'agrement_collectivite', 'taux_remboursement',
-    'prix_medicament', 'prix_public', 'honoraires', 'indications'
-  ]);
-  createIndexIncremental('presentations',
+  await loadParseAndIndex(
+    'presentations',
+    'CIS_CIP_bdpm.txt',
+    [
+      'cis', 'cip7', 'libelle', 'statut_admin', 'etat_commercialisation',
+      'date_declaration', 'cip13', 'agrement_collectivite', 'taux_remboursement',
+      'prix_medicament', 'prix_public', 'honoraires', 'indications'
+    ],
     ['cis', 'cip7', 'cip13', 'libelle', 'indications'],
     { libelle: 3, indications: 2, cis: 2, cip7: 1.5, cip13: 1.5 }
   );
 
-  dataCache.compositions = await parseFileStreaming('CIS_COMPO_bdpm.txt', [
-    'cis', 'designation_element', 'code_substance', 'denomination_substance',
-    'dosage', 'reference_dosage', 'nature_composant', 'numero_ordre'
-  ]);
-  createIndexIncremental('compositions',
+  await loadParseAndIndex(
+    'compositions',
+    'CIS_COMPO_bdpm.txt',
+    [
+      'cis', 'designation_element', 'code_substance', 'denomination_substance',
+      'dosage', 'reference_dosage', 'nature_composant', 'numero_ordre'
+    ],
     ['cis', 'denomination_substance', 'dosage'],
     { denomination_substance: 3, cis: 2, dosage: 1 }
   );
 
   if (LOAD_HAS_AVIS) {
-    dataCache.avis_smr = await parseFileStreaming('CIS_HAS_SMR_bdpm.txt', [
-      'cis', 'has_dossier', 'motif_evaluation', 'date_avis', 'valeur_smr', 'libelle_smr'
-    ]);
-    createIndexIncremental('avis_smr', ['libelle_smr', 'valeur_smr']);
-
-    dataCache.avis_asmr = await parseFileStreaming('CIS_HAS_ASMR_bdpm.txt', [
-      'cis', 'has_dossier', 'motif_evaluation', 'date_avis', 'valeur_asmr', 'libelle_asmr'
-    ]);
-    createIndexIncremental('avis_asmr', ['libelle_asmr', 'valeur_asmr']);
+    await loadParseAndIndex(
+      'avis_smr',
+      'CIS_HAS_SMR_bdpm.txt',
+      ['cis', 'has_dossier', 'motif_evaluation', 'date_avis', 'valeur_smr', 'libelle_smr'],
+      ['libelle_smr', 'valeur_smr']
+    );
+    await loadParseAndIndex(
+      'avis_asmr',
+      'CIS_HAS_ASMR_bdpm.txt',
+      ['cis', 'has_dossier', 'motif_evaluation', 'date_avis', 'valeur_asmr', 'libelle_asmr'],
+      ['libelle_asmr', 'valeur_asmr']
+    );
   } else {
     dataCache.avis_smr = [];
     dataCache.avis_asmr = [];
@@ -254,22 +279,34 @@ async function loadData() {
     searchIndexes.avis_asmr = null;
   }
 
-  dataCache.generiques = await parseFileStreaming('CIS_GENER_bdpm.txt', [
-    'id_groupe', 'libelle_groupe', 'cis', 'type_generique', 'numero_ordre'
-  ]);
-  createIndexIncremental('generiques', ['libelle_groupe']);
+  await loadParseAndIndex(
+    'generiques',
+    'CIS_GENER_bdpm.txt',
+    ['id_groupe', 'libelle_groupe', 'cis', 'type_generique', 'numero_ordre'],
+    ['libelle_groupe']
+  );
 
-  dataCache.conditions = await parseFileStreaming('CIS_CPD_bdpm.txt', ['cis', 'condition']);
-  createIndexIncremental('conditions', ['condition']);
+  await loadParseAndIndex(
+    'conditions',
+    'CIS_CPD_bdpm.txt',
+    ['cis', 'condition'],
+    ['condition']
+  );
 
-  dataCache.ruptures = await parseFileStreaming('CIS_CIP_Dispo_Spec.txt', [
-    'cis', 'cip13', 'code_statut', 'libelle_statut', 'date_debut',
-    'date_mise_a_jour', 'date_remise_dispo', 'lien_ansm'
-  ]);
-  createIndexIncremental('ruptures', ['libelle_statut']);
+  await loadParseAndIndex(
+    'ruptures',
+    'CIS_CIP_Dispo_Spec.txt',
+    [
+      'cis', 'cip13', 'code_statut', 'libelle_statut', 'date_debut',
+      'date_mise_a_jour', 'date_remise_dispo', 'lien_ansm'
+    ],
+    ['libelle_statut']
+  );
 
-  dataCache.mitm = await parseFileStreaming('CIS_MITM.txt', ['cis', 'code_atc', 'denomination', 'lien_fi']);
-  createIndexIncremental('mitm',
+  await loadParseAndIndex(
+    'mitm',
+    'CIS_MITM.txt',
+    ['cis', 'code_atc', 'denomination', 'lien_fi'],
     ['cis', 'code_atc', 'denomination'],
     { denomination: 3, code_atc: 2, cis: 2 }
   );
@@ -288,7 +325,7 @@ async function loadData() {
     }
   }
   dataCache.substances = Array.from(substancesMap.values());
-  createIndexIncremental('substances', ['denomination']);
+  await indexInMemoryRows('substances', dataCache.substances, ['denomination']);
 
   buildCisIndexes();
   console.log(`Données chargées et indexées: ${dataCache.specialites.length} spécialités`);

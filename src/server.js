@@ -139,6 +139,8 @@ const {
 const BDPM_REFRESH_MS = BDPM_CHECK_INTERVAL_HOURS * 60 * 60 * 1000;
 const VET_REFRESH_MS = VET_CHECK_INTERVAL_HOURS * 60 * 60 * 1000;
 const RELOAD_STRATEGY = String(process.env.RELOAD_STRATEGY || 'in-process').toLowerCase();
+const VET_LOAD_DEFERRED = process.env.VET_LOAD_DEFERRED === 'true';
+const VET_LOAD_DELAY_MS = Math.max(0, parseInt(process.env.VET_LOAD_DELAY_MS || '0', 10));
 
 function shouldRestartOnDataChange() {
   return RELOAD_STRATEGY === 'restart' || RELOAD_STRATEGY === 'exit';
@@ -160,6 +162,12 @@ async function reloadVetAfterChange() {
   await loadVetData();
 }
 
+async function delayBeforeVetLoad() {
+    if (VET_LOAD_DELAY_MS > 0) {
+        await new Promise((resolve) => setTimeout(resolve, VET_LOAD_DELAY_MS));
+    }
+}
+
 async function loadVetDataSafe() {
     try {
         await downloadVetDataIfNeeded();
@@ -169,6 +177,16 @@ async function loadVetDataSafe() {
     }
 }
 
+function scheduleDeferredVetLoad() {
+    (async () => {
+        await delayBeforeVetLoad();
+        console.log('Chargement des données vétérinaires (différé après listen)...');
+        await loadVetDataSafe();
+    })().catch((err) => {
+        console.warn('⚠ Échec chargement vétérinaire différé:', err.message);
+    });
+}
+
 async function startServer() {
     try {
         console.log('Vérification et téléchargement des données...');
@@ -176,11 +194,13 @@ async function startServer() {
 
         console.log('Chargement des données en mémoire...');
         await loadData();
-        await loadVetDataSafe();
-        const bootMemory = memoryUsageMb();
-        console.log(
-            `Mémoire après chargement: rss=${bootMemory.rss_mb} Mo, heap=${bootMemory.heap_used_mb} Mo`
-        );
+
+        if (!VET_LOAD_DEFERRED) {
+            await delayBeforeVetLoad();
+            await loadVetDataSafe();
+        } else {
+            console.log('Chargement vétérinaire différé (VET_LOAD_DEFERRED=true)');
+        }
 
         async function refreshBdpm() {
             console.log(`🔄 Rafraîchissement BDPM (intervalle ${BDPM_CHECK_INTERVAL_HOURS}h)...`);
@@ -212,6 +232,9 @@ async function startServer() {
             console.log(`Serveur démarré sur le port ${PORT}`);
             console.log(`Health check: http://localhost:${PORT}/health`);
             console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
+            if (VET_LOAD_DEFERRED) {
+                scheduleDeferredVetLoad();
+            }
         });
     } catch (error) {
         console.error('Erreur au démarrage:', error);
