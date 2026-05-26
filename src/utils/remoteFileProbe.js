@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const DEFAULT_USER_AGENT =
-  'Mozilla/5.0 (compatible; fr.gouv.medicaments.rest/1.0)';
+  'Mozilla/5.0 (compatible; fr.gouv.medicaments.rest/1.1)';
 
 function parseIntervalHours(envValue, defaultHours) {
   const parsed = parseInt(envValue ?? String(defaultHours), 10);

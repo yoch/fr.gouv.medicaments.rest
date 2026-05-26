@@ -30,7 +30,7 @@ const PRODUCTS_XML_NAME = 'amm-vet-fr-v2-v.xml';
 const DICT_XML_NAME = 'amm-vet-fr-v2-d.xml';
 
 const HTTP_HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (compatible; fr.gouv.medicaments.rest/1.0)'
+  'User-Agent': 'Mozilla/5.0 (compatible; fr.gouv.medicaments.rest/1.1)'
 };
 
 async function ensure7zipExecutable() {
