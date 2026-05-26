@@ -13,6 +13,35 @@ const {
 const { isStrongMatchQuality } = require('../utils/searchRanking');
 
 const MATCH_QUALITY_RANK = { exact: 3, prefix: 2, fuzzy: 1 };
+const MATCH_VIA_RANK = { cis: 4, num: 4, denomination: 3, presentation: 2, composition: 1 };
+
+function recordMatchMeta(metaByKey, key, item, via) {
+  if (!key) return;
+  const quality = item.match_quality;
+  const candidate = {
+    quality,
+    via
+  };
+  const previous = metaByKey[key];
+  if (!previous) {
+    metaByKey[key] = candidate;
+    return;
+  }
+  const rankNew = MATCH_QUALITY_RANK[quality] || 0;
+  const rankOld = MATCH_QUALITY_RANK[previous.quality] || 0;
+  if (rankNew > rankOld) {
+    metaByKey[key] = candidate;
+    return;
+  }
+  if (rankNew === rankOld && MATCH_VIA_RANK[via] > MATCH_VIA_RANK[previous.via]) {
+    metaByKey[key] = candidate;
+  }
+}
+
+function attachMatchFields(target, meta) {
+  if (!meta) return;
+  target.match_via = meta.via;
+}
 
 function normalizeSource(source) {
   const value = (source || 'auto').toLowerCase();
@@ -26,22 +55,52 @@ function searchBdpm(q) {
   const compositions = search('compositions', q);
 
   const matchQualityByCis = {};
-  for (const item of [...specialites, ...presentations, ...compositions]) {
+  const matchMetaByCis = {};
+
+  for (const item of specialites) {
+    recordMatchMeta(matchMetaByCis, item.cis, item, 'denomination');
+    const previous = matchQualityByCis[item.cis];
+    if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
+      matchQualityByCis[item.cis] = item.match_quality;
+    }
+  }
+  for (const item of presentations) {
+    recordMatchMeta(matchMetaByCis, item.cis, item, 'presentation');
+    const previous = matchQualityByCis[item.cis];
+    if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
+      matchQualityByCis[item.cis] = item.match_quality;
+    }
+  }
+  for (const item of compositions) {
+    recordMatchMeta(matchMetaByCis, item.cis, item, 'composition');
     const previous = matchQualityByCis[item.cis];
     if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
       matchQualityByCis[item.cis] = item.match_quality;
     }
   }
 
+  // CIS recherché numériquement : marquer via cis si match exact sur l'identifiant
+  const normalizedQuery = String(q).trim();
+  if (/^\d+$/.test(normalizedQuery) && matchQualityByCis[normalizedQuery] === 'exact') {
+    recordMatchMeta(matchMetaByCis, normalizedQuery, {
+      cis: normalizedQuery,
+      match_quality: 'exact'
+    }, 'cis');
+  }
+
   const matchedCis = new Set(Object.keys(matchQualityByCis));
 
-  return Array.from(matchedCis).map((cis) => ({
-    type: 'medicament',
-    match_quality: matchQualityByCis[cis],
-    ...(getSpecialiteByCis(cis) || { cis, url_bdpm: bdpmExtraitUrl(cis) }),
-    presentations: getRelatedByCis('presentations', cis, HYDRATE_RELATED_LIMIT),
-    compositions: getRelatedByCis('compositions', cis, HYDRATE_RELATED_LIMIT)
-  }));
+  return Array.from(matchedCis).map((cis) => {
+    const result = {
+      type: 'medicament',
+      match_quality: matchQualityByCis[cis],
+      ...(getSpecialiteByCis(cis) || { cis, url_bdpm: bdpmExtraitUrl(cis) }),
+      presentations: getRelatedByCis('presentations', cis, HYDRATE_RELATED_LIMIT),
+      compositions: getRelatedByCis('compositions', cis, HYDRATE_RELATED_LIMIT)
+    };
+    attachMatchFields(result, matchMetaByCis[cis]);
+    return result;
+  });
 }
 
 function searchVeterinary(q) {
@@ -49,22 +108,44 @@ function searchVeterinary(q) {
   const compositions = searchVet('compositions', q);
 
   const matchQualityByNum = {};
-  for (const item of [...medicaments, ...compositions]) {
+  const matchMetaByNum = {};
+
+  for (const item of medicaments) {
+    recordMatchMeta(matchMetaByNum, item.num, item, 'denomination');
+    const previous = matchQualityByNum[item.num];
+    if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
+      matchQualityByNum[item.num] = item.match_quality;
+    }
+  }
+  for (const item of compositions) {
+    recordMatchMeta(matchMetaByNum, item.num, item, 'composition');
     const previous = matchQualityByNum[item.num];
     if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
       matchQualityByNum[item.num] = item.match_quality;
     }
   }
 
+  const normalizedQuery = String(q).trim();
+  if (/^\d+$/.test(normalizedQuery)) {
+    const num = normalizedQuery.padStart(7, '0');
+    if (matchQualityByNum[num] === 'exact') {
+      recordMatchMeta(matchMetaByNum, num, { num, match_quality: 'exact' }, 'num');
+    }
+  }
+
   const matchedNums = new Set(Object.keys(matchQualityByNum));
 
-  return Array.from(matchedNums).map((num) => ({
-    type: 'medicament_veterinaire',
-    match_quality: matchQualityByNum[num],
-    ...(getMedicamentByNum(num) || { num }),
-    presentations: getRelatedByNum('presentations', num),
-    compositions: getRelatedByNum('compositions', num)
-  }));
+  return Array.from(matchedNums).map((num) => {
+    const result = {
+      type: 'medicament_veterinaire',
+      match_quality: matchQualityByNum[num],
+      ...(getMedicamentByNum(num) || { num }),
+      presentations: getRelatedByNum('presentations', num),
+      compositions: getRelatedByNum('compositions', num)
+    };
+    attachMatchFields(result, matchMetaByNum[num]);
+    return result;
+  });
 }
 
 function sortMergedResults(results) {

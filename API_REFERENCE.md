@@ -65,14 +65,30 @@ Tous ces endpoints acceptent les paramètres standards :
 Recherche globale multi-critères (spécialités, présentations, compositions agrégées par CIS). Peut interroger la BDPM seule, l'ANMV seule, ou les deux selon `source`.
 - **Paramètres**:
   - `q` (string, requis): Terme de recherche.
+  - `page`, `limit` (défaut `limit=50`).
   - `source` (string, optionnel): `auto` (défaut), `human`, `veterinary`, `mixed`.
     - `auto` : BDPM d'abord ; si aucun résultat, fallback ANMV.
     - `human` : BDPM uniquement (comportement historique).
     - `veterinary` : médicaments vétérinaires ANMV uniquement.
     - `mixed` : fusion des deux référentiels.
-- **Réponse BDPM**: Objets `medicament` agrégés par `cis`, avec `presentations` et `compositions` (inchangé).
+  - `format` (optionnel): `json` (défaut) ou `markdown`. En `markdown`, le corps est du texte `text/markdown` (pas de JSON) ; la pagination n’apparaît que dans l’en-tête du document.
+  - `detail` (optionnel): `full` (défaut) ou `summary`. Voir ci-dessous.
+- **Réponse BDPM** (`detail=full`): Objets `medicament` agrégés par `cis`, avec `presentations` et `compositions` (jusqu’à `SEARCH_HYDRATE_RELATED_LIMIT` entrées par tableau, défaut 50).
 - **Réponse ANMV**: Objets `medicament_veterinaire` agrégés par `num`, avec `presentations` et `compositions`.
-- **Métadonnées** (`search` à la racine) : `query`. Si `source` est fourni ou si le fallback ANMV est utilisé : `source` et `referentiels` (`queried`, `with_results`).
+- **Métadonnées** (`search` à la racine, JSON uniquement) : `query`. Si `source` est fourni ou si le fallback ANMV est utilisé : `source` et `referentiels` (`queried`, `with_results`).
+
+##### `detail=summary` (réponse allégée)
+Remplace `compositions[]` par `substances[]` (dénomination, dosage, nature). Chaque présentation ne conserve que `libelle`, `cip13`, `taux_remboursement`, `etat_commercialisation`, `prix_public` (champs non vides). Maximum **3** présentations par fiche + `presentations_count` si troncature. Champs spécialité retirés : `statut_amm`, `type_amm`, `date_amm`, `statut_bdm`, `num_autorisation_euro`.
+
+Chaque fiche inclut `match_via` (`denomination`, `presentation`, `composition`, `cis` / `num`) pour indiquer l'origine du match.
+
+En `format=markdown`, les substances sont listées séparées par des virgules ; les présentations sont des sous-puces indentées.
+
+##### Usage agent LLM (recommandé)
+```
+GET /api/medicaments/search?q={query}&limit=10&format=markdown&detail=summary&source=auto
+```
+Pour prescription, avis HAS, ruptures ou génériques : noter le `cis` / `num` et appeler `GET /medicaments/specialites/:cis` ou `GET /veterinaires/medicaments/:num`.
 
 ### Médicaments vétérinaires (ANMV)
 

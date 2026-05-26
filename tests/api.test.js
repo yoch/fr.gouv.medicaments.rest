@@ -112,6 +112,74 @@ describe('API Medicaments', () => {
             expect(res.body.search).toEqual({ query: 'paracetamol' });
             expect(res.body.data[0].match_quality).toBeDefined();
         });
+
+        it('detail=summary returns substances and omits full compositions', async () => {
+            const res = await request(app).get(
+                '/api/medicaments/search?q=doliprane&limit=1&detail=summary'
+            );
+            expect(res.statusCode).toEqual(200);
+            const item = res.body.data[0];
+            expect(item.substances).toBeInstanceOf(Array);
+            expect(item.substances.length).toBeGreaterThan(0);
+            expect(item.compositions).toBeUndefined();
+            expect(item.type_amm).toBeUndefined();
+            expect(item.presentations_count).toBeGreaterThan(0);
+            if (item.presentations.length > 0) {
+                expect(item.presentations[0].libelle).toBeDefined();
+                expect(item.presentations[0].cis).toBeUndefined();
+            }
+        });
+
+        it('detail=full preserves compositions (retrocompat)', async () => {
+            const res = await request(app).get(
+                '/api/medicaments/search?q=doliprane&limit=1&detail=full'
+            );
+            expect(res.statusCode).toEqual(200);
+            expect(res.body.data[0].compositions).toBeInstanceOf(Array);
+            expect(res.body.data[0].compositions.length).toBeGreaterThan(0);
+        });
+
+        it('format=markdown returns text/markdown body', async () => {
+            const res = await request(app).get(
+                '/api/medicaments/search?q=doliprane&limit=2&format=markdown&detail=summary'
+            );
+            expect(res.statusCode).toEqual(200);
+            expect(res.headers['content-type']).toMatch(/text\/markdown/);
+            expect(res.text).toContain('# BDPM — recherche « doliprane »');
+            expect(res.text).toContain('CIS');
+            expect(res.text).toContain('Substances:');
+            expect(res.text).toContain('- Présentations (');
+            expect(res.text).toMatch(/\n  - /);
+        });
+
+        it('CIS search exposes match_via', async () => {
+            const res = await request(app).get(
+                '/api/medicaments/search?q=60234100&limit=1&detail=summary'
+            );
+            expect(res.statusCode).toEqual(200);
+            expect(res.body.data[0].match_quality).toBe('exact');
+            expect(res.body.data[0].match_via).toBe('cis');
+        });
+
+        it('prefix brand search exposes match_via denomination', async () => {
+            const res = await request(app).get(
+                '/api/medicaments/search?q=doliprane&limit=1&detail=summary'
+            );
+            expect(res.statusCode).toEqual(200);
+            expect(res.body.data[0].match_quality).toBe('prefix');
+            expect(res.body.data[0].match_via).toBe('denomination');
+        });
+
+        it('exact substance search exposes match_via composition', async () => {
+            const res = await request(app).get(
+                '/api/medicaments/search?q=paracetamol&limit=1&detail=summary'
+            );
+            expect(res.statusCode).toEqual(200);
+            const item = res.body.data[0];
+            expect(item.match_quality).toBe('exact');
+            expect(['denomination', 'composition']).toContain(item.match_via);
+            expect(item.match_via).toBeDefined();
+        });
     });
 
     // Verify other lookups exist

@@ -41,6 +41,7 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 - `GET /api/medicaments/substances` - Substances actives
 - `GET /api/medicaments/search?q=aspirine` - Recherche globale (BDPM, avec fallback ANMV en `source=auto`)
 - `GET /api/medicaments/search?q=sultrian&source=veterinary` - Recherche vétérinaire uniquement
+- `GET /api/medicaments/search?q=doliprane&limit=10&format=markdown&detail=summary` - Format compact pour agents LLM
 
 ### Médicaments vétérinaires (ANMV / Anses)
 - `GET /api/veterinaires/medicaments` - Liste / recherche par nom
@@ -53,6 +54,8 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 - `page` - Numéro de page (défaut: 1)
 - `limit` - Nombre d'éléments par page (défaut: 100, max: 1000)
 - `source` - Sur `/api/medicaments/search` : `auto` (défaut), `human`, `veterinary`, `mixed`
+- `format` - Sur `/api/medicaments/search` : `json` (défaut), `markdown`
+- `detail` - Sur `/api/medicaments/search` : `full` (défaut), `summary`
 
 ## Documentation
 
