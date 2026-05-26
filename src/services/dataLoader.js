@@ -2,6 +2,12 @@ const fs = require('fs');
 const path = require('path');
 const { parse } = require('csv-parse');
 const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
+const {
+  miniSearchOptions,
+  normalizeSearchText,
+  computeMatchPriority,
+  matchQualityFromPriority
+} = require('../utils/searchRanking');
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const BDPM_MEDICAMENT_BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/medicament';
@@ -62,22 +68,6 @@ const RELATED_BY_CIS_MAPS = {
   avis_asmr: 'avisAsmrByCis',
   conditions: 'conditionsByCis'
 };
-
-const miniSearchOptions = {
-  processTerm: (term) => normalizeSearchText(term),
-  searchOptions: {
-    processTerm: (term) => normalizeSearchText(term),
-    prefix: true,
-    fuzzy: (term) => (/^\d+$/.test(term) ? false : 0.2)
-  }
-};
-
-function normalizeSearchText(value) {
-  return String(value ?? '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
-}
 
 function parseFileStreaming(filename, columns) {
   const filepath = path.join(DATA_DIR, filename);
@@ -350,8 +340,6 @@ const PRIMARY_FIELDS = {
   substances: 'denomination'
 };
 
-const MATCH_QUALITY = ['fuzzy', 'prefix', 'exact'];
-
 function search(type, query) {
   if (!query) {
     const rows = dataCache[type] || [];
@@ -363,18 +351,15 @@ function search(type, query) {
   if (!searchIndexes[type]) return [];
 
   const results = searchIndexes[type].search(query);
-  const normalizedQuery = normalizeSearchText(query);
   const primaryField = PRIMARY_FIELDS[type];
 
   const rankedResults = results.map((res) => {
     const item = dataCache[type][res.id];
-    const value = item && item[primaryField] ? normalizeSearchText(item[primaryField]) : '';
-    const normalizedCis = item && item.cis ? normalizeSearchText(item.cis) : '';
-    let priority = 0;
-    if (value === normalizedQuery || normalizedCis === normalizedQuery) priority = 2;
-    else if (value.startsWith(normalizedQuery) || normalizedCis.startsWith(normalizedQuery)) priority = 1;
+    const primaryValue = item && item[primaryField] ? item[primaryField] : '';
+    const idValue = item && item.cis ? item.cis : '';
+    const priority = computeMatchPriority(primaryValue, query, { idValue });
 
-    return { item, score: res.score, priority, match_quality: MATCH_QUALITY[priority] };
+    return { item, score: res.score, priority, match_quality: matchQualityFromPriority(priority) };
   });
 
   rankedResults.sort((a, b) => {

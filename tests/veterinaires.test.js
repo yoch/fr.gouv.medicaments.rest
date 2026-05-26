@@ -90,6 +90,25 @@ describe('API Vétérinaires ANMV', () => {
       expect(res.body.search.referentiels.with_results).toEqual(['anmv']);
     });
 
+    it('source=auto bascule sur ANMV pour SULTRIAN 100 (absent BDPM)', async () => {
+      const res = await request(app).get('/api/medicaments/search?q=SULTRIAN%20100&source=auto&limit=5');
+      expect(res.statusCode).toBe(200);
+      expect(res.body.pagination.total).toBeLessThan(10);
+      expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.body.data[0].type).toBe('medicament_veterinaire');
+      expect(res.body.data[0].nom).toBe('SULTRIAN 100');
+      expect(res.body.data[0].match_quality).toBe('exact');
+      expect(res.body.search.referentiels.with_results).toEqual(['anmv']);
+      expect(res.body.search.referentiels.queried).toEqual(expect.arrayContaining(['bdpm', 'anmv']));
+    });
+
+    it('SULTRIAN 100 ne matche pas les spécialités BDPM (régression OR + 100)', async () => {
+      const res = await request(app).get('/api/medicaments/specialites?q=SULTRIAN%20100&limit=5');
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data).toEqual([]);
+      expect(res.body.pagination.total).toBe(0);
+    });
+
     it('sans source explicite conserve search minimal si BDPM répond', async () => {
       const res = await request(app).get('/api/medicaments/search?q=paracetamol&limit=1');
       expect(res.statusCode).toBe(200);

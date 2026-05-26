@@ -4,6 +4,12 @@ const readline = require('readline');
 const { XMLParser } = require('fast-xml-parser');
 const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
 const {
+  miniSearchOptions,
+  normalizeSearchText,
+  computeMatchPriority,
+  matchQualityFromPriority
+} = require('../utils/searchRanking');
+const {
   VET_DATA_DIR,
   PRODUCTS_XML_NAME,
   DICT_XML_NAME
@@ -48,28 +54,10 @@ let searchIndexes = {
 
 let numIndexes = null;
 
-const miniSearchOptions = {
-  processTerm: (term) => normalizeSearchText(term),
-  searchOptions: {
-    processTerm: (term) => normalizeSearchText(term),
-    prefix: true,
-    fuzzy: (term) => (/^\d+$/.test(term) ? false : 0.2)
-  }
-};
-
 const PRIMARY_FIELDS = {
   medicaments: 'nom',
   compositions: 'substance'
 };
-
-const MATCH_QUALITY = ['fuzzy', 'prefix', 'exact'];
-
-function normalizeSearchText(value) {
-  return String(value)
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
-}
 
 function asArray(value) {
   if (value == null) return [];
@@ -481,23 +469,15 @@ function searchVet(type, query) {
   if (!searchIndexes[type]) return [];
 
   const results = searchIndexes[type].search(query);
-  const normalizedQuery = normalizeSearchText(query);
   const primaryField = PRIMARY_FIELDS[type];
 
   const rankedResults = results.map((res) => {
     const item = vetCache[type][res.id];
-    const value = item && item[primaryField]
-      ? normalizeSearchText(item[primaryField])
-      : '';
-    const normalizedNum = item && item.num ? normalizeSearchText(item.num) : '';
+    const primaryValue = item && item[primaryField] ? item[primaryField] : '';
+    const idValue = item && item.num ? item.num : '';
+    const priority = computeMatchPriority(primaryValue, query, { idValue });
 
-    let priority = 0;
-    if (value === normalizedQuery || normalizedNum === normalizedQuery) priority = 2;
-    else if (value.startsWith(normalizedQuery) || normalizedNum.startsWith(normalizedQuery)) {
-      priority = 1;
-    }
-
-    return { item, score: res.score, priority, match_quality: MATCH_QUALITY[priority] };
+    return { item, score: res.score, priority, match_quality: matchQualityFromPriority(priority) };
   });
 
   rankedResults.sort((a, b) => {

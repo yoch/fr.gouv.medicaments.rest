@@ -62,6 +62,12 @@ describe('API Medicaments', () => {
             expect(res.body.data[0].cis).toBe('60234100');
             expect(res.body.data[0].match_quality).toBe('exact');
         });
+
+        it('should not match human specialites on SULTRIAN 100 alone', async () => {
+            const res = await request(app).get('/api/medicaments/specialites?q=SULTRIAN%20100&limit=5');
+            expect(res.statusCode).toEqual(200);
+            expect(res.body.pagination.total).toBe(0);
+        });
     });
 
     describe('GET /api/medicaments/specialites/:cis', () => {

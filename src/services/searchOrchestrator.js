@@ -10,6 +10,7 @@ const {
   getMedicamentByNum,
   getRelatedByNum
 } = require('./vetDataLoader');
+const { isStrongMatchQuality } = require('../utils/searchRanking');
 
 const MATCH_QUALITY_RANK = { exact: 3, prefix: 2, fuzzy: 1 };
 
@@ -107,7 +108,8 @@ function executeHybridSearch(q, source) {
     }
 
     if (sourceMode === 'auto') {
-      if (bdpmResults.length > 0) {
+      const bdpmStrong = bdpmResults.some((r) => isStrongMatchQuality(r.match_quality));
+      if (bdpmResults.length > 0 && bdpmStrong) {
         return {
           results: bdpmResults,
           search: buildSearchMeta({
