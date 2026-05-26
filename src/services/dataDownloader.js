@@ -27,19 +27,28 @@ const HTTP_HEADERS = {
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 };
 
-const FILES = [
+const LOAD_HAS_AVIS = process.env.LOAD_HAS_AVIS !== 'false';
+
+const BDPM_FILES = [
   'CIS_bdpm.txt',
   'CIS_CIP_bdpm.txt',
   'CIS_COMPO_bdpm.txt',
-  'CIS_HAS_SMR_bdpm.txt',
-  'CIS_HAS_ASMR_bdpm.txt',
-  // https://base-donnees-publique.medicaments.gouv.fr/download/file/HAS_LiensPageCT_bdpm.txt
   'CIS_GENER_bdpm.txt',
   'CIS_CPD_bdpm.txt',
   'CIS_CIP_Dispo_Spec.txt',
-  'CIS_MITM.txt',
+  'CIS_MITM.txt'
   // 'CIS_InfoImportantes.txt'
 ];
+
+const HAS_FILES = [
+  'CIS_HAS_SMR_bdpm.txt',
+  'CIS_HAS_ASMR_bdpm.txt'
+  // https://base-donnees-publique.medicaments.gouv.fr/download/file/HAS_LiensPageCT_bdpm.txt
+];
+
+function bdpmFilesToSync() {
+  return LOAD_HAS_AVIS ? [...BDPM_FILES, ...HAS_FILES] : BDPM_FILES;
+}
 
 async function loadMetadata() {
   try {
@@ -150,8 +159,7 @@ async function downloadDataIfNeeded() {
   let metadata = await loadMetadata();
   let changed = false;
 
-  // Download static files
-  for (const filename of FILES) {
+  for (const filename of bdpmFilesToSync()) {
     const finalPath = path.join(DATA_DIR, filename);
     const tempPath = path.join(os.tmpdir(), filename);
     const url = `${BASE_URL}/file/${filename}`;

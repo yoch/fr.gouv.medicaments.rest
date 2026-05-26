@@ -4,7 +4,8 @@ const readline = require('readline');
 const { XMLParser } = require('fast-xml-parser');
 const {
   createFrozenIndexBuilder,
-  freezeFrozenIndexBuilder
+  freezeFrozenIndexBuilder,
+  buildFrozenIndexFromRows
 } = require('../utils/frozenMiniSearch');
 const {
   miniSearchOptions,
@@ -441,9 +442,6 @@ async function loadVetData() {
   const medicamentsBuilder = createFrozenIndexBuilder(
     vetIndexConfig(medicamentFields, { nom: 3, num: 2 })
   );
-  const compositionsBuilder = createFrozenIndexBuilder(
-    vetIndexConfig(compositionFields, { substance: 3, num: 1 })
-  );
 
   await streamMedicinalProducts(productsPath, async (blockXml) => {
     const product = parseProductBlock(blockXml, dict);
@@ -455,9 +453,7 @@ async function loadVetData() {
     medicamentsBuilder.add(buildVetIndexDocument(medicament, medRowIndex, medicamentFields));
 
     for (const line of parseCompositionLines(product, dict)) {
-      const compRowIndex = vetCache.compositions.length;
       vetCache.compositions.push(line);
-      compositionsBuilder.add(buildVetIndexDocument(line, compRowIndex, compositionFields));
     }
 
     for (const presentation of parsePresentations(product, dict)) {
@@ -471,7 +467,12 @@ async function loadVetData() {
   });
 
   searchIndexes.medicaments = freezeFrozenIndexBuilder(medicamentsBuilder);
-  searchIndexes.compositions = freezeFrozenIndexBuilder(compositionsBuilder);
+  const compositionOptions = vetIndexConfig(compositionFields, { substance: 3, num: 1 });
+  searchIndexes.compositions = buildFrozenIndexFromRows(
+    vetCache.compositions,
+    (item, rowIndex) => buildVetIndexDocument(item, rowIndex, compositionFields),
+    compositionOptions
+  );
   buildNumIndexes();
   console.log(`Données vétérinaires chargées: ${vetCache.medicaments.length} médicaments`);
 }

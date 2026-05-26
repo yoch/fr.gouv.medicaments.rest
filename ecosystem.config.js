@@ -10,7 +10,7 @@ module.exports = {
         NODE_ENV: 'production',
         RELOAD_STRATEGY: 'restart',
         VET_LOAD_DEFERRED: 'true',
-        VET_LOAD_DELAY_MS: '1000'
+        VET_LOAD_DELAY_MS: '10000'
       }
     }
   ]
