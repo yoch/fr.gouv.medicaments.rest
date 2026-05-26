@@ -10,7 +10,7 @@ module.exports = {
         RELOAD_STRATEGY: 'restart'
       },
       env_production: {
-        NODE_OPTIONS: '--max-old-space-size=384'
+        NODE_OPTIONS: '--max-old-space-size=512'
       }
     }
   ]
