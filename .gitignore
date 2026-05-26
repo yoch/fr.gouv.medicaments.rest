@@ -124,3 +124,7 @@ fic_cis_cip/
 data/veterinaires/*.xml
 data/veterinaires/*.7z
 data/veterinaires/meta.json
+
+# Données BDPM locales (volumineuses)
+data/*.txt
+data/meta.json
