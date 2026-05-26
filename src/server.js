@@ -129,7 +129,15 @@ function healthHandler(req, res) {
 app.get('/health', healthHandler);
 app.get('/api/health', healthHandler);
 
-const REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
+const {
+  CHECK_INTERVAL_HOURS: BDPM_CHECK_INTERVAL_HOURS
+} = require('./services/dataDownloader');
+const {
+  CHECK_INTERVAL_HOURS: VET_CHECK_INTERVAL_HOURS
+} = require('./services/vetDataDownloader');
+
+const BDPM_REFRESH_MS = BDPM_CHECK_INTERVAL_HOURS * 60 * 60 * 1000;
+const VET_REFRESH_MS = VET_CHECK_INTERVAL_HOURS * 60 * 60 * 1000;
 const RELOAD_STRATEGY = String(process.env.RELOAD_STRATEGY || 'in-process').toLowerCase();
 
 function shouldRestartOnDataChange() {
@@ -174,24 +182,33 @@ async function startServer() {
             `Mémoire après chargement: rss=${bootMemory.rss_mb} Mo, heap=${bootMemory.heap_used_mb} Mo`
         );
 
-        // Schedule periodic updates
-        setInterval(async () => {
-            console.log('🔄 Rafraîchissement périodique des données...');
+        async function refreshBdpm() {
+            console.log(`🔄 Rafraîchissement BDPM (intervalle ${BDPM_CHECK_INTERVAL_HOURS}h)...`);
             try {
                 const { changed: bdpmChanged } = await downloadDataIfNeeded();
                 if (bdpmChanged) await reloadBdpmAfterChange();
             } catch (err) {
                 console.error('❌ Erreur rafraîchissement BDPM:', err.message);
             }
+        }
+
+        async function refreshVet() {
+            console.log(`🔄 Rafraîchissement vétérinaire (intervalle ${VET_CHECK_INTERVAL_HOURS}h)...`);
             try {
                 const { changed: vetChanged } = await downloadVetDataIfNeeded();
                 if (vetChanged) await reloadVetAfterChange();
             } catch (err) {
                 console.warn('⚠ Erreur rafraîchissement vétérinaire:', err.message);
             }
-        }, REFRESH_INTERVAL);
+        }
+
+        setInterval(refreshBdpm, BDPM_REFRESH_MS);
+        setInterval(refreshVet, VET_REFRESH_MS);
 
         app.listen(PORT, () => {
+            console.log(
+                `Planificateur: BDPM toutes les ${BDPM_CHECK_INTERVAL_HOURS}h, vétérinaire toutes les ${VET_CHECK_INTERVAL_HOURS}h`
+            );
             console.log(`Serveur démarré sur le port ${PORT}`);
             console.log(`Health check: http://localhost:${PORT}/health`);
             console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);

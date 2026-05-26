@@ -7,11 +7,25 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 
 const execAsync = promisify(exec);
+const {
+  parseIntervalHours,
+  shouldRecheckFile,
+  fetchRemoteFingerprint,
+  remoteFingerprintUnchanged
+} = require('../utils/remoteFileProbe');
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const META_FILE = path.join(DATA_DIR, 'meta.json');
 const BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/download';
-const CHECK_INTERVAL_HOURS = 24;
+const CHECK_INTERVAL_HOURS = parseIntervalHours(
+  process.env.BDPM_CHECK_INTERVAL_HOURS,
+  72
+);
+
+const HTTP_HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+};
 
 const FILES = [
   'CIS_bdpm.txt',
@@ -110,9 +124,7 @@ async function downloadFile(url, filepath) {
       method: 'GET',
       url: url,
       responseType: 'stream',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      },
+      headers: HTTP_HEADERS,
       timeout: 30000
     });
 
@@ -133,24 +145,6 @@ async function downloadFile(url, filepath) {
   }
 }
 
-function shouldCheckFile(filename, metadata) {
-  const meta = metadata[filename];
-  if (!meta) return true;
-
-  // Si on a une date de vérification récente (< 24h), on ne retélécharge pas
-  const lastCheck = meta.checkedAt || meta.downloadedAt;
-  if (lastCheck) {
-    const checkDate = new Date(lastCheck);
-    const now = new Date();
-    const diffHours = (now - checkDate) / (1000 * 60 * 60);
-
-    if (diffHours < CHECK_INTERVAL_HOURS) {
-      return false;
-    }
-  }
-  return true;
-}
-
 async function downloadDataIfNeeded() {
   await fs.ensureDir(DATA_DIR);
   let metadata = await loadMetadata();
@@ -163,14 +157,15 @@ async function downloadDataIfNeeded() {
     const url = `${BASE_URL}/file/${filename}`;
     // Réactivation CIS_InfoImportantes.txt : `${BASE_URL}/${filename}` (sans /file/)
 
-    // Vérification de la fraîcheur (24h)
-    if (!shouldCheckFile(filename, metadata) && fs.existsSync(finalPath)) {
+    const fileMeta = metadata[filename];
+
+    if (!shouldRecheckFile(fileMeta, CHECK_INTERVAL_HOURS) && fs.existsSync(finalPath)) {
       console.log(`✓ ${filename} vérifié récemment (< ${CHECK_INTERVAL_HOURS}h)`);
       continue;
     }
 
     try {
-      const existingHash = metadata[filename]?.hash;
+      const existingHash = fileMeta?.hash;
 
       if (existingHash && fs.existsSync(finalPath)) {
         const localHash = await hashFile(finalPath);
@@ -182,13 +177,42 @@ async function downloadDataIfNeeded() {
         }
       }
 
+      let remoteFingerprint = null;
+      try {
+        remoteFingerprint = await fetchRemoteFingerprint(url, {
+          timeout: 30000,
+          userAgent: HTTP_HEADERS['User-Agent']
+        });
+        if (
+          remoteFingerprintUnchanged(fileMeta?.remote, remoteFingerprint) &&
+          existingHash &&
+          fs.existsSync(finalPath)
+        ) {
+          metadata[filename] = {
+            ...metadata[filename],
+            checkedAt: new Date().toISOString(),
+            remote: remoteFingerprint
+          };
+          await saveMetadata(metadata);
+          console.log(`✓ ${filename} inchangé (sonde distante, pas de téléchargement)`);
+          continue;
+        }
+      } catch (probeError) {
+        console.warn(
+          `⚠ Sonde distante ${filename}: ${probeError.message} — téléchargement complet`
+        );
+      }
+
       const fileHash = await downloadFile(url, tempPath);
 
       if (existingHash && fileHash === existingHash && fs.existsSync(finalPath)) {
         console.log(`✓ ${filename} inchangé (hash identique)`);
         // On met juste à jour la date de vérification
-        metadata[filename].checkedAt = new Date().toISOString();
-        // On supprime le fichier temporaire
+        metadata[filename] = {
+          ...metadata[filename],
+          checkedAt: new Date().toISOString(),
+          remote: remoteFingerprint ?? metadata[filename]?.remote
+        };
         await fs.remove(tempPath);
         await saveMetadata(metadata);
       } else {
@@ -211,7 +235,8 @@ async function downloadDataIfNeeded() {
           checkedAt: new Date().toISOString(),
           hash: fileHash,
           source: 'remote',
-          encoding: 'utf-8'
+          encoding: 'utf-8',
+          remote: remoteFingerprint ?? metadata[filename]?.remote ?? null
         };
         await saveMetadata(metadata);
         changed = true;
@@ -233,4 +258,4 @@ async function downloadDataIfNeeded() {
   return { changed };
 }
 
-module.exports = { downloadDataIfNeeded };
+module.exports = { downloadDataIfNeeded, CHECK_INTERVAL_HOURS };

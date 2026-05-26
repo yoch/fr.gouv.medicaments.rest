@@ -6,12 +6,21 @@ const os = require('os');
 const { execFile } = require('child_process');
 const { promisify } = require('util');
 const sevenBin = require('7zip-bin');
+const {
+  parseIntervalHours,
+  shouldRecheckFile,
+  fetchRemoteFingerprint,
+  remoteFingerprintUnchanged
+} = require('../utils/remoteFileProbe');
 
 const execFileAsync = promisify(execFile);
 
 const VET_DATA_DIR = path.join(__dirname, '../../data/veterinaires');
 const META_FILE = path.join(VET_DATA_DIR, 'meta.json');
-const CHECK_INTERVAL_HOURS = 24;
+const CHECK_INTERVAL_HOURS = parseIntervalHours(
+  process.env.VET_CHECK_INTERVAL_HOURS,
+  72
+);
 
 const ARCHIVE_URL = 'https://pro.anses.fr/RCP/amm-vet-fr-v2-v.7z';
 const DICT_URL = 'https://pro.anses.fr/RCP/amm-vet-fr-v2-d.xml';
@@ -19,6 +28,10 @@ const DICT_URL = 'https://pro.anses.fr/RCP/amm-vet-fr-v2-d.xml';
 const ARCHIVE_NAME = 'amm-vet-fr-v2-v.7z';
 const PRODUCTS_XML_NAME = 'amm-vet-fr-v2-v.xml';
 const DICT_XML_NAME = 'amm-vet-fr-v2-d.xml';
+
+const HTTP_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (compatible; fr.gouv.medicaments.rest/1.0)'
+};
 
 async function ensure7zipExecutable() {
   const bin = sevenBin.path7za;
@@ -62,9 +75,7 @@ async function downloadFile(url, filepath) {
     method: 'GET',
     url,
     responseType: 'stream',
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (compatible; fr.gouv.medicaments.rest/1.0)'
-    },
+    headers: HTTP_HEADERS,
     timeout: 120000
   });
 
@@ -80,56 +91,75 @@ async function downloadFile(url, filepath) {
   return hashFile(filepath);
 }
 
-function shouldCheckFile(filename, metadata) {
-  const meta = metadata[filename];
-  if (!meta) return true;
-
-  const lastCheck = meta.checkedAt || meta.downloadedAt;
-  if (!lastCheck) return true;
-
-  const diffHours = (Date.now() - new Date(lastCheck).getTime()) / (1000 * 60 * 60);
-  return diffHours >= CHECK_INTERVAL_HOURS;
-}
-
 async function extractArchive(archivePath, destDir) {
   const bin = await ensure7zipExecutable();
   await fs.ensureDir(destDir);
   await execFileAsync(bin, ['x', '-y', `-o${destDir}`, archivePath]);
 }
 
+function touchChecked(metadata, filename, extra = {}) {
+  metadata[filename] = {
+    ...metadata[filename],
+    checkedAt: new Date().toISOString(),
+    ...extra
+  };
+}
+
 async function processRemoteFile({ filename, url, metadata, extract = false }) {
   const finalPath = path.join(VET_DATA_DIR, filename);
   const tempPath = path.join(os.tmpdir(), `vet-${filename}`);
-  let changed = false;
+  const fileMeta = metadata[filename] ?? {};
 
-  if (!shouldCheckFile(filename, metadata) && fs.existsSync(finalPath)) {
-    console.log(`✓ ${filename} (vétérinaire) vérifié récemment (< ${CHECK_INTERVAL_HOURS}h)`);
+  if (!shouldRecheckFile(fileMeta, CHECK_INTERVAL_HOURS) && fs.existsSync(finalPath)) {
+    console.log(
+      `✓ ${filename} (vétérinaire) vérifié récemment (< ${CHECK_INTERVAL_HOURS}h)`
+    );
     return { changed: false };
   }
 
   try {
-    const existingHash = metadata[filename]?.hash;
+    const existingHash = fileMeta.hash;
     if (existingHash && fs.existsSync(finalPath)) {
       const localHash = await hashFile(finalPath);
       if (localHash === existingHash) {
-        metadata[filename] = {
-          ...metadata[filename],
-          checkedAt: new Date().toISOString()
-        };
+        touchChecked(metadata, filename);
         await saveMetadata(metadata);
         console.log(`✓ ${filename} (vétérinaire) inchangé (hash local identique)`);
         return { changed: false };
       }
     }
 
+    let remoteFingerprint = null;
+    try {
+      remoteFingerprint = await fetchRemoteFingerprint(url, {
+        timeout: 60000,
+        userAgent: HTTP_HEADERS['User-Agent']
+      });
+      if (
+        remoteFingerprintUnchanged(fileMeta.remote, remoteFingerprint) &&
+        existingHash &&
+        fs.existsSync(finalPath)
+      ) {
+        touchChecked(metadata, filename, { remote: remoteFingerprint });
+        await saveMetadata(metadata);
+        console.log(
+          `✓ ${filename} (vétérinaire) inchangé (sonde distante, pas de téléchargement)`
+        );
+        return { changed: false };
+      }
+    } catch (probeError) {
+      console.warn(
+        `⚠ Sonde distante ${filename} (vétérinaire): ${probeError.message} — téléchargement complet`
+      );
+    }
+
     const fileHash = await downloadFile(url, tempPath);
 
     if (existingHash && fileHash === existingHash && fs.existsSync(finalPath)) {
       await fs.remove(tempPath);
-      metadata[filename] = {
-        ...metadata[filename],
-        checkedAt: new Date().toISOString()
-      };
+      touchChecked(metadata, filename, {
+        remote: remoteFingerprint ?? fileMeta.remote
+      });
       await saveMetadata(metadata);
       console.log(`✓ ${filename} (vétérinaire) inchangé (hash distant identique)`);
       return { changed: false };
@@ -140,10 +170,10 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
       downloadedAt: new Date().toISOString(),
       checkedAt: new Date().toISOString(),
       hash: fileHash,
-      source: 'remote'
+      source: 'remote',
+      remote: remoteFingerprint ?? fileMeta.remote ?? null
     };
     await saveMetadata(metadata);
-    changed = true;
     console.log(`✓ ${filename} (vétérinaire) mis à jour`);
 
     if (extract) {
@@ -151,7 +181,7 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
       console.log(`✓ Archive vétérinaire extraite dans ${VET_DATA_DIR}`);
     }
 
-    return { changed };
+    return { changed: true };
   } catch (error) {
     console.error(`✗ Échec traitement ${filename} (vétérinaire):`, error.message);
     await fs.remove(tempPath).catch(() => {});
@@ -179,7 +209,6 @@ async function downloadVetDataIfNeeded() {
   changed = changed || archiveResult.changed;
   metadata = await loadMetadata();
 
-  metadata = await loadMetadata();
   const dictResult = await processRemoteFile({
     filename: DICT_XML_NAME,
     url: DICT_URL,
@@ -202,5 +231,6 @@ module.exports = {
   downloadVetDataIfNeeded,
   VET_DATA_DIR,
   PRODUCTS_XML_NAME,
-  DICT_XML_NAME
+  DICT_XML_NAME,
+  CHECK_INTERVAL_HOURS
 };
