@@ -2,23 +2,34 @@ const fs = require('fs');
 const path = require('path');
 const { parse } = require('csv-parse');
 const { buildFrozenIndexFromAsyncIterable, buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
-const {
-  miniSearchOptions,
-  normalizeSearchText,
-  computeMatchPriority,
-  matchQualityFromPriority
-} = require('../utils/searchRanking');
+const { miniSearchOptions } = require('../utils/searchRanking');
 const { loadMemoryMark } = require('../utils/memorySampler');
+const { BDPM_SCHEMAS } = require('../utils/corpusSchemas');
+const { rankAndMaterializeSearch } = require('../utils/corpusSearch');
+const {
+  createStore,
+  clearStore,
+  rowCount,
+  keyIndex,
+  indexFieldIndices,
+  pushFromRecord,
+  getRowValue,
+  toObject,
+  toObjects,
+  materializeRowRange,
+  buildIndexDocumentFromRow,
+  buildKeyIndex
+} = require('../utils/rowStore');
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const BDPM_MEDICAMENT_BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/medicament';
+const MAX_LIST_LIMIT = 1000;
 
 const HYDRATE_RELATED_LIMIT = Math.max(
   1,
   parseInt(process.env.SEARCH_HYDRATE_RELATED_LIMIT || '50', 10)
 );
 
-/** Fiche détail : 0 = pas de troncature (SEARCH_HYDRATE_RELATED_LIMIT reste pour /search). */
 const DETAIL_HYDRATE_RELATED_LIMIT = Math.max(
   0,
   parseInt(process.env.DETAIL_HYDRATE_RELATED_LIMIT || '0', 10)
@@ -26,25 +37,14 @@ const DETAIL_HYDRATE_RELATED_LIMIT = Math.max(
 
 const LOAD_HAS_AVIS = process.env.LOAD_HAS_AVIS !== 'false';
 
-function bdpmExtraitUrl(cis) {
-  return `${BDPM_MEDICAMENT_BASE_URL}/${cis}/extrait`;
+const corpusStores = {};
+for (const type of Object.keys(BDPM_SCHEMAS)) {
+  corpusStores[type] = createStore(BDPM_SCHEMAS[type]);
 }
 
-let dataCache = {
-  specialites: [],
-  presentations: [],
-  compositions: [],
-  avis_smr: [],
-  avis_asmr: [],
-  generiques: [],
-  conditions: [],
-  ruptures: [],
-  substances: [],
-  mitm: [],
-  metadata: {
-    last_updated: null,
-    source: 'base de données publique des médicaments - gouv.fr'
-  }
+const metadata = {
+  last_updated: null,
+  source: 'base de données publique des médicaments - gouv.fr'
 };
 
 let searchIndexes = {
@@ -70,303 +70,6 @@ const RELATED_BY_CIS_MAPS = {
   conditions: 'conditionsByCis'
 };
 
-function csvParserOptions(columns) {
-  return {
-    delimiter: '\t',
-    columns,
-    skip_empty_lines: true,
-    trim: true,
-    quote: false,
-    escape: false,
-    relax_quotes: true,
-    relax_column_count: true
-  };
-}
-
-function buildIndexDocument(item, rowIndex, fields) {
-  const doc = { id: rowIndex };
-  for (const field of fields) {
-    const value = item[field];
-    if (value != null && value !== '') {
-      doc[field] = value;
-    }
-  }
-  return doc;
-}
-
-function indexConfigFor(fields, boost = null) {
-  const indexConfig = {
-    fields,
-    storeFields: ['id'],
-    ...miniSearchOptions
-  };
-  if (boost) indexConfig.boost = boost;
-  return indexConfig;
-}
-
-/**
- * Une passe fichier : stream CSV → dataCache[type] + index frozen (fromAsyncIterable).
- */
-async function loadParseAndIndex(type, filename, columns, fields, boost = null) {
-  const filepath = path.join(DATA_DIR, filename);
-  console.log(`Chargement et indexation de ${type}...`);
-
-  dataCache[type] = [];
-  const options = indexConfigFor(fields, boost);
-
-  if (!fs.existsSync(filepath)) {
-    console.warn(`Fichier ${filename} non trouvé`);
-    searchIndexes[type] = null;
-    return;
-  }
-
-  async function* documents() {
-    const parser = fs
-      .createReadStream(filepath, { encoding: 'utf8' })
-      .pipe(parse(csvParserOptions(columns)));
-
-    let rowIndex = 0;
-    for await (const record of parser) {
-      dataCache[type].push(record);
-      yield buildIndexDocument(record, rowIndex, fields);
-      rowIndex++;
-    }
-  }
-
-  searchIndexes[type] = await buildFrozenIndexFromAsyncIterable(documents(), options);
-}
-
-async function indexInMemoryRows(type, rows, fields, boost = null) {
-  console.log(`Indexation de ${type}...`);
-  const options = indexConfigFor(fields, boost);
-  searchIndexes[type] = buildFrozenIndexFromRows(
-    rows,
-    (item, rowIndex) => buildIndexDocument(item, rowIndex, fields),
-    options
-  );
-}
-
-function appendToCisList(map, cis, item) {
-  if (!cis) return;
-  if (!map.has(cis)) map.set(cis, []);
-  map.get(cis).push(item);
-}
-
-function buildCisIndexes() {
-  const specialitesByCis = new Map();
-  for (const item of dataCache.specialites) {
-    if (item.cis) specialitesByCis.set(item.cis, item);
-  }
-
-  const presentationsByCis = new Map();
-  for (const item of dataCache.presentations) {
-    appendToCisList(presentationsByCis, item.cis, item);
-  }
-
-  const compositionsByCis = new Map();
-  for (const item of dataCache.compositions) {
-    appendToCisList(compositionsByCis, item.cis, item);
-  }
-
-  const avisSmrByCis = new Map();
-  for (const item of dataCache.avis_smr) {
-    appendToCisList(avisSmrByCis, item.cis, item);
-  }
-
-  const avisAsmrByCis = new Map();
-  for (const item of dataCache.avis_asmr) {
-    appendToCisList(avisAsmrByCis, item.cis, item);
-  }
-
-  const conditionsByCis = new Map();
-  for (const item of dataCache.conditions) {
-    appendToCisList(conditionsByCis, item.cis, item);
-  }
-
-  const generiquesByCis = new Map();
-  const generiquesByGroupe = new Map();
-  for (const item of dataCache.generiques) {
-    appendToCisList(generiquesByCis, item.cis, item);
-    appendToCisList(generiquesByGroupe, item.id_groupe, item);
-  }
-
-  cisIndexes = {
-    specialitesByCis,
-    presentationsByCis,
-    compositionsByCis,
-    avisSmrByCis,
-    avisAsmrByCis,
-    conditionsByCis,
-    generiquesByCis,
-    generiquesByGroupe
-  };
-}
-
-function clearLoadedData() {
-  for (const key of Object.keys(searchIndexes)) {
-    searchIndexes[key] = null;
-  }
-  for (const key of Object.keys(dataCache)) {
-    if (key === 'metadata') continue;
-    dataCache[key] = [];
-  }
-  cisIndexes = null;
-}
-
-async function loadData() {
-  const mainFilePath = path.join(DATA_DIR, 'CIS_bdpm.txt');
-  try {
-    const stats = fs.statSync(mainFilePath);
-    dataCache.metadata.last_updated = stats.mtime.toISOString();
-  } catch {
-    dataCache.metadata.last_updated = new Date().toISOString();
-  }
-
-  console.log('Chargement des données...');
-  clearLoadedData();
-  loadMemoryMark('bdpm_start');
-
-  await loadParseAndIndex(
-    'specialites',
-    'CIS_bdpm.txt',
-    [
-      'cis', 'denomination', 'forme_pharma', 'voies_admin', 'statut_amm',
-      'type_amm', 'commercialisation', 'date_amm', 'statut_bdm',
-      'num_autorisation_euro', 'titulaire', 'surveillance_renforcee'
-    ],
-    ['cis', 'denomination', 'forme_pharma', 'titulaire'],
-    { denomination: 3, cis: 2, forme_pharma: 0.5, titulaire: 1 }
-  );
-
-  await loadParseAndIndex(
-    'presentations',
-    'CIS_CIP_bdpm.txt',
-    [
-      'cis', 'cip7', 'libelle', 'statut_admin', 'etat_commercialisation',
-      'date_declaration', 'cip13', 'agrement_collectivite', 'taux_remboursement',
-      'prix_medicament', 'prix_public', 'honoraires', 'indications'
-    ],
-    ['cis', 'cip7', 'cip13', 'libelle', 'indications'],
-    { libelle: 3, indications: 2, cis: 2, cip7: 1.5, cip13: 1.5 }
-  );
-
-  await loadParseAndIndex(
-    'compositions',
-    'CIS_COMPO_bdpm.txt',
-    [
-      'cis', 'designation_element', 'code_substance', 'denomination_substance',
-      'dosage', 'reference_dosage', 'nature_composant', 'numero_ordre'
-    ],
-    ['cis', 'denomination_substance', 'dosage'],
-    { denomination_substance: 3, cis: 2, dosage: 1 }
-  );
-
-  if (LOAD_HAS_AVIS) {
-    await loadParseAndIndex(
-      'avis_smr',
-      'CIS_HAS_SMR_bdpm.txt',
-      ['cis', 'has_dossier', 'motif_evaluation', 'date_avis', 'valeur_smr', 'libelle_smr'],
-      ['libelle_smr', 'valeur_smr']
-    );
-    await loadParseAndIndex(
-      'avis_asmr',
-      'CIS_HAS_ASMR_bdpm.txt',
-      ['cis', 'has_dossier', 'motif_evaluation', 'date_avis', 'valeur_asmr', 'libelle_asmr'],
-      ['libelle_asmr', 'valeur_asmr']
-    );
-  } else {
-    dataCache.avis_smr = [];
-    dataCache.avis_asmr = [];
-    searchIndexes.avis_smr = null;
-    searchIndexes.avis_asmr = null;
-  }
-
-  await loadParseAndIndex(
-    'generiques',
-    'CIS_GENER_bdpm.txt',
-    ['id_groupe', 'libelle_groupe', 'cis', 'type_generique', 'numero_ordre'],
-    ['libelle_groupe']
-  );
-
-  await loadParseAndIndex(
-    'conditions',
-    'CIS_CPD_bdpm.txt',
-    ['cis', 'condition'],
-    ['condition']
-  );
-
-  await loadParseAndIndex(
-    'ruptures',
-    'CIS_CIP_Dispo_Spec.txt',
-    [
-      'cis', 'cip13', 'code_statut', 'libelle_statut', 'date_debut',
-      'date_mise_a_jour', 'date_remise_dispo', 'lien_ansm'
-    ],
-    ['libelle_statut']
-  );
-
-  await loadParseAndIndex(
-    'mitm',
-    'CIS_MITM.txt',
-    ['cis', 'code_atc', 'denomination', 'lien_fi'],
-    ['cis', 'code_atc', 'denomination'],
-    { denomination: 3, code_atc: 2, cis: 2 }
-  );
-
-  const substancesMap = new Map();
-  for (const comp of dataCache.compositions) {
-    if (comp.code_substance && comp.denomination_substance) {
-      if (!substancesMap.has(comp.code_substance)) {
-        substancesMap.set(comp.code_substance, {
-          code: comp.code_substance,
-          denomination: comp.denomination_substance,
-          medicaments_count: 0
-        });
-      }
-      substancesMap.get(comp.code_substance).medicaments_count++;
-    }
-  }
-  dataCache.substances = Array.from(substancesMap.values());
-  await indexInMemoryRows('substances', dataCache.substances, ['denomination']);
-
-  buildCisIndexes();
-  loadMemoryMark('bdpm_done', { specialites: dataCache.specialites.length });
-  console.log(`Données chargées et indexées: ${dataCache.specialites.length} spécialités`);
-}
-
-function enrichSpecialite(item) {
-  if (!item) return item;
-  return { ...item, url_bdpm: bdpmExtraitUrl(item.cis) };
-}
-
-function getSpecialiteByCis(cis) {
-  if (!cisIndexes) return undefined;
-  const row = cisIndexes.specialitesByCis.get(cis);
-  return row ? enrichSpecialite(row) : undefined;
-}
-
-function getRelatedByCis(type, cis, limit = HYDRATE_RELATED_LIMIT) {
-  if (!cisIndexes || !cis) return [];
-  const mapKey = RELATED_BY_CIS_MAPS[type];
-  if (!mapKey) return [];
-  const rows = cisIndexes[mapKey].get(cis) || [];
-  return limit > 0 ? rows.slice(0, limit) : rows;
-}
-
-function getGeneriquesForCis(cis) {
-  if (!cisIndexes || !cis) return null;
-  const drugGeneriques = cisIndexes.generiquesByCis.get(cis);
-  if (!drugGeneriques || drugGeneriques.length === 0) return null;
-
-  const id_groupe = drugGeneriques[0].id_groupe;
-  const items = cisIndexes.generiquesByGroupe.get(id_groupe) || [];
-  return {
-    id_groupe,
-    libelle_groupe: drugGeneriques[0].libelle_groupe,
-    items
-  };
-}
-
 const PRIMARY_FIELDS = {
   specialites: 'denomination',
   presentations: 'libelle',
@@ -380,55 +83,307 @@ const PRIMARY_FIELDS = {
   substances: 'denomination'
 };
 
-function search(type, query) {
-  if (!query) {
-    const rows = dataCache[type] || [];
-    if (type === 'specialites') {
-      return rows.map((row) => enrichSpecialite(row));
-    }
-    return rows;
+const primaryFieldIdx = {};
+const cisFieldIdx = {};
+for (const type of Object.keys(BDPM_SCHEMAS)) {
+  primaryFieldIdx[type] = keyIndex(corpusStores[type], PRIMARY_FIELDS[type]);
+  const cisIdx = keyIndex(corpusStores[type], 'cis');
+  cisFieldIdx[type] = cisIdx >= 0 ? cisIdx : -1;
+}
+
+function bdpmExtraitUrl(cis) {
+  return `${BDPM_MEDICAMENT_BASE_URL}/${cis}/extrait`;
+}
+
+function csvParserOptions(columns) {
+  return {
+    delimiter: '\t',
+    columns,
+    skip_empty_lines: true,
+    trim: true,
+    quote: false,
+    escape: false,
+    relax_quotes: true,
+    relax_column_count: true
+  };
+}
+
+function indexConfigFor(fields, boost = null) {
+  const indexConfig = {
+    fields,
+    storeFields: ['id'],
+    ...miniSearchOptions
+  };
+  if (boost) indexConfig.boost = boost;
+  return indexConfig;
+}
+
+async function loadParseAndIndex(type, filename, fields, boost = null) {
+  const filepath = path.join(DATA_DIR, filename);
+  console.log(`Chargement et indexation de ${type}...`);
+
+  const store = corpusStores[type];
+  clearStore(store);
+  const fieldIndices = indexFieldIndices(store, fields);
+  const options = indexConfigFor(fields, boost);
+
+  if (!fs.existsSync(filepath)) {
+    console.warn(`Fichier ${filename} non trouvé`);
+    searchIndexes[type] = null;
+    return;
   }
+
+  async function* documents() {
+    const parser = fs
+      .createReadStream(filepath, { encoding: 'utf8' })
+      .pipe(parse(csvParserOptions(store.keys)));
+
+    let rowIndex = 0;
+    for await (const record of parser) {
+      pushFromRecord(store, record);
+      yield buildIndexDocumentFromRow(store, rowIndex, fieldIndices);
+      rowIndex++;
+    }
+  }
+
+  searchIndexes[type] = await buildFrozenIndexFromAsyncIterable(documents(), options);
+}
+
+async function indexInMemoryStore(type, fields, boost = null) {
+  console.log(`Indexation de ${type}...`);
+  const store = corpusStores[type];
+  const fieldIndices = indexFieldIndices(store, fields);
+  const options = indexConfigFor(fields, boost);
+  searchIndexes[type] = buildFrozenIndexFromRows(
+    store.rows,
+    (_row, rowIndex) => buildIndexDocumentFromRow(store, rowIndex, fieldIndices),
+    options
+  );
+}
+
+function buildCisIndexes() {
+  cisIndexes = {
+    specialitesByCis: buildKeyIndex(corpusStores.specialites, 'cis', { unique: true }),
+    presentationsByCis: buildKeyIndex(corpusStores.presentations, 'cis'),
+    compositionsByCis: buildKeyIndex(corpusStores.compositions, 'cis'),
+    avisSmrByCis: buildKeyIndex(corpusStores.avis_smr, 'cis'),
+    avisAsmrByCis: buildKeyIndex(corpusStores.avis_asmr, 'cis'),
+    conditionsByCis: buildKeyIndex(corpusStores.conditions, 'cis'),
+    generiquesByCis: buildKeyIndex(corpusStores.generiques, 'cis'),
+    generiquesByGroupe: buildKeyIndex(corpusStores.generiques, 'id_groupe')
+  };
+}
+
+function clearLoadedData() {
+  for (const key of Object.keys(searchIndexes)) {
+    searchIndexes[key] = null;
+  }
+  for (const type of Object.keys(corpusStores)) {
+    clearStore(corpusStores[type]);
+  }
+  cisIndexes = null;
+}
+
+async function loadData() {
+  const mainFilePath = path.join(DATA_DIR, 'CIS_bdpm.txt');
+  try {
+    const stats = fs.statSync(mainFilePath);
+    metadata.last_updated = stats.mtime.toISOString();
+  } catch {
+    metadata.last_updated = new Date().toISOString();
+  }
+
+  console.log('Chargement des données...');
+  clearLoadedData();
+  loadMemoryMark('bdpm_start');
+
+  await loadParseAndIndex(
+    'specialites',
+    'CIS_bdpm.txt',
+    ['cis', 'denomination', 'forme_pharma', 'titulaire'],
+    { denomination: 3, cis: 2, forme_pharma: 0.5, titulaire: 1 }
+  );
+
+  await loadParseAndIndex(
+    'presentations',
+    'CIS_CIP_bdpm.txt',
+    ['cis', 'cip7', 'cip13', 'libelle', 'indications'],
+    { libelle: 3, indications: 2, cis: 2, cip7: 1.5, cip13: 1.5 }
+  );
+
+  await loadParseAndIndex(
+    'compositions',
+    'CIS_COMPO_bdpm.txt',
+    ['cis', 'denomination_substance', 'dosage'],
+    { denomination_substance: 3, cis: 2, dosage: 1 }
+  );
+
+  if (LOAD_HAS_AVIS) {
+    await loadParseAndIndex('avis_smr', 'CIS_HAS_SMR_bdpm.txt', ['libelle_smr', 'valeur_smr']);
+    await loadParseAndIndex('avis_asmr', 'CIS_HAS_ASMR_bdpm.txt', ['libelle_asmr', 'valeur_asmr']);
+  } else {
+    clearStore(corpusStores.avis_smr);
+    clearStore(corpusStores.avis_asmr);
+    searchIndexes.avis_smr = null;
+    searchIndexes.avis_asmr = null;
+  }
+
+  await loadParseAndIndex('generiques', 'CIS_GENER_bdpm.txt', ['libelle_groupe']);
+  await loadParseAndIndex('conditions', 'CIS_CPD_bdpm.txt', ['condition']);
+  await loadParseAndIndex('ruptures', 'CIS_CIP_Dispo_Spec.txt', ['libelle_statut']);
+  await loadParseAndIndex(
+    'mitm',
+    'CIS_MITM.txt',
+    ['cis', 'code_atc', 'denomination'],
+    { denomination: 3, code_atc: 2, cis: 2 }
+  );
+
+  const compStore = corpusStores.compositions;
+  const codeSubIdx = keyIndex(compStore, 'code_substance');
+  const denomSubIdx = keyIndex(compStore, 'denomination_substance');
+  const substancesMap = new Map();
+  for (let i = 0; i < compStore.rows.length; i++) {
+    const code = getRowValue(compStore, i, codeSubIdx);
+    const denomination = getRowValue(compStore, i, denomSubIdx);
+    if (!code || !denomination) continue;
+    if (!substancesMap.has(code)) {
+      substancesMap.set(code, { code, denomination, medicaments_count: 0 });
+    }
+    substancesMap.get(code).medicaments_count++;
+  }
+  const subStore = corpusStores.substances;
+  clearStore(subStore);
+  for (const record of substancesMap.values()) {
+    pushFromRecord(subStore, record);
+  }
+  await indexInMemoryStore('substances', ['denomination']);
+
+  buildCisIndexes();
+  loadMemoryMark('bdpm_done', { specialites: rowCount(corpusStores.specialites) });
+  console.log(`Données chargées et indexées: ${rowCount(corpusStores.specialites)} spécialités`);
+}
+
+function enrichSpecialite(item) {
+  if (!item) return item;
+  return { ...item, url_bdpm: bdpmExtraitUrl(item.cis) };
+}
+
+function enrichSpecialiteRow(obj) {
+  return enrichSpecialite(obj);
+}
+
+function getSpecialiteByCis(cis) {
+  if (!cisIndexes) return undefined;
+  const rowIndex = cisIndexes.specialitesByCis.get(cis);
+  if (rowIndex === undefined) return undefined;
+  return enrichSpecialite(toObject(corpusStores.specialites, rowIndex));
+}
+
+function getRelatedByCis(type, cis, limit = HYDRATE_RELATED_LIMIT) {
+  if (!cisIndexes || !cis) return [];
+  const mapKey = RELATED_BY_CIS_MAPS[type];
+  if (!mapKey) return [];
+  const store = corpusStores[type];
+  const indices = cisIndexes[mapKey].get(cis) || [];
+  const slice = limit > 0 ? indices.slice(0, limit) : indices;
+  return toObjects(store, slice);
+}
+
+function getGeneriquesForCis(cis) {
+  if (!cisIndexes || !cis) return null;
+  const indices = cisIndexes.generiquesByCis.get(cis);
+  if (!indices || indices.length === 0) return null;
+
+  const genStore = corpusStores.generiques;
+  const first = toObject(genStore, indices[0]);
+  const id_groupe = first.id_groupe;
+  const groupeIndices = cisIndexes.generiquesByGroupe.get(id_groupe) || [];
+  return {
+    id_groupe,
+    libelle_groupe: first.libelle_groupe,
+    items: toObjects(genStore, groupeIndices)
+  };
+}
+
+function search(type, query) {
+  const store = corpusStores[type];
+  if (!store || !query) return [];
   if (!searchIndexes[type]) return [];
 
   const results = searchIndexes[type].search(query);
-  const primaryField = PRIMARY_FIELDS[type];
+  const mapRow =
+    type === 'specialites'
+      ? (obj, _i, match_quality) => Object.assign(enrichSpecialite(obj), { match_quality })
+      : null;
 
-  const rankedResults = results.map((res) => {
-    const item = dataCache[type][res.id];
-    const primaryValue = item && item[primaryField] ? item[primaryField] : '';
-    const idValue = item && item.cis ? item.cis : '';
-    const priority = computeMatchPriority(primaryValue, query, { idValue });
-
-    return { item, score: res.score, priority, match_quality: matchQualityFromPriority(priority) };
-  });
-
-  rankedResults.sort((a, b) => {
-    if (b.priority !== a.priority) return b.priority - a.priority;
-    return b.score - a.score;
-  });
-
-  return rankedResults.map((r) => Object.assign({}, r.item, { match_quality: r.match_quality }));
+  return rankAndMaterializeSearch(
+    store,
+    results,
+    query,
+    { primaryIdx: primaryFieldIdx[type], idIdx: cisFieldIdx[type] },
+    mapRow
+  );
 }
 
-function getData(type) {
-  const rows = dataCache[type] || [];
-  if (type === 'specialites') {
-    return rows.map((row) => enrichSpecialite(row));
+function parseListPaging(page, limit) {
+  const safePage = Math.max(1, parseInt(page, 10) || 1);
+  const safeLimit = Math.min(MAX_LIST_LIMIT, Math.max(1, parseInt(limit, 10) || 100));
+  const offset = (safePage - 1) * safeLimit;
+  return { safePage, safeLimit, offset };
+}
+
+/** Liste paginée sans matérialiser tout le corpus (sans requête de recherche). */
+function listCorpusPage(type, page = 1, limit = 100) {
+  const store = corpusStores[type];
+  if (!store) {
+    return {
+      data: [],
+      pagination: { total: 0, page: 1, limit: 100, pages: 0 },
+      metadata: { last_updated: metadata.last_updated, source: metadata.source }
+    };
   }
-  return rows;
+
+  const { safePage, safeLimit, offset } = parseListPaging(page, limit);
+  const total = rowCount(store);
+  const end = Math.min(offset + safeLimit, total);
+  const mapRow = type === 'specialites' ? enrichSpecialiteRow : null;
+  const data = materializeRowRange(store, offset, end, mapRow);
+
+  return {
+    data,
+    pagination: {
+      total,
+      page: safePage,
+      limit: safeLimit,
+      pages: Math.ceil(total / safeLimit) || 0
+    },
+    metadata: {
+      last_updated: metadata.last_updated,
+      source: metadata.source
+    }
+  };
 }
 
 function getMetadata() {
-  return dataCache.metadata;
+  return metadata;
 }
 
 function isHasAvisLoaded() {
   return LOAD_HAS_AVIS;
 }
 
+/** Stats corpus (scripts d’analyse uniquement). */
+function getBdpmCorpusStats() {
+  const byType = {};
+  for (const type of Object.keys(corpusStores)) {
+    byType[type] = { rows: rowCount(corpusStores[type]), keys: corpusStores[type].keys };
+  }
+  return { byType, stores: corpusStores };
+}
+
 module.exports = {
   loadData,
-  getData,
+  listCorpusPage,
   search,
   getMetadata,
   isHasAvisLoaded,
@@ -437,5 +392,6 @@ module.exports = {
   getGeneriquesForCis,
   bdpmExtraitUrl,
   HYDRATE_RELATED_LIMIT,
-  DETAIL_HYDRATE_RELATED_LIMIT
+  DETAIL_HYDRATE_RELATED_LIMIT,
+  getBdpmCorpusStats
 };

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Taille par "colonne" du corpus vétérinaire (vetCache, index, dict).
+ * Taille par "colonne" du corpus vétérinaire (vetStores tuple, index, dict).
  * Usage: node scripts/analyze-vet-cache-size.js
  */
 'use strict';
@@ -91,24 +91,43 @@ async function main() {
     ' Mo fichier). Peu probable que le pic runtime = décompression.\n'
   );
 
-  const { loadVetData, getVetCorpus, getVetMetadata } = require('../src/services/vetDataLoader');
+  const {
+    loadVetData,
+    getVetMetadata,
+    getVetCorpusStats,
+    getRelatedByNum
+  } = require('../src/services/vetDataLoader');
+  const { materializeRowRange, rowCount, getRowValue, keyIndex } = require('../src/utils/rowStore');
 
   if (typeof global.gc === 'function') global.gc();
   const memBefore = process.memoryUsage();
 
   await loadVetData();
 
-  const medicaments = getVetCorpus('medicaments');
-  const compositions = getVetCorpus('compositions');
-  const presentations = getVetCorpus('presentations');
+  const { stores } = getVetCorpusStats();
+  const medicaments = materializeRowRange(
+    stores.medicaments,
+    0,
+    rowCount(stores.medicaments)
+  );
+  const compositions = materializeRowRange(
+    stores.compositions,
+    0,
+    rowCount(stores.compositions)
+  );
+  const presentations = materializeRowRange(
+    stores.presentations,
+    0,
+    rowCount(stores.presentations)
+  );
   const metadata = getVetMetadata();
 
-  const { getRelatedByNum } = require('../src/services/vetDataLoader');
-
+  const medNumIdx = keyIndex(stores.medicaments, 'num');
   let tempsAttenteRows = 0;
   let tempsAttenteBytes = 0;
-  for (const med of medicaments) {
-    const rows = getRelatedByNum('temps_attente', med.num, 0);
+  for (let i = 0; i < rowCount(stores.medicaments); i++) {
+    const num = getRowValue(stores.medicaments, i, medNumIdx);
+    const rows = getRelatedByNum('temps_attente', num, 0);
     tempsAttenteRows += rows.length;
     tempsAttenteBytes += jsonBytes(rows);
   }
@@ -132,7 +151,7 @@ async function main() {
     corpus.presentations.json_mb +
     corpus.temps_attente.json_mb;
 
-  console.log('=== vetCache — taille JSON (proxy heap corpus) ===');
+  console.log('=== vetStores — taille JSON (proxy heap corpus matérialisé) ===');
   console.log(JSON.stringify({ corpus_total_json_mb: Math.round(corpusTotalMb * 1000) / 1000, ...corpus }, null, 2));
 
   console.log('\n=== Par champ (somme des octets stringifiés par colonne) ===');

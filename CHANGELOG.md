@@ -7,6 +7,20 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.2.0] - 2026-05-29
+
+### Ajouté
+
+- Stockage corpus en tuples (`rowStore`, schémas centralisés) pour réduire l’empreinte mémoire BDPM et vétérinaire.
+- Pagination des listes sans matérialiser tout le corpus (`listCorpusPage`, `listVetCorpusPage`).
+- Script `analyze-bdpm-corpus-size.js` et tests unitaires `rowStore`.
+
+### Modifié
+
+- Index CIS/num sur indices de ligne plutôt que références objet.
+- Chargement vétérinaire : écriture directe en tuples (sans objets intermédiaires).
+- Recherche partagée via `corpusSearch` (matérialisation uniquement sur les hits).
+
 ## [1.1.0] - 2026-05-26
 
 ### Ajouté
@@ -32,6 +46,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.1.0...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/yoch/fr.gouv.medicaments.rest/releases/tag/v1.1.0
 [1.0.0]: https://github.com/yoch/fr.gouv.medicaments.rest/commit/716f95f

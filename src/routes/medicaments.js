@@ -1,6 +1,6 @@
 const express = require('express');
 const {
-  getData,
+  listCorpusPage,
   search,
   getMetadata,
   getSpecialiteByCis,
@@ -43,8 +43,11 @@ function paginate(data, page = 1, limit = 100) {
 function listHandler(dataType, defaultLimit = 100) {
   return (req, res) => {
     const { q, page = 1, limit = defaultLimit } = req.query;
-    const data = q ? search(dataType, q) : getData(dataType);
-    res.json(paginate(data, page, limit));
+    if (q) {
+      const data = search(dataType, q);
+      return res.json(paginate(data, page, limit));
+    }
+    res.json(listCorpusPage(dataType, page, limit));
   };
 }
 

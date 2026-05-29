@@ -4,12 +4,23 @@ const { XMLParser } = require('fast-xml-parser');
 const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
 const { streamMedicinalProducts } = require('../utils/streamMedicinalProductsXml');
 const { loadMemoryMark } = require('../utils/memorySampler');
+const { VET_SCHEMAS } = require('../utils/corpusSchemas');
+const { rankAndMaterializeSearch } = require('../utils/corpusSearch');
 const {
-  miniSearchOptions,
-  normalizeSearchText,
-  computeMatchPriority,
-  matchQualityFromPriority
-} = require('../utils/searchRanking');
+  createStore,
+  clearStore,
+  rowCount,
+  keyIndex,
+  indexFieldIndices,
+  pushRow,
+  getRowValue,
+  toObject,
+  toObjects,
+  materializeRowRange,
+  buildIndexDocumentFromRow,
+  buildKeyIndex
+} = require('../utils/rowStore');
+const { miniSearchOptions, normalizeSearchText } = require('../utils/searchRanking');
 const {
   VET_DATA_DIR,
   PRODUCTS_XML_NAME,
@@ -19,6 +30,7 @@ const {
 const dataDir = process.env.VET_DATA_DIR || VET_DATA_DIR;
 const productsFileName = process.env.VET_PRODUCTS_FILE || PRODUCTS_XML_NAME;
 const dictFileName = process.env.VET_DICT_FILE || DICT_XML_NAME;
+const MAX_LIST_LIMIT = 1000;
 
 const ARRAY_TAGS = new Set([
   'medicinal-product',
@@ -38,15 +50,17 @@ const xmlParser = new XMLParser({
   stopNodes: ['*.paragraphes-rcp', '*.lien-rcp']
 });
 
-let vetCache = {
-  medicaments: [],
-  compositions: [],
-  presentations: [],
-  tempsAttente: new Map(),
-  metadata: {
-    last_updated: null,
-    source: 'base de données publique des médicaments vétérinaires autorisés en France - Anses/ANMV'
-  }
+const vetStores = {
+  medicaments: createStore(VET_SCHEMAS.medicaments),
+  compositions: createStore(VET_SCHEMAS.compositions),
+  presentations: createStore(VET_SCHEMAS.presentations)
+};
+
+let tempsAttente = new Map();
+
+const metadata = {
+  last_updated: null,
+  source: 'base de données publique des médicaments vétérinaires autorisés en France - Anses/ANMV'
 };
 
 let searchIndexes = {
@@ -59,6 +73,21 @@ let numIndexes = null;
 const PRIMARY_FIELDS = {
   medicaments: 'nom',
   compositions: 'substance'
+};
+
+const primaryFieldIdx = {
+  medicaments: keyIndex(vetStores.medicaments, 'nom'),
+  compositions: keyIndex(vetStores.compositions, 'substance')
+};
+
+const numFieldIdx = {
+  medicaments: keyIndex(vetStores.medicaments, 'num'),
+  compositions: keyIndex(vetStores.compositions, 'num')
+};
+
+const presentationFilterIdx = {
+  libelle: keyIndex(vetStores.presentations, 'libelle'),
+  gtin: keyIndex(vetStores.presentations, 'gtin')
 };
 
 const ANMV_RCP_URL_PREFIX = 'http://www.ircp.anmv.anses.fr/rcp.aspx?NomMedicament=';
@@ -115,7 +144,6 @@ function parseDateAmm(value) {
   return value;
 }
 
-/** Même encodage que l’ANMV : + pour espaces, séquences %xx en minuscules. */
 function buildLienRcpFromNom(nom) {
   if (!nom) return '';
   const param = encodeURIComponent(String(nom).trim())
@@ -130,6 +158,10 @@ function enrichMedicamentForApi(medicament) {
     ...medicament,
     lien_rcp: medicament.maj_rcp ? buildLienRcpFromNom(medicament.nom) : ''
   };
+}
+
+function enrichMedicamentRow(obj) {
+  return enrichMedicamentForApi(obj);
 }
 
 function parseMajRcp(product) {
@@ -163,41 +195,59 @@ function parseEspeces(product, dict) {
   return [...especes];
 }
 
-function parseCompositionLines(product, dict) {
-  const lines = [];
+function normalizeNum(value) {
+  const digits = String(value ?? '').replace(/\D/g, '');
+  if (!digits) return '';
+  return digits.padStart(7, '0');
+}
+
+function pushMedicamentRow(store, product, dict) {
+  return pushRow(store, [
+    normalizeNum(product.num),
+    product.nom || '',
+    product['num-amm'] || '',
+    parseDateAmm(product['date-amm']),
+    resolveTerm(dict, 'term-tit', product['term-tit']),
+    resolveTerm(dict, 'term-fp', product['term-fp']),
+    resolveTerm(dict, 'term-stat-auto', product['term-stat-auto']),
+    parseAtcvetCodes(product),
+    parseEspeces(product, dict),
+    parseMajRcp(product)
+  ]);
+}
+
+function pushCompositionFromSa(store, num, sa, dict) {
+  pushRow(store, [
+    num,
+    resolveTerm(dict, 'term-sa', sa['term-sa']),
+    sa.quantite != null ? String(sa.quantite) : '',
+    sa.unite || resolveTerm(dict, 'term-unite', sa['term-unite'])
+  ]);
+}
+
+function pushCompositionRows(store, product, dict) {
+  const num = normalizeNum(product.num);
   const composition = product.composition;
-  if (!composition) return lines;
+  if (!composition) return;
 
   const compoBlocks = asArray(composition.compo);
   if (compoBlocks.length > 0) {
     for (const block of compoBlocks) {
       for (const sa of asArray(block.sa)) {
-        lines.push({
-          num: normalizeNum(product.num),
-          substance: resolveTerm(dict, 'term-sa', sa['term-sa']),
-          quantite: sa.quantite != null ? String(sa.quantite) : '',
-          unite: sa.unite || resolveTerm(dict, 'term-unite', sa['term-unite'])
-        });
+        pushCompositionFromSa(store, num, sa, dict);
       }
     }
-    return lines;
+    return;
   }
 
   for (const sa of asArray(composition.sa)) {
-    lines.push({
-      num: normalizeNum(product.num),
-      substance: resolveTerm(dict, 'term-sa', sa['term-sa']),
-      quantite: sa.quantite != null ? String(sa.quantite) : '',
-      unite: sa.unite || resolveTerm(dict, 'term-unite', sa['term-unite'])
-    });
+    pushCompositionFromSa(store, num, sa, dict);
   }
-
-  return lines;
 }
 
-function parsePresentationFromMod(product, mod, dict) {
+function pushPresentationRow(store, num, mod, dict) {
   const libelle = mod['lib-mod'];
-  if (!libelle) return null;
+  if (!libelle) return false;
 
   const conditions = [];
   if (mod['lib-condp']) {
@@ -207,35 +257,36 @@ function parsePresentationFromMod(product, mod, dict) {
     if (label) conditions.push(label);
   }
 
-  return {
-    num: normalizeNum(product.num),
+  pushRow(store, [
+    num,
     libelle,
-    gtin: mod['code-gtin'] ? String(mod['code-gtin']) : '',
-    conditions_delivrance: conditions
-  };
+    mod['code-gtin'] ? String(mod['code-gtin']) : '',
+    conditions
+  ]);
+  return true;
 }
 
-function parsePresentations(product, dict) {
-  const presentations = [];
+function pushPresentationRows(store, product, dict) {
+  const num = normalizeNum(product.num);
   const seen = new Set();
 
-  const add = (item) => {
-    if (!item) return;
-    const key = `${item.libelle}|${item.gtin}`;
+  const tryAdd = (mod) => {
+    if (!mod) return;
+    const libelle = mod['lib-mod'];
+    if (!libelle) return;
+    const gtin = mod['code-gtin'] ? String(mod['code-gtin']) : '';
+    const key = `${libelle}|${gtin}`;
     if (seen.has(key)) return;
     seen.add(key);
-    presentations.push(item);
+    pushPresentationRow(store, num, mod, dict);
   };
 
   for (const mod of asArray(product['modele-destine-vente']?.['mod-vte'])) {
-    add(parsePresentationFromMod(product, mod, dict));
+    tryAdd(mod);
   }
-
   for (const mod of asArray(product['mdv-codes-gtin']?.['mod-vte'])) {
-    add(parsePresentationFromMod(product, mod, dict));
+    tryAdd(mod);
   }
-
-  return presentations;
 }
 
 function parseTempsAttente(product, dict) {
@@ -251,39 +302,6 @@ function parseTempsAttente(product, dict) {
     });
   }
   return items;
-}
-
-function normalizeNum(value) {
-  const digits = String(value ?? '').replace(/\D/g, '');
-  if (!digits) return '';
-  return digits.padStart(7, '0');
-}
-
-function parseMedicament(product, dict) {
-  const num = normalizeNum(product.num);
-  return {
-    num,
-    nom: product.nom || '',
-    num_amm: product['num-amm'] || '',
-    date_amm: parseDateAmm(product['date-amm']),
-    titulaire: resolveTerm(dict, 'term-tit', product['term-tit']),
-    forme_pharmaceutique: resolveTerm(dict, 'term-fp', product['term-fp']),
-    statut_amm: resolveTerm(dict, 'term-stat-auto', product['term-stat-auto']),
-    codes_atcvet: parseAtcvetCodes(product),
-    especes: parseEspeces(product, dict),
-    maj_rcp: parseMajRcp(product)
-  };
-}
-
-function buildVetIndexDocument(item, rowIndex, fields) {
-  const doc = { id: rowIndex };
-  for (const field of fields) {
-    const value = item[field];
-    if (value != null && value !== '') {
-      doc[field] = value;
-    }
-  }
-  return doc;
 }
 
 function vetIndexConfig(fields, boost = null) {
@@ -319,53 +337,29 @@ function parseProductBlock(blockXml) {
   return product;
 }
 
-function appendToNumList(map, num, item) {
-  if (!num) return;
-  if (!map.has(num)) map.set(num, []);
-  map.get(num).push(item);
-}
-
 const RELATED_BY_NUM_MAPS = {
   compositions: 'compositionsByNum',
   presentations: 'presentationsByNum'
 };
 
 function buildNumIndexes() {
-  const medicamentsByNum = new Map();
-  for (const item of vetCache.medicaments) {
-    if (item.num) medicamentsByNum.set(item.num, item);
-  }
-
-  const compositionsByNum = new Map();
-  for (const item of vetCache.compositions) {
-    appendToNumList(compositionsByNum, item.num, item);
-  }
-
-  const presentationsByNum = new Map();
-  for (const item of vetCache.presentations) {
-    appendToNumList(presentationsByNum, item.num, item);
-  }
-
-  numIndexes = { medicamentsByNum, compositionsByNum, presentationsByNum };
+  numIndexes = {
+    medicamentsByNum: buildKeyIndex(vetStores.medicaments, 'num', { unique: true }),
+    compositionsByNum: buildKeyIndex(vetStores.compositions, 'num'),
+    presentationsByNum: buildKeyIndex(vetStores.presentations, 'num')
+  };
 }
 
 function clearLoadedData() {
   searchIndexes.medicaments = null;
   searchIndexes.compositions = null;
-  vetCache.medicaments = [];
-  vetCache.compositions = [];
-  vetCache.presentations = [];
-  vetCache.tempsAttente = new Map();
+  clearStore(vetStores.medicaments);
+  clearStore(vetStores.compositions);
+  clearStore(vetStores.presentations);
+  tempsAttente = new Map();
   numIndexes = null;
 }
 
-/**
- * Chargement vétérinaire en deux temps (fast-xml-parser) :
- * 1. Stream XML → vetCache (sans indexation) ;
- * 2. buildFrozenIndexFromRows sur medicaments / compositions.
- * Les blocs <paragraphes-rcp> et <lien-rcp> sont ignorés au parse (stopNodes) ;
- * lien_rcp API est reconstruit depuis nom + maj_rcp.
- */
 async function loadVetData() {
   const productsPath = path.join(dataDir, productsFileName);
   const dictPath = path.join(dataDir, dictFileName);
@@ -385,141 +379,200 @@ async function loadVetData() {
   loadMemoryMark('vet_dict_loaded');
   const dateJeu = extractDateJeuFromHeader(productsPath);
   if (dateJeu) {
-    vetCache.metadata.last_updated = new Date(dateJeu).toISOString();
+    metadata.last_updated = new Date(dateJeu).toISOString();
   } else {
-    vetCache.metadata.last_updated = fs.statSync(productsPath).mtime.toISOString();
+    metadata.last_updated = fs.statSync(productsPath).mtime.toISOString();
   }
 
   const medicamentFields = ['nom', 'num'];
   const compositionFields = ['substance', 'num'];
+  const medFieldIndices = indexFieldIndices(vetStores.medicaments, medicamentFields);
+  const compFieldIndices = indexFieldIndices(vetStores.compositions, compositionFields);
 
   await streamMedicinalProducts(productsPath, async (blockXml) => {
     const product = parseProductBlock(blockXml);
     if (!product) return;
 
-    const medicament = parseMedicament(product, dict);
-    vetCache.medicaments.push(medicament);
-
-    for (const line of parseCompositionLines(product, dict)) {
-      vetCache.compositions.push(line);
-    }
-
-    for (const presentation of parsePresentations(product, dict)) {
-      vetCache.presentations.push(presentation);
-    }
+    const num = pushMedicamentRow(vetStores.medicaments, product, dict);
+    pushCompositionRows(vetStores.compositions, product, dict);
+    pushPresentationRows(vetStores.presentations, product, dict);
 
     const waiting = parseTempsAttente(product, dict);
     if (waiting.length > 0) {
-      vetCache.tempsAttente.set(medicament.num, waiting);
+      const medNum = getRowValue(vetStores.medicaments, num, numFieldIdx.medicaments);
+      tempsAttente.set(medNum, waiting);
     }
   });
   loadMemoryMark('vet_stream_done', {
-    medicaments: vetCache.medicaments.length,
-    compositions: vetCache.compositions.length
+    medicaments: rowCount(vetStores.medicaments),
+    compositions: rowCount(vetStores.compositions)
   });
 
   console.log('Indexation vétérinaire (médicaments)...');
   loadMemoryMark('vet_index_medicaments_start');
+  const medStore = vetStores.medicaments;
   searchIndexes.medicaments = buildFrozenIndexFromRows(
-    vetCache.medicaments,
-    (item, rowIndex) => buildVetIndexDocument(item, rowIndex, medicamentFields),
+    medStore.rows,
+    (_row, rowIndex) => buildIndexDocumentFromRow(medStore, rowIndex, medFieldIndices),
     vetIndexConfig(medicamentFields, { nom: 3, num: 2 })
   );
   loadMemoryMark('vet_index_medicaments_done');
 
   console.log('Indexation vétérinaire (compositions)...');
   loadMemoryMark('vet_index_compositions_start');
+  const compStore = vetStores.compositions;
   searchIndexes.compositions = buildFrozenIndexFromRows(
-    vetCache.compositions,
-    (item, rowIndex) => buildVetIndexDocument(item, rowIndex, compositionFields),
+    compStore.rows,
+    (_row, rowIndex) => buildIndexDocumentFromRow(compStore, rowIndex, compFieldIndices),
     vetIndexConfig(compositionFields, { substance: 3, num: 1 })
   );
   loadMemoryMark('vet_index_compositions_done');
   buildNumIndexes();
-  loadMemoryMark('vet_done', { medicaments: vetCache.medicaments.length });
-  console.log(`Données vétérinaires chargées: ${vetCache.medicaments.length} médicaments`);
+  loadMemoryMark('vet_done', { medicaments: rowCount(vetStores.medicaments) });
+  console.log(`Données vétérinaires chargées: ${rowCount(vetStores.medicaments)} médicaments`);
 }
 
 function searchVet(type, query) {
-  if (!query) return getVetCorpus(type);
+  if (!query) return [];
   if (!searchIndexes[type]) return [];
 
+  const store = vetStores[type];
   const results = searchIndexes[type].search(query);
-  const primaryField = PRIMARY_FIELDS[type];
+  const mapRow =
+    type === 'medicaments'
+      ? (obj, _i, match_quality) => Object.assign(enrichMedicamentForApi(obj), { match_quality })
+      : null;
 
-  const rankedResults = results.map((res) => {
-    const item = vetCache[type][res.id];
-    const primaryValue = item && item[primaryField] ? item[primaryField] : '';
-    const idValue = item && item.num ? item.num : '';
-    const priority = computeMatchPriority(primaryValue, query, { idValue });
-
-    return { item, score: res.score, priority, match_quality: matchQualityFromPriority(priority) };
-  });
-
-  rankedResults.sort((a, b) => {
-    if (b.priority !== a.priority) return b.priority - a.priority;
-    return b.score - a.score;
-  });
-
-  return rankedResults.map((r) => {
-    const row =
-      type === 'medicaments' ? enrichMedicamentForApi(r.item) : { ...r.item };
-    return { ...row, match_quality: r.match_quality };
-  });
+  return rankAndMaterializeSearch(
+    store,
+    results,
+    query,
+    { primaryIdx: primaryFieldIdx[type], idIdx: numFieldIdx[type] },
+    mapRow
+  );
 }
 
-function filterPresentationsLinear(query) {
-  if (!query) return vetCache.presentations;
+function collectPresentationMatchIndices(query) {
+  const store = vetStores.presentations;
   const normalizedQuery = normalizeSearchText(query);
-  return vetCache.presentations.filter((item) => {
-    const libelle = normalizeSearchText(item.libelle || '');
-    const gtin = item.gtin || '';
-    return libelle.includes(normalizedQuery) || gtin.includes(query);
-  });
+  const libIdx = presentationFilterIdx.libelle;
+  const gtinIdx = presentationFilterIdx.gtin;
+  const indices = [];
+  for (let i = 0; i < store.rows.length; i++) {
+    const libelle = normalizeSearchText(getRowValue(store, i, libIdx));
+    const gtin = getRowValue(store, i, gtinIdx);
+    if (libelle.includes(normalizedQuery) || gtin.includes(query)) {
+      indices.push(i);
+    }
+  }
+  return indices;
 }
 
-function getVetCorpus(type) {
-  return vetCache[type] || [];
+function parseListPaging(page, limit) {
+  const safePage = Math.max(1, parseInt(page, 10) || 1);
+  const safeLimit = Math.min(MAX_LIST_LIMIT, Math.max(1, parseInt(limit, 10) || 100));
+  const offset = (safePage - 1) * safeLimit;
+  return { safePage, safeLimit, offset };
 }
 
-function getVetData(type) {
-  const rows = getVetCorpus(type);
-  if (type !== 'medicaments') return rows;
-  return rows.map(enrichMedicamentForApi);
+function listVetCorpusPage(type, page = 1, limit = 100) {
+  const store = vetStores[type];
+  if (!store) {
+    return {
+      data: [],
+      pagination: { total: 0, page: 1, limit: 100, pages: 0 },
+      metadata: { last_updated: metadata.last_updated, source: metadata.source }
+    };
+  }
+
+  const { safePage, safeLimit, offset } = parseListPaging(page, limit);
+  const total = rowCount(store);
+  const end = Math.min(offset + safeLimit, total);
+  const mapRow = type === 'medicaments' ? enrichMedicamentRow : null;
+  const data = materializeRowRange(store, offset, end, mapRow);
+
+  return {
+    data,
+    pagination: {
+      total,
+      page: safePage,
+      limit: safeLimit,
+      pages: Math.ceil(total / safeLimit) || 0
+    },
+    metadata: {
+      last_updated: metadata.last_updated,
+      source: metadata.source
+    }
+  };
+}
+
+/** Présentations filtrées par requête, paginées (indices d’abord, objets seulement sur la page). */
+function listPresentationsPage(query, page = 1, limit = 100) {
+  const indices = collectPresentationMatchIndices(query);
+  const { safePage, safeLimit, offset } = parseListPaging(page, limit);
+  const total = indices.length;
+  const end = Math.min(offset + safeLimit, total);
+  const pageIndices = indices.slice(offset, end);
+  const store = vetStores.presentations;
+
+  return {
+    data: toObjects(store, pageIndices),
+    pagination: {
+      total,
+      page: safePage,
+      limit: safeLimit,
+      pages: Math.ceil(total / safeLimit) || 0
+    },
+    metadata: {
+      last_updated: metadata.last_updated,
+      source: metadata.source
+    }
+  };
 }
 
 function getVetMetadata() {
-  return vetCache.metadata;
+  return metadata;
 }
 
 function getMedicamentByNum(num) {
   if (!numIndexes) return undefined;
-  const row = numIndexes.medicamentsByNum.get(normalizeNum(num));
-  return row ? enrichMedicamentForApi(row) : undefined;
+  const rowIndex = numIndexes.medicamentsByNum.get(normalizeNum(num));
+  if (rowIndex === undefined) return undefined;
+  return enrichMedicamentForApi(toObject(vetStores.medicaments, rowIndex));
 }
 
 function getRelatedByNum(type, num, limit = 50) {
   if (!num) return [];
   const normalized = normalizeNum(num);
   if (type === 'temps_attente') {
-    return vetCache.tempsAttente.get(normalized) || [];
+    return tempsAttente.get(normalized) || [];
   }
   if (!numIndexes) return [];
   const mapKey = RELATED_BY_NUM_MAPS[type];
   if (!mapKey) return [];
-  const rows = numIndexes[mapKey].get(normalized) || [];
-  return limit > 0 ? rows.slice(0, limit) : rows;
+  const store = vetStores[type];
+  const indices = numIndexes[mapKey].get(normalized) || [];
+  const slice = limit > 0 ? indices.slice(0, limit) : indices;
+  return toObjects(store, slice);
+}
+
+function getVetCorpusStats() {
+  const byType = {};
+  for (const type of Object.keys(vetStores)) {
+    byType[type] = { rows: rowCount(vetStores[type]), keys: vetStores[type].keys };
+  }
+  return { byType, stores: vetStores };
 }
 
 module.exports = {
   loadVetData,
   searchVet,
-  getVetCorpus,
-  getVetData,
+  listVetCorpusPage,
+  listPresentationsPage,
   getVetMetadata,
   getMedicamentByNum,
   getRelatedByNum,
-  filterPresentationsLinear,
   buildLienRcpFromNom,
-  ANMV_RCP_URL_PREFIX
+  ANMV_RCP_URL_PREFIX,
+  getVetCorpusStats
 };

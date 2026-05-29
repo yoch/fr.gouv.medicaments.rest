@@ -1,11 +1,11 @@
 const express = require('express');
 const {
-  getVetData,
+  listVetCorpusPage,
+  listPresentationsPage,
   searchVet,
   getVetMetadata,
   getMedicamentByNum,
-  getRelatedByNum,
-  filterPresentationsLinear
+  getRelatedByNum
 } = require('../services/vetDataLoader');
 const { DETAIL_HYDRATE_RELATED_LIMIT } = require('../services/dataLoader');
 
@@ -37,15 +37,14 @@ function paginate(data, page = 1, limit = 100) {
 function listHandler(dataType, defaultLimit = 100) {
   return (req, res) => {
     const { q, page = 1, limit = defaultLimit } = req.query;
-    let data;
-
-    if (dataType === 'presentations') {
-      data = q ? filterPresentationsLinear(q) : getVetData('presentations');
-    } else {
-      data = q ? searchVet(dataType, q) : getVetData(dataType);
+    if (q) {
+      if (dataType === 'presentations') {
+        return res.json(listPresentationsPage(q, page, limit));
+      }
+      const data = searchVet(dataType, q);
+      return res.json(paginate(data, page, limit));
     }
-
-    res.json(paginate(data, page, limit));
+    res.json(listVetCorpusPage(dataType, page, limit));
   };
 }
 
