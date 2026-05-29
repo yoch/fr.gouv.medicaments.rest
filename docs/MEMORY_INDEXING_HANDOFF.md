@@ -77,7 +77,7 @@ Exemple spécialités :
 
 **CSV** : API streaming (`createReadStream` → `pipe(parser)`), mais **accumulation complète** dans `records[]`. Après `end`, parser/stream non référencés.
 
-**XML vétérinaire** : dict en `readFileSync` (~911 Ko) ; produits (~51 Mo fichier) en streaming par bloc `<medicinal-product>` ; arbre JS intermédiaire par bloc, jeté après extraction vers `vetCache`.
+**XML vétérinaire** (`fast-xml-parser`) : dict en `readFileSync` (~911 Ko) ; produits en streaming par bloc `<medicinal-product>` (`streamMedicinalProductsXml`) → remplissage `vetCache` **sans** index ; puis `buildFrozenIndexFromRows` (médicaments, compositions). `stopNodes` : `paragraphes-rcp`, `lien-rcp` ; `lien_rcp` API reconstruit depuis `nom` + `maj_rcp`.
 
 **Note opérationnelle :** `loadData()` / `loadVetData()` ne sont pas réentrants. En cas de reload concurrent (ex. in-process + intervalle court), `dataCache` peut être partiellement rempli jusqu’à la fin du chargement. À éviter en prod ou à protéger par un verrou si besoin.
 

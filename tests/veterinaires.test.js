@@ -1,16 +1,16 @@
 const path = require('path');
+
+const fixtureDir = path.join(__dirname, 'fixtures/veterinaires');
+process.env.VET_DATA_DIR = fixtureDir;
+process.env.VET_PRODUCTS_FILE = 'amm-vet-fixture.xml';
+process.env.VET_DICT_FILE = 'amm-vet-d-fixture.xml';
+
 const request = require('supertest');
 const express = require('express');
 const medicamentRoutes = require('../src/routes/medicaments');
 const veterinaireRoutes = require('../src/routes/veterinaires');
 const { loadData } = require('../src/services/dataLoader');
 const { loadVetData } = require('../src/services/vetDataLoader');
-
-const fixtureDir = path.join(__dirname, 'fixtures/veterinaires');
-
-process.env.VET_DATA_DIR = fixtureDir;
-process.env.VET_PRODUCTS_FILE = 'amm-vet-fixture.xml';
-process.env.VET_DICT_FILE = 'amm-vet-d-fixture.xml';
 
 const app = express();
 app.use(express.json());
@@ -45,6 +45,10 @@ describe('API Vétérinaires ANMV', () => {
       expect(res.body.compositions.length).toBeGreaterThanOrEqual(2);
       expect(res.body.presentations.length).toBeGreaterThan(0);
       expect(res.body.especes).toEqual(expect.arrayContaining(['Chat', 'Chien']));
+      expect(res.body.lien_rcp).toBe(
+        'http://www.ircp.anmv.anses.fr/rcp.aspx?NomMedicament=SULTRIAN+100'
+      );
+      expect(res.body.maj_rcp).toBe('2025-11-07');
     });
 
     it('retourne 404 pour num inconnu', async () => {

@@ -1,12 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const readline = require('readline');
 const { XMLParser } = require('fast-xml-parser');
-const {
-  createFrozenIndexBuilder,
-  freezeFrozenIndexBuilder,
-  buildFrozenIndexFromRows
-} = require('../utils/frozenMiniSearch');
+const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
+const { streamMedicinalProducts } = require('../utils/streamMedicinalProductsXml');
+const { loadMemoryMark } = require('../utils/memorySampler');
 const {
   miniSearchOptions,
   normalizeSearchText,
@@ -38,7 +35,7 @@ const xmlParser = new XMLParser({
   ignoreAttributes: true,
   trimValues: true,
   isArray: (tagName) => ARRAY_TAGS.has(tagName),
-  stopNodes: ['*.paragraphes-rcp']
+  stopNodes: ['*.paragraphes-rcp', '*.lien-rcp']
 });
 
 let vetCache = {
@@ -63,6 +60,8 @@ const PRIMARY_FIELDS = {
   medicaments: 'nom',
   compositions: 'substance'
 };
+
+const ANMV_RCP_URL_PREFIX = 'http://www.ircp.anmv.anses.fr/rcp.aspx?NomMedicament=';
 
 function asArray(value) {
   if (value == null) return [];
@@ -116,18 +115,25 @@ function parseDateAmm(value) {
   return value;
 }
 
-function parseLienRcp(product) {
-  if (product['lien-rcp']) return product['lien-rcp'];
-  const rcp = product['paragraphes-rcp'];
-  if (rcp && rcp.lien_rcp) return rcp.lien_rcp;
-  return '';
+/** Même encodage que l’ANMV : + pour espaces, séquences %xx en minuscules. */
+function buildLienRcpFromNom(nom) {
+  if (!nom) return '';
+  const param = encodeURIComponent(String(nom).trim())
+    .replace(/%20/g, '+')
+    .replace(/%[0-9a-f]{2}/gi, (hex) => hex.toLowerCase());
+  return `${ANMV_RCP_URL_PREFIX}${param}`;
+}
+
+function enrichMedicamentForApi(medicament) {
+  if (!medicament) return medicament;
+  return {
+    ...medicament,
+    lien_rcp: medicament.maj_rcp ? buildLienRcpFromNom(medicament.nom) : ''
+  };
 }
 
 function parseMajRcp(product) {
-  if (product['maj-rcp']) return product['maj-rcp'];
-  const rcp = product['paragraphes-rcp'];
-  if (rcp && rcp['date-validation']) return rcp['date-validation'];
-  return '';
+  return product['maj-rcp'] ? String(product['maj-rcp']) : '';
 }
 
 function parseAtcvetCodes(product) {
@@ -265,7 +271,6 @@ function parseMedicament(product, dict) {
     statut_amm: resolveTerm(dict, 'term-stat-auto', product['term-stat-auto']),
     codes_atcvet: parseAtcvetCodes(product),
     especes: parseEspeces(product, dict),
-    lien_rcp: parseLienRcp(product),
     maj_rcp: parseMajRcp(product)
   };
 }
@@ -291,27 +296,6 @@ function vetIndexConfig(fields, boost = null) {
   return indexConfig;
 }
 
-const PRODUCT_CLOSE = '</medicinal-product>';
-
-function indexOfProductOpen(line, fromIndex = 0) {
-  const marker = '<medicinal-product';
-  let pos = fromIndex;
-  while (pos < line.length) {
-    const idx = line.indexOf(marker, pos);
-    if (idx === -1) return -1;
-    if (line.startsWith('<medicinal-product-group', idx)) {
-      pos = idx + marker.length;
-      continue;
-    }
-    const nextChar = line[idx + marker.length];
-    if (nextChar === '>' || nextChar === ' ' || nextChar === '\t') {
-      return idx;
-    }
-    pos = idx + 1;
-  }
-  return -1;
-}
-
 function extractDateJeuFromHeader(filepath) {
   try {
     const fd = fs.openSync(filepath, 'r');
@@ -326,47 +310,7 @@ function extractDateJeuFromHeader(filepath) {
   }
 }
 
-async function streamMedicinalProducts(productsPath, onProduct) {
-  const stream = fs.createReadStream(productsPath, { encoding: 'utf8' });
-  const rl = readline.createInterface({ input: stream, crlfDelay: Infinity });
-
-  let buffer = '';
-  let inProduct = false;
-
-  for await (const line of rl) {
-    if (!inProduct) {
-      const openIdx = indexOfProductOpen(line);
-      if (openIdx === -1) continue;
-      inProduct = true;
-      buffer = line.slice(openIdx);
-      const closeIdx = buffer.indexOf(PRODUCT_CLOSE);
-      if (closeIdx !== -1) {
-        const block = buffer.slice(0, closeIdx + PRODUCT_CLOSE.length);
-        buffer = '';
-        inProduct = false;
-        await onProduct(block);
-      }
-      continue;
-    }
-
-    buffer += `\n${line}`;
-    const closeIdx = buffer.indexOf(PRODUCT_CLOSE);
-    if (closeIdx === -1) continue;
-
-    const block = buffer.slice(0, closeIdx + PRODUCT_CLOSE.length);
-    buffer = buffer.slice(closeIdx + PRODUCT_CLOSE.length);
-    inProduct = indexOfProductOpen(buffer) !== -1;
-    if (inProduct) {
-      const nextOpen = indexOfProductOpen(buffer);
-      buffer = buffer.slice(nextOpen);
-    } else {
-      buffer = '';
-    }
-    await onProduct(block);
-  }
-}
-
-function parseProductBlock(blockXml, dict) {
+function parseProductBlock(blockXml) {
   const wrapped = `<?xml version="1.0" encoding="UTF-8"?><root>${blockXml}</root>`;
   const parsed = xmlParser.parse(wrapped);
   const raw = parsed.root?.['medicinal-product'] ?? parsed.root;
@@ -415,6 +359,13 @@ function clearLoadedData() {
   numIndexes = null;
 }
 
+/**
+ * Chargement vétérinaire en deux temps (fast-xml-parser) :
+ * 1. Stream XML → vetCache (sans indexation) ;
+ * 2. buildFrozenIndexFromRows sur medicaments / compositions.
+ * Les blocs <paragraphes-rcp> et <lien-rcp> sont ignorés au parse (stopNodes) ;
+ * lien_rcp API est reconstruit depuis nom + maj_rcp.
+ */
 async function loadVetData() {
   const productsPath = path.join(dataDir, productsFileName);
   const dictPath = path.join(dataDir, dictFileName);
@@ -428,8 +379,10 @@ async function loadVetData() {
 
   console.log('Chargement des données vétérinaires (streaming)...');
   clearLoadedData();
+  loadMemoryMark('vet_start');
 
   const dict = parseDictionary(fs.readFileSync(dictPath, 'utf8'));
+  loadMemoryMark('vet_dict_loaded');
   const dateJeu = extractDateJeuFromHeader(productsPath);
   if (dateJeu) {
     vetCache.metadata.last_updated = new Date(dateJeu).toISOString();
@@ -439,18 +392,13 @@ async function loadVetData() {
 
   const medicamentFields = ['nom', 'num'];
   const compositionFields = ['substance', 'num'];
-  const medicamentsBuilder = createFrozenIndexBuilder(
-    vetIndexConfig(medicamentFields, { nom: 3, num: 2 })
-  );
 
   await streamMedicinalProducts(productsPath, async (blockXml) => {
-    const product = parseProductBlock(blockXml, dict);
+    const product = parseProductBlock(blockXml);
     if (!product) return;
 
     const medicament = parseMedicament(product, dict);
-    const medRowIndex = vetCache.medicaments.length;
     vetCache.medicaments.push(medicament);
-    medicamentsBuilder.add(buildVetIndexDocument(medicament, medRowIndex, medicamentFields));
 
     for (const line of parseCompositionLines(product, dict)) {
       vetCache.compositions.push(line);
@@ -465,20 +413,35 @@ async function loadVetData() {
       vetCache.tempsAttente.set(medicament.num, waiting);
     }
   });
+  loadMemoryMark('vet_stream_done', {
+    medicaments: vetCache.medicaments.length,
+    compositions: vetCache.compositions.length
+  });
 
-  searchIndexes.medicaments = freezeFrozenIndexBuilder(medicamentsBuilder);
-  const compositionOptions = vetIndexConfig(compositionFields, { substance: 3, num: 1 });
+  console.log('Indexation vétérinaire (médicaments)...');
+  loadMemoryMark('vet_index_medicaments_start');
+  searchIndexes.medicaments = buildFrozenIndexFromRows(
+    vetCache.medicaments,
+    (item, rowIndex) => buildVetIndexDocument(item, rowIndex, medicamentFields),
+    vetIndexConfig(medicamentFields, { nom: 3, num: 2 })
+  );
+  loadMemoryMark('vet_index_medicaments_done');
+
+  console.log('Indexation vétérinaire (compositions)...');
+  loadMemoryMark('vet_index_compositions_start');
   searchIndexes.compositions = buildFrozenIndexFromRows(
     vetCache.compositions,
     (item, rowIndex) => buildVetIndexDocument(item, rowIndex, compositionFields),
-    compositionOptions
+    vetIndexConfig(compositionFields, { substance: 3, num: 1 })
   );
+  loadMemoryMark('vet_index_compositions_done');
   buildNumIndexes();
+  loadMemoryMark('vet_done', { medicaments: vetCache.medicaments.length });
   console.log(`Données vétérinaires chargées: ${vetCache.medicaments.length} médicaments`);
 }
 
 function searchVet(type, query) {
-  if (!query) return vetCache[type] || [];
+  if (!query) return getVetCorpus(type);
   if (!searchIndexes[type]) return [];
 
   const results = searchIndexes[type].search(query);
@@ -498,10 +461,11 @@ function searchVet(type, query) {
     return b.score - a.score;
   });
 
-  return rankedResults.map((r) => ({
-    ...r.item,
-    match_quality: r.match_quality
-  }));
+  return rankedResults.map((r) => {
+    const row =
+      type === 'medicaments' ? enrichMedicamentForApi(r.item) : { ...r.item };
+    return { ...row, match_quality: r.match_quality };
+  });
 }
 
 function filterPresentationsLinear(query) {
@@ -514,8 +478,14 @@ function filterPresentationsLinear(query) {
   });
 }
 
-function getVetData(type) {
+function getVetCorpus(type) {
   return vetCache[type] || [];
+}
+
+function getVetData(type) {
+  const rows = getVetCorpus(type);
+  if (type !== 'medicaments') return rows;
+  return rows.map(enrichMedicamentForApi);
 }
 
 function getVetMetadata() {
@@ -524,7 +494,8 @@ function getVetMetadata() {
 
 function getMedicamentByNum(num) {
   if (!numIndexes) return undefined;
-  return numIndexes.medicamentsByNum.get(normalizeNum(num));
+  const row = numIndexes.medicamentsByNum.get(normalizeNum(num));
+  return row ? enrichMedicamentForApi(row) : undefined;
 }
 
 function getRelatedByNum(type, num, limit = 50) {
@@ -543,9 +514,12 @@ function getRelatedByNum(type, num, limit = 50) {
 module.exports = {
   loadVetData,
   searchVet,
+  getVetCorpus,
   getVetData,
   getVetMetadata,
   getMedicamentByNum,
   getRelatedByNum,
-  filterPresentationsLinear
+  filterPresentationsLinear,
+  buildLienRcpFromNom,
+  ANMV_RCP_URL_PREFIX
 };

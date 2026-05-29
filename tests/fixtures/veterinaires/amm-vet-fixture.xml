@@ -3,6 +3,8 @@
     <src-id>1106</src-id>
     <nom>SULTRIAN 100</nom>
     <num>0452300</num>
+    <maj-rcp>2025-11-07</maj-rcp>
+    <lien-rcp>http://www.ircp.anmv.anses.fr/rcp.aspx?NomMedicament=SULTRIAN+100</lien-rcp>
     <term-tit>1659</term-tit>
     <term-nat>1</term-nat>
     <term-typ-proc>1</term-typ-proc>
@@ -202,6 +204,8 @@
   <medicinal-product>
     <src-id>1774</src-id>
     <nom>SULTRIAN 400</nom>
+    <maj-rcp>2025-11-07</maj-rcp>
+    <lien-rcp>http://www.ircp.anmv.anses.fr/rcp.aspx?NomMedicament=SULTRIAN+400</lien-rcp>
     <num>0966100</num>
     <term-tit>1659</term-tit>
     <term-nat>1</term-nat>

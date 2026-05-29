@@ -8,6 +8,7 @@ const {
   computeMatchPriority,
   matchQualityFromPriority
 } = require('../utils/searchRanking');
+const { loadMemoryMark } = require('../utils/memorySampler');
 
 const DATA_DIR = path.join(__dirname, '../../data');
 const BDPM_MEDICAMENT_BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/medicament';
@@ -223,6 +224,7 @@ async function loadData() {
 
   console.log('Chargement des données...');
   clearLoadedData();
+  loadMemoryMark('bdpm_start');
 
   await loadParseAndIndex(
     'specialites',
@@ -328,6 +330,7 @@ async function loadData() {
   await indexInMemoryRows('substances', dataCache.substances, ['denomination']);
 
   buildCisIndexes();
+  loadMemoryMark('bdpm_done', { specialites: dataCache.specialites.length });
   console.log(`Données chargées et indexées: ${dataCache.specialites.length} spécialités`);
 }
 
