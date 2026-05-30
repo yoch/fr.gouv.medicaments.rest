@@ -4,23 +4,23 @@ const { XMLParser } = require('fast-xml-parser');
 const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
 const { streamMedicinalProducts } = require('../utils/streamMedicinalProductsXml');
 const { loadMemoryMark } = require('../utils/memorySampler');
-const { VET_SCHEMAS } = require('../utils/corpusSchemas');
 const { rankAndMaterializeSearch } = require('../utils/corpusSearch');
 const {
-  createStore,
-  clearStore,
+  createCorpus,
+  clearCorpus,
+  push,
   rowCount,
-  keyIndex,
-  indexFieldIndices,
-  pushRow,
-  getRowValue,
-  toObject,
-  toObjects,
-  materializeRowRange,
-  buildIndexDocumentFromRow,
-  buildKeyIndex
-} = require('../utils/rowStore');
-const { miniSearchOptions, normalizeSearchText } = require('../utils/searchRanking');
+  materializeRange,
+  materializeIndices,
+  buildKeyIndex,
+  buildIndexDocument
+} = require('../utils/corpusStore');
+const { normalizeSearchText } = require('../utils/searchRanking');
+const { parseListPaging } = require('../utils/corpusPaging');
+const { miniSearchIndexConfig } = require('../utils/miniSearchIndexConfig');
+const { MedicamentVet, CompositionVet, PresentationVet } = require('../models/vet');
+const { TempsAttenteEntry } = require('../models/tempsAttente');
+const { buildLienRcpFromNom, ANMV_RCP_URL_PREFIX } = require('../models/vet/rcp');
 const {
   VET_DATA_DIR,
   PRODUCTS_XML_NAME,
@@ -30,7 +30,6 @@ const {
 const dataDir = process.env.VET_DATA_DIR || VET_DATA_DIR;
 const productsFileName = process.env.VET_PRODUCTS_FILE || PRODUCTS_XML_NAME;
 const dictFileName = process.env.VET_DICT_FILE || DICT_XML_NAME;
-const MAX_LIST_LIMIT = 1000;
 
 const ARRAY_TAGS = new Set([
   'medicinal-product',
@@ -50,10 +49,10 @@ const xmlParser = new XMLParser({
   stopNodes: ['*.paragraphes-rcp', '*.lien-rcp']
 });
 
-const vetStores = {
-  medicaments: createStore(VET_SCHEMAS.medicaments),
-  compositions: createStore(VET_SCHEMAS.compositions),
-  presentations: createStore(VET_SCHEMAS.presentations)
+const corpus = {
+  medicaments: createCorpus(),
+  compositions: createCorpus(),
+  presentations: createCorpus()
 };
 
 let tempsAttente = new Map();
@@ -75,22 +74,10 @@ const PRIMARY_FIELDS = {
   compositions: 'substance'
 };
 
-const primaryFieldIdx = {
-  medicaments: keyIndex(vetStores.medicaments, 'nom'),
-  compositions: keyIndex(vetStores.compositions, 'substance')
+const ID_FIELDS = {
+  medicaments: 'num',
+  compositions: 'num'
 };
-
-const numFieldIdx = {
-  medicaments: keyIndex(vetStores.medicaments, 'num'),
-  compositions: keyIndex(vetStores.compositions, 'num')
-};
-
-const presentationFilterIdx = {
-  libelle: keyIndex(vetStores.presentations, 'libelle'),
-  gtin: keyIndex(vetStores.presentations, 'gtin')
-};
-
-const ANMV_RCP_URL_PREFIX = 'http://www.ircp.anmv.anses.fr/rcp.aspx?NomMedicament=';
 
 function asArray(value) {
   if (value == null) return [];
@@ -144,26 +131,6 @@ function parseDateAmm(value) {
   return value;
 }
 
-function buildLienRcpFromNom(nom) {
-  if (!nom) return '';
-  const param = encodeURIComponent(String(nom).trim())
-    .replace(/%20/g, '+')
-    .replace(/%[0-9a-f]{2}/gi, (hex) => hex.toLowerCase());
-  return `${ANMV_RCP_URL_PREFIX}${param}`;
-}
-
-function enrichMedicamentForApi(medicament) {
-  if (!medicament) return medicament;
-  return {
-    ...medicament,
-    lien_rcp: medicament.maj_rcp ? buildLienRcpFromNom(medicament.nom) : ''
-  };
-}
-
-function enrichMedicamentRow(obj) {
-  return enrichMedicamentForApi(obj);
-}
-
 function parseMajRcp(product) {
   return product['maj-rcp'] ? String(product['maj-rcp']) : '';
 }
@@ -201,31 +168,37 @@ function normalizeNum(value) {
   return digits.padStart(7, '0');
 }
 
-function pushMedicamentRow(store, product, dict) {
-  return pushRow(store, [
-    normalizeNum(product.num),
-    product.nom || '',
-    product['num-amm'] || '',
-    parseDateAmm(product['date-amm']),
-    resolveTerm(dict, 'term-tit', product['term-tit']),
-    resolveTerm(dict, 'term-fp', product['term-fp']),
-    resolveTerm(dict, 'term-stat-auto', product['term-stat-auto']),
-    parseAtcvetCodes(product),
-    parseEspeces(product, dict),
-    parseMajRcp(product)
-  ]);
+function pushMedicament(medicaments, product, dict) {
+  return push(
+    medicaments,
+    new MedicamentVet(
+      normalizeNum(product.num),
+      product.nom || '',
+      product['num-amm'] || '',
+      parseDateAmm(product['date-amm']),
+      resolveTerm(dict, 'term-tit', product['term-tit']),
+      resolveTerm(dict, 'term-fp', product['term-fp']),
+      resolveTerm(dict, 'term-stat-auto', product['term-stat-auto']),
+      parseAtcvetCodes(product),
+      parseEspeces(product, dict),
+      parseMajRcp(product)
+    )
+  );
 }
 
-function pushCompositionFromSa(store, num, sa, dict) {
-  pushRow(store, [
-    num,
-    resolveTerm(dict, 'term-sa', sa['term-sa']),
-    sa.quantite != null ? String(sa.quantite) : '',
-    sa.unite || resolveTerm(dict, 'term-unite', sa['term-unite'])
-  ]);
+function pushCompositionFromSa(compositions, num, sa, dict) {
+  push(
+    compositions,
+    new CompositionVet(
+      num,
+      resolveTerm(dict, 'term-sa', sa['term-sa']),
+      sa.quantite != null ? String(sa.quantite) : '',
+      sa.unite || resolveTerm(dict, 'term-unite', sa['term-unite'])
+    )
+  );
 }
 
-function pushCompositionRows(store, product, dict) {
+function pushCompositionRows(compositions, product, dict) {
   const num = normalizeNum(product.num);
   const composition = product.composition;
   if (!composition) return;
@@ -234,18 +207,18 @@ function pushCompositionRows(store, product, dict) {
   if (compoBlocks.length > 0) {
     for (const block of compoBlocks) {
       for (const sa of asArray(block.sa)) {
-        pushCompositionFromSa(store, num, sa, dict);
+        pushCompositionFromSa(compositions, num, sa, dict);
       }
     }
     return;
   }
 
   for (const sa of asArray(composition.sa)) {
-    pushCompositionFromSa(store, num, sa, dict);
+    pushCompositionFromSa(compositions, num, sa, dict);
   }
 }
 
-function pushPresentationRow(store, num, mod, dict) {
+function pushPresentation(presentations, num, mod, dict) {
   const libelle = mod['lib-mod'];
   if (!libelle) return false;
 
@@ -257,16 +230,19 @@ function pushPresentationRow(store, num, mod, dict) {
     if (label) conditions.push(label);
   }
 
-  pushRow(store, [
-    num,
-    libelle,
-    mod['code-gtin'] ? String(mod['code-gtin']) : '',
-    conditions
-  ]);
+  push(
+    presentations,
+    new PresentationVet(
+      num,
+      libelle,
+      mod['code-gtin'] ? String(mod['code-gtin']) : '',
+      conditions
+    )
+  );
   return true;
 }
 
-function pushPresentationRows(store, product, dict) {
+function pushPresentationRows(presentations, product, dict) {
   const num = normalizeNum(product.num);
   const seen = new Set();
 
@@ -278,7 +254,7 @@ function pushPresentationRows(store, product, dict) {
     const key = `${libelle}|${gtin}`;
     if (seen.has(key)) return;
     seen.add(key);
-    pushPresentationRow(store, num, mod, dict);
+    pushPresentation(presentations, num, mod, dict);
   };
 
   for (const mod of asArray(product['modele-destine-vente']?.['mod-vte'])) {
@@ -293,25 +269,17 @@ function parseTempsAttente(product, dict) {
   const items = [];
   for (const route of asArray(product['voie-administration']?.['voie-admin'])) {
     if (!route['qte-ta']) continue;
-    items.push({
-      voie: resolveTerm(dict, 'term-va', route['term-va']),
-      espece: resolveTerm(dict, 'term-esp', route['term-esp']),
-      denree: resolveTerm(dict, 'term-denr', route['term-denr']),
-      quantite: String(route['qte-ta']),
-      unite: resolveTerm(dict, 'term-unite', route['term-unite'])
-    });
+    items.push(
+      new TempsAttenteEntry(
+        resolveTerm(dict, 'term-va', route['term-va']),
+        resolveTerm(dict, 'term-esp', route['term-esp']),
+        resolveTerm(dict, 'term-denr', route['term-denr']),
+        String(route['qte-ta']),
+        resolveTerm(dict, 'term-unite', route['term-unite'])
+      )
+    );
   }
   return items;
-}
-
-function vetIndexConfig(fields, boost = null) {
-  const indexConfig = {
-    fields,
-    storeFields: ['id'],
-    ...miniSearchOptions
-  };
-  if (boost) indexConfig.boost = boost;
-  return indexConfig;
 }
 
 function extractDateJeuFromHeader(filepath) {
@@ -344,18 +312,18 @@ const RELATED_BY_NUM_MAPS = {
 
 function buildNumIndexes() {
   numIndexes = {
-    medicamentsByNum: buildKeyIndex(vetStores.medicaments, 'num', { unique: true }),
-    compositionsByNum: buildKeyIndex(vetStores.compositions, 'num'),
-    presentationsByNum: buildKeyIndex(vetStores.presentations, 'num')
+    medicamentsByNum: buildKeyIndex(corpus.medicaments, 'num', { unique: true }),
+    compositionsByNum: buildKeyIndex(corpus.compositions, 'num'),
+    presentationsByNum: buildKeyIndex(corpus.presentations, 'num')
   };
 }
 
 function clearLoadedData() {
   searchIndexes.medicaments = null;
   searchIndexes.compositions = null;
-  clearStore(vetStores.medicaments);
-  clearStore(vetStores.compositions);
-  clearStore(vetStores.presentations);
+  clearCorpus(corpus.medicaments);
+  clearCorpus(corpus.compositions);
+  clearCorpus(corpus.presentations);
   tempsAttente = new Map();
   numIndexes = null;
 }
@@ -386,81 +354,68 @@ async function loadVetData() {
 
   const medicamentFields = ['nom', 'num'];
   const compositionFields = ['substance', 'num'];
-  const medFieldIndices = indexFieldIndices(vetStores.medicaments, medicamentFields);
-  const compFieldIndices = indexFieldIndices(vetStores.compositions, compositionFields);
 
   await streamMedicinalProducts(productsPath, async (blockXml) => {
     const product = parseProductBlock(blockXml);
     if (!product) return;
 
-    const num = pushMedicamentRow(vetStores.medicaments, product, dict);
-    pushCompositionRows(vetStores.compositions, product, dict);
-    pushPresentationRows(vetStores.presentations, product, dict);
+    const rowIndex = pushMedicament(corpus.medicaments, product, dict);
+    pushCompositionRows(corpus.compositions, product, dict);
+    pushPresentationRows(corpus.presentations, product, dict);
 
     const waiting = parseTempsAttente(product, dict);
     if (waiting.length > 0) {
-      const medNum = getRowValue(vetStores.medicaments, num, numFieldIdx.medicaments);
+      const medNum = corpus.medicaments[rowIndex].num;
       tempsAttente.set(medNum, waiting);
     }
   });
   loadMemoryMark('vet_stream_done', {
-    medicaments: rowCount(vetStores.medicaments),
-    compositions: rowCount(vetStores.compositions)
+    medicaments: rowCount(corpus.medicaments),
+    compositions: rowCount(corpus.compositions)
   });
 
   console.log('Indexation vétérinaire (médicaments)...');
   loadMemoryMark('vet_index_medicaments_start');
-  const medStore = vetStores.medicaments;
   searchIndexes.medicaments = buildFrozenIndexFromRows(
-    medStore.rows,
-    (_row, rowIndex) => buildIndexDocumentFromRow(medStore, rowIndex, medFieldIndices),
-    vetIndexConfig(medicamentFields, { nom: 3, num: 2 })
+    corpus.medicaments,
+    (item, rowIndex) => buildIndexDocument(item, rowIndex, medicamentFields),
+    miniSearchIndexConfig(medicamentFields, { nom: 3, num: 2 })
   );
   loadMemoryMark('vet_index_medicaments_done');
 
   console.log('Indexation vétérinaire (compositions)...');
   loadMemoryMark('vet_index_compositions_start');
-  const compStore = vetStores.compositions;
   searchIndexes.compositions = buildFrozenIndexFromRows(
-    compStore.rows,
-    (_row, rowIndex) => buildIndexDocumentFromRow(compStore, rowIndex, compFieldIndices),
-    vetIndexConfig(compositionFields, { substance: 3, num: 1 })
+    corpus.compositions,
+    (item, rowIndex) => buildIndexDocument(item, rowIndex, compositionFields),
+    miniSearchIndexConfig(compositionFields, { substance: 3, num: 1 })
   );
   loadMemoryMark('vet_index_compositions_done');
   buildNumIndexes();
-  loadMemoryMark('vet_done', { medicaments: rowCount(vetStores.medicaments) });
-  console.log(`Données vétérinaires chargées: ${rowCount(vetStores.medicaments)} médicaments`);
+  loadMemoryMark('vet_done', { medicaments: rowCount(corpus.medicaments) });
+  console.log(`Données vétérinaires chargées: ${rowCount(corpus.medicaments)} médicaments`);
 }
 
 function searchVet(type, query) {
   if (!query) return [];
   if (!searchIndexes[type]) return [];
 
-  const store = vetStores[type];
+  const rows = corpus[type];
   const results = searchIndexes[type].search(query);
-  const mapRow =
-    type === 'medicaments'
-      ? (obj, _i, match_quality) => Object.assign(enrichMedicamentForApi(obj), { match_quality })
-      : null;
-
-  return rankAndMaterializeSearch(
-    store,
-    results,
-    query,
-    { primaryIdx: primaryFieldIdx[type], idIdx: numFieldIdx[type] },
-    mapRow
-  );
+  return rankAndMaterializeSearch(rows, results, query, {
+    primaryField: PRIMARY_FIELDS[type],
+    idField: ID_FIELDS[type]
+  });
 }
 
 function collectPresentationMatchIndices(query) {
-  const store = vetStores.presentations;
+  const presentations = corpus.presentations;
   const normalizedQuery = normalizeSearchText(query);
-  const libIdx = presentationFilterIdx.libelle;
-  const gtinIdx = presentationFilterIdx.gtin;
   const indices = [];
-  for (let i = 0; i < store.rows.length; i++) {
-    const libelle = normalizeSearchText(getRowValue(store, i, libIdx));
-    const gtin = getRowValue(store, i, gtinIdx);
+  for (let i = 0; i < presentations.length; i++) {
+    const row = presentations[i];
+    const libelle = normalizeSearchText(row.libelle);
+    const gtin = row.gtin;
     if (libelle.includes(normalizedQuery) || gtin.includes(query)) {
       indices.push(i);
     }
@@ -468,16 +423,9 @@ function collectPresentationMatchIndices(query) {
   return indices;
 }
 
-function parseListPaging(page, limit) {
-  const safePage = Math.max(1, parseInt(page, 10) || 1);
-  const safeLimit = Math.min(MAX_LIST_LIMIT, Math.max(1, parseInt(limit, 10) || 100));
-  const offset = (safePage - 1) * safeLimit;
-  return { safePage, safeLimit, offset };
-}
-
 function listVetCorpusPage(type, page = 1, limit = 100) {
-  const store = vetStores[type];
-  if (!store) {
+  const rows = corpus[type];
+  if (!rows) {
     return {
       data: [],
       pagination: { total: 0, page: 1, limit: 100, pages: 0 },
@@ -486,10 +434,9 @@ function listVetCorpusPage(type, page = 1, limit = 100) {
   }
 
   const { safePage, safeLimit, offset } = parseListPaging(page, limit);
-  const total = rowCount(store);
+  const total = rowCount(rows);
   const end = Math.min(offset + safeLimit, total);
-  const mapRow = type === 'medicaments' ? enrichMedicamentRow : null;
-  const data = materializeRowRange(store, offset, end, mapRow);
+  const data = materializeRange(rows, offset, end);
 
   return {
     data,
@@ -506,17 +453,15 @@ function listVetCorpusPage(type, page = 1, limit = 100) {
   };
 }
 
-/** Présentations filtrées par requête, paginées (indices d’abord, objets seulement sur la page). */
 function listPresentationsPage(query, page = 1, limit = 100) {
   const indices = collectPresentationMatchIndices(query);
   const { safePage, safeLimit, offset } = parseListPaging(page, limit);
   const total = indices.length;
   const end = Math.min(offset + safeLimit, total);
   const pageIndices = indices.slice(offset, end);
-  const store = vetStores.presentations;
 
   return {
-    data: toObjects(store, pageIndices),
+    data: materializeIndices(corpus.presentations, pageIndices),
     pagination: {
       total,
       page: safePage,
@@ -538,30 +483,31 @@ function getMedicamentByNum(num) {
   if (!numIndexes) return undefined;
   const rowIndex = numIndexes.medicamentsByNum.get(normalizeNum(num));
   if (rowIndex === undefined) return undefined;
-  return enrichMedicamentForApi(toObject(vetStores.medicaments, rowIndex));
+  return corpus.medicaments[rowIndex].toJSON();
 }
 
 function getRelatedByNum(type, num, limit = 50) {
   if (!num) return [];
   const normalized = normalizeNum(num);
   if (type === 'temps_attente') {
-    return tempsAttente.get(normalized) || [];
+    const entries = tempsAttente.get(normalized) || [];
+    return entries.map((e) => e.toJSON());
   }
   if (!numIndexes) return [];
   const mapKey = RELATED_BY_NUM_MAPS[type];
   if (!mapKey) return [];
-  const store = vetStores[type];
+  const rows = corpus[type];
   const indices = numIndexes[mapKey].get(normalized) || [];
   const slice = limit > 0 ? indices.slice(0, limit) : indices;
-  return toObjects(store, slice);
+  return materializeIndices(rows, slice);
 }
 
 function getVetCorpusStats() {
   const byType = {};
-  for (const type of Object.keys(vetStores)) {
-    byType[type] = { rows: rowCount(vetStores[type]), keys: vetStores[type].keys };
+  for (const type of Object.keys(corpus)) {
+    byType[type] = { rows: rowCount(corpus[type]) };
   }
-  return { byType, stores: vetStores };
+  return { byType, corpus };
 }
 
 module.exports = {

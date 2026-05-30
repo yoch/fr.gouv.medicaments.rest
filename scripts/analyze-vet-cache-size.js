@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Taille par "colonne" du corpus vétérinaire (vetStores tuple, index, dict).
+ * Taille par "colonne" du corpus vétérinaire (instances classe, index, dict).
  * Usage: node scripts/analyze-vet-cache-size.js
  */
 'use strict';
@@ -97,36 +97,35 @@ async function main() {
     getVetCorpusStats,
     getRelatedByNum
   } = require('../src/services/vetDataLoader');
-  const { materializeRowRange, rowCount, getRowValue, keyIndex } = require('../src/utils/rowStore');
+  const { materializeRange, rowCount } = require('../src/utils/corpusStore');
 
   if (typeof global.gc === 'function') global.gc();
   const memBefore = process.memoryUsage();
 
   await loadVetData();
 
-  const { stores } = getVetCorpusStats();
-  const medicaments = materializeRowRange(
+  const { corpus: stores } = getVetCorpusStats();
+  const medicaments = materializeRange(
     stores.medicaments,
     0,
     rowCount(stores.medicaments)
   );
-  const compositions = materializeRowRange(
+  const compositions = materializeRange(
     stores.compositions,
     0,
     rowCount(stores.compositions)
   );
-  const presentations = materializeRowRange(
+  const presentations = materializeRange(
     stores.presentations,
     0,
     rowCount(stores.presentations)
   );
   const metadata = getVetMetadata();
 
-  const medNumIdx = keyIndex(stores.medicaments, 'num');
   let tempsAttenteRows = 0;
   let tempsAttenteBytes = 0;
   for (let i = 0; i < rowCount(stores.medicaments); i++) {
-    const num = getRowValue(stores.medicaments, i, medNumIdx);
+    const num = stores.medicaments[i].num;
     const rows = getRelatedByNum('temps_attente', num, 0);
     tempsAttenteRows += rows.length;
     tempsAttenteBytes += jsonBytes(rows);
@@ -151,7 +150,7 @@ async function main() {
     corpus.presentations.json_mb +
     corpus.temps_attente.json_mb;
 
-  console.log('=== vetStores — taille JSON (proxy heap corpus matérialisé) ===');
+  console.log('=== corpus vétérinaire — taille JSON (proxy heap corpus matérialisé) ===');
   console.log(JSON.stringify({ corpus_total_json_mb: Math.round(corpusTotalMb * 1000) / 1000, ...corpus }, null, 2));
 
   console.log('\n=== Par champ (somme des octets stringifiés par colonne) ===');

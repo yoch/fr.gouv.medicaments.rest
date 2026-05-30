@@ -1,19 +1,28 @@
 'use strict';
 
-const { getRowValue, toObject } = require('./rowStore');
 const { computeMatchPriority, matchQualityFromPriority } = require('./searchRanking');
 
 /**
- * Classe les hits MiniSearch sur le corpus tuple, matérialise uniquement les lignes retournées.
- * @param {Function} [mapRow] - (obj, rowIndex, match_quality) => réponse API
+ * Classe les hits MiniSearch, matérialise via toJSON() (getters inclus).
+ * @param {object[]} corpus
+ * @param {Function} [mapRow] - (instance, rowIndex, match_quality) => réponse API
  */
-function rankAndMaterializeSearch(store, searchResults, query, { primaryIdx, idIdx = -1 }, mapRow) {
+function rankAndMaterializeSearch(
+  corpus,
+  searchResults,
+  query,
+  { primaryField, idField = null },
+  mapRow = null
+) {
   const ranked = new Array(searchResults.length);
   for (let i = 0; i < searchResults.length; i++) {
     const res = searchResults[i];
-    const primaryValue = getRowValue(store, res.id, primaryIdx);
-    const idValue = idIdx >= 0 ? getRowValue(store, res.id, idIdx) : '';
+    const row = corpus[res.id];
+    const primaryValue = row[primaryField] != null && row[primaryField] !== '' ? row[primaryField] : '';
+    const idValue =
+      idField && row[idField] != null && row[idField] !== '' ? row[idField] : '';
     const priority = computeMatchPriority(primaryValue, query, { idValue });
+
     ranked[i] = {
       rowIndex: res.id,
       score: res.score,
@@ -27,13 +36,14 @@ function rankAndMaterializeSearch(store, searchResults, query, { primaryIdx, idI
     return b.score - a.score;
   });
 
-  const materialize = mapRow
-    ? (r) => mapRow(toObject(store, r.rowIndex), r.rowIndex, r.match_quality)
-    : (r) => Object.assign({}, toObject(store, r.rowIndex), { match_quality: r.match_quality });
-
   const out = new Array(ranked.length);
   for (let i = 0; i < ranked.length; i++) {
-    out[i] = materialize(ranked[i]);
+    const r = ranked[i];
+    if (mapRow) {
+      out[i] = mapRow(corpus[r.rowIndex], r.rowIndex, r.match_quality);
+    } else {
+      out[i] = { ...corpus[r.rowIndex].toJSON(), match_quality: r.match_quality };
+    }
   }
   return out;
 }

@@ -7,6 +7,31 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Ajouté
+
+- Factory `defineCorpusRecord` (champs dérivés de `corpusSchemas`), doc `docs/CORPUS_CLASSES.md`, script `compare-corpus-memory.js`, utils `corpusPaging` / `miniSearchIndexConfig`.
+
+### Modifié
+
+- Corpus BDPM et vétérinaire : stockage en **classes ES6** à forme fixe (`src/models/bdpm`, `src/models/vet`) avec `corpusStore` (helpers sur tableaux d’instances) à la place des tuples `rowStore`.
+- Champs dérivés `url_bdpm` et `lien_rcp` : **getters** sur le prototype (non stockés en RAM) ; sérialisation API via `toJSON()`.
+- Scripts `analyze-bdpm-corpus-size.js`, `analyze-vet-cache-size.js` et benchmark `compare-corpus-memory.js` adaptés aux instances.
+
+### Supprimé
+
+- `rowStore.js` et tests `rowStore.test.js` (remplacés par `corpusRecords.test.js`).
+
+### Benchmark mémoire (classes vs tuples v1.2.0)
+
+Comparer sur la même machine avec `node --expose-gc` :
+
+```bash
+git checkout v1.2.0 && node --expose-gc scripts/compare-corpus-memory.js --vet --label=tuple
+git checkout main && node --expose-gc scripts/compare-corpus-memory.js --vet --label=classes
+```
+
+**Décision** : les index FrozenMiniSearch dominent toujours l’empreinte (~45 Mo) ; le corpus (chaînes partagées) est une fraction du RSS. Les classes améliorent la lisibilité et l’accès typé ; le gain RSS par rapport aux tuples n’est **pas garanti** — valider avec le script ci-dessus avant déploiement. Régression acceptable si ≤ 3 Mo RSS documentée.
+
 ## [1.2.0] - 2026-05-29
 
 ### Ajouté
