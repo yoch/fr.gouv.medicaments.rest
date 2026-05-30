@@ -11,13 +11,14 @@ const medicamentRoutes = require('../src/routes/medicaments');
 const veterinaireRoutes = require('../src/routes/veterinaires');
 const { loadData } = require('../src/services/dataLoader');
 const { loadVetData } = require('../src/services/vetDataLoader');
+const { describeSlow } = require('./helpers/slowTests');
 
 const app = express();
 app.use(express.json());
 app.use('/api/medicaments', medicamentRoutes);
 app.use('/api/veterinaires', veterinaireRoutes);
 
-describe('API Vétérinaires ANMV', () => {
+describeSlow('API Vétérinaires ANMV', () => {
   beforeAll(async () => {
     jest.spyOn(console, 'log').mockImplementation(() => {});
     jest.spyOn(console, 'error').mockImplementation(() => {});

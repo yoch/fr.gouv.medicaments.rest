@@ -151,7 +151,9 @@ describe('corpusStore', () => {
     const corpus = createCorpus();
     push(
       corpus,
-      Presentation.fromCsv(emptyCsv(BDPM_SCHEMAS.presentations, { cis: '1', libelle: 'X' }))
+      Presentation.fromCsv(
+        emptyCsv(BDPM_SCHEMAS.presentations, { cis: '1', libelle: 'X' })
+      )
     );
     expect(buildIndexDocument(corpus[0], 0, ['cis', 'libelle'])).toEqual({
       id: 0,
@@ -198,8 +200,6 @@ describe('MedicamentVet', () => {
       '',
       '',
       '',
-      '',
-      '',
       [],
       [],
       '2024-01-01'
@@ -211,7 +211,7 @@ describe('MedicamentVet', () => {
   });
 
   it('sans maj_rcp : pas de lien_rcp dans toJSON', () => {
-    const m = new MedicamentVet('1', 'X', '', '', '', '', '', [], [], '');
+    const m = new MedicamentVet('1', 'X', '', '', '', [], [], '');
     expect(m.toJSON()).toEqual({ num: '1', nom: 'X' });
   });
 
@@ -222,7 +222,7 @@ describe('MedicamentVet', () => {
 
 describe('tableaux vétérinaires', () => {
   it('codes_atcvet et especes sont toujours des tableaux sur l’instance', () => {
-    const m = new MedicamentVet('1', 'X', '', '', '', '', '', null, undefined, '');
+    const m = new MedicamentVet('1', 'X', '', '', '', null, undefined, '');
     expect(m.codes_atcvet).toEqual([]);
     expect(m.especes).toEqual([]);
     expect(m.toJSON()).toEqual({ num: '1', nom: 'X' });

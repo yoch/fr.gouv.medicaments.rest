@@ -36,7 +36,7 @@ function mapToObject(map) {
 
 function breakdownMedicaments(rows) {
   const fields = [
-    'num', 'nom', 'num_amm', 'date_amm', 'titulaire', 'forme_pharmaceutique',
+    'num', 'nom', 'titulaire', 'forme_pharmaceutique',
     'statut_amm', 'codes_atcvet', 'especes', 'maj_rcp'
   ];
   const out = {};

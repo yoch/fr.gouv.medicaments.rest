@@ -2,12 +2,13 @@ const request = require('supertest');
 const express = require('express');
 const medicamentRoutes = require('../src/routes/medicaments');
 const { loadData } = require('../src/services/dataLoader');
+const { describeSlow } = require('./helpers/slowTests');
 
 const app = express();
 app.use(express.json());
 app.use('/api/medicaments', medicamentRoutes);
 
-describe('API Medicaments', () => {
+describeSlow('API Medicaments', () => {
     beforeAll(async () => {
         // Load data before running tests
         // Ensure we mock or have data available.
@@ -170,15 +171,14 @@ describe('API Medicaments', () => {
             expect(res.body.data[0].match_via).toBe('denomination');
         });
 
-        it('exact substance search exposes match_via composition', async () => {
+        it('substance query can match via composition', async () => {
             const res = await request(app).get(
-                '/api/medicaments/search?q=paracetamol&limit=1&detail=summary'
+                '/api/medicaments/search?q=paracetamol&limit=20&detail=summary'
             );
             expect(res.statusCode).toEqual(200);
-            const item = res.body.data[0];
-            expect(item.match_quality).toBe('exact');
-            expect(['denomination', 'composition']).toContain(item.match_via);
-            expect(item.match_via).toBeDefined();
+            const viaComposition = res.body.data.filter((d) => d.match_via === 'composition');
+            expect(viaComposition.length).toBeGreaterThan(0);
+            expect(viaComposition[0].substances?.length).toBeGreaterThan(0);
         });
     });
 

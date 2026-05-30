@@ -50,11 +50,8 @@ Corpus : `dataLoader.js` → `corpus.<type>[]`
 | `cis` | string | **clé**, **index** |
 | `cip7` | string | **index** |
 | `libelle` | string | **index** |
-| `statut_admin` | string | |
 | `etat_commercialisation` | string | |
-| `date_declaration` | string | |
 | `cip13` | string | **index** |
-| `agrement_collectivite` | string | |
 | `taux_remboursement` | string | |
 | `prix_medicament` | string | |
 | `prix_public` | string | |
@@ -74,9 +71,7 @@ Corpus : `dataLoader.js` → `corpus.<type>[]`
 | `code_substance` | string | alimente `Substance` |
 | `denomination_substance` | string | **index** |
 | `dosage` | string | **index** |
-| `reference_dosage` | string | |
 | `nature_composant` | string | |
-| `numero_ordre` | string | |
 
 `fromCsv` : oui — `CIS_COMPO_bdpm.txt`
 
@@ -163,7 +158,7 @@ Corpus : `dataLoader.js` → `corpus.<type>[]`
 | `denomination` | string | **index** |
 | `lien_fi` | string | |
 
-`fromCsv` : oui — `CIS_MITM.txt`
+`fromCsv` : oui — `CIS_MITM.txt` (si `LOAD_MITM`)
 
 ---
 
@@ -189,8 +184,6 @@ Corpus : `vetDataLoader.js` → `corpus.medicaments | compositions | presentatio
 |-----------|------|--------|
 | `num` | string | **clé**, **index** |
 | `nom` | string | **index** |
-| `num_amm` | string | |
-| `date_amm` | string | |
 | `titulaire` | string | |
 | `forme_pharmaceutique` | string | |
 | `statut_amm` | string | |

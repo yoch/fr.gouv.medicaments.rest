@@ -28,6 +28,7 @@ const HTTP_HEADERS = {
 };
 
 const LOAD_HAS_AVIS = process.env.LOAD_HAS_AVIS !== 'false';
+const LOAD_MITM = process.env.LOAD_MITM !== 'false';
 
 const BDPM_FILES = [
   'CIS_bdpm.txt',
@@ -35,10 +36,11 @@ const BDPM_FILES = [
   'CIS_COMPO_bdpm.txt',
   'CIS_GENER_bdpm.txt',
   'CIS_CPD_bdpm.txt',
-  'CIS_CIP_Dispo_Spec.txt',
-  'CIS_MITM.txt'
+  'CIS_CIP_Dispo_Spec.txt'
   // 'CIS_InfoImportantes.txt'
 ];
+
+const MITM_FILES = ['CIS_MITM.txt'];
 
 const HAS_FILES = [
   'CIS_HAS_SMR_bdpm.txt',
@@ -47,7 +49,10 @@ const HAS_FILES = [
 ];
 
 function bdpmFilesToSync() {
-  return LOAD_HAS_AVIS ? [...BDPM_FILES, ...HAS_FILES] : BDPM_FILES;
+  let files = [...BDPM_FILES];
+  if (LOAD_MITM) files = files.concat(MITM_FILES);
+  if (LOAD_HAS_AVIS) files = files.concat(HAS_FILES);
+  return files;
 }
 
 async function loadMetadata() {

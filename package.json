@@ -11,7 +11,9 @@
     "dev": "nodemon --exec 'node --env-file=.env' src/server.js",
     "download-data": "node src/scripts/download-initial-data.js",
     "test": "jest",
-    "test:serial": "jest --runInBand"
+    "test:serial": "jest --runInBand",
+    "test:integration": "RUN_SLOW_TESTS=1 jest --runInBand tests/api.test.js tests/coherence.test.js tests/veterinaires.test.js",
+    "test:all": "RUN_SLOW_TESTS=1 jest --runInBand"
   },
   "dependencies": {
     "@yoch/minisearch": "^8.2.1",

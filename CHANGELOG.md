@@ -7,6 +7,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Modifié
+
+- Profil allégé agents : `LOAD_MITM=false` (comme `LOAD_HAS_AVIS`), champs retirés des schémas (`presentations`, `compositions` partiels, vet `medicaments`).
+
 ### Ajouté
 
 - Factory `defineCorpusRecord` (champs dérivés de `corpusSchemas`), doc `docs/CORPUS_CLASSES.md`, script `compare-corpus-memory.js`, utils `corpusPaging` / `miniSearchIndexConfig`.

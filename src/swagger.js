@@ -51,11 +51,8 @@ const options = {
                         cis: { type: 'string' },
                         cip7: { type: 'string', description: 'Code CIP7' },
                         libelle: { type: 'string', description: 'Libellé de la présentation' },
-                        statut_admin: { type: 'string' },
                         etat_commercialisation: { type: 'string' },
-                        date_declaration: { type: 'string' },
                         cip13: { type: 'string', description: 'Code CIP13' },
-                        agrement_collectivite: { type: 'string' },
                         taux_remboursement: { type: 'string' },
                         prix_medicament: { type: 'string' },
                         prix_public: { type: 'string' },
@@ -159,10 +156,10 @@ const options = {
                     properties: {
                         cis: { type: 'string' },
                         element_pharmaceutique: { type: 'string' },
+                        designation_element: { type: 'string' },
                         code_substance: { type: 'string' },
                         denomination_substance: { type: 'string' },
                         dosage: { type: 'string' },
-                        reference_dosage: { type: 'string' },
                         nature_composant: { type: 'string' }
                     }
                 },
@@ -171,8 +168,6 @@ const options = {
                     properties: {
                         num: { type: 'string', description: 'Identifiant produit ANMV (7 chiffres)' },
                         nom: { type: 'string' },
-                        num_amm: { type: 'string' },
-                        date_amm: { type: 'string' },
                         titulaire: { type: 'string' },
                         forme_pharmaceutique: { type: 'string' },
                         statut_amm: { type: 'string' },

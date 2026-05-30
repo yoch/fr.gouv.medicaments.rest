@@ -123,14 +123,6 @@ function parseDictionary(xmlContent) {
   return dict;
 }
 
-function parseDateAmm(value) {
-  if (!value) return '';
-  if (/^\d{4}-\d{2}-\d{2}/.test(value)) return value.slice(0, 10);
-  const match = /^(\d{2})\/(\d{2})\/(\d{4})/.exec(value);
-  if (match) return `${match[3]}-${match[2]}-${match[1]}`;
-  return value;
-}
-
 function parseMajRcp(product) {
   return product['maj-rcp'] ? String(product['maj-rcp']) : '';
 }
@@ -174,8 +166,6 @@ function pushMedicament(medicaments, product, dict) {
     new MedicamentVet(
       normalizeNum(product.num),
       product.nom || '',
-      product['num-amm'] || '',
-      parseDateAmm(product['date-amm']),
       resolveTerm(dict, 'term-tit', product['term-tit']),
       resolveTerm(dict, 'term-fp', product['term-fp']),
       resolveTerm(dict, 'term-stat-auto', product['term-stat-auto']),

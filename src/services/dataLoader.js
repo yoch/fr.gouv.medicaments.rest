@@ -32,6 +32,7 @@ const DETAIL_HYDRATE_RELATED_LIMIT = Math.max(
 );
 
 const LOAD_HAS_AVIS = process.env.LOAD_HAS_AVIS !== 'false';
+const LOAD_MITM = process.env.LOAD_MITM !== 'false';
 
 const corpus = {
   specialites: createCorpus(),
@@ -225,12 +226,17 @@ async function loadData() {
   await loadParseAndIndex('generiques', 'CIS_GENER_bdpm.txt', ['libelle_groupe']);
   await loadParseAndIndex('conditions', 'CIS_CPD_bdpm.txt', ['condition']);
   await loadParseAndIndex('ruptures', 'CIS_CIP_Dispo_Spec.txt', ['libelle_statut']);
-  await loadParseAndIndex(
-    'mitm',
-    'CIS_MITM.txt',
-    ['cis', 'code_atc', 'denomination'],
-    { denomination: 3, code_atc: 2, cis: 2 }
-  );
+  if (LOAD_MITM) {
+    await loadParseAndIndex(
+      'mitm',
+      'CIS_MITM.txt',
+      ['cis', 'code_atc', 'denomination'],
+      { denomination: 3, code_atc: 2, cis: 2 }
+    );
+  } else {
+    clearCorpus(corpus.mitm);
+    searchIndexes.mitm = null;
+  }
 
   const substancesMap = new Map();
   for (const comp of corpus.compositions) {
@@ -337,6 +343,10 @@ function isHasAvisLoaded() {
   return LOAD_HAS_AVIS;
 }
 
+function isMitmLoaded() {
+  return LOAD_MITM;
+}
+
 function getBdpmCorpusStats() {
   const byType = {};
   for (const type of Object.keys(corpus)) {
@@ -351,6 +361,7 @@ module.exports = {
   search,
   getMetadata,
   isHasAvisLoaded,
+  isMitmLoaded,
   getSpecialiteByCis,
   getRelatedByCis,
   getGeneriquesForCis,

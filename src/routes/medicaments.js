@@ -8,6 +8,7 @@ const {
   getGeneriquesForCis,
   bdpmExtraitUrl,
   isHasAvisLoaded,
+  isMitmLoaded,
   DETAIL_HYDRATE_RELATED_LIMIT
 } = require('../services/dataLoader');
 const { executeHybridSearch } = require('../services/searchOrchestrator');
@@ -57,6 +58,18 @@ function avisListHandler(dataType) {
       return res.status(410).json({
         error:
           'Les avis HAS (SMR/ASMR) ne sont pas chargés sur ce serveur (LOAD_HAS_AVIS=false).'
+      });
+    }
+    return listHandler(dataType)(req, res);
+  };
+}
+
+function mitmListHandler(dataType) {
+  return (req, res) => {
+    if (!isMitmLoaded()) {
+      return res.status(410).json({
+        error:
+          'Les MITM ne sont pas chargés sur ce serveur (LOAD_MITM=false).'
       });
     }
     return listHandler(dataType)(req, res);
@@ -502,6 +515,7 @@ router.get('/disponibilite', listHandler('ruptures'));
  * /medicaments/interet-therapeutique-majeur:
  *   get:
  *     summary: Médicaments d'Intérêt Thérapeutique Majeur (MITM)
+ *     description: Indisponible si `LOAD_MITM=false` (réponse **410 Gone**).
  *     tags: [Médicaments]
  *     parameters:
  *       - in: query
@@ -533,7 +547,7 @@ router.get('/disponibilite', listHandler('ruptures'));
  *                       items:
  *                         $ref: '#/components/schemas/MITM'
  */
-router.get('/interet-therapeutique-majeur', listHandler('mitm'));
+router.get('/interet-therapeutique-majeur', mitmListHandler('mitm'));
 
 // GET /api/medicaments/substances
 /**

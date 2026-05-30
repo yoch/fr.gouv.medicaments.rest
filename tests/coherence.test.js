@@ -2,12 +2,13 @@ const request = require('supertest');
 const express = require('express');
 const medicamentRoutes = require('../src/routes/medicaments');
 const { loadData } = require('../src/services/dataLoader');
+const { describeSlow } = require('./helpers/slowTests');
 
 const app = express();
 app.use(express.json());
 app.use('/api/medicaments', medicamentRoutes);
 
-describe('API Coherence Tests', () => {
+describeSlow('API Coherence Tests', () => {
     beforeAll(async () => {
         jest.spyOn(console, 'log').mockImplementation(() => { });
         jest.spyOn(console, 'error').mockImplementation(() => { });

@@ -8,13 +8,12 @@ const BDPM_SCHEMAS = {
     'num_autorisation_euro', 'titulaire', 'surveillance_renforcee'
   ],
   presentations: [
-    'cis', 'cip7', 'libelle', 'statut_admin', 'etat_commercialisation',
-    'date_declaration', 'cip13', 'agrement_collectivite', 'taux_remboursement',
-    'prix_medicament', 'prix_public', 'honoraires', 'indications'
+    'cis', 'cip7', 'libelle', 'etat_commercialisation', 'cip13',
+    'taux_remboursement', 'prix_medicament', 'prix_public', 'honoraires', 'indications'
   ],
   compositions: [
     'cis', 'designation_element', 'code_substance', 'denomination_substance',
-    'dosage', 'reference_dosage', 'nature_composant', 'numero_ordre'
+    'dosage', 'nature_composant'
   ],
   avis_smr: [
     'cis', 'has_dossier', 'motif_evaluation', 'date_avis', 'valeur_smr', 'libelle_smr'
@@ -35,8 +34,8 @@ const BDPM_SCHEMAS = {
 /** Schémas vétérinaires — tableaux imbriqués en slot (référence Array). */
 const VET_SCHEMAS = {
   medicaments: [
-    'num', 'nom', 'num_amm', 'date_amm', 'titulaire', 'forme_pharmaceutique',
-    'statut_amm', 'codes_atcvet', 'especes', 'maj_rcp'
+    'num', 'nom', 'titulaire', 'forme_pharmaceutique', 'statut_amm', 'codes_atcvet',
+    'especes', 'maj_rcp'
   ],
   compositions: ['num', 'substance', 'quantite', 'unite'],
   presentations: ['num', 'libelle', 'gtin', 'conditions_delivrance']
