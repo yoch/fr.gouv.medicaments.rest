@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@nodable/flexible-xml-parser": "^1.2.1",
-    "@yoch/minisearch": "^8.2.1",
+    "@yoch/minisearch": "^8.2.4",
     "7zip-bin": "^5.2.0",
     "axios": "^1.6.0",
     "cors": "^2.8.5",
