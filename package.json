@@ -10,12 +10,14 @@
     "start": "node --env-file=.env src/server.js",
     "dev": "nodemon --exec 'node --env-file=.env' src/server.js",
     "download-data": "node src/scripts/download-initial-data.js",
+    "benchmark:vet-xml": "node --expose-gc scripts/benchmark-vet-xml-parsers.js",
     "test": "jest",
     "test:serial": "jest --runInBand",
     "test:integration": "RUN_SLOW_TESTS=1 jest --runInBand tests/api.test.js tests/coherence.test.js tests/veterinaires.test.js",
     "test:all": "RUN_SLOW_TESTS=1 jest --runInBand"
   },
   "dependencies": {
+    "@nodable/flexible-xml-parser": "^1.2.1",
     "@yoch/minisearch": "^8.2.1",
     "7zip-bin": "^5.2.0",
     "axios": "^1.6.0",
@@ -23,13 +25,13 @@
     "csv-parse": "^6.1.0",
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1",
-    "fast-xml-parser": "^5.8.0",
     "fs-extra": "^11.1.1",
     "helmet": "^8.1.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "fast-xml-parser": "^5.8.0",
     "jest": "^30.2.0",
     "knip": "^5.62.0",
     "nodemon": "^3.0.1",

@@ -1,33 +1,11 @@
-const { XMLParser } = require('fast-xml-parser');
 const { streamMedicinalProducts } = require('../../src/utils/streamMedicinalProductsXml');
+const {
+  createVetProductBlockParser,
+  parseProductBlock,
+  VET_SKIP_SCAN_TAGS
+} = require('../../src/utils/vetXmlParser');
 
-const ARRAY_TAGS = new Set([
-  'medicinal-product',
-  'compo',
-  'sa',
-  'mod-vte',
-  'voie-admin',
-  'code-atcvet',
-  'entry',
-  'term-esp'
-]);
-
-/** Parse léger : ignore le corps des paragraphes-rcp, garde lien-rcp / maj-rcp au niveau produit. */
-const xmlParser = new XMLParser({
-  ignoreAttributes: true,
-  trimValues: true,
-  isArray: (tagName) => ARRAY_TAGS.has(tagName),
-  stopNodes: ['*.paragraphes-rcp']
-});
-
-function parseProductBlock(blockXml) {
-  const wrapped = `<?xml version="1.0" encoding="UTF-8"?><root>${blockXml}</root>`;
-  const parsed = xmlParser.parse(wrapped);
-  const raw = parsed.root?.['medicinal-product'] ?? parsed.root;
-  const product = Array.isArray(raw) ? raw[0] : raw;
-  if (!product || !product.nom) return null;
-  return product;
-}
+const scanParser = createVetProductBlockParser(VET_SKIP_SCAN_TAGS);
 
 function extractRcpLinkFields(product) {
   return {
@@ -45,7 +23,7 @@ function extractRcpLinkFields(product) {
  */
 async function scanVetProductsXml(productsPath, onFields) {
   await streamMedicinalProducts(productsPath, (blockXml) => {
-    const product = parseProductBlock(blockXml);
+    const product = parseProductBlock(blockXml, scanParser);
     if (!product) return;
     onFields(extractRcpLinkFields(product));
   });
@@ -53,6 +31,5 @@ async function scanVetProductsXml(productsPath, onFields) {
 
 module.exports = {
   scanVetProductsXml,
-  extractRcpLinkFields,
-  parseProductBlock
+  extractRcpLinkFields
 };

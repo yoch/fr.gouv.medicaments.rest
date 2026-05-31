@@ -1,8 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-const { XMLParser } = require('fast-xml-parser');
 const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
 const { streamMedicinalProducts } = require('../utils/streamMedicinalProductsXml');
+const {
+  defaultDictionaryParser,
+  defaultProductParser,
+  parseProductBlock
+} = require('../utils/vetXmlParser');
 const { loadMemoryMark } = require('../utils/memorySampler');
 const { rankAndMaterializeSearch } = require('../utils/corpusSearch');
 const {
@@ -30,24 +34,6 @@ const {
 const dataDir = process.env.VET_DATA_DIR || VET_DATA_DIR;
 const productsFileName = process.env.VET_PRODUCTS_FILE || PRODUCTS_XML_NAME;
 const dictFileName = process.env.VET_DICT_FILE || DICT_XML_NAME;
-
-const ARRAY_TAGS = new Set([
-  'medicinal-product',
-  'compo',
-  'sa',
-  'mod-vte',
-  'voie-admin',
-  'code-atcvet',
-  'entry',
-  'term-esp'
-]);
-
-const xmlParser = new XMLParser({
-  ignoreAttributes: true,
-  trimValues: true,
-  isArray: (tagName) => ARRAY_TAGS.has(tagName),
-  stopNodes: ['*.paragraphes-rcp', '*.lien-rcp']
-});
 
 const corpus = {
   medicaments: createCorpus(),
@@ -107,7 +93,7 @@ function dictionaryEntriesFromSection(section) {
 }
 
 function parseDictionary(xmlContent) {
-  const parsed = xmlParser.parse(xmlContent);
+  const parsed = defaultDictionaryParser.parse(xmlContent);
   const root = parsed['donnees-reference-group'] || {};
   const dict = {};
 
@@ -286,15 +272,6 @@ function extractDateJeuFromHeader(filepath) {
   }
 }
 
-function parseProductBlock(blockXml) {
-  const wrapped = `<?xml version="1.0" encoding="UTF-8"?><root>${blockXml}</root>`;
-  const parsed = xmlParser.parse(wrapped);
-  const raw = parsed.root?.['medicinal-product'] ?? parsed.root;
-  const product = Array.isArray(raw) ? raw[0] : raw;
-  if (!product || !product.num || !product.nom) return null;
-  return product;
-}
-
 const RELATED_BY_NUM_MAPS = {
   compositions: 'compositionsByNum',
   presentations: 'presentationsByNum'
@@ -346,7 +323,7 @@ async function loadVetData() {
   const compositionFields = ['substance', 'num'];
 
   await streamMedicinalProducts(productsPath, async (blockXml) => {
-    const product = parseProductBlock(blockXml);
+    const product = parseProductBlock(blockXml, defaultProductParser);
     if (!product) return;
 
     const rowIndex = pushMedicament(corpus.medicaments, product, dict);
