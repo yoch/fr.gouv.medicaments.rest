@@ -10,6 +10,7 @@
     "start": "node --env-file=.env src/server.js",
     "dev": "nodemon --exec 'node --env-file=.env' src/server.js",
     "download-data": "node src/scripts/download-initial-data.js",
+    "export-search-indexes": "node src/scripts/export-search-indexes.js",
     "benchmark:vet-xml": "node --expose-gc scripts/benchmark-vet-xml-parsers.js",
     "test": "jest",
     "test:serial": "jest --runInBand",
@@ -18,7 +19,7 @@
   },
   "dependencies": {
     "@nodable/flexible-xml-parser": "^1.2.1",
-    "@yoch/minisearch": "^8.2.4",
+    "@yoch/minisearch": "^8.3.3",
     "7zip-bin": "^5.2.0",
     "axios": "^1.6.0",
     "cors": "^2.8.5",

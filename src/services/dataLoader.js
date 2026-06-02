@@ -1,7 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 const { parse } = require('csv-parse');
-const { buildFrozenIndexFromAsyncIterable, buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
+const {
+  buildFrozenIndexFromAsyncIterable,
+  buildFrozenIndexFromRows,
+  exportFrozenIndexes
+} = require('../utils/frozenMiniSearch');
 const { loadMemoryMark } = require('../utils/memorySampler');
 const { parseListPaging } = require('../utils/corpusPaging');
 const { miniSearchIndexConfig } = require('../utils/miniSearchIndexConfig');
@@ -355,8 +359,18 @@ function getBdpmCorpusStats() {
   return { byType, corpus };
 }
 
+function exportBdpmSearchIndexes(outDir) {
+  return exportFrozenIndexes(searchIndexes, outDir, 'bdpm', {
+    last_updated: metadata.last_updated,
+    source: metadata.source,
+    load_has_avis: LOAD_HAS_AVIS,
+    load_mitm: LOAD_MITM
+  });
+}
+
 module.exports = {
   loadData,
+  exportBdpmSearchIndexes,
   listCorpusPage,
   search,
   getMetadata,

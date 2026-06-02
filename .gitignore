@@ -133,3 +133,6 @@ data/veterinaires/meta.json
 # Données BDPM locales (volumineuses)
 data/*.txt
 data/meta.json
+
+# Snapshots d’index MiniSearch MSv5 (régénérables)
+data/search-indexes/

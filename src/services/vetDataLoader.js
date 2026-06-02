@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
+const { buildFrozenIndexFromRows, exportFrozenIndexes } = require('../utils/frozenMiniSearch');
 const { streamMedicinalProducts } = require('../utils/streamMedicinalProductsXml');
 const {
   defaultDictionaryParser,
@@ -477,8 +477,16 @@ function getVetCorpusStats() {
   return { byType, corpus };
 }
 
+function exportVetSearchIndexes(outDir) {
+  return exportFrozenIndexes(searchIndexes, outDir, 'vet', {
+    last_updated: metadata.last_updated,
+    source: metadata.source
+  });
+}
+
 module.exports = {
   loadVetData,
+  exportVetSearchIndexes,
   searchVet,
   listVetCorpusPage,
   listPresentationsPage,

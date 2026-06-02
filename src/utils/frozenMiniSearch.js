@@ -1,7 +1,10 @@
+const fs = require('fs');
+const path = require('path');
 const {
   FrozenMiniSearch,
   createFrozenIndexBuilder,
-  freezeFrozenIndexBuilder
+  freezeFrozenIndexBuilder,
+  frozenMemoryBreakdown
 } = require('@yoch/minisearch');
 
 /**
@@ -24,10 +27,56 @@ function buildFrozenIndexFromRows(rows, buildDocument, options) {
   return freezeFrozenIndexBuilder(builder);
 }
 
+function saveFrozenIndexToFile(frozenIndex, filePath) {
+  const buffer = frozenIndex.saveBinarySync();
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, buffer);
+  return buffer.length;
+}
+
+function loadFrozenIndexFromFile(filePath, options) {
+  const buffer = fs.readFileSync(filePath);
+  return FrozenMiniSearch.loadBinarySync(buffer, options);
+}
+
+function exportFrozenIndexes(indexesByType, outDir, prefix, manifestExtra = {}) {
+  fs.mkdirSync(outDir, { recursive: true });
+  const manifest = {
+    format: 'msv5',
+    prefix,
+    exported_at: new Date().toISOString(),
+    indexes: {},
+    ...manifestExtra
+  };
+
+  for (const [type, frozenIndex] of Object.entries(indexesByType)) {
+    if (!frozenIndex) continue;
+    const filename = `${prefix}_${type}.msbin`;
+    const filePath = path.join(outDir, filename);
+    const bytes = saveFrozenIndexToFile(frozenIndex, filePath);
+    const breakdown = frozenMemoryBreakdown(frozenIndex);
+    manifest.indexes[type] = {
+      file: filename,
+      bytes,
+      documentCount: breakdown.documentCount,
+      termCount: breakdown.termCount,
+      estimatedStructuredBytes: breakdown.estimatedStructuredBytes
+    };
+  }
+
+  const manifestPath = path.join(outDir, `${prefix}-manifest.json`);
+  fs.writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  return manifest;
+}
+
 module.exports = {
   FrozenMiniSearch,
   createFrozenIndexBuilder,
   freezeFrozenIndexBuilder,
+  frozenMemoryBreakdown,
   buildFrozenIndexFromAsyncIterable,
-  buildFrozenIndexFromRows
+  buildFrozenIndexFromRows,
+  saveFrozenIndexToFile,
+  loadFrozenIndexFromFile,
+  exportFrozenIndexes
 };
