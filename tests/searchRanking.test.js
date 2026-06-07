@@ -1,4 +1,4 @@
-const { FrozenMiniSearch } = require('@yoch/minisearch');
+const { FrozenMiniSearch } = require('@yoch/frozenminisearch');
 const {
   miniSearchOptions,
   computeMatchPriority,

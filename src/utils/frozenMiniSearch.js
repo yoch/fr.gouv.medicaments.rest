@@ -5,7 +5,7 @@ const {
   createFrozenIndexBuilder,
   freezeFrozenIndexBuilder,
   frozenMemoryBreakdown
-} = require('@yoch/minisearch');
+} = require('@yoch/frozenminisearch');
 
 /**
  * Index async (ex. flux CSV) : un document à la fois, sans tableau intermédiaire.

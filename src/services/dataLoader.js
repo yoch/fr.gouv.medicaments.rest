@@ -22,8 +22,55 @@ const {
   buildIndexDocument
 } = require('../utils/corpusStore');
 const { FROM_CSV, bdpmExtraitUrl, Substance } = require('../models/bdpm');
+const { exportCorpusDocuments } = require('../utils/exportCorpusDocuments');
 
 const DATA_DIR = path.join(__dirname, '../../data');
+
+const BDPM_INDEX_SPECS = {
+  specialites: {
+    file: 'CIS_bdpm.txt',
+    fields: ['cis', 'denomination', 'forme_pharma', 'titulaire'],
+    boost: { denomination: 3, cis: 2, forme_pharma: 0.5, titulaire: 1 }
+  },
+  presentations: {
+    file: 'CIS_CIP_bdpm.txt',
+    fields: ['cis', 'cip7', 'cip13', 'libelle', 'indications'],
+    boost: { libelle: 3, indications: 2, cis: 2, cip7: 1.5, cip13: 1.5 }
+  },
+  compositions: {
+    file: 'CIS_COMPO_bdpm.txt',
+    fields: ['cis', 'denomination_substance', 'dosage'],
+    boost: { denomination_substance: 3, cis: 2, dosage: 1 }
+  },
+  avis_smr: {
+    file: 'CIS_HAS_SMR_bdpm.txt',
+    fields: ['libelle_smr', 'valeur_smr']
+  },
+  avis_asmr: {
+    file: 'CIS_HAS_ASMR_bdpm.txt',
+    fields: ['libelle_asmr', 'valeur_asmr']
+  },
+  generiques: {
+    file: 'CIS_GENER_bdpm.txt',
+    fields: ['libelle_groupe']
+  },
+  conditions: {
+    file: 'CIS_CPD_bdpm.txt',
+    fields: ['condition']
+  },
+  ruptures: {
+    file: 'CIS_CIP_Dispo_Spec.txt',
+    fields: ['libelle_statut']
+  },
+  mitm: {
+    file: 'CIS_MITM.txt',
+    fields: ['cis', 'code_atc', 'denomination'],
+    boost: { denomination: 3, code_atc: 2, cis: 2 }
+  },
+  substances: {
+    fields: ['denomination']
+  }
+};
 
 const HYDRATE_RELATED_LIMIT = Math.max(
   1,
@@ -196,30 +243,20 @@ async function loadData() {
   clearLoadedData();
   loadMemoryMark('bdpm_start');
 
-  await loadParseAndIndex(
-    'specialites',
-    'CIS_bdpm.txt',
-    ['cis', 'denomination', 'forme_pharma', 'titulaire'],
-    { denomination: 3, cis: 2, forme_pharma: 0.5, titulaire: 1 }
-  );
+  const { file: specFile, fields: specFields, boost: specBoost } = BDPM_INDEX_SPECS.specialites;
+  await loadParseAndIndex('specialites', specFile, specFields, specBoost);
 
-  await loadParseAndIndex(
-    'presentations',
-    'CIS_CIP_bdpm.txt',
-    ['cis', 'cip7', 'cip13', 'libelle', 'indications'],
-    { libelle: 3, indications: 2, cis: 2, cip7: 1.5, cip13: 1.5 }
-  );
+  const pres = BDPM_INDEX_SPECS.presentations;
+  await loadParseAndIndex('presentations', pres.file, pres.fields, pres.boost);
 
-  await loadParseAndIndex(
-    'compositions',
-    'CIS_COMPO_bdpm.txt',
-    ['cis', 'denomination_substance', 'dosage'],
-    { denomination_substance: 3, cis: 2, dosage: 1 }
-  );
+  const comp = BDPM_INDEX_SPECS.compositions;
+  await loadParseAndIndex('compositions', comp.file, comp.fields, comp.boost);
 
   if (LOAD_HAS_AVIS) {
-    await loadParseAndIndex('avis_smr', 'CIS_HAS_SMR_bdpm.txt', ['libelle_smr', 'valeur_smr']);
-    await loadParseAndIndex('avis_asmr', 'CIS_HAS_ASMR_bdpm.txt', ['libelle_asmr', 'valeur_asmr']);
+    const smr = BDPM_INDEX_SPECS.avis_smr;
+    await loadParseAndIndex('avis_smr', smr.file, smr.fields);
+    const asmr = BDPM_INDEX_SPECS.avis_asmr;
+    await loadParseAndIndex('avis_asmr', asmr.file, asmr.fields);
   } else {
     clearCorpus(corpus.avis_smr);
     clearCorpus(corpus.avis_asmr);
@@ -227,16 +264,15 @@ async function loadData() {
     searchIndexes.avis_asmr = null;
   }
 
-  await loadParseAndIndex('generiques', 'CIS_GENER_bdpm.txt', ['libelle_groupe']);
-  await loadParseAndIndex('conditions', 'CIS_CPD_bdpm.txt', ['condition']);
-  await loadParseAndIndex('ruptures', 'CIS_CIP_Dispo_Spec.txt', ['libelle_statut']);
+  const generiques = BDPM_INDEX_SPECS.generiques;
+  await loadParseAndIndex('generiques', generiques.file, generiques.fields);
+  const conditions = BDPM_INDEX_SPECS.conditions;
+  await loadParseAndIndex('conditions', conditions.file, conditions.fields);
+  const ruptures = BDPM_INDEX_SPECS.ruptures;
+  await loadParseAndIndex('ruptures', ruptures.file, ruptures.fields);
   if (LOAD_MITM) {
-    await loadParseAndIndex(
-      'mitm',
-      'CIS_MITM.txt',
-      ['cis', 'code_atc', 'denomination'],
-      { denomination: 3, code_atc: 2, cis: 2 }
-    );
+    const mitm = BDPM_INDEX_SPECS.mitm;
+    await loadParseAndIndex('mitm', mitm.file, mitm.fields, mitm.boost);
   } else {
     clearCorpus(corpus.mitm);
     searchIndexes.mitm = null;
@@ -258,7 +294,11 @@ async function loadData() {
   for (const sub of substancesMap.values()) {
     push(corpus.substances, sub);
   }
-  await indexInMemoryCorpus('substances', ['denomination']);
+  await indexInMemoryCorpus(
+    'substances',
+    BDPM_INDEX_SPECS.substances.fields,
+    BDPM_INDEX_SPECS.substances.boost
+  );
 
   buildCisIndexes();
   loadMemoryMark('bdpm_done', { specialites: rowCount(corpus.specialites) });
@@ -368,9 +408,35 @@ function exportBdpmSearchIndexes(outDir) {
   });
 }
 
+function exportBdpmCorpusDocuments(outDir) {
+  const datasets = [];
+
+  for (const [type, spec] of Object.entries(BDPM_INDEX_SPECS)) {
+    const rows = corpus[type];
+    if (!rows || rowCount(rows) === 0) continue;
+    if (!searchIndexes[type]) continue;
+
+    const { fields, boost } = spec;
+    datasets.push({
+      type,
+      rows,
+      toDocument: (item, rowIndex) => buildIndexDocument(item, rowIndex, fields),
+      indexOptions: miniSearchIndexConfig(fields, boost)
+    });
+  }
+
+  return exportCorpusDocuments(datasets, outDir, 'bdpm', {
+    last_updated: metadata.last_updated,
+    source: metadata.source,
+    load_has_avis: LOAD_HAS_AVIS,
+    load_mitm: LOAD_MITM
+  });
+}
+
 module.exports = {
   loadData,
   exportBdpmSearchIndexes,
+  exportBdpmCorpusDocuments,
   listCorpusPage,
   search,
   getMetadata,

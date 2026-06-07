@@ -1,4 +1,4 @@
-const { AND } = require('@yoch/minisearch');
+const { AND } = require('@yoch/frozenminisearch');
 
 const MATCH_QUALITY = ['fuzzy', 'prefix', 'exact'];
 const SPACE_OR_PUNCTUATION = /[\s\p{P}]+/u;

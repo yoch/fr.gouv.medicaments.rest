@@ -30,6 +30,18 @@ const {
   PRODUCTS_XML_NAME,
   DICT_XML_NAME
 } = require('./vetDataDownloader');
+const { exportCorpusDocuments } = require('../utils/exportCorpusDocuments');
+
+const VET_INDEX_SPECS = {
+  medicaments: {
+    fields: ['nom', 'num'],
+    boost: { nom: 3, num: 2 }
+  },
+  compositions: {
+    fields: ['substance', 'num'],
+    boost: { substance: 3, num: 1 }
+  }
+};
 
 const dataDir = process.env.VET_DATA_DIR || VET_DATA_DIR;
 const productsFileName = process.env.VET_PRODUCTS_FILE || PRODUCTS_XML_NAME;
@@ -319,8 +331,8 @@ async function loadVetData() {
     metadata.last_updated = fs.statSync(productsPath).mtime.toISOString();
   }
 
-  const medicamentFields = ['nom', 'num'];
-  const compositionFields = ['substance', 'num'];
+  const medicamentFields = VET_INDEX_SPECS.medicaments.fields;
+  const compositionFields = VET_INDEX_SPECS.compositions.fields;
 
   await streamMedicinalProducts(productsPath, async (blockXml) => {
     const product = parseProductBlock(blockXml, defaultProductParser);
@@ -346,7 +358,7 @@ async function loadVetData() {
   searchIndexes.medicaments = buildFrozenIndexFromRows(
     corpus.medicaments,
     (item, rowIndex) => buildIndexDocument(item, rowIndex, medicamentFields),
-    miniSearchIndexConfig(medicamentFields, { nom: 3, num: 2 })
+    miniSearchIndexConfig(medicamentFields, VET_INDEX_SPECS.medicaments.boost)
   );
   loadMemoryMark('vet_index_medicaments_done');
 
@@ -355,7 +367,7 @@ async function loadVetData() {
   searchIndexes.compositions = buildFrozenIndexFromRows(
     corpus.compositions,
     (item, rowIndex) => buildIndexDocument(item, rowIndex, compositionFields),
-    miniSearchIndexConfig(compositionFields, { substance: 3, num: 1 })
+    miniSearchIndexConfig(compositionFields, VET_INDEX_SPECS.compositions.boost)
   );
   loadMemoryMark('vet_index_compositions_done');
   buildNumIndexes();
@@ -484,9 +496,39 @@ function exportVetSearchIndexes(outDir) {
   });
 }
 
+function exportVetCorpusDocuments(outDir) {
+  const datasets = [];
+
+  for (const [type, spec] of Object.entries(VET_INDEX_SPECS)) {
+    const rows = corpus[type];
+    if (!rows || rowCount(rows) === 0) continue;
+
+    const { fields, boost } = spec;
+    datasets.push({
+      type,
+      rows,
+      toDocument: (item, rowIndex) => buildIndexDocument(item, rowIndex, fields),
+      indexOptions: miniSearchIndexConfig(fields, boost)
+    });
+  }
+
+  if (rowCount(corpus.presentations) > 0) {
+    datasets.push({
+      type: 'presentations',
+      rows: corpus.presentations
+    });
+  }
+
+  return exportCorpusDocuments(datasets, outDir, 'vet', {
+    last_updated: metadata.last_updated,
+    source: metadata.source
+  });
+}
+
 module.exports = {
   loadVetData,
   exportVetSearchIndexes,
+  exportVetCorpusDocuments,
   searchVet,
   listVetCorpusPage,
   listPresentationsPage,

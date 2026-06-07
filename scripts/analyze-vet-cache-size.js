@@ -65,7 +65,7 @@ function breakdownPresentations(rows) {
 }
 
 async function main() {
-  const { frozenMemoryBreakdown } = require('@yoch/minisearch');
+  const { frozenMemoryBreakdown } = require('@yoch/frozenminisearch');
   const {
     VET_DATA_DIR,
     PRODUCTS_XML_NAME,
@@ -213,7 +213,7 @@ async function main() {
     compositions: frozenMemoryBreakdown(idxComp)
   };
 
-  console.log('\n=== Index frozen (estimation @yoch/minisearch) ===');
+  console.log('\n=== Index frozen (estimation @yoch/frozenminisearch) ===');
   for (const [name, b] of Object.entries(indexBreakdown)) {
     const structured = b.estimatedStructuredBytes / 1024 / 1024;
     console.log(
