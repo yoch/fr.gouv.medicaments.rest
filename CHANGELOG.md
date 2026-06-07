@@ -36,6 +36,12 @@ git checkout main && node --expose-gc scripts/compare-corpus-memory.js --vet --l
 
 **Décision** : les index FrozenMiniSearch dominent toujours l’empreinte (~45 Mo) ; le corpus (chaînes partagées) est une fraction du RSS. Les classes améliorent la lisibilité et l’accès typé ; le gain RSS par rapport aux tuples n’est **pas garanti** — valider avec le script ci-dessus avant déploiement. Régression acceptable si ≤ 3 Mo RSS documentée.
 
+## [1.2.1] - 2026-06-07
+
+### Modifié
+
+- Index de recherche : `storeFields` vide par défaut — l’`id` document n’est plus dupliqué dans le store JSON (lookup inchangé via `corpus[res.id]`).
+
 ## [1.2.0] - 2026-05-29
 
 ### Ajouté
@@ -75,7 +81,8 @@ git checkout main && node --expose-gc scripts/compare-corpus-memory.js --vet --l
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.0...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/yoch/fr.gouv.medicaments.rest/releases/tag/v1.1.0
 [1.0.0]: https://github.com/yoch/fr.gouv.medicaments.rest/commit/716f95f

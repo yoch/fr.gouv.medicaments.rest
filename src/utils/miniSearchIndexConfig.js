@@ -5,7 +5,7 @@ const { miniSearchOptions } = require('./searchRanking');
 function miniSearchIndexConfig(fields, boost = null) {
   const indexConfig = {
     fields,
-    storeFields: ['id'],
+    storeFields: [],
     ...miniSearchOptions
   };
   if (boost) indexConfig.boost = boost;

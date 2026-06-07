@@ -180,7 +180,7 @@ async function main() {
   const { miniSearchOptions } = require('../src/utils/searchRanking');
 
   function vetIndexConfig(fields, boost) {
-    const c = { fields, storeFields: ['id'], ...miniSearchOptions };
+    const c = { fields, storeFields: [], ...miniSearchOptions };
     if (boost) c.boost = boost;
     return c;
   }
