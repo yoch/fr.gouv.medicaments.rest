@@ -3,8 +3,7 @@ const path = require('path');
 const {
   FrozenMiniSearch,
   createFrozenIndexBuilder,
-  freezeFrozenIndexBuilder,
-  frozenMemoryBreakdown
+  freezeFrozenIndexBuilder
 } = require('@yoch/frozenminisearch');
 
 /**
@@ -54,13 +53,11 @@ function exportFrozenIndexes(indexesByType, outDir, prefix, manifestExtra = {}) 
     const filename = `${prefix}_${type}.msbin`;
     const filePath = path.join(outDir, filename);
     const bytes = saveFrozenIndexToFile(frozenIndex, filePath);
-    const breakdown = frozenMemoryBreakdown(frozenIndex);
     manifest.indexes[type] = {
       file: filename,
       bytes,
-      documentCount: breakdown.documentCount,
-      termCount: breakdown.termCount,
-      estimatedStructuredBytes: breakdown.estimatedStructuredBytes
+      documentCount: frozenIndex.documentCount,
+      termCount: frozenIndex.termCount
     };
   }
 
@@ -73,7 +70,6 @@ module.exports = {
   FrozenMiniSearch,
   createFrozenIndexBuilder,
   freezeFrozenIndexBuilder,
-  frozenMemoryBreakdown,
   buildFrozenIndexFromAsyncIterable,
   buildFrozenIndexFromRows,
   saveFrozenIndexToFile,

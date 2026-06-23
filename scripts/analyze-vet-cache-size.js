@@ -64,8 +64,35 @@ function breakdownPresentations(rows) {
   return out;
 }
 
+/** API interne @yoch/frozenminisearch 1.4+ (ex-export `frozenMemoryBreakdown`). */
+function indexMemoryBreakdown(index) {
+  if (typeof index._memoryBreakdown === 'function') {
+    return index._memoryBreakdown();
+  }
+  return {
+    documentCount: index.documentCount,
+    termCount: index.termCount,
+    estimatedStructuredBytes: null,
+    documents: { storedFieldsJsonBytes: null }
+  };
+}
+
+/** Référence doc `docs/MEMORY_INDEXING_HANDOFF.md` (frozenminisearch ≤1.2.4, storeFields id). */
+const INDEX_REFERENCE = {
+  medicaments: { documentCount: 3213, estimatedStructuredMb: 1.4 },
+  compositions: { documentCount: null, estimatedStructuredMb: null }
+};
+
+function formatIndexDelta(name, breakdown) {
+  const ref = INDEX_REFERENCE[name];
+  if (!ref || ref.estimatedStructuredMb == null) return '';
+  const structuredMb = breakdown.estimatedStructuredBytes / 1024 / 1024;
+  const delta = structuredMb - ref.estimatedStructuredMb;
+  const sign = delta >= 0 ? '+' : '';
+  return `  ref doc: ~${ref.estimatedStructuredMb} Mo structured → Δ ${sign}${delta.toFixed(2)} Mo`;
+}
+
 async function main() {
-  const { frozenMemoryBreakdown } = require('@yoch/frozenminisearch');
   const {
     VET_DATA_DIR,
     PRODUCTS_XML_NAME,
@@ -209,16 +236,19 @@ async function main() {
   );
 
   const indexBreakdown = {
-    medicaments: frozenMemoryBreakdown(idxMed),
-    compositions: frozenMemoryBreakdown(idxComp)
+    medicaments: indexMemoryBreakdown(idxMed),
+    compositions: indexMemoryBreakdown(idxComp)
   };
 
-  console.log('\n=== Index frozen (estimation @yoch/frozenminisearch) ===');
+  console.log('\n=== Index frozen (@yoch/frozenminisearch, _memoryBreakdown) ===');
   for (const [name, b] of Object.entries(indexBreakdown)) {
     const structured = b.estimatedStructuredBytes / 1024 / 1024;
+    const storedKb = (b.documents.storedFieldsJsonBytes || 0) / 1024;
     console.log(
-      `  ${name}: docs=${b.documentCount} terms=${b.termCount} structured≈${structured.toFixed(2)} Mo storedJson≈${(b.storedFieldsJsonBytes / 1024).toFixed(0)} Ko`
+      `  ${name}: docs=${b.documentCount} terms=${b.termCount} structured≈${structured.toFixed(2)} Mo storedJson≈${storedKb.toFixed(0)} Ko`
     );
+    const deltaLine = formatIndexDelta(name, b);
+    if (deltaLine) console.log(deltaLine);
   }
 
   const memAfter = process.memoryUsage();
