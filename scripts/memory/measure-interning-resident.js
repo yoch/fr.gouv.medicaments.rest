@@ -3,8 +3,8 @@
 
 /**
  * Mesure résident BDPM (heap/RSS/pool) — plusieurs runs pour médiane.
- * node --expose-gc scripts/measure-interning-resident.js
- * LOAD_HAS_AVIS=false node --expose-gc scripts/measure-interning-resident.js
+ * node --expose-gc scripts/memory/measure-interning-resident.js
+ * LOAD_HAS_AVIS=false node --expose-gc scripts/memory/measure-interning-resident.js
  */
 
 const { spawnSync } = require('child_process');
@@ -23,7 +23,7 @@ function runOnce() {
   const res = spawnSync(process.execPath, ['--expose-gc', script], {
     encoding: 'utf8',
     env: process.env,
-    cwd: path.resolve(__dirname, '..'),
+    cwd: path.resolve(__dirname, '../..'),
     maxBuffer: 64 * 1024 * 1024
   });
   if (res.status !== 0) {

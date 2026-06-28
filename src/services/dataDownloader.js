@@ -1,34 +1,33 @@
-const axios = require('axios');
-const crypto = require('crypto');
 const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
 const { exec } = require('child_process');
 const { promisify } = require('util');
+const { shouldRecheckFile } = require('../utils/remoteFileProbe');
+const config = require('../config');
+const {
+  hashFile,
+  loadJsonMeta,
+  saveJsonMeta,
+  downloadFile,
+  probeRemote,
+  remoteUnchanged
+} = require('./download/syncHelpers');
 
 const execAsync = promisify(exec);
-const {
-  parseIntervalHours,
-  shouldRecheckFile,
-  fetchRemoteFingerprint,
-  remoteFingerprintUnchanged
-} = require('../utils/remoteFileProbe');
 
-const DATA_DIR = path.join(__dirname, '../../data');
+const DATA_DIR = config.dataDir;
 const META_FILE = path.join(DATA_DIR, 'meta.json');
 const BASE_URL = 'https://base-donnees-publique.medicaments.gouv.fr/download';
-const CHECK_INTERVAL_HOURS = parseIntervalHours(
-  process.env.BDPM_CHECK_INTERVAL_HOURS,
-  72
-);
+const CHECK_INTERVAL_HOURS = config.bdpmCheckIntervalHours;
 
 const HTTP_HEADERS = {
   'User-Agent':
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 };
 
-const LOAD_HAS_AVIS = process.env.LOAD_HAS_AVIS !== 'false';
-const LOAD_MITM = process.env.LOAD_MITM !== 'false';
+const LOAD_HAS_AVIS = config.loadHasAvis;
+const LOAD_MITM = config.loadMitm;
 
 const BDPM_FILES = [
   'CIS_bdpm.txt',
@@ -37,16 +36,25 @@ const BDPM_FILES = [
   'CIS_GENER_bdpm.txt',
   'CIS_CPD_bdpm.txt',
   'CIS_CIP_Dispo_Spec.txt'
-  // 'CIS_InfoImportantes.txt'
 ];
 
 const MITM_FILES = ['CIS_MITM.txt'];
 
-const HAS_FILES = [
-  'CIS_HAS_SMR_bdpm.txt',
-  'CIS_HAS_ASMR_bdpm.txt'
-  // https://base-donnees-publique.medicaments.gouv.fr/download/file/HAS_LiensPageCT_bdpm.txt
-];
+const HAS_FILES = ['CIS_HAS_SMR_bdpm.txt', 'CIS_HAS_ASMR_bdpm.txt'];
+
+/**
+ * Fichiers sources BDPM désactivés (réserve).
+ *
+ * Conservés ici pour réactivation rapide en cas de changement d'avis.
+ * `bdpmFilesToSync()` ne les inclut pas — ne pas supprimer sans discussion.
+ *
+ * Notes de réactivation :
+ *   - CIS_InfoImportantes.txt : URL sans suffixe /file/ (voir plus bas)
+ *     `${BASE_URL}/${filename}` au lieu de `${BASE_URL}/file/${filename}`
+ *   - HAS_LiensPageCT_bdpm.txt : URL distante distincte
+ *     https://base-donnees-publique.medicaments.gouv.fr/download/file/HAS_LiensPageCT_bdpm.txt
+ */
+const BDPM_DISABLED_FILES = ['CIS_InfoImportantes.txt', 'HAS_LiensPageCT_bdpm.txt'];
 
 function bdpmFilesToSync() {
   let files = [...BDPM_FILES];
@@ -55,51 +63,22 @@ function bdpmFilesToSync() {
   return files;
 }
 
-async function loadMetadata() {
-  try {
-    if (fs.existsSync(META_FILE)) {
-      const data = await fs.readJson(META_FILE);
-      return data;
-    }
-  } catch (error) {
-    console.error('Erreur lors du chargement des métadonnées:', error.message);
-  }
-  return {};
-}
-
-async function saveMetadata(metadata) {
-  try {
-    await fs.ensureDir(DATA_DIR);
-    await fs.writeJson(META_FILE, metadata, { spaces: 2 });
-  } catch (error) {
-    console.error('Erreur lors de la sauvegarde des métadonnées:', error.message);
-  }
-}
-
 async function checkAndConvertToUTF8(filepath) {
   try {
-    // Vérifier l'encodage du fichier
     const { stdout } = await execAsync(`file -b --mime-encoding "${filepath}"`);
     const encoding = stdout.trim();
 
     if (encoding !== 'utf-8' && encoding !== 'us-ascii') {
       console.log(`  → Conversion de ${path.basename(filepath)} de ${encoding} vers UTF-8...`);
 
-      // Créer une copie temporaire
       const tempFile = filepath + '.tmp';
-
-      // Déterminer l'encodage source
       let sourceEncoding = encoding;
       if (encoding === 'unknown-8bit' || encoding === 'binary') {
-        // Essayer de détecter si c'est du latin1 ou windows-1252
         sourceEncoding = 'ISO-8859-1';
       }
 
       try {
-        // Convertir le fichier en UTF-8
         await execAsync(`iconv -f ${sourceEncoding} -t UTF-8 "${filepath}" > "${tempFile}"`);
-
-        // Remplacer le fichier original
         await fs.move(tempFile, filepath, { overwrite: true });
         console.log(`  ✓ Conversion réussie`);
       } catch (convError) {
@@ -110,8 +89,7 @@ async function checkAndConvertToUTF8(filepath) {
           console.log(`  ✓ Conversion réussie avec windows-1252`);
         } catch (err2) {
           console.error(`  ✗ Impossible de convertir le fichier, il sera utilisé tel quel`);
-          // Nettoyer le fichier temporaire s'il existe
-          await fs.remove(tempFile).catch(() => { });
+          await fs.remove(tempFile).catch(() => {});
         }
       }
     }
@@ -120,48 +98,9 @@ async function checkAndConvertToUTF8(filepath) {
   }
 }
 
-function hashFile(filepath) {
-  return new Promise((resolve, reject) => {
-    const hash = crypto.createHash('sha256');
-    const reader = fs.createReadStream(filepath);
-    reader.pipe(hash);
-    hash.on('finish', () => resolve(hash.digest('hex')));
-    reader.on('error', reject);
-    hash.on('error', reject);
-  });
-}
-
-async function downloadFile(url, filepath) {
-  try {
-    console.log(`Téléchargement de ${path.basename(filepath)}...`);
-    const response = await axios({
-      method: 'GET',
-      url: url,
-      responseType: 'stream',
-      headers: HTTP_HEADERS,
-      timeout: 30000
-    });
-
-    await fs.ensureDir(path.dirname(filepath));
-
-    const writer = fs.createWriteStream(filepath);
-    response.data.pipe(writer);
-
-    await new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
-      writer.on('error', reject);
-    });
-
-    return hashFile(filepath);
-  } catch (error) {
-    console.error(`Erreur téléchargement ${path.basename(filepath)}:`, error.message);
-    throw error;
-  }
-}
-
 async function downloadDataIfNeeded() {
   await fs.ensureDir(DATA_DIR);
-  let metadata = await loadMetadata();
+  let metadata = await loadJsonMeta(META_FILE);
   let changed = false;
 
   for (const filename of bdpmFilesToSync()) {
@@ -185,49 +124,42 @@ async function downloadDataIfNeeded() {
         if (localHash === existingHash) {
           console.log(`✓ ${filename} inchangé (hash local identique)`);
           metadata[filename].checkedAt = new Date().toISOString();
-          await saveMetadata(metadata);
+          await saveJsonMeta(META_FILE, metadata);
           continue;
         }
       }
 
-      let remoteFingerprint = null;
-      try {
-        remoteFingerprint = await fetchRemoteFingerprint(url, {
-          timeout: 30000,
-          userAgent: HTTP_HEADERS['User-Agent']
-        });
-        if (
-          remoteFingerprintUnchanged(fileMeta?.remote, remoteFingerprint) &&
-          existingHash &&
-          fs.existsSync(finalPath)
-        ) {
-          metadata[filename] = {
-            ...metadata[filename],
-            checkedAt: new Date().toISOString(),
-            remote: remoteFingerprint
-          };
-          await saveMetadata(metadata);
-          console.log(`✓ ${filename} inchangé (sonde distante, pas de téléchargement)`);
-          continue;
-        }
-      } catch (probeError) {
-        console.warn(
-          `⚠ Sonde distante ${filename}: ${probeError.message} — téléchargement complet`
-        );
+      const remoteFingerprint = await probeRemote(url, {
+        timeoutMs: 30000,
+        userAgent: HTTP_HEADERS['User-Agent']
+      });
+      if (
+        remoteFingerprint &&
+        remoteUnchanged(fileMeta?.remote, remoteFingerprint) &&
+        existingHash &&
+        fs.existsSync(finalPath)
+      ) {
+        metadata[filename] = {
+          ...metadata[filename],
+          checkedAt: new Date().toISOString(),
+          remote: remoteFingerprint
+        };
+        await saveJsonMeta(META_FILE, metadata);
+        console.log(`✓ ${filename} inchangé (sonde distante, pas de téléchargement)`);
+        continue;
       }
 
-      const fileHash = await downloadFile(url, tempPath);
+      const fileHash = await downloadFile(url, tempPath, { headers: HTTP_HEADERS });
 
       if (existingHash && fileHash === existingHash && fs.existsSync(finalPath)) {
         console.log(`✓ ${filename} inchangé (hash identique)`);
-        // On met juste à jour la date de vérification
         metadata[filename] = {
           ...metadata[filename],
           checkedAt: new Date().toISOString(),
           remote: remoteFingerprint ?? metadata[filename]?.remote
         };
         await fs.remove(tempPath);
-        await saveMetadata(metadata);
+        await saveJsonMeta(META_FILE, metadata);
       } else {
         if (existingHash) {
           console.log(`⟳ ${filename} a été mis à jour par le serveur (hash différent)`);
@@ -235,14 +167,9 @@ async function downloadDataIfNeeded() {
           console.log(`+ ${filename} nouvelle ressource`);
         }
 
-        // Le fichier a changé ou est nouveau
-        // 1. Convertir en UTF-8 le fichier temporaire
         await checkAndConvertToUTF8(tempPath);
-
-        // 2. Déplacer vers la destination finale
         await fs.move(tempPath, finalPath, { overwrite: true });
 
-        // 3. Mettre à jour les métadonnées
         metadata[filename] = {
           downloadedAt: new Date().toISOString(),
           checkedAt: new Date().toISOString(),
@@ -251,14 +178,13 @@ async function downloadDataIfNeeded() {
           encoding: 'utf-8',
           remote: remoteFingerprint ?? metadata[filename]?.remote ?? null
         };
-        await saveMetadata(metadata);
+        await saveJsonMeta(META_FILE, metadata);
         changed = true;
         console.log(`✓ ${filename} mis à jour et converti`);
       }
     } catch (error) {
       console.error(`✗ Échec traitement ${filename}:`, error.message);
-      // Nettoyage
-      await fs.remove(tempPath).catch(() => { });
+      await fs.remove(tempPath).catch(() => {});
 
       if (!fs.existsSync(finalPath)) {
         console.log(`Le fichier ${filename} n'existe pas localement et le téléchargement a échoué`);

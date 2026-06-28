@@ -7,15 +7,12 @@
  *   CORPUS_EXPORT_OUT_DIR=data/corpus-export SKIP_VET=1 node src/scripts/export-corpus-documents.js
  */
 
-const path = require('path');
 const { loadData, exportBdpmCorpusDocuments } = require('../services/dataLoader');
 const { loadVetData, exportVetCorpusDocuments } = require('../services/vetDataLoader');
+const config = require('../config');
 
-const OUT_DIR =
-  process.env.CORPUS_EXPORT_OUT_DIR ||
-  path.join(__dirname, '../../data/corpus-export');
-
-const SKIP_VET = process.env.SKIP_VET === '1' || process.env.SKIP_VET === 'true';
+const OUT_DIR = config.corpusExportOutDir;
+const SKIP_VET = config.skipVet;
 
 async function main() {
   console.log(`Répertoire de sortie: ${OUT_DIR}`);

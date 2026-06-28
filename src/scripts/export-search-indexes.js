@@ -7,15 +7,12 @@
  *   SEARCH_INDEX_OUT_DIR=data/search-indexes SKIP_VET=1 node src/scripts/export-search-indexes.js
  */
 
-const path = require('path');
 const { loadData, exportBdpmSearchIndexes } = require('../services/dataLoader');
 const { loadVetData, exportVetSearchIndexes } = require('../services/vetDataLoader');
+const config = require('../config');
 
-const OUT_DIR =
-  process.env.SEARCH_INDEX_OUT_DIR ||
-  path.join(__dirname, '../../data/search-indexes');
-
-const SKIP_VET = process.env.SKIP_VET === '1' || process.env.SKIP_VET === 'true';
+const OUT_DIR = config.searchIndexOutDir;
+const SKIP_VET = config.skipVet;
 
 async function main() {
   console.log(`Répertoire de sortie: ${OUT_DIR}`);

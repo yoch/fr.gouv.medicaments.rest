@@ -25,7 +25,7 @@
 | `vet_cache_only_stream` RSS (profil vet seul) | — | **~163 Mo** |
 
 Bench : `npm run benchmark:vet-xml`  
-Profil : `PROFILE_VET=1 PROFILE_BDPM=0 node --expose-gc scripts/profile-load-memory-highfreq.js`
+Profil : `PROFILE_VET=1 PROFILE_BDPM=0 node --expose-gc scripts/memory/profile-load-memory-highfreq.js`
 
 **Tests scan RCP :** [`scanVetProductsXml.js`](../tests/helpers/scanVetProductsXml.js) utilise `VET_SKIP_SCAN_TAGS` (seul `paragraphes-rcp` ignoré) pour conserver `<lien-rcp>` dans les tests d’équivalence.
 
@@ -42,7 +42,7 @@ Profil : `PROFILE_VET=1 PROFILE_BDPM=0 node --expose-gc scripts/profile-load-mem
 
 **Conclusion :** `parseStream` sans sink **aggrave** la mémoire (arbre global de tous les produits). Ne pas activer en production sans phase 3.
 
-**Code de référence :** `extractMedicinalProductsFromGroup()` + bench phase `phase2` dans [`scripts/benchmark-vet-xml-parsers.js`](../scripts/benchmark-vet-xml-parsers.js) (désactivée par défaut ; `BENCHMARK_PHASES` sans `phase2`).
+**Code de référence :** `extractMedicinalProductsFromGroup()` + bench phase `phase2` dans [`scripts/benchmark/vet-xml-parsers.js`](../scripts/benchmark/vet-xml-parsers.js) (désactivée par défaut ; `BENCHMARK_PHASES` sans `phase2`).
 
 ---
 
@@ -71,5 +71,5 @@ Profil : `PROFILE_VET=1 PROFILE_BDPM=0 node --expose-gc scripts/profile-load-mem
 | `src/utils/vetXmlParser.js` | Parsers singletons + `parseProductBlock(block, parser)` |
 | `src/services/vetDataLoader.js` | Chargeur prod |
 | `tests/helpers/scanVetProductsXml.js` | Scan tests RCP |
-| `scripts/benchmark-vet-xml-parsers.js` | Comparaison baseline / phase1 / phase2 |
+| `scripts/benchmark/vet-xml-parsers.js` | Comparaison baseline / phase1 / phase2 |
 | `package.json` | `@nodable/flexible-xml-parser` ; `fast-xml-parser` en devDep (bench) |

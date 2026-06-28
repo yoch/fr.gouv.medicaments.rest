@@ -5,18 +5,18 @@
  * Analyse la cardinalité des champs corpus pour décider quoi interner.
  *
  * Usage:
- *   node scripts/analyze-interning-candidates.js
- *   LOAD_HAS_AVIS=false CORPUS_LIGHT_PROFILE=true node scripts/analyze-interning-candidates.js
- *   node --expose-gc scripts/analyze-interning-candidates.js --json > tmp/interning.json
+ *   node scripts/benchmark/analyze-interning-candidates.js
+ *   LOAD_HAS_AVIS=false CORPUS_LIGHT_PROFILE=true node scripts/benchmark/analyze-interning-candidates.js
+ *   node --expose-gc scripts/benchmark/analyze-interning-candidates.js --json > tmp/interning.json
  *
  * Heuristique « intern » : ratio distinctes < 5 %, ≥ 20 copies moyennes, longueur médiane < 120.
  * Heuristique « skip » : ratio > 50 % ou longueur médiane > 300.
  */
 
-const { loadData, getBdpmCorpusStats } = require('../src/services/dataLoader');
-const { BDPM_RECORD_CLASSES } = require('../src/models/bdpm');
-const { internPoolSize } = require('../src/utils/stringPool');
-const { BDPM_LOW_CARDINALITY_FIELDS } = require('../src/utils/bdpmInterning');
+const { loadData, getBdpmCorpusStats } = require('../../src/services/dataLoader');
+const { BDPM_RECORD_CLASSES } = require('../../src/models/bdpm');
+const { internPoolSize } = require('../../src/utils/stringPool');
+const { BDPM_LOW_CARDINALITY_FIELDS } = require('../../src/utils/bdpmInterning');
 
 const MIN_COPIES_FOR_INTERN = 20;
 const MAX_DISTINCT_RATIO = 0.05;

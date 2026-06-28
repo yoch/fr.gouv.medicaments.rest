@@ -24,7 +24,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 - `corpusLightProfile` : omission RAM / index sur champs lourds sans tronquer le parsing CSV (`CORPUS_LIGHT_PROFILE=true`, indépendant de `LOAD_HAS_AVIS`).
 - `GET /config` : feature flags et limites runtime pour le debug.
-- `bdpmInterning` : liste centralisée des champs internés, alignée sur `scripts/analyze-interning-candidates.js`.
+- `bdpmInterning` : liste centralisée des champs internés, alignée sur `scripts/benchmark/analyze-interning-candidates.js`.
 - Tests de non-régression CIP13 (`bdpmPresentationSchema`, `corpusLightProfile`, `bdpmInterning`) et scripts `analyze:interning` / `measure:bdpm-resident`.
 
 ### Modifié

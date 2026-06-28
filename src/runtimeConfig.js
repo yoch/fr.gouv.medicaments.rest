@@ -1,14 +1,7 @@
 'use strict';
 
 const { version } = require('../package.json');
-const { CHECK_INTERVAL_HOURS: BDPM_CHECK_INTERVAL_HOURS } = require('./services/dataDownloader');
-const { CHECK_INTERVAL_HOURS: VET_CHECK_INTERVAL_HOURS } = require('./services/vetDataDownloader');
-const {
-  isHasAvisLoaded,
-  isMitmLoaded,
-  HYDRATE_RELATED_LIMIT: SEARCH_HYDRATE_RELATED_LIMIT,
-  DETAIL_HYDRATE_RELATED_LIMIT
-} = require('./services/dataLoader');
+const config = require('./config');
 const {
   isCorpusLightProfile,
   presentationIndexFields,
@@ -16,30 +9,34 @@ const {
 } = require('./utils/corpusLightProfile');
 const { internPoolSize } = require('./utils/stringPool');
 
+/**
+ * Expose une vue sluggée (snake_case) de la config runtime via GET /config.
+ * Garde la même forme que depuis l'origine pour ne pas casser le contrat API.
+ */
 function getRuntimeConfig() {
   const corpusLight = isCorpusLightProfile();
 
   return {
     version,
-    node_env: process.env.NODE_ENV || 'development',
-    reload_strategy: String(process.env.RELOAD_STRATEGY || 'in-process').toLowerCase(),
+    node_env: config.nodeEnv,
+    reload_strategy: config.reloadStrategy,
     features: {
-      load_has_avis: isHasAvisLoaded(),
-      load_mitm: isMitmLoaded(),
+      load_has_avis: config.loadHasAvis,
+      load_mitm: config.loadMitm,
       corpus_light_profile: corpusLight,
-      vet_load_deferred: process.env.VET_LOAD_DEFERRED === 'true',
-      enable_rate_limit: process.env.ENABLE_RATE_LIMIT === 'true'
+      vet_load_deferred: config.vetLoadDeferred,
+      enable_rate_limit: config.enableRateLimit
     },
     intervals_hours: {
-      bdpm_check: BDPM_CHECK_INTERVAL_HOURS,
-      vet_check: VET_CHECK_INTERVAL_HOURS
+      bdpm_check: config.bdpmCheckIntervalHours,
+      vet_check: config.vetCheckIntervalHours
     },
     limits: {
-      search_hydrate_related: SEARCH_HYDRATE_RELATED_LIMIT,
-      detail_hydrate_related: DETAIL_HYDRATE_RELATED_LIMIT,
-      vet_load_delay_ms: Math.max(0, parseInt(process.env.VET_LOAD_DELAY_MS || '0', 10)),
-      rate_limit_window_ms: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10),
-      rate_limit_max: parseInt(process.env.RATE_LIMIT_MAX || '500', 10)
+      search_hydrate_related: config.searchHydrateRelatedLimit,
+      detail_hydrate_related: config.detailHydrateRelatedLimit,
+      vet_load_delay_ms: config.vetLoadDelayMs,
+      rate_limit_window_ms: config.rateLimitWindowMs,
+      rate_limit_max: config.rateLimitMax
     },
     corpus_light_omit_fields: corpusLight ? { ...OMIT_STORED_FIELDS_BY_TYPE } : null,
     presentation_index_fields: presentationIndexFields(),

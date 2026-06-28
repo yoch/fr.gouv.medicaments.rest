@@ -1,33 +1,33 @@
-const axios = require('axios');
-const crypto = require('crypto');
 const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
 const { execFile } = require('child_process');
 const { promisify } = require('util');
 const sevenBin = require('7zip-bin');
+const { shouldRecheckFile } = require('../utils/remoteFileProbe');
+const config = require('../config');
 const {
-  parseIntervalHours,
-  shouldRecheckFile,
-  fetchRemoteFingerprint,
-  remoteFingerprintUnchanged
-} = require('../utils/remoteFileProbe');
+  hashFile,
+  loadJsonMeta,
+  saveJsonMeta,
+  downloadFile,
+  probeRemote,
+  remoteUnchanged,
+  touchChecked
+} = require('./download/syncHelpers');
 
 const execFileAsync = promisify(execFile);
 
-const VET_DATA_DIR = path.join(__dirname, '../../data/veterinaires');
+const VET_DATA_DIR = config.vetDataDir;
 const META_FILE = path.join(VET_DATA_DIR, 'meta.json');
-const CHECK_INTERVAL_HOURS = parseIntervalHours(
-  process.env.VET_CHECK_INTERVAL_HOURS,
-  72
-);
+const CHECK_INTERVAL_HOURS = config.vetCheckIntervalHours;
 
 const ARCHIVE_URL = 'https://pro.anses.fr/RCP/amm-vet-fr-v2-v.7z';
 const DICT_URL = 'https://pro.anses.fr/RCP/amm-vet-fr-v2-d.xml';
 
 const ARCHIVE_NAME = 'amm-vet-fr-v2-v.7z';
-const PRODUCTS_XML_NAME = 'amm-vet-fr-v2-v.xml';
-const DICT_XML_NAME = 'amm-vet-fr-v2-d.xml';
+const PRODUCTS_XML_NAME = config.vetProductsFile;
+const DICT_XML_NAME = config.vetDictFile;
 
 const HTTP_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (compatible; fr.gouv.medicaments.rest/1.1)'
@@ -42,67 +42,10 @@ async function ensure7zipExecutable() {
   return bin;
 }
 
-async function loadMetadata() {
-  try {
-    if (fs.existsSync(META_FILE)) {
-      return await fs.readJson(META_FILE);
-    }
-  } catch (error) {
-    console.error('Erreur lors du chargement des métadonnées vétérinaires:', error.message);
-  }
-  return {};
-}
-
-async function saveMetadata(metadata) {
-  await fs.ensureDir(VET_DATA_DIR);
-  await fs.writeJson(META_FILE, metadata, { spaces: 2 });
-}
-
-function hashFile(filepath) {
-  return new Promise((resolve, reject) => {
-    const hash = crypto.createHash('sha256');
-    const reader = fs.createReadStream(filepath);
-    reader.pipe(hash);
-    hash.on('finish', () => resolve(hash.digest('hex')));
-    reader.on('error', reject);
-    hash.on('error', reject);
-  });
-}
-
-async function downloadFile(url, filepath) {
-  console.log(`Téléchargement vétérinaire: ${path.basename(filepath)}...`);
-  const response = await axios({
-    method: 'GET',
-    url,
-    responseType: 'stream',
-    headers: HTTP_HEADERS,
-    timeout: 120000
-  });
-
-  await fs.ensureDir(path.dirname(filepath));
-  const writer = fs.createWriteStream(filepath);
-  response.data.pipe(writer);
-
-  await new Promise((resolve, reject) => {
-    writer.on('finish', resolve);
-    writer.on('error', reject);
-  });
-
-  return hashFile(filepath);
-}
-
 async function extractArchive(archivePath, destDir) {
   const bin = await ensure7zipExecutable();
   await fs.ensureDir(destDir);
   await execFileAsync(bin, ['x', '-y', `-o${destDir}`, archivePath]);
-}
-
-function touchChecked(metadata, filename, extra = {}) {
-  metadata[filename] = {
-    ...metadata[filename],
-    checkedAt: new Date().toISOString(),
-    ...extra
-  };
 }
 
 async function processRemoteFile({ filename, url, metadata, extract = false }) {
@@ -123,44 +66,41 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
       const localHash = await hashFile(finalPath);
       if (localHash === existingHash) {
         touchChecked(metadata, filename);
-        await saveMetadata(metadata);
+        await saveJsonMeta(META_FILE, metadata, VET_DATA_DIR);
         console.log(`✓ ${filename} (vétérinaire) inchangé (hash local identique)`);
         return { changed: false };
       }
     }
 
-    let remoteFingerprint = null;
-    try {
-      remoteFingerprint = await fetchRemoteFingerprint(url, {
-        timeout: 60000,
-        userAgent: HTTP_HEADERS['User-Agent']
-      });
-      if (
-        remoteFingerprintUnchanged(fileMeta.remote, remoteFingerprint) &&
-        existingHash &&
-        fs.existsSync(finalPath)
-      ) {
-        touchChecked(metadata, filename, { remote: remoteFingerprint });
-        await saveMetadata(metadata);
-        console.log(
-          `✓ ${filename} (vétérinaire) inchangé (sonde distante, pas de téléchargement)`
-        );
-        return { changed: false };
-      }
-    } catch (probeError) {
-      console.warn(
-        `⚠ Sonde distante ${filename} (vétérinaire): ${probeError.message} — téléchargement complet`
+    const remoteFingerprint = await probeRemote(url, {
+      timeoutMs: 60000,
+      userAgent: HTTP_HEADERS['User-Agent']
+    });
+    if (
+      remoteFingerprint &&
+      remoteUnchanged(fileMeta.remote, remoteFingerprint) &&
+      existingHash &&
+      fs.existsSync(finalPath)
+    ) {
+      touchChecked(metadata, filename, { remote: remoteFingerprint });
+      await saveJsonMeta(META_FILE, metadata, VET_DATA_DIR);
+      console.log(
+        `✓ ${filename} (vétérinaire) inchangé (sonde distante, pas de téléchargement)`
       );
+      return { changed: false };
     }
 
-    const fileHash = await downloadFile(url, tempPath);
+    const fileHash = await downloadFile(url, tempPath, {
+      headers: HTTP_HEADERS,
+      timeoutMs: 120000
+    });
 
     if (existingHash && fileHash === existingHash && fs.existsSync(finalPath)) {
       await fs.remove(tempPath);
       touchChecked(metadata, filename, {
         remote: remoteFingerprint ?? fileMeta.remote
       });
-      await saveMetadata(metadata);
+      await saveJsonMeta(META_FILE, metadata, VET_DATA_DIR);
       console.log(`✓ ${filename} (vétérinaire) inchangé (hash distant identique)`);
       return { changed: false };
     }
@@ -173,7 +113,7 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
       source: 'remote',
       remote: remoteFingerprint ?? fileMeta.remote ?? null
     };
-    await saveMetadata(metadata);
+    await saveJsonMeta(META_FILE, metadata, VET_DATA_DIR);
     console.log(`✓ ${filename} (vétérinaire) mis à jour`);
 
     if (extract) {
@@ -185,7 +125,6 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
   } catch (error) {
     console.error(`✗ Échec traitement ${filename} (vétérinaire):`, error.message);
     await fs.remove(tempPath).catch(() => {});
-
     if (!fs.existsSync(finalPath)) {
       console.log(`Le fichier ${filename} n'existe pas localement et le téléchargement a échoué`);
     } else {
@@ -197,7 +136,7 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
 
 async function downloadVetDataIfNeeded() {
   await fs.ensureDir(VET_DATA_DIR);
-  let metadata = await loadMetadata();
+  let metadata = await loadJsonMeta(META_FILE);
   let changed = false;
 
   const archiveResult = await processRemoteFile({
@@ -207,7 +146,7 @@ async function downloadVetDataIfNeeded() {
     extract: true
   });
   changed = changed || archiveResult.changed;
-  metadata = await loadMetadata();
+  metadata = await loadJsonMeta(META_FILE);
 
   const dictResult = await processRemoteFile({
     filename: DICT_XML_NAME,

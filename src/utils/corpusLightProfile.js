@@ -1,5 +1,7 @@
 'use strict';
 
+const config = require('../config');
+
 /**
  * Profil corpus allégé : ne pas charger en RAM certains champs peu utiles aux agents —
  * sans tronquer le schéma CSV (qui doit toujours refléter les colonnes gouv).
@@ -15,7 +17,7 @@ const OMIT_STORED_FIELDS_BY_TYPE = {
 };
 
 function isCorpusLightProfile() {
-  return process.env.CORPUS_LIGHT_PROFILE === 'true';
+  return config.corpusLightProfile;
 }
 
 function omitStoredFieldsFor(type) {

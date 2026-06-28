@@ -7,11 +7,11 @@ Projet source : `fr.gouv.medicaments.rest` (API BDPM + vétérinaire).
 
 ## 1. Contexte et observation produit
 
-- Stack : CSV (`csv-parse`) et/ou XML vétérinaire (`fast-xml-parser`) → corpus en mémoire → `FrozenMiniSearch.fromDocuments()` (`@yoch/minisearch`).
+- Stack : CSV (`csv-parse`) et/ou XML vétérinaire (`@nodable/flexible-xml-parser`) → corpus en mémoire (`corpusStore`) → `FrozenMiniSearch.fromAsyncIterable()` (`@yoch/frozenminisearch`).
 - Observation terrain : **~600 Mo RSS** juste après construction, puis **~280–310 Mo RSS** stabilisé.
-- Contrainte : le **corpus métier doit rester en mémoire** après l’index (lookup par `res.id` → ligne dans `dataCache`). Ne pas proposer de supprimer ce corpus en prod.
+- Contrainte : le **corpus métier doit rester en mémoire** après l’index (lookup par `res.id` → ligne dans le corpus). Ne pas proposer de supprimer ce corpus en prod.
 
-**Important — nommage :** en prod ce n’est pas le tableau `documents[]` d’index qui persiste, mais **`dataCache`** (lignes CSV/objets complets). Les `documents[]` sont **vidés** après `fromDocuments` dans `buildFrozenIndexFromRows`.
+**Important — nommage :** en prod ce n’est pas le tableau `documents[]` d’index qui persiste, mais le **corpus** (lignes CSV/objets complets via `corpusStore`). Les `documents[]` sont **consommés en streaming** par `fromAsyncIterable` dans `buildFrozenIndexFromRows` (pas de tableau éphémère volumineux en mémoire).
 
 ---
 
@@ -19,39 +19,38 @@ Projet source : `fr.gouv.medicaments.rest` (API BDPM + vétérinaire).
 
 | Étape | Fichier | Symbole |
 |-------|---------|---------|
-| Parse CSV BDPM | `src/services/dataLoader.js` | `parseFileStreaming()` |
-| Corpus persistant | `src/services/dataLoader.js` | `dataCache`, `cisIndexes` |
-| Documents d’index (éphémères) | `src/services/dataLoader.js` | `buildIndexDocument()` |
-| Build index | `src/utils/frozenMiniSearch.js` | `buildFrozenIndexFromRows()` → `FrozenMiniSearch.fromDocuments()` |
+| Parse CSV BDPM (streaming) | `src/services/dataLoader.js` | `loadParseAndIndex()` |
+| Corpus persistant | `src/services/bdpm/state.js` → `corpusStore` | `corpus[type]` |
+| Index par CIS | `src/services/bdpm/state.js` | `state.getCisIndexes()` |
+| Documents d’index (streaming) | `src/utils/frozenMiniSearch.js` | `buildFrozenIndexFromRows()` → `fromAsyncIterable()` |
 | Options recherche | `src/utils/searchRanking.js` | `miniSearchOptions` |
-| Config par type | `src/services/dataLoader.js` | `createIndexIncremental()` |
-| Lookup | `src/services/dataLoader.js` | `dataCache[type][res.id]` (`id` = index de ligne) |
+| Specs d’index (champs, boost) | `src/search/indexSpecs.js` | `BDPM_INDEX_SPECS` |
+| Lookup | `src/utils/corpusStore.js` | `materializeRange` / `materializeIndices` |
 | Vétérinaire | `src/services/vetDataLoader.js` | streaming produits + dict XML |
 | Démarrage | `src/server.js` | `loadData()` puis `loadVetData()` |
 
 ```javascript
-// src/utils/frozenMiniSearch.js — documents éphémères
-const frozen = FrozenMiniSearch.fromDocuments(documents, options);
-documents.length = 0;
+// src/utils/frozenMiniSearch.js — streaming, pas de tableau documents[] en mémoire
+const frozen = FrozenMiniSearch.fromAsyncIterable(asyncDocuments, options);
 return frozen;
 ```
 
 ---
 
-## 3. Configuration `fromDocuments` (réelle)
+## 3. Configuration `fromAsyncIterable` (réelle)
 
 - **`idField`** : implicite `id` (entier = `rowIndex`).
-- **`storeFields`** : `['id']` uniquement (pas de duplication du corpus via store).
+- **`storeFields`** : `[]` (vide — pas de duplication du corpus via store ; lookup via `corpus[type][res.id]`).
 - **`tokenize`** / **`processTerm`** : `tokenizeSearchText` + `normalizeSearchText` (NFD, sans accents, lowercase).
 - **`searchOptions`** : `combineWith: AND`, `prefix` sauf termes purement numériques, `fuzzy: 0.2` sauf termes commençant par un chiffre.
-- **`boost`** : par type (ex. spécialités : `denomination: 3`, `cis: 2`, …).
+- **`boost`** : par type (ex. spécialités : `denomination: 3`, `cis: 2`, …) — centralisé dans `src/search/indexSpecs.js`.
 
 Exemple spécialités :
 
 ```javascript
 {
   fields: ['cis', 'denomination', 'forme_pharma', 'titulaire'],
-  storeFields: ['id'],
+  storeFields: [],
   ...miniSearchOptions,
   boost: { denomination: 3, cis: 2, forme_pharma: 0.5, titulaire: 1 }
 }
@@ -67,19 +66,19 @@ Exemple spécialités :
 | avis_smr / avis_asmr | 15 257 / 9 906 | libellés HAS |
 | autres | generiques, conditions, ruptures, mitm, substances | voir `dataLoader.js` |
 
-- Corpus `dataCache` (JSON) ≈ **39 Mo**.
+- Corpus (JSON) ≈ **39 Mo**.
 - Σ `estimatedStructuredBytes` (10 index BDPM) ≈ **44,5 Mo**.
-- `storeFields` : `storedFieldsJsonBytes` négligeable (ex. ~175 Ko / 15 848 docs spécialités). La duplication utile est **texte tokenisé (postings + radix)** vs chaînes dans `dataCache`.
+- `storeFields` : vide — `storedFieldsJsonBytes` nul. La mémoire utile est **texte tokenisé (postings + radix)** vs chaînes dans le corpus.
 
 ---
 
 ## 4. Parsing (sans refactor)
 
-**CSV** : API streaming (`createReadStream` → `pipe(parser)`), mais **accumulation complète** dans `records[]`. Après `end`, parser/stream non référencés.
+**CSV** : streaming `fromAsyncIterable` — parse + index en une passe, pas d’accumulation `records[]` (le corpus est alimenté via `corpusStore.push` au fil de l’eau).
 
 **XML vétérinaire** (`@nodable/flexible-xml-parser`, phase 1 — voir [`docs/VET_XML_PARSER_PHASES.md`](./VET_XML_PARSER_PHASES.md)) : dict en `readFileSync` (~911 Ko) ; produits en streaming par bloc `<medicinal-product>` (`streamMedicinalProductsXml`) + `skip.tags` (`paragraphes-rcp`, `lien-rcp`) via `vetXmlParser` → corpus **sans** index ; puis `buildFrozenIndexFromRows`. `lien_rcp` API reconstruit depuis `nom` + `maj_rcp`.
 
-**Note opérationnelle :** `loadData()` / `loadVetData()` ne sont pas réentrants. En cas de reload concurrent (ex. in-process + intervalle court), `dataCache` peut être partiellement rempli jusqu’à la fin du chargement. À éviter en prod ou à protéger par un verrou si besoin.
+**Note opérationnelle :** `loadData()` / `loadVetData()` ne sont pas réentrants. En cas de reload concurrent (ex. in-process + intervalle court), le corpus peut être partiellement rempli jusqu’à la fin du chargement. À éviter en prod ou à protéger par un verrou si besoin.
 
 ---
 
@@ -89,8 +88,8 @@ Exemple spécialités :
 |-----------|--------|
 | Node | v22.22.0 |
 | `@yoch/minisearch` | 8.0.0-beta.1 (installé ; package.json ^8.0.0-beta.2) |
-| GC | `node --expose-gc` + `global.gc()` avant chaque mesure |
-| Scripts | `scripts/profile-index-memory.js`, `scripts/profile-memory-settle.js` |
+| GC | `node --expose-gc` + `global.gc()` avant chaque mesure (`src/utils/loadGc.js`) |
+| Scripts | `scripts/memory/profile-index-memory.js`, `scripts/memory/profile-memory-settle.js` |
 
 ---
 
@@ -99,17 +98,17 @@ Exemple spécialités :
 | Étape | heapUsed (Mo) | rss (Mo) | Notes |
 |-------|---------------|----------|-------|
 | baseline | 3,4 | 42 | |
-| after_loadData (BDPM) | 131,3 | 307–335 | `dataCache` + 10 index + `cisIndexes` |
+| after_loadData (BDPM) | 131,3 | 307–335 | corpus + 10 index + `cisIndexes` |
 | after_loadVetData (BDPM+vet) | 150,8 | **~601** | pic RSS observé |
 | steady heap | ~151 | — | Stable sur 3 min |
 
-Pic isolé `fromDocuments` (spécialités seules, script) : heap **60,7** / RSS **148,6** pendant build ; RSS post-build avec corpus **~129**.
+Pic isolé `fromAsyncIterable` (spécialités seules, script) : heap **60,7** / RSS **148,6** pendant build ; RSS post-build avec corpus **~129**.
 
 ---
 
 ## 7. Stabilisation RSS (test 3 min — BDPM + vet)
 
-**Méthode :** `scripts/profile-memory-settle.js` avec `SETTLE_MINUTES=3`, `SETTLE_INTERVAL_SEC=15`, après `loadData()` + `loadVetData()`.
+**Méthode :** `scripts/memory/profile-memory-settle.js` avec `SETTLE_MINUTES=3`, `SETTLE_INTERVAL_SEC=15`, après `loadData()` + `loadVetData()`.
 
 | t après fin construction | heapUsed (Mo) | rss (Mo) |
 |--------------------------|---------------|----------|
@@ -156,7 +155,7 @@ Postings + radix dominent ; `storedFieldsJsonBytes` marginal.
 - **Heap steady** ≈ 151 Mo → corpus + index + maps + overhead V8 cohérents.
 - **RSS steady** ≈ **281 Mo** (BDPM+vet, t ≥ 30 s) vs **~206 Mo** (BDPM seul, t ≥ 15 s après construction — §14).
 
-Diagnostic hors prod (`after_index_corpus_only`) : index seul spécialités ~**7–8 Mo heap** une fois `dataCache` nullé.
+Diagnostic hors prod (`after_index_corpus_only`) : index seul spécialités ~**7–8 Mo heap** une fois le corpus nullé.
 
 ---
 
@@ -164,7 +163,7 @@ Diagnostic hors prod (`after_index_corpus_only`) : index seul spécialités ~**7
 
 | Probabilité | Hypothèse |
 |-------------|-----------|
-| Très haute | Pic pendant `fromDocuments` avec tout `dataCache` déjà chargé + `documents[]` temporaires |
+| Très haute | Pic pendant `fromAsyncIterable` avec corpus déjà chargé + structures frozen transitoires |
 | Très haute | Superposition BDPM + vet ; RSS pic ~600 Mo puis rendu OS différé (~30 s) |
 | Haute | Corpus + ~45 Mo structures index + overhead |
 | Faible | Duplication `storeFields` |
@@ -172,12 +171,12 @@ Diagnostic hors prod (`after_index_corpus_only`) : index seul spécialités ~**7
 
 ---
 
-## 11. Leviers (sans supprimer `dataCache`)
+## 11. Leviers (sans supprimer le corpus)
 
 1. `LOAD_HAS_AVIS=false` si acceptable : −2 gros CSV/index HAS.
 2. Réduire champs indexés sur gros textes (`indications`, libellés HAS) — cible principale postings/radix (`presentations` ~14 Mo).
 3. Vet : chargement différé / process séparé pour éviter pic RSS superposé à BDPM.
-4. `storeFields: ['id']` déjà minimal — gain marginal à le vider.
+4. `storeFields: []` déjà minimal (vide).
 
 ---
 
@@ -197,13 +196,13 @@ Diagnostic hors prod (`after_index_corpus_only`) : index seul spécialités ~**7
 
 ```bash
 # Profil détaillé par étapes
-node --expose-gc scripts/profile-index-memory.js
+node --expose-gc scripts/memory/profile-index-memory.js
 
 # Stabilisation post-construction
-SETTLE_MINUTES=3 SETTLE_INTERVAL_SEC=15 node --expose-gc scripts/profile-memory-settle.js
+SETTLE_MINUTES=3 SETTLE_INTERVAL_SEC=15 node --expose-gc scripts/memory/profile-memory-settle.js
 
 # BDPM seul, 1 min
-PROFILE_VET=0 SETTLE_MINUTES=1 SETTLE_INTERVAL_SEC=15 node --expose-gc scripts/profile-memory-settle.js
+PROFILE_VET=0 SETTLE_MINUTES=1 SETTLE_INTERVAL_SEC=15 node --expose-gc scripts/memory/profile-memory-settle.js
 ```
 
 Variables : `LOAD_HAS_AVIS=false`, `PROFILE_VET=0`, `SETTLE_MINUTES`, `SETTLE_INTERVAL_SEC`.
@@ -212,7 +211,7 @@ Variables : `LOAD_HAS_AVIS=false`, `PROFILE_VET=0`, `SETTLE_MINUTES`, `SETTLE_IN
 
 ## 14. BDPM seul — stabilisation 1 min
 
-**Commande :** `PROFILE_VET=0 SETTLE_MINUTES=1 SETTLE_INTERVAL_SEC=15 node --expose-gc scripts/profile-memory-settle.js`  
+**Commande :** `PROFILE_VET=0 SETTLE_MINUTES=1 SETTLE_INTERVAL_SEC=15 node --expose-gc scripts/memory/profile-memory-settle.js`
 **Durée construction :** ~6 s (`loadData` uniquement).
 
 | t après fin construction | heapUsed (Mo) | rss (Mo) | heapTotal (Mo) |

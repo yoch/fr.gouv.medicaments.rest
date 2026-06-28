@@ -2,10 +2,10 @@
 /**
  * Mesure RSS / heap après chargement BDPM (+ vétérinaire si --vet).
  * Comparer avec la branche/tag v1.2.0 (tuples) :
- *   git stash && git checkout v1.2.0 && node --expose-gc scripts/compare-corpus-memory.js --label=tuple
- *   git checkout - && git stash pop && node --expose-gc scripts/compare-corpus-memory.js --label=classes
+ *   git stash && git checkout v1.2.0 && node --expose-gc scripts/memory/compare-corpus-memory.js --label=tuple
+ *   git checkout - && git stash pop && node --expose-gc scripts/memory/compare-corpus-memory.js --label=classes
  *
- * Usage: node --expose-gc scripts/compare-corpus-memory.js [--vet] [--label=classes]
+ * Usage: node --expose-gc scripts/memory/compare-corpus-memory.js [--vet] [--label=classes]
  */
 'use strict';
 
@@ -24,7 +24,7 @@ function parseArgs(argv) {
 
 async function main() {
   const { vet, label } = parseArgs(process.argv.slice(2));
-  const { loadData, getBdpmCorpusStats } = require('../src/services/dataLoader');
+  const { loadData, getBdpmCorpusStats } = require('../../src/services/dataLoader');
 
   if (typeof global.gc !== 'function') {
     console.warn('Recommandé: node --expose-gc pour des mesures stables');
@@ -36,7 +36,7 @@ async function main() {
   await loadData();
   let vetStats = null;
   if (vet) {
-    const { loadVetData, getVetCorpusStats } = require('../src/services/vetDataLoader');
+    const { loadVetData, getVetCorpusStats } = require('../../src/services/vetDataLoader');
     await loadVetData();
     vetStats = getVetCorpusStats();
   }

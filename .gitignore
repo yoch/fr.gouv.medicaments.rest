@@ -75,9 +75,13 @@ typings/
 .nuxt
 dist
 
+# Page d'accueil statique versionnée (exception au pattern `public`)
+!public/
+public/*
+!public/index.html
+
 # Gatsby files
 .cache/
-public
 
 # Storybook build outputs
 .out
@@ -118,9 +122,9 @@ reports/
 benchmark_*.json
 
 # Profilage mémoire local (hors commit)
-scripts/profile-index-memory.js
-scripts/profile-memory-settle.js
-src/utils/loadGc.js
+scripts/memory/profile-index-memory.js
+scripts/memory/profile-memory-settle.js
+*.heapsnapshot
 
 # Artefacts locaux divers
 __pycache__/
@@ -133,6 +137,9 @@ data/veterinaires/meta.json
 # Données BDPM locales (volumineuses)
 data/*.txt
 data/meta.json
+
+# Export corpus JSONL (régénérable via export-corpus-documents.js)
+data/corpus-export/
 
 # Snapshots d’index MiniSearch MSv5 (régénérables)
 data/search-indexes/

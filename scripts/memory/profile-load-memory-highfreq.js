@@ -4,9 +4,9 @@
  * Pas de GC entre échantillons → pic RSS réaliste.
  *
  * Usage:
- *   node --expose-gc scripts/profile-load-memory-highfreq.js
- *   PROFILE_SAMPLE_MS=100 PROFILE_VET=1 node --expose-gc scripts/profile-load-memory-highfreq.js
- *   PROFILE_OUT=tmp/vet-mem.json node --expose-gc scripts/profile-load-memory-highfreq.js
+ *   node --expose-gc scripts/memory/profile-load-memory-highfreq.js
+ *   PROFILE_SAMPLE_MS=100 PROFILE_VET=1 node --expose-gc scripts/memory/profile-load-memory-highfreq.js
+ *   PROFILE_OUT=tmp/vet-mem.json node --expose-gc scripts/memory/profile-load-memory-highfreq.js
  *
  * Env:
  *   PROFILE_SAMPLE_MS — intervalle (défaut 200 = 5/s)
@@ -19,12 +19,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const { gcBeforeMeasure } = require('../src/utils/loadGc');
+const { gcBeforeMeasure } = require('../../src/utils/loadGc');
 const {
   createMemorySampler,
   installLoadMemoryMarks,
   uninstallLoadMemoryMarks
-} = require('../src/utils/memorySampler');
+} = require('../../src/utils/memorySampler');
 
 const PROFILE_SAMPLE_MS = parseInt(process.env.PROFILE_SAMPLE_MS || '200', 10);
 const PROFILE_VET = process.env.PROFILE_VET !== '0';
@@ -75,12 +75,12 @@ async function main() {
 
   try {
     if (PROFILE_BDPM) {
-      const { loadData } = require('../src/services/dataLoader');
+      const { loadData } = require('../../src/services/dataLoader');
       await loadData();
     }
 
     if (PROFILE_VET) {
-      const { loadVetData } = require('../src/services/vetDataLoader');
+      const { loadVetData } = require('../../src/services/vetDataLoader');
       await loadVetData();
     }
   } finally {

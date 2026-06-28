@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
  * Chargeur BDPM minimal pour mesure résident (heap + RSS) après gc.
- * node --expose-gc scripts/measure-bdpm-resident.js
+ * node --expose-gc scripts/memory/measure-bdpm-resident.js
  */
 'use strict';
 
-const { loadData } = require('../src/services/dataLoader');
-const { internPoolSize } = require('../src/utils/stringPool');
+const { loadData } = require('../../src/services/dataLoader');
+const { internPoolSize } = require('../../src/utils/stringPool');
 
 (async () => {
   await loadData();

@@ -2,7 +2,7 @@
 
 /**
  * Champs BDPM éligibles à l'interning (stringPool).
- * Aligné sur scripts/analyze-interning-candidates.js — relancer après changement de schéma.
+ * Aligné sur scripts/benchmark/analyze-interning-candidates.js — relancer après changement de schéma.
  *
  * Règles : ratio distinct/total faible, copies moyennes élevées, chaînes courtes.
  * Ne pas interner : cis, cip13, libelle, denomination, indications (textes longs).

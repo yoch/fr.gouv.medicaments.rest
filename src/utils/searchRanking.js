@@ -83,12 +83,16 @@ const miniSearchOptions = {
   }
 };
 
+const MATCH_QUALITY_RANK = { exact: 3, prefix: 2, fuzzy: 1 };
+const MATCH_VIA_RANK = { cis: 4, num: 4, denomination: 3, presentation: 2, composition: 1 };
+
 module.exports = {
   miniSearchOptions,
   normalizeSearchText,
-  tokenizeSearchText,
   computeMatchPriority,
   matchQualityFromPriority,
   isStrongMatchQuality,
-  queryTerms
+  queryTerms,
+  MATCH_QUALITY_RANK,
+  MATCH_VIA_RANK
 };

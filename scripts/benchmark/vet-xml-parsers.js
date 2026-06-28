@@ -18,7 +18,7 @@
 const fs = require('fs');
 const path = require('path');
 const { XMLParser: FxpParser } = require('fast-xml-parser');
-const { streamMedicinalProducts } = require('../src/utils/streamMedicinalProductsXml');
+const { streamMedicinalProducts } = require('../../src/utils/streamMedicinalProductsXml');
 const {
   createVetProductBlockParser,
   defaultProductParser,
@@ -26,9 +26,9 @@ const {
   extractMedicinalProductsFromGroup,
   parseProductBlock,
   wrapProductBlockXml
-} = require('../src/utils/vetXmlParser');
+} = require('../../src/utils/vetXmlParser');
 
-const { gcBeforeMeasure } = require('../src/utils/loadGc');
+const { gcBeforeMeasure } = require('../../src/utils/loadGc');
 
 const DEFAULT_PRODUCTS = path.join(
   __dirname,

@@ -33,11 +33,6 @@ function saveFrozenIndexToFile(frozenIndex, filePath) {
   return buffer.length;
 }
 
-function loadFrozenIndexFromFile(filePath, options) {
-  const buffer = fs.readFileSync(filePath);
-  return FrozenMiniSearch.loadBinarySync(buffer, options);
-}
-
 function exportFrozenIndexes(indexesByType, outDir, prefix, manifestExtra = {}) {
   fs.mkdirSync(outDir, { recursive: true });
   const manifest = {
@@ -67,12 +62,7 @@ function exportFrozenIndexes(indexesByType, outDir, prefix, manifestExtra = {}) 
 }
 
 module.exports = {
-  FrozenMiniSearch,
-  createFrozenIndexBuilder,
-  freezeFrozenIndexBuilder,
   buildFrozenIndexFromAsyncIterable,
   buildFrozenIndexFromRows,
-  saveFrozenIndexToFile,
-  loadFrozenIndexFromFile,
   exportFrozenIndexes
 };

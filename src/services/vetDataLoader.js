@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { buildFrozenIndexFromRows, exportFrozenIndexes } = require('../utils/frozenMiniSearch');
+const { buildFrozenIndexFromRows } = require('../utils/frozenMiniSearch');
 const { streamMedicinalProducts } = require('../utils/streamMedicinalProductsXml');
 const {
   defaultProductParser,
@@ -9,7 +9,6 @@ const {
 const { loadMemoryMark } = require('../utils/memorySampler');
 const { rankAndMaterializeSearch } = require('../utils/corpusSearch');
 const {
-  createCorpus,
   clearCorpus,
   push,
   rowCount,
@@ -25,63 +24,26 @@ const { MedicamentVet, CompositionVet, PresentationVet } = require('../models/ve
 const { TempsAttenteEntry } = require('../models/tempsAttente');
 const { buildLienRcpFromNom, ANMV_RCP_URL_PREFIX } = require('../models/vet/rcp');
 const { intern } = require('../utils/stringPool');
+const config = require('../config');
+const { VET_INDEX_SPECS } = require('../search/indexSpecs');
+const state = require('./vet/state');
+const { exportVetSearchIndexes, exportVetCorpusDocuments } = require('./vet/exportApi');
 
 function internElements(arr) {
   if (!arr || !arr.length) return arr;
   for (let i = 0; i < arr.length; i++) arr[i] = intern(arr[i]);
   return arr;
 }
-const {
-  VET_DATA_DIR,
-  PRODUCTS_XML_NAME,
-  DICT_XML_NAME
-} = require('./vetDataDownloader');
-const { exportCorpusDocuments } = require('../utils/exportCorpusDocuments');
 
-const VET_INDEX_SPECS = {
-  medicaments: {
-    fields: ['nom', 'num'],
-    boost: { nom: 3, num: 2 }
-  },
-  compositions: {
-    fields: ['substance', 'num'],
-    boost: { substance: 3, num: 1 }
-  }
-};
+const dataDir = config.vetDataDir;
+const productsFileName = config.vetProductsFile;
+const dictFileName = config.vetDictFile;
 
-const dataDir = process.env.VET_DATA_DIR || VET_DATA_DIR;
-const productsFileName = process.env.VET_PRODUCTS_FILE || PRODUCTS_XML_NAME;
-const dictFileName = process.env.VET_DICT_FILE || DICT_XML_NAME;
+const { corpus, metadata, searchIndexes, RELATED_BY_NUM_MAPS } = state;
 
-const corpus = {
-  medicaments: createCorpus(),
-  compositions: createCorpus(),
-  presentations: createCorpus()
-};
-
-let tempsAttente = new Map();
-
-const metadata = {
-  last_updated: null,
-  source: 'base de données publique des médicaments vétérinaires autorisés en France - Anses/ANMV'
-};
-
-let searchIndexes = {
-  medicaments: null,
-  compositions: null
-};
-
-let numIndexes = null;
-
-const PRIMARY_FIELDS = {
-  medicaments: 'nom',
-  compositions: 'substance'
-};
-
-const ID_FIELDS = {
-  medicaments: 'num',
-  compositions: 'num'
-};
+/* ------------------------------------------------------------------ *
+ * Parsing du dictionnaire ANMV (streaming, faible mémoire)
+ * ------------------------------------------------------------------ */
 
 function asArray(value) {
   if (value == null) return [];
@@ -322,17 +284,12 @@ function extractDateJeuFromHeader(filepath) {
   }
 }
 
-const RELATED_BY_NUM_MAPS = {
-  compositions: 'compositionsByNum',
-  presentations: 'presentationsByNum'
-};
-
 function buildNumIndexes() {
-  numIndexes = {
+  state.setNumIndexes({
     medicamentsByNum: buildKeyIndex(corpus.medicaments, 'num', { unique: true }),
     compositionsByNum: buildKeyIndex(corpus.compositions, 'num'),
     presentationsByNum: buildKeyIndex(corpus.presentations, 'num')
-  };
+  });
 }
 
 function clearLoadedData() {
@@ -341,8 +298,8 @@ function clearLoadedData() {
   clearCorpus(corpus.medicaments);
   clearCorpus(corpus.compositions);
   clearCorpus(corpus.presentations);
-  tempsAttente = new Map();
-  numIndexes = null;
+  state.setTempsAttente(new Map());
+  state.setNumIndexes(null);
 }
 
 async function loadVetData() {
@@ -383,7 +340,7 @@ async function loadVetData() {
     const waiting = parseTempsAttente(product, dict);
     if (waiting.length > 0) {
       const medNum = corpus.medicaments[rowIndex].num;
-      tempsAttente.set(medNum, waiting);
+      state.getTempsAttente().set(medNum, waiting);
     }
   });
   loadMemoryMark('vet_stream_done', {
@@ -418,10 +375,11 @@ function searchVet(type, query) {
   if (!searchIndexes[type]) return [];
 
   const rows = corpus[type];
+  const spec = VET_INDEX_SPECS[type];
   const results = searchIndexes[type].search(query);
   return rankAndMaterializeSearch(rows, results, query, {
-    primaryField: PRIMARY_FIELDS[type],
-    idField: ID_FIELDS[type]
+    primaryField: spec.primaryField,
+    idField: spec.idField
   });
 }
 
@@ -497,6 +455,7 @@ function getVetMetadata() {
 }
 
 function getMedicamentByNum(num) {
+  const numIndexes = state.getNumIndexes();
   if (!numIndexes) return undefined;
   const rowIndex = numIndexes.medicamentsByNum.get(normalizeNum(num));
   if (rowIndex === undefined) return undefined;
@@ -507,9 +466,10 @@ function getRelatedByNum(type, num, limit = 50) {
   if (!num) return [];
   const normalized = normalizeNum(num);
   if (type === 'temps_attente') {
-    const entries = tempsAttente.get(normalized) || [];
+    const entries = state.getTempsAttente().get(normalized) || [];
     return entries.map((e) => e.toJSON());
   }
+  const numIndexes = state.getNumIndexes();
   if (!numIndexes) return [];
   const mapKey = RELATED_BY_NUM_MAPS[type];
   if (!mapKey) return [];
@@ -529,42 +489,6 @@ function getVetCorpusStats() {
 
 function getVetSearchIndexes() {
   return { medicaments: searchIndexes.medicaments, compositions: searchIndexes.compositions };
-}
-
-function exportVetSearchIndexes(outDir) {
-  return exportFrozenIndexes(searchIndexes, outDir, 'vet', {
-    last_updated: metadata.last_updated,
-    source: metadata.source
-  });
-}
-
-function exportVetCorpusDocuments(outDir) {
-  const datasets = [];
-
-  for (const [type, spec] of Object.entries(VET_INDEX_SPECS)) {
-    const rows = corpus[type];
-    if (!rows || rowCount(rows) === 0) continue;
-
-    const { fields, boost } = spec;
-    datasets.push({
-      type,
-      rows,
-      toDocument: (item, rowIndex) => buildIndexDocument(item, rowIndex, fields),
-      indexOptions: miniSearchIndexConfig(fields, boost)
-    });
-  }
-
-  if (rowCount(corpus.presentations) > 0) {
-    datasets.push({
-      type: 'presentations',
-      rows: corpus.presentations
-    });
-  }
-
-  return exportCorpusDocuments(datasets, outDir, 'vet', {
-    last_updated: metadata.last_updated,
-    source: metadata.source
-  });
 }
 
 module.exports = {

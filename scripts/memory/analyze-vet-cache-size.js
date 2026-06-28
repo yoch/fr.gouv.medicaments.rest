@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Taille par "colonne" du corpus vétérinaire (instances classe, index, dict).
- * Usage: node scripts/analyze-vet-cache-size.js
+ * Usage: node scripts/memory/analyze-vet-cache-size.js
  */
 'use strict';
 
@@ -11,7 +11,8 @@ const {
   createMemorySampler,
   installLoadMemoryMarks,
   uninstallLoadMemoryMarks
-} = require('../src/utils/memorySampler');
+} = require('../../src/utils/memorySampler');
+const { frozenBreakdown } = require('./frozenBreakdown');
 
 function mb(bytes) {
   return Math.round((bytes / 1024 / 1024) * 1000) / 1000;
@@ -73,75 +74,6 @@ function breakdownPresentations(rows) {
   return out;
 }
 
-/**
- * Empreinte mémoire résidente d'un index frozen 1.6+ en utilisant les
- * primitives publiques de PackedRadixTree + les typed arrays exposés en
- * `protected` (accessibles à l'exécution en JS). Complément indispensable :
- * `saveBinarySync().length` donne la forme sérialisée compacte, proche du
- * résident réel.
- */
-function frozenBreakdown(idx) {
-  if (!idx) return null;
-  const termIndex = idx._index;
-  const postings = idx._postings;
-  const radixBytes = typeof termIndex?.packedByteLength === 'function'
-    ? termIndex.packedByteLength()
-    : null;
-  const radixNodes = typeof termIndex?.packedNodeCount === 'function'
-    ? termIndex.packedNodeCount()
-    : null;
-  const radixEdges = typeof termIndex?.packedEdgeCount === 'function'
-    ? termIndex.packedEdgeCount()
-    : null;
-
-  let postingsBytes = null;
-  if (postings) {
-    postingsBytes = (postings.allDocIds?.byteLength || 0)
-      + (postings.allFreqs?.byteLength || 0);
-    if (postings.layout === 'dense') {
-      postingsBytes += (postings.denseOffsets?.byteLength || 0)
-        + (postings.denseLengths?.byteLength || 0);
-    } else if (postings.layout === 'sparse') {
-      postingsBytes += (postings.sparseTermStarts?.byteLength || 0)
-        + (postings.sparseFieldIds?.byteLength || 0)
-        + (postings.sparseOffsets?.byteLength || 0)
-        + (postings.sparseLengths?.byteLength || 0);
-    }
-  }
-
-  const fieldLengthBytes = idx._fieldLengthMatrix?.byteLength || null;
-  const avgFieldLengthBytes = idx._avgFieldLength?.byteLength || null;
-  const externalIdsCount = idx._externalIds?.length ?? null;
-
-  let binarySnapshotBytes = null;
-  try {
-    if (typeof idx.saveBinarySync === 'function') {
-      binarySnapshotBytes = idx.saveBinarySync().length;
-    }
-  } catch {
-    binarySnapshotBytes = null;
-  }
-
-  const structuredBytes = (radixBytes || 0)
-    + (postingsBytes || 0)
-    + (fieldLengthBytes || 0)
-    + (avgFieldLengthBytes || 0);
-
-  return {
-    documentCount: idx.documentCount,
-    termCount: idx.termCount,
-    radixBytes,
-    radixNodes,
-    radixEdges,
-    postingsBytes,
-    fieldLengthBytes,
-    avgFieldLengthBytes,
-    externalIdsCount,
-    structuredBytes,
-    binarySnapshotBytes
-  };
-}
-
 function formatBytes(b) {
   if (b == null) return 'n/a';
   return `${kb(b)} Ko (${mb(b)} Mo)`;
@@ -152,7 +84,7 @@ async function main() {
     VET_DATA_DIR,
     PRODUCTS_XML_NAME,
     DICT_XML_NAME
-  } = require('../src/services/vetDataDownloader');
+  } = require('../../src/services/vetDataDownloader');
 
   const dataDir = process.env.VET_DATA_DIR || VET_DATA_DIR;
   const productsPath = path.join(dataDir, PRODUCTS_XML_NAME);
@@ -179,8 +111,8 @@ async function main() {
     getVetCorpusStats,
     getVetSearchIndexes,
     getRelatedByNum
-  } = require('../src/services/vetDataLoader');
-  const { materializeRange, rowCount } = require('../src/utils/corpusStore');
+  } = require('../../src/services/vetDataLoader');
+  const { materializeRange, rowCount } = require('../../src/utils/corpusStore');
 
   if (typeof global.gc === 'function') global.gc();
   const memBefore = process.memoryUsage();

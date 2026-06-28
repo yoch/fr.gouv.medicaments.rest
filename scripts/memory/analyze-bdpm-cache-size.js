@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Profil mémoire du chargement BDPM : sampler par phase + empreinte résidente
- * des index frozen (primitives 1.6+). Usage: node --expose-gc scripts/analyze-bdpm-cache-size.js
+ * des index frozen (primitives 1.6+). Usage: node --expose-gc scripts/memory/analyze-bdpm-cache-size.js
  */
 'use strict';
 
@@ -11,7 +11,8 @@ const {
   createMemorySampler,
   installLoadMemoryMarks,
   uninstallLoadMemoryMarks
-} = require('../src/utils/memorySampler');
+} = require('../../src/utils/memorySampler');
+const { frozenBreakdown } = require('./frozenBreakdown');
 
 function mb(bytes) {
   return Math.round((bytes / 1024 / 1024) * 1000) / 1000;
@@ -26,54 +27,8 @@ function formatBytes(b) {
   return `${kb(b)} Ko (${mb(b)} Mo)`;
 }
 
-function frozenBreakdown(idx) {
-  if (!idx) return null;
-  const termIndex = idx._index;
-  const postings = idx._postings;
-  const radixBytes = typeof termIndex?.packedByteLength === 'function'
-    ? termIndex.packedByteLength()
-    : null;
-  let postingsBytes = null;
-  if (postings) {
-    postingsBytes = (postings.allDocIds?.byteLength || 0)
-      + (postings.allFreqs?.byteLength || 0);
-    if (postings.layout === 'dense') {
-      postingsBytes += (postings.denseOffsets?.byteLength || 0)
-        + (postings.denseLengths?.byteLength || 0);
-    } else if (postings.layout === 'sparse') {
-      postingsBytes += (postings.sparseTermStarts?.byteLength || 0)
-        + (postings.sparseFieldIds?.byteLength || 0)
-        + (postings.sparseOffsets?.byteLength || 0)
-        + (postings.sparseLengths?.byteLength || 0);
-    }
-  }
-  const fieldLengthBytes = idx._fieldLengthMatrix?.byteLength || null;
-  const avgFieldLengthBytes = idx._avgFieldLength?.byteLength || null;
-  let binarySnapshotBytes = null;
-  try {
-    if (typeof idx.saveBinarySync === 'function') {
-      binarySnapshotBytes = idx.saveBinarySync().length;
-    }
-  } catch {
-    binarySnapshotBytes = null;
-  }
-  const structuredBytes = (radixBytes || 0)
-    + (postingsBytes || 0)
-    + (fieldLengthBytes || 0)
-    + (avgFieldLengthBytes || 0);
-  return {
-    documentCount: idx.documentCount,
-    termCount: idx.termCount,
-    radixBytes,
-    postingsBytes,
-    fieldLengthBytes,
-    structuredBytes,
-    binarySnapshotBytes
-  };
-}
-
 async function main() {
-  const DATA_DIR = path.join(__dirname, '..', 'data');
+  const DATA_DIR = path.join(__dirname, '..', '..', 'data');
   const files = {
     CIS_bdpm: mb(fs.statSync(path.join(DATA_DIR, 'CIS_bdpm.txt')).size),
     CIS_CIP: mb(fs.statSync(path.join(DATA_DIR, 'CIS_CIP_bdpm.txt')).size),
@@ -88,8 +43,8 @@ async function main() {
   console.log('=== Fichiers BDPM sur disque (Mo) ===');
   console.log(JSON.stringify(files, null, 2));
 
-  const { loadData, getBdpmCorpusStats, getBdpmSearchIndexes } = require('../src/services/dataLoader');
-  const { rowCount } = require('../src/utils/corpusStore');
+  const { loadData, getBdpmCorpusStats, getBdpmSearchIndexes } = require('../../src/services/dataLoader');
+  const { rowCount } = require('../../src/utils/corpusStore');
 
   if (typeof global.gc === 'function') global.gc();
   const memBefore = process.memoryUsage();

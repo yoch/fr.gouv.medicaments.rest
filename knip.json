@@ -1,0 +1,11 @@
+{
+  "entry": [
+    "src/server.js",
+    "src/scripts/*.js",
+    "scripts/**/*.js",
+    "tests/**/*.test.js"
+  ],
+  "project": ["src/**/*.js", "scripts/**/*.js"],
+  "ignore": ["scripts/benchmark/*.js"],
+  "ignoreDependencies": ["7zip-bin", "fast-xml-parser", "knip", "nodemon", "supertest"]
+}

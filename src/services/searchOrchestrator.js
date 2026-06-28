@@ -10,24 +10,21 @@ const {
   getMedicamentByNum,
   getRelatedByNum
 } = require('./vetDataLoader');
-const { isStrongMatchQuality } = require('../utils/searchRanking');
-
-const MATCH_QUALITY_RANK = { exact: 3, prefix: 2, fuzzy: 1 };
-const MATCH_VIA_RANK = { cis: 4, num: 4, denomination: 3, presentation: 2, composition: 1 };
+const {
+  isStrongMatchQuality,
+  MATCH_QUALITY_RANK,
+  MATCH_VIA_RANK
+} = require('../utils/searchRanking');
 
 function recordMatchMeta(metaByKey, key, item, via) {
   if (!key) return;
-  const quality = item.match_quality;
-  const candidate = {
-    quality,
-    via
-  };
+  const candidate = { quality: item.match_quality, via };
   const previous = metaByKey[key];
   if (!previous) {
     metaByKey[key] = candidate;
     return;
   }
-  const rankNew = MATCH_QUALITY_RANK[quality] || 0;
+  const rankNew = MATCH_QUALITY_RANK[candidate.quality] || 0;
   const rankOld = MATCH_QUALITY_RANK[previous.quality] || 0;
   if (rankNew > rankOld) {
     metaByKey[key] = candidate;
@@ -49,101 +46,97 @@ function normalizeSource(source) {
   return 'auto';
 }
 
+/**
+ * Fusionne plusieurs listes de hits de recherche par clé (cis / num).
+ *
+ * - `keyField` : champ d'identifiant sur lequel dédoublonner
+ * - `searches` : liste de `{ items, via }` (ex. spécialités via `denomination`)
+ * - `onExactKey` : callback optionnel pour marquer un match exact sur l'identifiant
+ *   quand la requête est numérique (cis/num)
+ *
+ * Retourne `{ qualityByKey, metaByKey }` — l'appelant matérialise les résultats.
+ */
+function mergeSearchHits({ keyField, searches, onExactKey }) {
+  const qualityByKey = {};
+  const metaByKey = {};
+
+  for (const { items, via } of searches) {
+    for (const item of items) {
+      const key = item[keyField];
+      recordMatchMeta(metaByKey, key, item, via);
+      const previous = qualityByKey[key];
+      if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
+        qualityByKey[key] = item.match_quality;
+      }
+    }
+  }
+
+  if (onExactKey) {
+    onExactKey({ qualityByKey, metaByKey, recordMatchMeta });
+  }
+
+  return { qualityByKey, metaByKey };
+}
+
 function searchBdpm(q) {
-  const specialites = search('specialites', q);
-  const presentations = search('presentations', q);
-  const compositions = search('compositions', q);
-
-  const matchQualityByCis = {};
-  const matchMetaByCis = {};
-
-  for (const item of specialites) {
-    recordMatchMeta(matchMetaByCis, item.cis, item, 'denomination');
-    const previous = matchQualityByCis[item.cis];
-    if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
-      matchQualityByCis[item.cis] = item.match_quality;
+  const { qualityByKey, metaByKey } = mergeSearchHits({
+    keyField: 'cis',
+    searches: [
+      { items: search('specialites', q), via: 'denomination' },
+      { items: search('presentations', q), via: 'presentation' },
+      { items: search('compositions', q), via: 'composition' }
+    ],
+    onExactKey: ({ qualityByKey, metaByKey, recordMatchMeta }) => {
+      const normalizedQuery = String(q).trim();
+      if (/^\d+$/.test(normalizedQuery) && qualityByKey[normalizedQuery] === 'exact') {
+        recordMatchMeta(metaByKey, normalizedQuery, {
+          cis: normalizedQuery,
+          match_quality: 'exact'
+        }, 'cis');
+      }
     }
-  }
-  for (const item of presentations) {
-    recordMatchMeta(matchMetaByCis, item.cis, item, 'presentation');
-    const previous = matchQualityByCis[item.cis];
-    if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
-      matchQualityByCis[item.cis] = item.match_quality;
-    }
-  }
-  for (const item of compositions) {
-    recordMatchMeta(matchMetaByCis, item.cis, item, 'composition');
-    const previous = matchQualityByCis[item.cis];
-    if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
-      matchQualityByCis[item.cis] = item.match_quality;
-    }
-  }
+  });
 
-  // CIS recherché numériquement : marquer via cis si match exact sur l'identifiant
-  const normalizedQuery = String(q).trim();
-  if (/^\d+$/.test(normalizedQuery) && matchQualityByCis[normalizedQuery] === 'exact') {
-    recordMatchMeta(matchMetaByCis, normalizedQuery, {
-      cis: normalizedQuery,
-      match_quality: 'exact'
-    }, 'cis');
-  }
-
-  const matchedCis = new Set(Object.keys(matchQualityByCis));
-
-  return Array.from(matchedCis).map((cis) => {
+  return Object.keys(qualityByKey).map((cis) => {
     const result = {
       type: 'medicament',
-      match_quality: matchQualityByCis[cis],
+      match_quality: qualityByKey[cis],
       ...(getSpecialiteByCis(cis) || { cis, url_bdpm: bdpmExtraitUrl(cis) }),
       presentations: getRelatedByCis('presentations', cis, HYDRATE_RELATED_LIMIT),
       compositions: getRelatedByCis('compositions', cis, HYDRATE_RELATED_LIMIT)
     };
-    attachMatchFields(result, matchMetaByCis[cis]);
+    attachMatchFields(result, metaByKey[cis]);
     return result;
   });
 }
 
 function searchVeterinary(q) {
-  const medicaments = searchVet('medicaments', q);
-  const compositions = searchVet('compositions', q);
-
-  const matchQualityByNum = {};
-  const matchMetaByNum = {};
-
-  for (const item of medicaments) {
-    recordMatchMeta(matchMetaByNum, item.num, item, 'denomination');
-    const previous = matchQualityByNum[item.num];
-    if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
-      matchQualityByNum[item.num] = item.match_quality;
+  const { qualityByKey, metaByKey } = mergeSearchHits({
+    keyField: 'num',
+    searches: [
+      { items: searchVet('medicaments', q), via: 'denomination' },
+      { items: searchVet('compositions', q), via: 'composition' }
+    ],
+    onExactKey: ({ qualityByKey, metaByKey, recordMatchMeta }) => {
+      const normalizedQuery = String(q).trim();
+      if (/^\d+$/.test(normalizedQuery)) {
+        const num = normalizedQuery.padStart(7, '0');
+        if (qualityByKey[num] === 'exact') {
+          recordMatchMeta(metaByKey, num, { num, match_quality: 'exact' }, 'num');
+        }
+      }
     }
-  }
-  for (const item of compositions) {
-    recordMatchMeta(matchMetaByNum, item.num, item, 'composition');
-    const previous = matchQualityByNum[item.num];
-    if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
-      matchQualityByNum[item.num] = item.match_quality;
-    }
-  }
+  });
 
-  const normalizedQuery = String(q).trim();
-  if (/^\d+$/.test(normalizedQuery)) {
-    const num = normalizedQuery.padStart(7, '0');
-    if (matchQualityByNum[num] === 'exact') {
-      recordMatchMeta(matchMetaByNum, num, { num, match_quality: 'exact' }, 'num');
-    }
-  }
-
-  const matchedNums = new Set(Object.keys(matchQualityByNum));
-
-  return Array.from(matchedNums).map((num) => {
+  return Object.keys(qualityByKey).map((num) => {
     const result = {
       type: 'medicament_veterinaire',
-      match_quality: matchQualityByNum[num],
+      match_quality: qualityByKey[num],
       ...(getMedicamentByNum(num) || { num }),
       presentations: getRelatedByNum('presentations', num),
       compositions: getRelatedByNum('compositions', num)
     };
-    attachMatchFields(result, matchMetaByNum[num]);
+    attachMatchFields(result, metaByKey[num]);
     return result;
   });
 }
@@ -240,7 +233,5 @@ function executeHybridSearch(q, source) {
 }
 
 module.exports = {
-  executeHybridSearch,
-  searchBdpm,
-  searchVeterinary
+  executeHybridSearch
 };

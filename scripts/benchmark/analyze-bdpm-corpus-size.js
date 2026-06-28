@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
  * Taille du corpus BDPM (instances classe + proxy JSON matérialisé).
- * Usage: node scripts/analyze-bdpm-corpus-size.js
+ * Usage: node scripts/benchmark/analyze-bdpm-corpus-size.js
  */
 'use strict';
 
-const { BDPM_SCHEMAS } = require('../src/utils/corpusSchemas');
+const { BDPM_SCHEMAS } = require('../../src/utils/corpusSchemas');
 
 function mb(bytes) {
   return Math.round((bytes / 1024 / 1024) * 1000) / 1000;
@@ -43,7 +43,7 @@ function materializedPageJsonBytes(corpus, pageSize = 100) {
 }
 
 async function main() {
-  const { loadData, getBdpmCorpusStats } = require('../src/services/dataLoader');
+  const { loadData, getBdpmCorpusStats } = require('../../src/services/dataLoader');
 
   if (typeof global.gc === 'function') global.gc();
   const memBefore = process.memoryUsage();
