@@ -489,6 +489,10 @@ function getVetCorpusStats() {
   return { byType, corpus };
 }
 
+function getVetSearchIndexes() {
+  return { medicaments: searchIndexes.medicaments, compositions: searchIndexes.compositions };
+}
+
 function exportVetSearchIndexes(outDir) {
   return exportFrozenIndexes(searchIndexes, outDir, 'vet', {
     last_updated: metadata.last_updated,
@@ -537,5 +541,6 @@ module.exports = {
   getRelatedByNum,
   buildLienRcpFromNom,
   ANMV_RCP_URL_PREFIX,
-  getVetCorpusStats
+  getVetCorpusStats,
+  getVetSearchIndexes
 };

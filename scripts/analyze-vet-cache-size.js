@@ -7,9 +7,18 @@
 
 const fs = require('fs');
 const path = require('path');
+const {
+  createMemorySampler,
+  installLoadMemoryMarks,
+  uninstallLoadMemoryMarks
+} = require('../src/utils/memorySampler');
 
 function mb(bytes) {
   return Math.round((bytes / 1024 / 1024) * 1000) / 1000;
+}
+
+function kb(bytes) {
+  return Math.round((bytes / 1024) * 1000) / 1000;
 }
 
 function jsonBytes(value) {
@@ -64,32 +73,78 @@ function breakdownPresentations(rows) {
   return out;
 }
 
-/** Métriques index : `_memoryBreakdown` (1.4–1.5) ou getters publics (1.6+). */
-function indexMemoryBreakdown(index) {
-  if (typeof index._memoryBreakdown === 'function') {
-    return index._memoryBreakdown();
+/**
+ * Empreinte mémoire résidente d'un index frozen 1.6+ en utilisant les
+ * primitives publiques de PackedRadixTree + les typed arrays exposés en
+ * `protected` (accessibles à l'exécution en JS). Complément indispensable :
+ * `saveBinarySync().length` donne la forme sérialisée compacte, proche du
+ * résident réel.
+ */
+function frozenBreakdown(idx) {
+  if (!idx) return null;
+  const termIndex = idx._index;
+  const postings = idx._postings;
+  const radixBytes = typeof termIndex?.packedByteLength === 'function'
+    ? termIndex.packedByteLength()
+    : null;
+  const radixNodes = typeof termIndex?.packedNodeCount === 'function'
+    ? termIndex.packedNodeCount()
+    : null;
+  const radixEdges = typeof termIndex?.packedEdgeCount === 'function'
+    ? termIndex.packedEdgeCount()
+    : null;
+
+  let postingsBytes = null;
+  if (postings) {
+    postingsBytes = (postings.allDocIds?.byteLength || 0)
+      + (postings.allFreqs?.byteLength || 0);
+    if (postings.layout === 'dense') {
+      postingsBytes += (postings.denseOffsets?.byteLength || 0)
+        + (postings.denseLengths?.byteLength || 0);
+    } else if (postings.layout === 'sparse') {
+      postingsBytes += (postings.sparseTermStarts?.byteLength || 0)
+        + (postings.sparseFieldIds?.byteLength || 0)
+        + (postings.sparseOffsets?.byteLength || 0)
+        + (postings.sparseLengths?.byteLength || 0);
+    }
   }
+
+  const fieldLengthBytes = idx._fieldLengthMatrix?.byteLength || null;
+  const avgFieldLengthBytes = idx._avgFieldLength?.byteLength || null;
+  const externalIdsCount = idx._externalIds?.length ?? null;
+
+  let binarySnapshotBytes = null;
+  try {
+    if (typeof idx.saveBinarySync === 'function') {
+      binarySnapshotBytes = idx.saveBinarySync().length;
+    }
+  } catch {
+    binarySnapshotBytes = null;
+  }
+
+  const structuredBytes = (radixBytes || 0)
+    + (postingsBytes || 0)
+    + (fieldLengthBytes || 0)
+    + (avgFieldLengthBytes || 0);
+
   return {
-    documentCount: index.documentCount,
-    termCount: index.termCount,
-    estimatedStructuredBytes: null,
-    documents: { storedFieldsJsonBytes: null }
+    documentCount: idx.documentCount,
+    termCount: idx.termCount,
+    radixBytes,
+    radixNodes,
+    radixEdges,
+    postingsBytes,
+    fieldLengthBytes,
+    avgFieldLengthBytes,
+    externalIdsCount,
+    structuredBytes,
+    binarySnapshotBytes
   };
 }
 
-/** Référence doc `docs/MEMORY_INDEXING_HANDOFF.md` (frozenminisearch ≤1.2.4, storeFields id). */
-const INDEX_REFERENCE = {
-  medicaments: { documentCount: 3213, estimatedStructuredMb: 1.4 },
-  compositions: { documentCount: null, estimatedStructuredMb: null }
-};
-
-function formatIndexDelta(name, breakdown) {
-  const ref = INDEX_REFERENCE[name];
-  if (!ref || ref.estimatedStructuredMb == null || breakdown.estimatedStructuredBytes == null) return '';
-  const structuredMb = breakdown.estimatedStructuredBytes / 1024 / 1024;
-  const delta = structuredMb - ref.estimatedStructuredMb;
-  const sign = delta >= 0 ? '+' : '';
-  return `  ref doc: ~${ref.estimatedStructuredMb} Mo structured → Δ ${sign}${delta.toFixed(2)} Mo`;
+function formatBytes(b) {
+  if (b == null) return 'n/a';
+  return `${kb(b)} Ko (${mb(b)} Mo)`;
 }
 
 async function main() {
@@ -122,6 +177,7 @@ async function main() {
     loadVetData,
     getVetMetadata,
     getVetCorpusStats,
+    getVetSearchIndexes,
     getRelatedByNum
   } = require('../src/services/vetDataLoader');
   const { materializeRange, rowCount } = require('../src/utils/corpusStore');
@@ -129,9 +185,57 @@ async function main() {
   if (typeof global.gc === 'function') global.gc();
   const memBefore = process.memoryUsage();
 
+  const sampler = createMemorySampler({ intervalMs: 100 });
+  installLoadMemoryMarks(sampler);
+  sampler.start();
+
   await loadVetData();
 
+  sampler.stop();
+  uninstallLoadMemoryMarks();
+
+  if (typeof global.gc === 'function') global.gc();
+  const memAfterLoad = process.memoryUsage();
+
+  const marks = sampler.getMarks();
+  const samples = sampler.getSamples();
+
+  console.log('\n=== Pic mémoire par phase (sampler 100 ms, sans GC) ===');
+  console.log(
+    `  phase                              t_ms    peak_heap_mb   peak_rss_mb   delta_heap_mb`
+  );
+  let prevHeapMb = mb(memBefore.heapUsed);
+  for (let i = 0; i < marks.length; i++) {
+    const m = marks[i];
+    const next = marks[i + 1];
+    const tEnd = next ? next.t_ms : m.t_ms + 200;
+    const peak = sampler.peakInWindow(m.t_ms, tEnd);
+    const peakHeapMb = peak.heapUsed_mb || 0;
+    const peakRssMb = peak.rss_mb || 0;
+    const delta = peakHeapMb - prevHeapMb;
+    const phaseLabel = (m.phase || '(sample)').padEnd(34);
+    console.log(
+      `  ${phaseLabel} ${String(m.t_ms).padStart(6)}   ${String(peakHeapMb).padStart(12)}   ${String(peakRssMb).padStart(11)}   ${delta >= 0 ? '+' : ''}${delta.toFixed(2)}`
+    );
+    prevHeapMb = peakHeapMb;
+  }
+
+  let peakHeap = 0;
+  let peakRss = 0;
+  let peakPhase = null;
+  for (const s of samples) {
+    if (s.heapUsed_mb > peakHeap) {
+      peakHeap = s.heapUsed_mb;
+      peakRss = s.rss_mb;
+      peakPhase = s.phase || null;
+    }
+  }
+  console.log(
+    `\n  PIC GLOBAL : heap=${peakHeap} Mo rss=${peakRss} Mo${peakPhase ? ` (@${peakPhase})` : ''}`
+  );
+
   const { corpus: stores } = getVetCorpusStats();
+  const { medicaments: idxMed, compositions: idxComp } = getVetSearchIndexes();
   const medicaments = materializeRange(
     stores.medicaments,
     0,
@@ -203,74 +307,64 @@ async function main() {
     console.log(`  ${k.padEnd(22)} ${String(v.mb).padStart(8)} Mo  (${((v.bytes / presTotal) * 100).toFixed(1)}%)`);
   }
 
-  const { buildFrozenIndexFromRows } = require('../src/utils/frozenMiniSearch');
-  const { miniSearchOptions } = require('../src/utils/searchRanking');
-
-  function vetIndexConfig(fields, boost) {
-    const c = { fields, storeFields: [], ...miniSearchOptions };
-    if (boost) c.boost = boost;
-    return c;
-  }
-
-  function buildVetIndexDocument(item, rowIndex, fields) {
-    const doc = { id: rowIndex };
-    for (const field of fields) {
-      const value = item[field];
-      if (value != null && value !== '') doc[field] = value;
-    }
-    return doc;
-  }
-
-  const medFieldsIdx = ['nom', 'num'];
-  const compFieldsIdx = ['substance', 'num'];
-
-  const idxMed = buildFrozenIndexFromRows(
-    medicaments,
-    (item, i) => buildVetIndexDocument(item, i, medFieldsIdx),
-    vetIndexConfig(medFieldsIdx, { nom: 3, num: 2 })
-  );
-  const idxComp = buildFrozenIndexFromRows(
-    compositions,
-    (item, i) => buildVetIndexDocument(item, i, compFieldsIdx),
-    vetIndexConfig(compFieldsIdx, { substance: 3, num: 1 })
-  );
-
+  // On mesure les index RÉELS construits par loadVetData (via getVetSearchIndexes).
+  // Plus de rebuild duplicataire qui faussait le pic et le résident.
   const indexBreakdown = {
-    medicaments: indexMemoryBreakdown(idxMed),
-    compositions: indexMemoryBreakdown(idxComp)
+    medicaments: frozenBreakdown(idxMed),
+    compositions: frozenBreakdown(idxComp)
   };
 
-  console.log('\n=== Index frozen (@yoch/frozenminisearch) ===');
+  console.log('\n=== Index frozen résidents (primitives 1.6+) ===');
   for (const [name, b] of Object.entries(indexBreakdown)) {
-    const structured =
-      b.estimatedStructuredBytes != null
-        ? `structured≈${(b.estimatedStructuredBytes / 1024 / 1024).toFixed(2)} Mo`
-        : 'structured=n/a (1.6+)';
-    const storedKb = (b.documents?.storedFieldsJsonBytes || 0) / 1024;
+    if (!b) {
+      console.log(`  ${name}: non construit`);
+      continue;
+    }
     console.log(
-      `  ${name}: docs=${b.documentCount} terms=${b.termCount} ${structured} storedJson≈${storedKb.toFixed(0)} Ko`
+      `  ${name}: docs=${b.documentCount} terms=${b.termCount} radix(nodes=${b.radixNodes},edges=${b.radixEdges})`
     );
-    const deltaLine = formatIndexDelta(name, b);
-    if (deltaLine) console.log(deltaLine);
+    console.log(
+      `    radix=${formatBytes(b.radixBytes)} postings=${formatBytes(b.postingsBytes)} fieldLen=${formatBytes(b.fieldLengthBytes)} avgFieldLen=${formatBytes(b.avgFieldLengthBytes)}`
+    );
+    console.log(
+      `    structured_total=${formatBytes(b.structuredBytes)} binary_snapshot=${formatBytes(b.binarySnapshotBytes)} externalIds=${b.externalIdsCount}`
+    );
   }
 
   const memAfter = process.memoryUsage();
-  console.log('\n=== Process après loadVetData ===');
+  console.log('\n=== Process après loadVetData (+ GC final) ===');
   console.log(
     JSON.stringify(
       {
         heapUsed_mb: mb(memAfter.heapUsed),
         rss_mb: mb(memAfter.rss),
         heap_delta_mb: mb(memAfter.heapUsed - memBefore.heapUsed),
-        corpus_json_mb: corpusTotalMb,
-        note: 'RSS >> corpus JSON = arènes V8 + index + parse transitoire non compacté'
+        corpus_json_mb: corpusTotalMb
       },
       null,
       2
     )
   );
 
-  console.log('\n=== Synthèse ===');
+  const residentIndexMb = mb(
+    (indexBreakdown.medicaments?.binarySnapshotBytes || 0)
+    + (indexBreakdown.compositions?.binarySnapshotBytes || 0)
+  );
+  const structuredIndexMb = mb(
+    (indexBreakdown.medicaments?.structuredBytes || 0)
+    + (indexBreakdown.compositions?.structuredBytes || 0)
+  );
+
+  console.log('\n=== Synthèse pic build vs résident ===');
+  console.log(`  pic heap pendant loadVetData : ${peakHeap} Mo${peakPhase ? ` (@${peakPhase})` : ''}`);
+  console.log(`  heap résident après GC       : ${mb(memAfter.heapUsed)} Mo`);
+  console.log(`  surcoût transitoire (pic - résident) : ~${Math.max(0, peakHeap - mb(memAfter.heapUsed)).toFixed(2)} Mo`);
+  console.log(`  index frozen — snapshot binaire (résident ≈) : ${residentIndexMb} Mo`);
+  console.log(`  index frozen — structured (radix+postings+fieldLen) : ${structuredIndexMb} Mo`);
+  console.log('  note : le snapshot binaire est l\'empreinte compactée ; le pic de build');
+  console.log('         englobe en plus les structures grossissantes du FrozenIndexBuilder.');
+
+  console.log('\n=== Corpus (proxy JSON) ===');
   const sorted = [
     ['presentations', corpus.presentations.json_mb],
     ['compositions', corpus.compositions.json_mb],

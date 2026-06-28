@@ -1,6 +1,8 @@
 'use strict';
 
-const { cell, jsonFromEntries } = require('./recordJson');
+const { cell } = require('./recordJson');
+
+const EMPTY_ARRAY = Object.freeze([]);
 
 /**
  * Classe corpus monomorphe : champs dérivés de `fields` (ex. BDPM_SCHEMAS).
@@ -25,7 +27,7 @@ function defineCorpusRecord(className, options) {
         const key = fields[i];
         const v = values[i];
         if (arraySet.has(key)) {
-          this[key] = v == null ? [] : v;
+          this[key] = v == null || (Array.isArray(v) && v.length === 0) ? EMPTY_ARRAY : v;
         } else if (numericSet.has(key)) {
           this[key] = v == null || v === '' ? 0 : Number(v);
         } else {
@@ -39,7 +41,21 @@ function defineCorpusRecord(className, options) {
     }
 
     toJSON() {
-      const o = jsonFromEntries(fields.map((f) => [f, this[f]]));
+      const o = {};
+      for (let i = 0; i < fields.length; i++) {
+        const key = fields[i];
+        const value = this[key];
+        if (value == null || value === '') continue;
+        if (typeof value === 'number') {
+          o[key] = value;
+          continue;
+        }
+        if (Array.isArray(value)) {
+          if (value.length > 0) o[key] = value;
+          continue;
+        }
+        o[key] = value;
+      }
       if (enrichToJson) enrichToJson(this, o);
       return o;
     }

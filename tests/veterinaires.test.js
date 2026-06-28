@@ -50,6 +50,7 @@ describeSlow('API Vétérinaires ANMV', () => {
         'http://www.ircp.anmv.anses.fr/rcp.aspx?NomMedicament=SULTRIAN+100'
       );
       expect(res.body.maj_rcp).toBe('2025-11-07');
+      expect(res.body.temps_attente).toEqual([]);
     });
 
     it('retourne 404 pour num inconnu', async () => {
