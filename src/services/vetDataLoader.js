@@ -3,7 +3,6 @@ const path = require('path');
 const { buildFrozenIndexFromRows, exportFrozenIndexes } = require('../utils/frozenMiniSearch');
 const { streamMedicinalProducts } = require('../utils/streamMedicinalProductsXml');
 const {
-  defaultDictionaryParser,
   defaultProductParser,
   parseProductBlock
 } = require('../utils/vetXmlParser');
@@ -89,32 +88,64 @@ function resolveTerm(dict, termKey, code) {
   return (map && map.get(key)) || key;
 }
 
-function dictionaryEntriesFromSection(section) {
-  if (!section) return [];
-  const entries = [];
+/**
+ * Tokeniseur streaming sur le dict ANMV : scan par regex sur des chunks lus
+ * via un ReadStream, état maintenu entre chunks. Évite la matérialisation de
+ * l'arbre JS complet que produirait `defaultDictionaryParser.parse(...)` (pic
+ * ~90 Mo → ~1-2 Mo : buffer borné par le plus long token incomplet + Maps).
+ *
+ * Le format du dict est plat, sans attribut, sans CDATA : chaque `<entry>`
+ * contient exactement un `<source-code>` et un `<source-desc>` (parfois un
+ * `<ordre>` ignoré). Les sections `<term-XXX />` auto-fermantes (vides) sont
+ * gérées. Le tokenizer est insensible au formatage (pretty-printed ou compact).
+ */
+const TOKEN_RE = /<\/term-([a-z][a-z0-9-]*)\s*>|<term-([a-z][a-z0-9-]*)\b[^>]*?\/>|<term-([a-z][a-z0-9-]*)\b[^>]*?>|<entry\b[^>]*?\/>|<entry\b[^>]*?>|<\/entry>|<source-code>([^<]*)<\/source-code>|<source-desc>([^<]*)<\/source-desc>/g;
 
-  for (const block of asArray(section)) {
-    if (block && block.entry != null) {
-      entries.push(...asArray(block.entry));
-    } else if (block && block['source-code'] != null) {
-      entries.push(block);
-    }
-  }
-
-  return entries;
-}
-
-function parseDictionary(xmlContent) {
-  const parsed = defaultDictionaryParser.parse(xmlContent);
-  const root = parsed['donnees-reference-group'] || {};
+async function parseDictionaryFromStream(filepath) {
   const dict = {};
+  const stream = fs.createReadStream(filepath, { encoding: 'utf8' });
 
-  for (const [termKey, section] of Object.entries(root)) {
-    if (!termKey.startsWith('term-')) continue;
-    dict[termKey] = new Map();
-    for (const entry of dictionaryEntriesFromSection(section)) {
-      if (!entry || entry['source-code'] == null) continue;
-      dict[termKey].set(String(entry['source-code']), entry['source-desc'] || '');
+  let buffer = '';
+  let currentTerm = null;
+  let inEntry = false;
+  let pendingCode = null;
+  let pendingDesc = null;
+
+  for await (const chunk of stream) {
+    buffer += chunk;
+    TOKEN_RE.lastIndex = 0;
+    let lastEnd = 0;
+    let match;
+    while ((match = TOKEN_RE.exec(buffer)) !== null) {
+      lastEnd = TOKEN_RE.lastIndex;
+      const full = match[0];
+      if (match[1] !== undefined) {
+        currentTerm = null;
+      } else if (match[2] !== undefined) {
+        // <term-XXX /> auto-fermant : section vide, rien à faire
+      } else if (match[3] !== undefined) {
+        currentTerm = 'term-' + match[3];
+        if (!dict[currentTerm]) dict[currentTerm] = new Map();
+      } else if (match[4] !== undefined) {
+        if (inEntry) pendingCode = match[4].trim();
+      } else if (match[5] !== undefined) {
+        if (inEntry) pendingDesc = match[5].trim();
+      } else if (full === '</entry>') {
+        if (inEntry && currentTerm && pendingCode !== null) {
+          dict[currentTerm].set(pendingCode, pendingDesc || '');
+        }
+        inEntry = false;
+      } else if (full.endsWith('/>')) {
+        // <entry /> auto-fermant : ignoré
+      } else {
+        // <entry> ouvrant
+        inEntry = true;
+        pendingCode = null;
+        pendingDesc = null;
+      }
+    }
+    if (lastEnd > 0) {
+      buffer = buffer.slice(lastEnd);
     }
   }
 
@@ -322,7 +353,7 @@ async function loadVetData() {
   clearLoadedData();
   loadMemoryMark('vet_start');
 
-  const dict = parseDictionary(fs.readFileSync(dictPath, 'utf8'));
+  const dict = await parseDictionaryFromStream(dictPath);
   loadMemoryMark('vet_dict_loaded');
   const dateJeu = extractDateJeuFromHeader(productsPath);
   if (dateJeu) {
