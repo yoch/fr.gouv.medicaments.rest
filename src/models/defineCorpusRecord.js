@@ -8,7 +8,7 @@ const EMPTY_ARRAY = Object.freeze([]);
 /**
  * Classe corpus monomorphe : champs dérivés de `fields` (ex. BDPM_SCHEMAS).
  * @param {string} className
- * @param {{ fields: string[], numericFields?: string[], arrayFields?: string[], lowCardinalityFields?: string[], getters?: Record<string, Function>, enrichToJson?: (inst: object, o: object) => void }} options
+ * @param {{ fields: string[], numericFields?: string[], arrayFields?: string[], lowCardinalityFields?: string[], omitStoredFields?: string[] | (() => string[]), getters?: Record<string, Function>, enrichToJson?: (inst: object, o: object) => void }} options
  */
 function defineCorpusRecord(className, options) {
   const {
@@ -16,6 +16,7 @@ function defineCorpusRecord(className, options) {
     numericFields = [],
     arrayFields = [],
     lowCardinalityFields = [],
+    omitStoredFields = [],
     getters = {},
     enrichToJson = null
   } = options;
@@ -23,6 +24,11 @@ function defineCorpusRecord(className, options) {
   const numericSet = new Set(numericFields);
   const arraySet = new Set(arrayFields);
   const lowCardSet = new Set(lowCardinalityFields);
+
+  function resolveOmitStoredFields() {
+    const resolved = typeof omitStoredFields === 'function' ? omitStoredFields() : omitStoredFields;
+    return new Set(resolved);
+  }
 
   class CorpusRecord {
     constructor(...values) {
@@ -40,10 +46,12 @@ function defineCorpusRecord(className, options) {
     }
 
     static fromCsv(record) {
+      const omitSet = resolveOmitStoredFields();
       const args = new Array(fields.length);
       for (let i = 0; i < fields.length; i++) {
         const f = fields[i];
-        const v = record[f];
+        let v = record[f];
+        if (omitSet.has(f)) v = '';
         args[i] = lowCardSet.has(f) ? intern(v) : v;
       }
       return new CorpusRecord(...args);

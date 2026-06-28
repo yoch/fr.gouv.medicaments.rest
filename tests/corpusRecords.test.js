@@ -41,6 +41,14 @@ describe('BDPM schema alignment', () => {
   }
 });
 
+describe('Presentation CIS_CIP_bdpm.txt', () => {
+  const { DOLIPRANE_8CP_JSON } = require('./fixtures/cis-cip-samples');
+
+  it('mappe une ligne fixture Doliprane', () => {
+    expect(Presentation.fromCsv(DOLIPRANE_8CP_JSON).toJSON()).toEqual(DOLIPRANE_8CP_JSON);
+  });
+});
+
 describe('BDPM toJSON contract', () => {
   const cases = [
     {
@@ -200,6 +208,8 @@ describe('MedicamentVet', () => {
       '',
       '',
       '',
+      '',
+      '',
       [],
       [],
       '2024-01-01'
@@ -211,7 +221,7 @@ describe('MedicamentVet', () => {
   });
 
   it('sans maj_rcp : pas de lien_rcp dans toJSON', () => {
-    const m = new MedicamentVet('1', 'X', '', '', '', [], [], '');
+    const m = new MedicamentVet('1', 'X', '', '', '', '', null, [], [], '');
     expect(m.toJSON()).toEqual({ num: '1', nom: 'X' });
   });
 
@@ -222,7 +232,7 @@ describe('MedicamentVet', () => {
 
 describe('tableaux vétérinaires', () => {
   it('codes_atcvet et especes sont toujours des tableaux sur l’instance', () => {
-    const m = new MedicamentVet('1', 'X', '', '', '', null, undefined, '');
+    const m = new MedicamentVet('1', 'X', '', '', '', '', null, undefined, undefined, '');
     expect(m.codes_atcvet).toEqual([]);
     expect(m.especes).toEqual([]);
     expect(m.toJSON()).toEqual({ num: '1', nom: 'X' });

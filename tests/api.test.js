@@ -3,6 +3,8 @@ const express = require('express');
 const medicamentRoutes = require('../src/routes/medicaments');
 const { loadData } = require('../src/services/dataLoader');
 const { describeSlow } = require('./helpers/slowTests');
+const { DOLIPRANE_CIS, DOLIPRANE_CIP13, DOLIPRANE_CIP7 } = require('./fixtures/cis-cip-samples');
+const { isPlausibleCip13 } = require('./helpers/bdpmPresentation');
 
 const app = express();
 app.use(express.json());
@@ -83,6 +85,16 @@ describeSlow('API Medicaments', () => {
             );
             expect(res.body.presentations).toBeDefined();
             expect(res.body.compositions).toBeDefined();
+        });
+
+        it('expose des présentations avec CIP13 valide (non régression schéma)', async () => {
+            const res = await request(app).get(`/api/medicaments/specialites/${DOLIPRANE_CIS}`);
+            expect(res.statusCode).toEqual(200);
+            const pres = res.body.presentations.find((p) => p.cip7 === DOLIPRANE_CIP7);
+            expect(pres).toBeDefined();
+            expect(isPlausibleCip13(pres.cip13)).toBe(true);
+            expect(pres.cip13).toBe(DOLIPRANE_CIP13);
+            expect(pres.taux_remboursement).toMatch(/%$/);
         });
 
         it('should return 404 for unknown CIS', async () => {
@@ -179,6 +191,18 @@ describeSlow('API Medicaments', () => {
             const viaComposition = res.body.data.filter((d) => d.match_via === 'composition');
             expect(viaComposition.length).toBeGreaterThan(0);
             expect(viaComposition[0].substances?.length).toBeGreaterThan(0);
+        });
+    });
+
+    describe('GET /api/medicaments/presentations', () => {
+        it('retrouve une présentation par CIP13 indexé', async () => {
+            const res = await request(app).get(
+                `/api/medicaments/presentations?q=${DOLIPRANE_CIP13}&limit=1`
+            );
+            expect(res.statusCode).toEqual(200);
+            expect(res.body.data.length).toBe(1);
+            expect(res.body.data[0].cip13).toBe(DOLIPRANE_CIP13);
+            expect(isPlausibleCip13(res.body.data[0].cip13)).toBe(true);
         });
     });
 

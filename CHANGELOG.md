@@ -7,36 +7,24 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
-### Modifié
+## [1.2.4] - 2026-06-28
 
-- Profil allégé agents : `LOAD_MITM=false` (comme `LOAD_HAS_AVIS`), champs retirés des schémas (`presentations`, `compositions` partiels, vet `medicaments`).
+### Corrigé
+
+- Schéma `CIS_CIP_bdpm.txt` restauré (13 colonnes gouv) : régression du commit « profil allégé » qui raccourcissait le schéma CSV et décalait `cip13`, les taux de remboursement et les prix.
+- Version Swagger lue depuis `package.json` (plus de décalage avec la version npm).
 
 ### Ajouté
 
-- Factory `defineCorpusRecord` (champs dérivés de `corpusSchemas`), doc `docs/CORPUS_CLASSES.md`, script `compare-corpus-memory.js`, utils `corpusPaging` / `miniSearchIndexConfig`.
+- `corpusLightProfile` : omission RAM / index sur champs lourds sans tronquer le parsing CSV (`CORPUS_LIGHT_PROFILE=true`, indépendant de `LOAD_HAS_AVIS`).
+- `GET /config` et `GET /api/config` : feature flags et limites runtime pour le debug.
+- `bdpmInterning` : liste centralisée des champs internés, alignée sur `scripts/analyze-interning-candidates.js`.
+- Tests de non-régression CIP13 (`bdpmPresentationSchema`, `corpusLightProfile`, `bdpmInterning`) et scripts `analyze:interning` / `measure:bdpm-resident`.
 
 ### Modifié
 
-- Corpus BDPM et vétérinaire : stockage en **classes ES6** à forme fixe (`src/models/bdpm`, `src/models/vet`) avec `corpusStore` (helpers sur tableaux d’instances) à la place des tuples `rowStore`.
-- Champs dérivés `url_bdpm` et `lien_rcp` : **getters** sur le prototype (non stockés en RAM) ; sérialisation API via `toJSON()`.
-- Scripts `analyze-bdpm-corpus-size.js`, `analyze-vet-cache-size.js` et benchmark `compare-corpus-memory.js` adaptés aux instances.
-
-### Supprimé
-
-- `rowStore.js` et tests `rowStore.test.js` (remplacés par `corpusRecords.test.js`).
-
-### Benchmark mémoire (classes vs tuples v1.2.0)
-
-Comparer sur la même machine avec `node --expose-gc` :
-
-```bash
-git checkout v1.2.0 && node --expose-gc scripts/compare-corpus-memory.js --vet --label=tuple
-git checkout main && node --expose-gc scripts/compare-corpus-memory.js --vet --label=classes
-```
-
-**Décision** : les index FrozenMiniSearch dominent toujours l’empreinte (~45 Mo) ; le corpus (chaînes partagées) est une fraction du RSS. Les classes améliorent la lisibilité et l’accès typé ; le gain RSS par rapport aux tuples n’est **pas garanti** — valider avec le script ci-dessus avant déploiement. Régression acceptable si ≤ 3 Mo RSS documentée.
-
-## [Non publié]
+- Interning présentations réaligné sur les nouveaux champs (`statut_admin`, `declaration`, `agrement_collectivite`) ; retrait de `indications`.
+- Compositions et spécialités : interning étendu (`designation_element`, `reference_dosage`, `titulaire`, etc.) après mesures de cardinalité.
 
 ## [1.2.2] - 2026-06-23
 
@@ -91,7 +79,8 @@ git checkout main && node --expose-gc scripts/compare-corpus-memory.js --vet --l
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.2...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.4...HEAD
+[1.2.4]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.2...v1.2.4
 [1.2.2]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.1.0...v1.2.0

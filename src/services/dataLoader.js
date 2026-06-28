@@ -10,6 +10,10 @@ const { loadMemoryMark } = require('../utils/memorySampler');
 const { parseListPaging } = require('../utils/corpusPaging');
 const { miniSearchIndexConfig } = require('../utils/miniSearchIndexConfig');
 const { BDPM_SCHEMAS } = require('../utils/corpusSchemas');
+const {
+  presentationIndexFields,
+  presentationIndexBoost
+} = require('../utils/corpusLightProfile');
 const { rankAndMaterializeSearch } = require('../utils/corpusSearch');
 const {
   createCorpus,
@@ -34,8 +38,12 @@ const BDPM_INDEX_SPECS = {
   },
   presentations: {
     file: 'CIS_CIP_bdpm.txt',
-    fields: ['cis', 'cip7', 'cip13', 'libelle', 'indications'],
-    boost: { libelle: 3, indications: 2, cis: 2, cip7: 1.5, cip13: 1.5 }
+    get fields() {
+      return presentationIndexFields();
+    },
+    get boost() {
+      return presentationIndexBoost();
+    }
   },
   compositions: {
     file: 'CIS_COMPO_bdpm.txt',

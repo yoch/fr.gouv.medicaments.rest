@@ -3,6 +3,7 @@ const cors = require('cors');
 const { downloadDataIfNeeded } = require('./services/dataDownloader');
 const { downloadVetDataIfNeeded } = require('./services/vetDataDownloader');
 const { loadData, getMetadata } = require('./services/dataLoader');
+const { getRuntimeConfig } = require('./runtimeConfig');
 const { loadVetData } = require('./services/vetDataLoader');
 const medicamentRoutes = require('./routes/medicaments');
 const veterinaireRoutes = require('./routes/veterinaires');
@@ -126,8 +127,22 @@ function healthHandler(req, res) {
     }
 }
 
+function configHandler(req, res) {
+    const { pretty } = req.query;
+    const responseData = getRuntimeConfig();
+
+    if (pretty === 'true' || pretty === '1') {
+        res.set('Content-Type', 'application/json; charset=utf-8');
+        res.send(JSON.stringify(responseData, null, 2));
+    } else {
+        res.json(responseData);
+    }
+}
+
 app.get('/health', healthHandler);
 app.get('/api/health', healthHandler);
+app.get('/config', configHandler);
+app.get('/api/config', configHandler);
 
 const {
   CHECK_INTERVAL_HOURS: BDPM_CHECK_INTERVAL_HOURS

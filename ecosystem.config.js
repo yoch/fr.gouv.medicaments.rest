@@ -9,6 +9,7 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         RELOAD_STRATEGY: 'restart',
+        CORPUS_LIGHT_PROFILE: 'true',
         VET_LOAD_DEFERRED: 'true',
         VET_LOAD_DELAY_MS: '10000'
       }

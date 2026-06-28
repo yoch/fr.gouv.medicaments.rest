@@ -3,10 +3,12 @@
 const { BDPM_SCHEMAS } = require('../../utils/corpusSchemas');
 const { defineCorpusRecord } = require('../defineCorpusRecord');
 const { bdpmExtraitUrl } = require('./constants');
+const { omitStoredFieldsFor } = require('../../utils/corpusLightProfile');
+const { lowCardinalityFieldsFor } = require('../../utils/bdpmInterning');
 
 const Specialite = defineCorpusRecord('Specialite', {
   fields: BDPM_SCHEMAS.specialites,
-  lowCardinalityFields: ['forme_pharma', 'voies_admin', 'statut_amm', 'type_amm', 'commercialisation', 'surveillance_renforcee'],
+  lowCardinalityFields: lowCardinalityFieldsFor('specialites'),
   getters: {
     url_bdpm() {
       return this.cis ? bdpmExtraitUrl(this.cis) : '';
@@ -19,42 +21,44 @@ const Specialite = defineCorpusRecord('Specialite', {
 
 const Presentation = defineCorpusRecord('Presentation', {
   fields: BDPM_SCHEMAS.presentations,
-  lowCardinalityFields: ['etat_commercialisation', 'taux_remboursement', 'indications']
+  omitStoredFields: () => omitStoredFieldsFor('presentations'),
+  lowCardinalityFields: lowCardinalityFieldsFor('presentations')
 });
 
 const Composition = defineCorpusRecord('Composition', {
   fields: BDPM_SCHEMAS.compositions,
-  lowCardinalityFields: ['nature_composant']
+  omitStoredFields: () => omitStoredFieldsFor('compositions'),
+  lowCardinalityFields: lowCardinalityFieldsFor('compositions')
 });
 
 const AvisSmr = defineCorpusRecord('AvisSmr', {
   fields: BDPM_SCHEMAS.avis_smr,
-  lowCardinalityFields: ['motif_evaluation', 'valeur_smr', 'libelle_smr']
+  lowCardinalityFields: lowCardinalityFieldsFor('avis_smr')
 });
 
 const AvisAsmr = defineCorpusRecord('AvisAsmr', {
   fields: BDPM_SCHEMAS.avis_asmr,
-  lowCardinalityFields: ['motif_evaluation', 'valeur_asmr', 'libelle_asmr']
+  lowCardinalityFields: lowCardinalityFieldsFor('avis_asmr')
 });
 
 const Generique = defineCorpusRecord('Generique', {
   fields: BDPM_SCHEMAS.generiques,
-  lowCardinalityFields: ['type_generique']
+  lowCardinalityFields: lowCardinalityFieldsFor('generiques')
 });
 
 const Condition = defineCorpusRecord('Condition', {
   fields: BDPM_SCHEMAS.conditions,
-  lowCardinalityFields: ['condition']
+  lowCardinalityFields: lowCardinalityFieldsFor('conditions')
 });
 
 const Rupture = defineCorpusRecord('Rupture', {
   fields: BDPM_SCHEMAS.ruptures,
-  lowCardinalityFields: ['code_statut', 'libelle_statut']
+  lowCardinalityFields: lowCardinalityFieldsFor('ruptures')
 });
 
 const Mitm = defineCorpusRecord('Mitm', {
   fields: BDPM_SCHEMAS.mitm,
-  lowCardinalityFields: ['code_atc']
+  lowCardinalityFields: lowCardinalityFieldsFor('mitm')
 });
 
 const Substance = defineCorpusRecord('Substance', {

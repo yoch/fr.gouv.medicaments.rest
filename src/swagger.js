@@ -1,11 +1,12 @@
 const swaggerJsdoc = require('swagger-jsdoc');
+const { version } = require('../package.json');
 
 const options = {
     definition: {
         openapi: '3.0.0',
         info: {
             title: 'API Base de Données Publique des Médicaments',
-            version: '1.2.2',
+            version,
             description: 'API REST pour accéder aux données officielles des médicaments humains (BDPM) et vétérinaires (ANMV/ANSES).',
             contact: {
                 name: 'Yoch Melka',
@@ -51,8 +52,23 @@ const options = {
                         cis: { type: 'string' },
                         cip7: { type: 'string', description: 'Code CIP7' },
                         libelle: { type: 'string', description: 'Libellé de la présentation' },
-                        etat_commercialisation: { type: 'string' },
+                        etat_commercialisation: {
+                            type: 'string',
+                            description: 'État de commercialisation déclaré par le titulaire'
+                        },
+                        statut_admin: {
+                            type: 'string',
+                            description: 'Statut administratif de la présentation (ex. Présentation active)'
+                        },
+                        date_declaration: {
+                            type: 'string',
+                            description: 'Date de la déclaration de commercialisation (JJ/MM/AAAA)'
+                        },
                         cip13: { type: 'string', description: 'Code CIP13' },
+                        agrement_collectivite: {
+                            type: 'string',
+                            description: 'Agrément aux collectivités (oui, non, inconnu)'
+                        },
                         taux_remboursement: { type: 'string' },
                         prix_medicament: { type: 'string' },
                         prix_public: { type: 'string' },
