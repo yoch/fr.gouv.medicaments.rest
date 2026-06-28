@@ -24,6 +24,13 @@ const { miniSearchIndexConfig } = require('../utils/miniSearchIndexConfig');
 const { MedicamentVet, CompositionVet, PresentationVet } = require('../models/vet');
 const { TempsAttenteEntry } = require('../models/tempsAttente');
 const { buildLienRcpFromNom, ANMV_RCP_URL_PREFIX } = require('../models/vet/rcp');
+const { intern } = require('../utils/stringPool');
+
+function internElements(arr) {
+  if (!arr || !arr.length) return arr;
+  for (let i = 0; i < arr.length; i++) arr[i] = intern(arr[i]);
+  return arr;
+}
 const {
   VET_DATA_DIR,
   PRODUCTS_XML_NAME,
@@ -198,9 +205,9 @@ function pushMedicament(medicaments, product, dict) {
       resolveTerm(dict, 'term-tit', product['term-tit']),
       resolveTerm(dict, 'term-fp', product['term-fp']),
       resolveTerm(dict, 'term-stat-auto', product['term-stat-auto']),
-      parseAtcvetCodes(product),
+      internElements(parseAtcvetCodes(product)),
       parseEspeces(product, dict),
-      parseMajRcp(product)
+      intern(parseMajRcp(product))
     )
   );
 }
@@ -212,7 +219,7 @@ function pushCompositionFromSa(compositions, num, sa, dict) {
       num,
       resolveTerm(dict, 'term-sa', sa['term-sa']),
       sa.quantite != null ? String(sa.quantite) : '',
-      sa.unite || resolveTerm(dict, 'term-unite', sa['term-unite'])
+      intern(sa.unite || resolveTerm(dict, 'term-unite', sa['term-unite']))
     )
   );
 }
@@ -243,7 +250,7 @@ function pushPresentation(presentations, num, mod, dict) {
 
   const conditions = [];
   if (mod['lib-condp']) {
-    conditions.push(mod['lib-condp']);
+    conditions.push(intern(mod['lib-condp']));
   } else if (mod['term-cd']) {
     const label = resolveTerm(dict, 'term-cd', mod['term-cd']);
     if (label) conditions.push(label);
@@ -253,7 +260,7 @@ function pushPresentation(presentations, num, mod, dict) {
     presentations,
     new PresentationVet(
       num,
-      libelle,
+      intern(libelle),
       mod['code-gtin'] ? String(mod['code-gtin']) : '',
       conditions
     )
