@@ -245,18 +245,23 @@ async function loadData() {
 
   const { file: specFile, fields: specFields, boost: specBoost } = BDPM_INDEX_SPECS.specialites;
   await loadParseAndIndex('specialites', specFile, specFields, specBoost);
+  loadMemoryMark('bdpm_after_specialites', { rows: rowCount(corpus.specialites) });
 
   const pres = BDPM_INDEX_SPECS.presentations;
   await loadParseAndIndex('presentations', pres.file, pres.fields, pres.boost);
+  loadMemoryMark('bdpm_after_presentations', { rows: rowCount(corpus.presentations) });
 
   const comp = BDPM_INDEX_SPECS.compositions;
   await loadParseAndIndex('compositions', comp.file, comp.fields, comp.boost);
+  loadMemoryMark('bdpm_after_compositions', { rows: rowCount(corpus.compositions) });
 
   if (LOAD_HAS_AVIS) {
     const smr = BDPM_INDEX_SPECS.avis_smr;
     await loadParseAndIndex('avis_smr', smr.file, smr.fields);
+    loadMemoryMark('bdpm_after_avis_smr', { rows: rowCount(corpus.avis_smr) });
     const asmr = BDPM_INDEX_SPECS.avis_asmr;
     await loadParseAndIndex('avis_asmr', asmr.file, asmr.fields);
+    loadMemoryMark('bdpm_after_avis_asmr', { rows: rowCount(corpus.avis_asmr) });
   } else {
     clearCorpus(corpus.avis_smr);
     clearCorpus(corpus.avis_asmr);
@@ -266,13 +271,17 @@ async function loadData() {
 
   const generiques = BDPM_INDEX_SPECS.generiques;
   await loadParseAndIndex('generiques', generiques.file, generiques.fields);
+  loadMemoryMark('bdpm_after_generiques', { rows: rowCount(corpus.generiques) });
   const conditions = BDPM_INDEX_SPECS.conditions;
   await loadParseAndIndex('conditions', conditions.file, conditions.fields);
+  loadMemoryMark('bdpm_after_conditions', { rows: rowCount(corpus.conditions) });
   const ruptures = BDPM_INDEX_SPECS.ruptures;
   await loadParseAndIndex('ruptures', ruptures.file, ruptures.fields);
+  loadMemoryMark('bdpm_after_ruptures', { rows: rowCount(corpus.ruptures) });
   if (LOAD_MITM) {
     const mitm = BDPM_INDEX_SPECS.mitm;
     await loadParseAndIndex('mitm', mitm.file, mitm.fields, mitm.boost);
+    loadMemoryMark('bdpm_after_mitm', { rows: rowCount(corpus.mitm) });
   } else {
     clearCorpus(corpus.mitm);
     searchIndexes.mitm = null;
@@ -299,6 +308,7 @@ async function loadData() {
     BDPM_INDEX_SPECS.substances.fields,
     BDPM_INDEX_SPECS.substances.boost
   );
+  loadMemoryMark('bdpm_after_substances', { rows: rowCount(corpus.substances) });
 
   buildCisIndexes();
   loadMemoryMark('bdpm_done', { specialites: rowCount(corpus.specialites) });
@@ -399,6 +409,14 @@ function getBdpmCorpusStats() {
   return { byType, corpus };
 }
 
+function getBdpmSearchIndexes() {
+  const out = {};
+  for (const type of Object.keys(searchIndexes)) {
+    out[type] = searchIndexes[type];
+  }
+  return out;
+}
+
 function exportBdpmSearchIndexes(outDir) {
   return exportFrozenIndexes(searchIndexes, outDir, 'bdpm', {
     last_updated: metadata.last_updated,
@@ -448,5 +466,6 @@ module.exports = {
   bdpmExtraitUrl,
   HYDRATE_RELATED_LIMIT,
   DETAIL_HYDRATE_RELATED_LIMIT,
-  getBdpmCorpusStats
+  getBdpmCorpusStats,
+  getBdpmSearchIndexes
 };
