@@ -1,6 +1,6 @@
 {
   "name": "fr.gouv.medicaments.rest",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "API REST pour la base de données publique des médicaments du gouvernement français",
   "main": "src/server.js",
   "engines": {
@@ -19,8 +19,8 @@
     "test:all": "RUN_SLOW_TESTS=1 jest --runInBand"
   },
   "dependencies": {
-    "@nodable/flexible-xml-parser": "^1.3.0",
-    "@yoch/frozenminisearch": "^1.4.0",
+    "@nodable/flexible-xml-parser": "^1.4.0",
+    "@yoch/frozenminisearch": "^1.6.0",
     "7zip-bin": "^5.2.0",
     "axios": "^1.18.0",
     "cors": "^2.8.6",

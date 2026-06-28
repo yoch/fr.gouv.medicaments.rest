@@ -20,6 +20,11 @@ function resolveFullProductsXmlPath() {
   return null;
 }
 
+/** ANMV encode parfois des espaces doubles en `++` dans `<lien-rcp>` alors que `<nom>` n'en a qu'un (flexible-xml-parser 1.4+ les préserve). */
+function normalizeRcpLinkForCompare(url) {
+  return String(url).replace(/\++/g, '+');
+}
+
 /**
  * @param {string} xmlPath
  * @param {{ minWithLien?: number, maxFailuresShown?: number }} [options]
@@ -41,7 +46,7 @@ async function collectRcpLinkMismatches(xmlPath, options = {}) {
     }
     withLien++;
     const rebuilt = buildLienRcpFromNom(nom);
-    if (rebuilt !== lien_rcp_xml) {
+    if (normalizeRcpLinkForCompare(rebuilt) !== normalizeRcpLinkForCompare(lien_rcp_xml)) {
       mismatches.push({ num, nom, expected: lien_rcp_xml, got: rebuilt });
     }
   });

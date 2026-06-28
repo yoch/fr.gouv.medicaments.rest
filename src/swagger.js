@@ -5,7 +5,7 @@ const options = {
         openapi: '3.0.0',
         info: {
             title: 'API Base de Données Publique des Médicaments',
-            version: '1.2.1',
+            version: '1.2.2',
             description: 'API REST pour accéder aux données officielles des médicaments humains (BDPM) et vétérinaires (ANMV/ANSES).',
             contact: {
                 name: 'Yoch Melka',
