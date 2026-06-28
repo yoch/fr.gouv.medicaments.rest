@@ -7,6 +7,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.2.5] - 2026-06-28
+
+### Corrigé
+
+- `corpusLightProfile` réaligné sur l'intention du profil allégé (7766624) : omet `statut_admin`, `date_declaration`, `agrement_collectivite` ; conserve `honoraires`, `indications` et l'index `indications` (le parsing reste sur le schéma gouv 13 colonnes).
+
 ## [1.2.4] - 2026-06-28
 
 ### Corrigé

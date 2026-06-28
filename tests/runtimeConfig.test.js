@@ -33,8 +33,8 @@ describe('runtimeConfig', () => {
       enable_rate_limit: false
     });
     expect(config.limits.vet_load_delay_ms).toBe(15000);
-    expect(config.corpus_light_omit_fields.presentations).toContain('indications');
-    expect(config.presentation_index_fields).not.toContain('indications');
+    expect(config.corpus_light_omit_fields.presentations).toContain('statut_admin');
+    expect(config.presentation_index_fields).toContain('indications');
   });
 
   it('corpus_light_profile est indépendant de LOAD_HAS_AVIS', () => {

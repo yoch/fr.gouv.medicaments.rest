@@ -52,7 +52,7 @@ describe('corpusLightProfile', () => {
     expect(on.isCorpusLightProfile()).toBe(true);
   });
 
-  it('conserve le CIP13 correct tout en omettant les champs lourds', () => {
+  it('conserve le CIP13 et omet les champs admin en profil allégé', () => {
     process.env.CORPUS_LIGHT_PROFILE = 'true';
     const { Presentation: Pres, parsePresentationTsv: parseTsv, isPlausibleCip13: okCip13 } =
       reloadModules();
@@ -61,15 +61,23 @@ describe('corpusLightProfile', () => {
 
     expect(okCip13(json.cip13)).toBe(true);
     expect(json.cip13).toBe(DOLIPRANE_CIP13);
-    expect(json.indications).toBeUndefined();
-    expect(json.honoraires).toBeUndefined();
+    expect(json.statut_admin).toBeUndefined();
+    expect(json.date_declaration).toBeUndefined();
+    expect(json.agrement_collectivite).toBeUndefined();
+    expect(json.honoraires).toBe(DOLIPRANE_8CP_JSON.honoraires);
     expect(json.taux_remboursement).toBe(DOLIPRANE_8CP_JSON.taux_remboursement);
   });
 
-  it('n’indexe pas indications en profil allégé', () => {
+  it('indexe indications en profil allégé', () => {
     process.env.CORPUS_LIGHT_PROFILE = 'true';
     const { light } = reloadModules();
-    expect(light.presentationIndexFields()).toEqual(['cis', 'cip7', 'cip13', 'libelle']);
+    expect(light.presentationIndexFields()).toEqual([
+      'cis',
+      'cip7',
+      'cip13',
+      'libelle',
+      'indications'
+    ]);
   });
 
   it('omet reference_dosage et numero_ordre des compositions en profil allégé', () => {
