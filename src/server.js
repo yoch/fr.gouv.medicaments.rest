@@ -83,6 +83,8 @@ app.get('/', (req, res) => {
 
         <p style="margin-top: 50px; font-size: 0.9em;">
             <a href="/health" style="color: #666;">Status API</a>
+            ·
+            <a href="/config" style="color: #666;">Configuration runtime</a>
         </p>
     </body>
     </html>
@@ -127,22 +129,10 @@ function healthHandler(req, res) {
     }
 }
 
-function configHandler(req, res) {
-    const { pretty } = req.query;
-    const responseData = getRuntimeConfig();
-
-    if (pretty === 'true' || pretty === '1') {
-        res.set('Content-Type', 'application/json; charset=utf-8');
-        res.send(JSON.stringify(responseData, null, 2));
-    } else {
-        res.json(responseData);
-    }
-}
-
 app.get('/health', healthHandler);
-app.get('/api/health', healthHandler);
-app.get('/config', configHandler);
-app.get('/api/config', configHandler);
+app.get('/config', (req, res) => {
+    res.json(getRuntimeConfig());
+});
 
 const {
   CHECK_INTERVAL_HOURS: BDPM_CHECK_INTERVAL_HOURS
