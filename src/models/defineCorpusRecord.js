@@ -1,25 +1,28 @@
 'use strict';
 
 const { cell } = require('./recordJson');
+const { intern } = require('../utils/stringPool');
 
 const EMPTY_ARRAY = Object.freeze([]);
 
 /**
  * Classe corpus monomorphe : champs dérivés de `fields` (ex. BDPM_SCHEMAS).
  * @param {string} className
- * @param {{ fields: string[], numericFields?: string[], arrayFields?: string[], getters?: Record<string, Function>, enrichToJson?: (inst: object, o: object) => void }} options
+ * @param {{ fields: string[], numericFields?: string[], arrayFields?: string[], lowCardinalityFields?: string[], getters?: Record<string, Function>, enrichToJson?: (inst: object, o: object) => void }} options
  */
 function defineCorpusRecord(className, options) {
   const {
     fields,
     numericFields = [],
     arrayFields = [],
+    lowCardinalityFields = [],
     getters = {},
     enrichToJson = null
   } = options;
 
   const numericSet = new Set(numericFields);
   const arraySet = new Set(arrayFields);
+  const lowCardSet = new Set(lowCardinalityFields);
 
   class CorpusRecord {
     constructor(...values) {
@@ -37,7 +40,13 @@ function defineCorpusRecord(className, options) {
     }
 
     static fromCsv(record) {
-      return new CorpusRecord(...fields.map((f) => record[f]));
+      const args = new Array(fields.length);
+      for (let i = 0; i < fields.length; i++) {
+        const f = fields[i];
+        const v = record[f];
+        args[i] = lowCardSet.has(f) ? intern(v) : v;
+      }
+      return new CorpusRecord(...args);
     }
 
     toJSON() {
