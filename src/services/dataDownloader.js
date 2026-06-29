@@ -197,4 +197,4 @@ async function downloadDataIfNeeded() {
   return { changed };
 }
 
-module.exports = { downloadDataIfNeeded, CHECK_INTERVAL_HOURS };
+module.exports = { downloadDataIfNeeded };

@@ -167,68 +167,64 @@ function buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource }
   };
 }
 
+/**
+ * Plans de recherche par `source` — supprime les branches conditionnelles
+ * redondantes dans `executeHybridSearch`. `merge`:
+ *   - 'replace'  : un seul référentiel retenu (human ou veterinary)
+ *   - 'concat'   : union triée (mixed)
+ *   - 'auto'     : bdpm prioritaire si match fort, sinon vet
+ */
+const SEARCH_PLANS = {
+  human:     { bdpm: true,  vet: false, merge: 'replace' },
+  veterinary:{ bdpm: false, vet: true,  merge: 'replace' },
+  mixed:     { bdpm: true,  vet: true,  merge: 'concat' },
+  auto:      { bdpm: true,  vet: true,  merge: 'auto' }
+};
+
 function executeHybridSearch(q, source) {
   const sourceMode = normalizeSource(source);
   const explicitSource = source != null && String(source).trim() !== '';
+  const plan = SEARCH_PLANS[sourceMode];
   const queried = [];
   const withResults = [];
-  let results = [];
 
-  if (sourceMode === 'human' || sourceMode === 'auto' || sourceMode === 'mixed') {
+  let bdpmResults = [];
+  let vetResults = [];
+
+  if (plan.bdpm) {
     queried.push('bdpm');
-    const bdpmResults = searchBdpm(q);
-    if (bdpmResults.length > 0) {
-      withResults.push('bdpm');
-    }
-
-    if (sourceMode === 'auto') {
-      const bdpmStrong = bdpmResults.some((r) => isStrongMatchQuality(r.match_quality));
-      if (bdpmResults.length > 0 && bdpmStrong) {
-        return {
-          results: bdpmResults,
-          search: buildSearchMeta({
-            q,
-            sourceMode,
-            queried,
-            withResults,
-            explicitSource
-          })
-        };
-      }
-    } else {
-      results = results.concat(bdpmResults);
-    }
+    bdpmResults = searchBdpm(q);
+    if (bdpmResults.length > 0) withResults.push('bdpm');
   }
 
-  if (sourceMode === 'veterinary' || sourceMode === 'auto' || sourceMode === 'mixed') {
-    if (!queried.includes('anmv')) queried.push('anmv');
-    const vetResults = searchVeterinary(q);
-    if (vetResults.length > 0) {
-      withResults.push('anmv');
-    }
-
-    if (sourceMode === 'veterinary') {
-      results = vetResults;
-    } else if (sourceMode === 'auto') {
-      results = vetResults;
-    } else {
-      results = results.concat(vetResults);
-    }
+  // auto : early-exit si bdpm a un match fort (ne query pas vet)
+  const bdpmStrong =
+    bdpmResults.length > 0 && bdpmResults.some((r) => isStrongMatchQuality(r.match_quality));
+  if (plan.merge === 'auto' && bdpmStrong) {
+    return {
+      results: bdpmResults,
+      search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
+    };
   }
 
-  if (sourceMode === 'mixed') {
-    results = sortMergedResults(results);
+  if (plan.vet) {
+    queried.push('anmv');
+    vetResults = searchVeterinary(q);
+    if (vetResults.length > 0) withResults.push('anmv');
+  }
+
+  let results;
+  if (plan.merge === 'concat') {
+    results = sortMergedResults([...bdpmResults, ...vetResults]);
+  } else if (plan.merge === 'replace') {
+    results = plan.bdpm ? bdpmResults : vetResults;
+  } else {
+    results = vetResults;
   }
 
   return {
     results,
-    search: buildSearchMeta({
-      q,
-      sourceMode,
-      queried,
-      withResults,
-      explicitSource
-    })
+    search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
   };
 }
 

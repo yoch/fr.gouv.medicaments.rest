@@ -2,13 +2,11 @@
 
 const fs = require('fs');
 const path = require('path');
+const { buildIndexDocument } = require('./corpusStore');
+const { miniSearchIndexConfig } = require('./miniSearchIndexConfig');
 
 /**
  * Écrit un tableau de lignes en JSONL (un objet JSON par ligne).
- * @param {string} filePath
- * @param {object[]} rows
- * @param {(row: object, rowIndex: number) => object} mapRow
- * @returns {number} nombre de lignes écrites
  */
 function writeJsonl(filePath, rows, mapRow) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -24,18 +22,39 @@ function writeJsonl(filePath, rows, mapRow) {
 }
 
 /**
+ * Construit la liste de `datasets` à exporter à partir des specs d'index.
+ * Source unique pour BDPM et vet — supprime la duplication des exportApi.
+ *
+ * @param {object} corpus map type → rows
+ * @param {object} specs map type → { fields, boost } (BDPM_INDEX_SPECS / VET_INDEX_SPECS)
+ * @param {object} options
+ *   - `onlyIndexed` : sauter les types dont l'index frozen est absent (BDPM
+ *     n'exporte que les types indexés ; vet exporte aussi presentations non-indexé)
+ *   - `searchIndexes` : requis si `onlyIndexed` (map type → frozen index)
+ */
+function buildDatasetsFromSpecs(corpus, specs, options = {}) {
+  const { onlyIndexed = false, searchIndexes = {} } = options;
+  const datasets = [];
+
+  for (const [type, spec] of Object.entries(specs)) {
+    const rows = corpus[type];
+    if (!rows || rows.length === 0) continue;
+    if (onlyIndexed && !searchIndexes[type]) continue;
+
+    const { fields, boost } = spec;
+    datasets.push({
+      type,
+      rows,
+      toDocument: (item, rowIndex) => buildIndexDocument(item, rowIndex, fields),
+      indexOptions: miniSearchIndexConfig(fields, boost)
+    });
+  }
+
+  return datasets;
+}
+
+/**
  * Exporte des jeux de documents post-parse en JSONL + manifeste.
- *
- * Chaque entrée de `datasets` :
- * - `type` : identifiant (ex. specialites)
- * - `rows` : corpus en mémoire après parse
- * - `toDocument(row, rowIndex)` : forme envoyée à MiniSearch (défaut : toJSON())
- * - `indexOptions` : options passées à fromDocuments (optionnel)
- *
- * @param {object[]} datasets
- * @param {string} outDir
- * @param {string} prefix ex. bdpm, vet
- * @param {object} manifestExtra métadonnées (source, last_updated, …)
  */
 function exportCorpusDocuments(datasets, outDir, prefix, manifestExtra = {}) {
   fs.mkdirSync(outDir, { recursive: true });
@@ -74,6 +93,6 @@ function exportCorpusDocuments(datasets, outDir, prefix, manifestExtra = {}) {
 }
 
 module.exports = {
-  writeJsonl,
+  buildDatasetsFromSpecs,
   exportCorpusDocuments
 };

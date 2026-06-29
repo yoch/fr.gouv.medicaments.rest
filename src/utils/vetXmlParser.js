@@ -75,9 +75,7 @@ function parseProductBlock(blockXml, parser) {
 module.exports = {
   VET_SKIP_PRODUCT_TAGS,
   VET_SKIP_SCAN_TAGS,
-  createVetDictionaryParser,
   createVetProductBlockParser,
-  defaultDictionaryParser,
   defaultProductParser,
   wrapProductBlockXml,
   extractMedicinalProduct,

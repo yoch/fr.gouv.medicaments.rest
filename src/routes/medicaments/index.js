@@ -2,6 +2,9 @@
 
 const express = require('express');
 
+// Annotations OpenAPI centralisées (scannées par swagger-jsdoc).
+require('./swagger');
+
 const router = express.Router();
 
 router.use(require('./listHandlers'));

@@ -7,47 +7,30 @@
  */
 
 const { exportFrozenIndexes } = require('../../utils/frozenMiniSearch');
-const { miniSearchIndexConfig } = require('../../utils/miniSearchIndexConfig');
-const { exportCorpusDocuments } = require('../../utils/exportCorpusDocuments');
-const { rowCount, buildIndexDocument } = require('../../utils/corpusStore');
+const {
+  exportCorpusDocuments,
+  buildDatasetsFromSpecs
+} = require('../../utils/exportCorpusDocuments');
 const { VET_INDEX_SPECS } = require('../../search/indexSpecs');
 const state = require('./state');
 
 function exportVetSearchIndexes(outDir) {
-  const { searchIndexes, metadata } = state;
-  return exportFrozenIndexes(searchIndexes, outDir, 'vet', {
-    last_updated: metadata.last_updated,
-    source: metadata.source
+  return exportFrozenIndexes(state.searchIndexes, outDir, 'vet', {
+    last_updated: state.metadata.last_updated,
+    source: state.metadata.source
   });
 }
 
 function exportVetCorpusDocuments(outDir) {
-  const { corpus, metadata } = state;
-  const datasets = [];
-
-  for (const [type, spec] of Object.entries(VET_INDEX_SPECS)) {
-    const rows = corpus[type];
-    if (!rows || rowCount(rows) === 0) continue;
-
-    const { fields, boost } = spec;
-    datasets.push({
-      type,
-      rows,
-      toDocument: (item, rowIndex) => buildIndexDocument(item, rowIndex, fields),
-      indexOptions: miniSearchIndexConfig(fields, boost)
-    });
+  const datasets = buildDatasetsFromSpecs(state.corpus, VET_INDEX_SPECS);
+  // Presentations vet : non indexées (pas dans VET_INDEX_SPECS), exportées
+  // sans indexOptions pour reindexation côté consommateur.
+  if (state.corpus.presentations.length > 0) {
+    datasets.push({ type: 'presentations', rows: state.corpus.presentations });
   }
-
-  if (rowCount(corpus.presentations) > 0) {
-    datasets.push({
-      type: 'presentations',
-      rows: corpus.presentations
-    });
-  }
-
   return exportCorpusDocuments(datasets, outDir, 'vet', {
-    last_updated: metadata.last_updated,
-    source: metadata.source
+    last_updated: state.metadata.last_updated,
+    source: state.metadata.source
   });
 }
 

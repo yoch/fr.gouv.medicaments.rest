@@ -16,7 +16,7 @@ const {
   buildFrozenIndexFromRows
 } = require('../utils/frozenMiniSearch');
 const { loadMemoryMark } = require('../utils/memorySampler');
-const { parseListPaging } = require('../utils/corpusPaging');
+const { buildPagedResponse } = require('../utils/corpusPaging');
 const { miniSearchIndexConfig } = require('../utils/miniSearchIndexConfig');
 const { BDPM_SCHEMAS } = require('../utils/corpusSchemas');
 const { rankAndMaterializeSearch } = require('../utils/corpusSearch');
@@ -31,16 +31,17 @@ const {
 } = require('../utils/corpusStore');
 const { FROM_CSV, bdpmExtraitUrl, Substance } = require('../models/bdpm');
 const { BDPM_INDEX_SPECS } = require('../search/indexSpecs');
+const config = require('../config');
 const state = require('./bdpm/state');
 const { exportBdpmSearchIndexes, exportBdpmCorpusDocuments } = require('./bdpm/exportApi');
 
-const DATA_DIR = require('../config').dataDir;
+const DATA_DIR = config.dataDir;
 
 const { corpus, metadata, searchIndexes, RELATED_BY_CIS_MAPS } = state;
-const HYDRATE_RELATED_LIMIT = state.HYDRATE_RELATED_LIMIT;
-const DETAIL_HYDRATE_RELATED_LIMIT = state.DETAIL_HYDRATE_RELATED_LIMIT;
-const LOAD_HAS_AVIS = state.loadHasAvis;
-const LOAD_MITM = state.loadMitm;
+const HYDRATE_RELATED_LIMIT = config.searchHydrateRelatedLimit;
+const DETAIL_HYDRATE_RELATED_LIMIT = config.detailHydrateRelatedLimit;
+const LOAD_HAS_AVIS = config.loadHasAvis;
+const LOAD_MITM = config.loadMitm;
 
 /* ------------------------------------------------------------------ *
  * Pipeline de chargement
@@ -102,7 +103,7 @@ async function indexInMemoryCorpus(type, fields, boost = null) {
 }
 
 function buildCisIndexes() {
-  state.setCisIndexes({
+  state.cisIndexes = {
     specialitesByCis: buildKeyIndex(corpus.specialites, 'cis', { unique: true }),
     presentationsByCis: buildKeyIndex(corpus.presentations, 'cis'),
     compositionsByCis: buildKeyIndex(corpus.compositions, 'cis'),
@@ -111,17 +112,14 @@ function buildCisIndexes() {
     conditionsByCis: buildKeyIndex(corpus.conditions, 'cis'),
     generiquesByCis: buildKeyIndex(corpus.generiques, 'cis'),
     generiquesByGroupe: buildKeyIndex(corpus.generiques, 'id_groupe')
-  });
+  };
 }
 
 function clearLoadedData() {
-  for (const key of Object.keys(searchIndexes)) {
-    searchIndexes[key] = null;
-  }
+  state.reset();
   for (const type of Object.keys(corpus)) {
     clearCorpus(corpus[type]);
   }
-  state.setCisIndexes(null);
 }
 
 async function loadOne(type, markLabel) {
@@ -150,12 +148,8 @@ async function loadData() {
   if (LOAD_HAS_AVIS) {
     await loadOne('avis_smr', 'bdpm_after_avis_smr');
     await loadOne('avis_asmr', 'bdpm_after_avis_asmr');
-  } else {
-    clearCorpus(corpus.avis_smr);
-    clearCorpus(corpus.avis_asmr);
-    searchIndexes.avis_smr = null;
-    searchIndexes.avis_asmr = null;
   }
+  // else : corpus + index déjà nuls via clearLoadedData()
 
   await loadOne('generiques', 'bdpm_after_generiques');
   await loadOne('conditions', 'bdpm_after_conditions');
@@ -163,9 +157,6 @@ async function loadData() {
 
   if (LOAD_MITM) {
     await loadOne('mitm', 'bdpm_after_mitm');
-  } else {
-    clearCorpus(corpus.mitm);
-    searchIndexes.mitm = null;
   }
 
   deriveSubstances();
@@ -220,35 +211,25 @@ function search(type, query) {
 function listCorpusPage(type, page = 1, limit = 100) {
   const rows = corpus[type];
   if (!rows) {
-    return {
-      data: [],
-      pagination: { total: 0, page: 1, limit: 100, pages: 0 },
-      metadata: { last_updated: metadata.last_updated, source: metadata.source }
-    };
+    return buildPagedResponse({
+      total: 0,
+      page: 1,
+      limit: 100,
+      metadata,
+      materializePage: () => []
+    });
   }
-
-  const { safePage, safeLimit, offset } = parseListPaging(page, limit);
-  const total = rowCount(rows);
-  const end = Math.min(offset + safeLimit, total);
-  const data = materializeRange(rows, offset, end);
-
-  return {
-    data,
-    pagination: {
-      total,
-      page: safePage,
-      limit: safeLimit,
-      pages: Math.ceil(total / safeLimit) || 0
-    },
-    metadata: {
-      last_updated: metadata.last_updated,
-      source: metadata.source
-    }
-  };
+  return buildPagedResponse({
+    total: rowCount(rows),
+    page,
+    limit,
+    metadata,
+    materializePage: (offset, end) => materializeRange(rows, offset, end)
+  });
 }
 
 function getSpecialiteByCis(cis) {
-  const cisIndexes = state.getCisIndexes();
+  const cisIndexes = state.cisIndexes;
   if (!cisIndexes) return undefined;
   const rowIndex = cisIndexes.specialitesByCis.get(cis);
   if (rowIndex === undefined) return undefined;
@@ -256,7 +237,7 @@ function getSpecialiteByCis(cis) {
 }
 
 function getRelatedByCis(type, cis, limit = HYDRATE_RELATED_LIMIT) {
-  const cisIndexes = state.getCisIndexes();
+  const cisIndexes = state.cisIndexes;
   if (!cisIndexes || !cis) return [];
   const mapKey = RELATED_BY_CIS_MAPS[type];
   if (!mapKey) return [];
@@ -267,7 +248,7 @@ function getRelatedByCis(type, cis, limit = HYDRATE_RELATED_LIMIT) {
 }
 
 function getGeneriquesForCis(cis) {
-  const cisIndexes = state.getCisIndexes();
+  const cisIndexes = state.cisIndexes;
   if (!cisIndexes || !cis) return null;
   const indices = cisIndexes.generiquesByCis.get(cis);
   if (!indices || indices.length === 0) return null;

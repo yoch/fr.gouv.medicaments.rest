@@ -132,6 +132,5 @@ module.exports = {
   shapeSearchHit,
   shapeSearchResults,
   normalizeDetail,
-  extractSubstances,
-  MAX_SUMMARY_PRESENTATIONS
+  extractSubstances
 };

@@ -6,31 +6,17 @@
  * couplage dur vers un loader spécifique.
  */
 
-const MAX_LIMIT = 1000;
-
-function paginate(data, page = 1, limit = 100, metadata) {
-  const safePage = Math.max(1, parseInt(page, 10) || 1);
-  const safeLimit = Math.min(MAX_LIMIT, Math.max(1, parseInt(limit, 10) || 100));
-  const offset = (safePage - 1) * safeLimit;
-  const paginatedData = data.slice(offset, offset + safeLimit);
-
-  return {
-    data: paginatedData,
-    pagination: {
-      total: data.length,
-      page: safePage,
-      limit: safeLimit,
-      pages: Math.ceil(data.length / safeLimit)
-    },
-    metadata: {
-      last_updated: metadata.last_updated,
-      source: metadata.source
-    }
-  };
-}
+const { buildPagedResponse } = require('./corpusPaging');
 
 function createPaginate(getMetadata) {
-  return (data, page, limit) => paginate(data, page, limit, getMetadata());
+  return (data, page, limit) =>
+    buildPagedResponse({
+      total: data.length,
+      page,
+      limit,
+      metadata: getMetadata(),
+      materializePage: (offset, end) => data.slice(offset, end)
+    });
 }
 
 /**

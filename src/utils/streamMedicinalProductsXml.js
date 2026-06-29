@@ -68,6 +68,5 @@ async function streamMedicinalProducts(productsPath, onProduct) {
 }
 
 module.exports = {
-  streamMedicinalProducts,
-  PRODUCT_CLOSE
+  streamMedicinalProducts
 };

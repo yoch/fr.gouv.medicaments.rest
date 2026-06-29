@@ -7,45 +7,33 @@
  */
 
 const { exportFrozenIndexes } = require('../../utils/frozenMiniSearch');
-const { miniSearchIndexConfig } = require('../../utils/miniSearchIndexConfig');
-const { exportCorpusDocuments } = require('../../utils/exportCorpusDocuments');
-const { rowCount, buildIndexDocument } = require('../../utils/corpusStore');
+const {
+  exportCorpusDocuments,
+  buildDatasetsFromSpecs
+} = require('../../utils/exportCorpusDocuments');
 const { BDPM_INDEX_SPECS } = require('../../search/indexSpecs');
+const config = require('../../config');
 const state = require('./state');
 
 function exportBdpmSearchIndexes(outDir) {
-  const { searchIndexes, metadata, loadHasAvis, loadMitm } = state;
-  return exportFrozenIndexes(searchIndexes, outDir, 'bdpm', {
-    last_updated: metadata.last_updated,
-    source: metadata.source,
-    load_has_avis: loadHasAvis,
-    load_mitm: loadMitm
+  return exportFrozenIndexes(state.searchIndexes, outDir, 'bdpm', {
+    last_updated: state.metadata.last_updated,
+    source: state.metadata.source,
+    load_has_avis: config.loadHasAvis,
+    load_mitm: config.loadMitm
   });
 }
 
 function exportBdpmCorpusDocuments(outDir) {
-  const { corpus, searchIndexes, metadata, loadHasAvis, loadMitm } = state;
-  const datasets = [];
-
-  for (const [type, spec] of Object.entries(BDPM_INDEX_SPECS)) {
-    const rows = corpus[type];
-    if (!rows || rowCount(rows) === 0) continue;
-    if (!searchIndexes[type]) continue;
-
-    const { fields, boost } = spec;
-    datasets.push({
-      type,
-      rows,
-      toDocument: (item, rowIndex) => buildIndexDocument(item, rowIndex, fields),
-      indexOptions: miniSearchIndexConfig(fields, boost)
-    });
-  }
-
+  const datasets = buildDatasetsFromSpecs(state.corpus, BDPM_INDEX_SPECS, {
+    onlyIndexed: true,
+    searchIndexes: state.searchIndexes
+  });
   return exportCorpusDocuments(datasets, outDir, 'bdpm', {
-    last_updated: metadata.last_updated,
-    source: metadata.source,
-    load_has_avis: loadHasAvis,
-    load_mitm: loadMitm
+    last_updated: state.metadata.last_updated,
+    source: state.metadata.source,
+    load_has_avis: config.loadHasAvis,
+    load_mitm: config.loadMitm
   });
 }
 

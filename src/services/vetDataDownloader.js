@@ -170,6 +170,5 @@ module.exports = {
   downloadVetDataIfNeeded,
   VET_DATA_DIR,
   PRODUCTS_XML_NAME,
-  DICT_XML_NAME,
-  CHECK_INTERVAL_HOURS
+  DICT_XML_NAME
 };

@@ -17,8 +17,10 @@ function parsePositiveInt(raw, fallback) {
 }
 
 function parseBoolFlag(raw, defaultValue) {
-  if (raw == null) return defaultValue;
-  return raw === 'true';
+  if (raw == null || raw === '') return defaultValue;
+  if (raw === 'true' || raw === '1') return true;
+  if (raw === 'false' || raw === '0') return false;
+  return defaultValue;
 }
 
 function parseReloadStrategy(raw) {
@@ -46,8 +48,8 @@ const config = Object.freeze({
   rateLimitMax: parsePositiveInt(process.env.RATE_LIMIT_MAX, 500),
 
   // Corpus BDPM
-  loadHasAvis: process.env.LOAD_HAS_AVIS !== 'false',
-  loadMitm: process.env.LOAD_MITM !== 'false',
+  loadHasAvis: parseBoolFlag(process.env.LOAD_HAS_AVIS, true),
+  loadMitm: parseBoolFlag(process.env.LOAD_MITM, true),
   corpusLightProfile: parseBoolFlag(process.env.CORPUS_LIGHT_PROFILE, false),
 
   // Hydratation recherche
@@ -75,7 +77,7 @@ const config = Object.freeze({
     process.env.SEARCH_INDEX_OUT_DIR || path.join(DATA_DIR, 'search-indexes'),
   corpusExportOutDir:
     process.env.CORPUS_EXPORT_OUT_DIR || path.join(DATA_DIR, 'corpus-export'),
-  skipVet: process.env.SKIP_VET === '1' || process.env.SKIP_VET === 'true'
+  skipVet: parseBoolFlag(process.env.SKIP_VET, false)
 });
 
 module.exports = config;

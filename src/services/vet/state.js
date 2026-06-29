@@ -3,60 +3,50 @@
 /**
  * État mutable partagé du domaine vétérinaire : corpus, index de recherche,
  * index par num, metadata, temps d'attente. Centralisé ici pour permettre
- * aux sous-modules (exportApi) de partager la même source de vérité.
+ * aux sous-modules (loadPipeline, exportApi) de partager la même source.
+ *
+ * Objet unique à propriétés mutables — pas de getters/setters partiels.
+ * Le reload passe par `reset()` pour rester atomique.
  */
 
 const { createCorpus } = require('../../utils/corpusStore');
 
-const corpus = {
-  medicaments: createCorpus(),
-  compositions: createCorpus(),
-  presentations: createCorpus()
+const state = {
+  corpus: {
+    medicaments: createCorpus(),
+    compositions: createCorpus(),
+    presentations: createCorpus()
+  },
+
+  metadata: {
+    last_updated: null,
+    source:
+      'base de données publique des médicaments vétérinaires autorisés en France - Anses/ANMV'
+  },
+
+  searchIndexes: {
+    medicaments: null,
+    compositions: null
+  },
+
+  numIndexes: null,
+  tempsAttente: new Map(),
+
+  RELATED_BY_NUM_MAPS: {
+    compositions: 'compositionsByNum',
+    presentations: 'presentationsByNum'
+  },
+
+  /**
+   * Remet l'état à zéro avant un reload. Atomique : appelé en tête de
+   * `loadVetData()`. Les corpus sont vidés par `clearCorpus` côté pipeline.
+   */
+  reset() {
+    this.searchIndexes.medicaments = null;
+    this.searchIndexes.compositions = null;
+    this.numIndexes = null;
+    this.tempsAttente = new Map();
+  }
 };
 
-let tempsAttente = new Map();
-
-const metadata = {
-  last_updated: null,
-  source:
-    'base de données publique des médicaments vétérinaires autorisés en France - Anses/ANMV'
-};
-
-const searchIndexes = {
-  medicaments: null,
-  compositions: null
-};
-
-let numIndexes = null;
-
-function getNumIndexes() {
-  return numIndexes;
-}
-
-function setNumIndexes(value) {
-  numIndexes = value;
-}
-
-function getTempsAttente() {
-  return tempsAttente;
-}
-
-function setTempsAttente(value) {
-  tempsAttente = value;
-}
-
-const RELATED_BY_NUM_MAPS = {
-  compositions: 'compositionsByNum',
-  presentations: 'presentationsByNum'
-};
-
-module.exports = {
-  corpus,
-  metadata,
-  searchIndexes,
-  getNumIndexes,
-  setNumIndexes,
-  getTempsAttente,
-  setTempsAttente,
-  RELATED_BY_NUM_MAPS
-};
+module.exports = state;
