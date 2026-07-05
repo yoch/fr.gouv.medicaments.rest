@@ -57,6 +57,18 @@ function defineCorpusRecord(className, options) {
       return new CorpusRecord(...args);
     }
 
+    static fromObject(record) {
+      const omitSet = resolveOmitStoredFields();
+      const args = new Array(fields.length);
+      for (let i = 0; i < fields.length; i++) {
+        const f = fields[i];
+        let v = record ? record[f] : undefined;
+        if (omitSet.has(f)) v = '';
+        args[i] = lowCardSet.has(f) ? intern(v) : v;
+      }
+      return new CorpusRecord(...args);
+    }
+
     toJSON() {
       const o = {};
       for (let i = 0; i < fields.length; i++) {

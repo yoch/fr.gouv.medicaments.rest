@@ -7,6 +7,24 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.3.0] - 2026-07-05
+
+### Ajouté
+
+- Entrée publique side-effect-free via `src/index.js` (`main` npm) pour créer l'app Express et accéder aux façades BDPM/ANMV sans démarrer le serveur.
+- Tests production grade sur l'entrée publique, le bootstrap serveur, le mapping ANMV, les erreurs HTTP, la config runtime et Swagger.
+
+### Modifié
+
+- `src/app.js` porte désormais la composition Express ; `src/server.js` ne gère plus que le bootstrap runtime (download, load, refresh, listen).
+- Planchers `package.json` relevés sur les dépendances directes validées après `npm update`.
+- `csv-parse` mis à jour en `7.0.1`.
+
+### Corrigé
+
+- Mapping des médicaments vétérinaires ANMV : les champs `num_amm`, `date_amm`, `titulaire`, `forme_pharmaceutique`, `statut_amm`, `codes_atcvet`, `especes` et `maj_rcp` ne peuvent plus être décalés par un constructeur positionnel.
+- GTIN vétérinaires normalisés à 14 chiffres pour préserver les zéros initiaux après parsing XML.
+
 ## [1.2.5] - 2026-06-28
 
 ### Corrigé
@@ -85,7 +103,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.4...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.5...v1.3.0
+[1.2.5]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.4...v1.2.5
 [1.2.4]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.2...v1.2.4
 [1.2.2]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.0...v1.2.1

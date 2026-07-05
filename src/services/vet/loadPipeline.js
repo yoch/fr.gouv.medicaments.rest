@@ -151,31 +151,39 @@ function normalizeNum(value) {
   return digits.padStart(7, '0');
 }
 
+function normalizeGtin(value) {
+  const digits = String(value ?? '').replace(/\D/g, '');
+  if (!digits) return '';
+  return digits.padStart(14, '0');
+}
+
 function pushMedicament(medicaments, product, dict) {
   return push(
     medicaments,
-    new MedicamentVet(
-      normalizeNum(product.num),
-      product.nom || '',
-      resolveTerm(dict, 'term-tit', product['term-tit']),
-      resolveTerm(dict, 'term-fp', product['term-fp']),
-      resolveTerm(dict, 'term-stat-auto', product['term-stat-auto']),
-      internElements(parseAtcvetCodes(product)),
-      parseEspeces(product, dict),
-      intern(parseMajRcp(product))
-    )
+    MedicamentVet.fromObject({
+      num: normalizeNum(product.num),
+      nom: product.nom || '',
+      num_amm: product['num-amm'] || '',
+      date_amm: product['date-amm'] || '',
+      titulaire: resolveTerm(dict, 'term-tit', product['term-tit']),
+      forme_pharmaceutique: resolveTerm(dict, 'term-fp', product['term-fp']),
+      statut_amm: resolveTerm(dict, 'term-stat-auto', product['term-stat-auto']),
+      codes_atcvet: internElements(parseAtcvetCodes(product)),
+      especes: internElements(parseEspeces(product, dict)),
+      maj_rcp: intern(parseMajRcp(product))
+    })
   );
 }
 
 function pushCompositionFromSa(compositions, num, sa, dict) {
   push(
     compositions,
-    new CompositionVet(
+    CompositionVet.fromObject({
       num,
-      resolveTerm(dict, 'term-sa', sa['term-sa']),
-      sa.quantite != null ? String(sa.quantite) : '',
-      intern(sa.unite || resolveTerm(dict, 'term-unite', sa['term-unite']))
-    )
+      substance: resolveTerm(dict, 'term-sa', sa['term-sa']),
+      quantite: sa.quantite != null ? String(sa.quantite) : '',
+      unite: intern(sa.unite || resolveTerm(dict, 'term-unite', sa['term-unite']))
+    })
   );
 }
 
@@ -213,12 +221,12 @@ function pushPresentation(presentations, num, mod, dict) {
 
   push(
     presentations,
-    new PresentationVet(
+    PresentationVet.fromObject({
       num,
-      intern(libelle),
-      mod['code-gtin'] ? String(mod['code-gtin']) : '',
-      conditions
-    )
+      libelle: intern(libelle),
+      gtin: normalizeGtin(mod['code-gtin']),
+      conditions_delivrance: internElements(conditions)
+    })
   );
   return true;
 }
@@ -231,7 +239,7 @@ function pushPresentationRows(presentations, product, dict) {
     if (!mod) return;
     const libelle = mod['lib-mod'];
     if (!libelle) return;
-    const gtin = mod['code-gtin'] ? String(mod['code-gtin']) : '';
+    const gtin = normalizeGtin(mod['code-gtin']);
     const key = `${libelle}|${gtin}`;
     if (seen.has(key)) return;
     seen.add(key);

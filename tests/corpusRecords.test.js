@@ -201,6 +201,33 @@ describe('rankAndMaterializeSearch', () => {
 });
 
 describe('MedicamentVet', () => {
+  it('fromObject mappe par nom de champ et ignore les champs inconnus', () => {
+    const m = MedicamentVet.fromObject({
+      num: '0001234',
+      nom: 'Mon médicament',
+      titulaire: 'Titulaire',
+      forme_pharmaceutique: 'Comprimé',
+      statut_amm: 'AMM illimitée',
+      codes_atcvet: ['QA'],
+      especes: ['Chat'],
+      maj_rcp: '2024-01-01',
+      ignored: 'non exposé'
+    });
+
+    expect(MedicamentVet.FIELD_NAMES).toEqual(VET_SCHEMAS.medicaments);
+    expect(m.toJSON()).toMatchObject({
+      num: '0001234',
+      nom: 'Mon médicament',
+      titulaire: 'Titulaire',
+      forme_pharmaceutique: 'Comprimé',
+      statut_amm: 'AMM illimitée',
+      codes_atcvet: ['QA'],
+      especes: ['Chat'],
+      maj_rcp: '2024-01-01'
+    });
+    expect(m.toJSON()).not.toHaveProperty('ignored');
+  });
+
   it('lien_rcp via getter quand maj_rcp est renseigné', () => {
     const m = new MedicamentVet(
       '0001234',
@@ -232,7 +259,7 @@ describe('MedicamentVet', () => {
 
 describe('tableaux vétérinaires', () => {
   it('codes_atcvet et especes sont toujours des tableaux sur l’instance', () => {
-    const m = new MedicamentVet('1', 'X', '', '', '', '', null, undefined, undefined, '');
+    const m = MedicamentVet.fromObject({ num: '1', nom: 'X' });
     expect(m.codes_atcvet).toEqual([]);
     expect(m.especes).toEqual([]);
     expect(m.toJSON()).toEqual({ num: '1', nom: 'X' });

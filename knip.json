@@ -1,11 +1,25 @@
 {
   "entry": [
-    "src/server.js",
     "src/scripts/*.js",
     "scripts/**/*.js",
     "tests/**/*.test.js"
   ],
   "project": ["src/**/*.js", "scripts/**/*.js"],
-  "ignore": ["scripts/benchmark/*.js"],
-  "ignoreDependencies": ["7zip-bin", "fast-xml-parser", "knip", "nodemon", "supertest"]
+  "ignore": [
+    "scripts/benchmark/*.js",
+    "scripts/memory/profile-*.js"
+  ],
+  "ignoreFiles": [
+    "src/routes/medicaments/disabled.js"
+  ],
+  "ignoreIssues": {
+    "src/models/bdpm/index.js": ["exports"],
+    "src/models/bdpm/records.js": ["exports"],
+    "src/models/bdpm/constants.js": ["exports"],
+    "src/models/vet/index.js": ["exports"],
+    "src/models/vet/records.js": ["exports"],
+    "src/models/recordJson.js": ["exports"],
+    "src/models/tempsAttente.js": ["exports"],
+    "src/utils/vetXmlParser.js": ["exports"]
+  }
 }

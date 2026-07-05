@@ -2,6 +2,27 @@
 
 Cette API permet d'accéder aux données officielles des médicaments en France (BDPM).
 
+## Usage comme bibliothèque Node.js
+
+L'import principal est side-effect-free : il ne lance pas `listen()`, ne télécharge rien et ne charge pas les corpus tant que l'appelant ne demande rien explicitement.
+
+```js
+const { createApp, bdpm, vet, executeHybridSearch, swaggerSpecs } = require('fr.gouv.medicaments.rest');
+
+const app = createApp();
+
+await bdpm.loadData();
+await vet.loadVetData();
+
+const search = executeHybridSearch('paracetamol', 'auto');
+```
+
+Exports publics stables :
+- `createApp()` : construit l'application Express complète.
+- `bdpm` : façade médicaments humains (`loadData`, `search`, `listCorpusPage`, détails et exports).
+- `vet` : façade ANMV (`loadVetData`, `searchVet`, listes, détails et exports).
+- `executeHybridSearch(q, source)` : recherche globale BDPM/ANMV.
+- `swaggerSpecs` : spécification OpenAPI générée.
 
 ## Endpoints
 

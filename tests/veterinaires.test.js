@@ -43,6 +43,11 @@ describeSlow('API Vétérinaires ANMV', () => {
       const res = await request(app).get('/api/veterinaires/medicaments/0452300');
       expect(res.statusCode).toBe(200);
       expect(res.body.nom).toBe('SULTRIAN 100');
+      expect(res.body.num_amm).toBe('FR/V/9222645 4/1980');
+      expect(res.body.date_amm).toBe('01/12/1980');
+      expect(res.body.forme_pharmaceutique).toBe('Comprimé');
+      expect(res.body.statut_amm).toBe('AMM illimitée');
+      expect(res.body.codes_atcvet).toEqual(['QJ01EW11']);
       expect(res.body.compositions.length).toBeGreaterThanOrEqual(2);
       expect(res.body.presentations.length).toBeGreaterThan(0);
       expect(res.body.especes).toEqual(expect.arrayContaining(['Chat', 'Chien']));
@@ -86,6 +91,16 @@ describeSlow('API Vétérinaires ANMV', () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.data.length).toBe(0);
       expect(res.body.search.source).toBe('human');
+    });
+
+    it('source=mixed interroge les deux référentiels', async () => {
+      const res = await request(app).get('/api/medicaments/search?q=sultrian&source=mixed&limit=5');
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.body.data[0].type).toBe('medicament_veterinaire');
+      expect(res.body.search.source).toBe('mixed');
+      expect(res.body.search.referentiels.queried).toEqual(['bdpm', 'anmv']);
+      expect(res.body.search.referentiels.with_results).toEqual(['anmv']);
     });
 
     it('source=auto bascule sur ANMV si BDPM vide', async () => {

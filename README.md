@@ -63,12 +63,39 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 - **Swagger UI**: `http://localhost:3000/api-docs`
 - **OpenAPI Spec**: `http://localhost:3000/api-docs.json`
 
+## Usage bibliothèque
+
+Le point d'entrée npm (`require('fr.gouv.medicaments.rest')`) est sans effet de bord : il ne télécharge pas les données, ne charge pas les corpus et ne démarre pas de serveur.
+
+```js
+const { createApp, bdpm, vet, executeHybridSearch } = require('fr.gouv.medicaments.rest');
+
+const app = createApp();
+
+await bdpm.loadData();
+await vet.loadVetData();
+
+const { results } = executeHybridSearch('doliprane', 'auto');
+```
+
+Les exports publics exposent les façades BDPM/ANMV et la création d'app Express. Les états mutables internes ne font pas partie de l'API publique.
+
 ## Développement local
 
 ```bash
 npm install
 npm run dev
 ```
+
+## Validation
+
+```bash
+npm test -- --runInBand
+npm run test:all
+npx knip
+```
+
+`npm test` garde les tests lourds désactivés. `npm run test:all` charge les corpus et valide les contrats HTTP complets.
 
 ## Attribution
 
