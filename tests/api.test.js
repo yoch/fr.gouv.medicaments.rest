@@ -192,6 +192,26 @@ describeSlow('API Medicaments', () => {
             expect(viaComposition.length).toBeGreaterThan(0);
             expect(viaComposition[0].substances?.length).toBeGreaterThan(0);
         });
+
+        it('pagine la recherche globale sans changer total ni ordre', async () => {
+            const all = await request(app).get(
+                '/api/medicaments/search?q=paracetamol&source=human&limit=4&detail=summary'
+            );
+            const page1 = await request(app).get(
+                '/api/medicaments/search?q=paracetamol&source=human&limit=2&page=1&detail=summary'
+            );
+            const page2 = await request(app).get(
+                '/api/medicaments/search?q=paracetamol&source=human&limit=2&page=2&detail=summary'
+            );
+
+            expect(page1.statusCode).toBe(200);
+            expect(page2.statusCode).toBe(200);
+            expect(page1.body.pagination.total).toBe(all.body.pagination.total);
+            expect(page2.body.pagination.total).toBe(all.body.pagination.total);
+
+            const firstFour = all.body.data.map((item) => item.cis);
+            expect([...page1.body.data, ...page2.body.data].map((item) => item.cis)).toEqual(firstFour);
+        });
     });
 
     describe('GET /api/medicaments/presentations', () => {
@@ -203,6 +223,20 @@ describeSlow('API Medicaments', () => {
             expect(res.body.data.length).toBe(1);
             expect(res.body.data[0].cip13).toBe(DOLIPRANE_CIP13);
             expect(isPlausibleCip13(res.body.data[0].cip13)).toBe(true);
+        });
+
+        it('pagine les recherches de liste avec total stable', async () => {
+            const all = await request(app).get('/api/medicaments/presentations?q=doliprane&limit=4');
+            const page1 = await request(app).get('/api/medicaments/presentations?q=doliprane&limit=2&page=1');
+            const page2 = await request(app).get('/api/medicaments/presentations?q=doliprane&limit=2&page=2');
+
+            expect(page1.statusCode).toBe(200);
+            expect(page2.statusCode).toBe(200);
+            expect(page1.body.pagination.total).toBe(all.body.pagination.total);
+            expect(page2.body.pagination.total).toBe(all.body.pagination.total);
+            expect([...page1.body.data, ...page2.body.data].map((item) => item.cip13)).toEqual(
+                all.body.data.map((item) => item.cip13)
+            );
         });
     });
 

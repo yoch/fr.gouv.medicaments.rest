@@ -2,9 +2,9 @@
 
 const express = require('express');
 const { createListHandler } = require('../../utils/routeHelpers');
-const { listCorpusPage, search, getMetadata } = require('../../services/dataLoader');
+const { listCorpusPage, search, searchPage, getMetadata } = require('../../services/dataLoader');
 
-const listHandler = createListHandler({ getMetadata, search, listCorpusPage });
+const listHandler = createListHandler({ getMetadata, search, searchPage, listCorpusPage });
 
 const router = express.Router();
 

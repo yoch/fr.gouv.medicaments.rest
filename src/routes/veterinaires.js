@@ -2,6 +2,7 @@ const express = require('express');
 const {
   listVetCorpusPage,
   searchVet,
+  searchVetPage,
   getVetMetadata,
   getMedicamentByNum,
   getRelatedByNum
@@ -17,6 +18,7 @@ const router = express.Router();
 const listHandler = createListHandler({
   getMetadata: getVetMetadata,
   search: searchVet,
+  searchPage: searchVetPage,
   listCorpusPage: listVetCorpusPage
 });
 

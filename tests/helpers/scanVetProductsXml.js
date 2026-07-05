@@ -26,6 +26,8 @@ async function scanVetProductsXml(productsPath, onFields) {
     const product = parseProductBlock(blockXml, scanParser);
     if (!product) return;
     onFields(extractRcpLinkFields(product));
+  }, {
+    stripTags: ['paragraphes-rcp']
   });
 }
 

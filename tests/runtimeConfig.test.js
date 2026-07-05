@@ -20,6 +20,7 @@ describe('runtimeConfig', () => {
     process.env.RELOAD_STRATEGY = 'restart';
     process.env.VET_LOAD_DEFERRED = 'true';
     process.env.VET_LOAD_DELAY_MS = '15000';
+    process.env.POST_LOAD_GC = 'true';
 
     const config = loadConfig();
 
@@ -30,6 +31,7 @@ describe('runtimeConfig', () => {
       load_mitm: false,
       corpus_light_profile: true,
       vet_load_deferred: true,
+      post_load_gc: true,
       enable_rate_limit: false
     });
     expect(config.limits.vet_load_delay_ms).toBe(15000);
@@ -45,6 +47,7 @@ describe('runtimeConfig', () => {
 
     expect(config.features.load_has_avis).toBe(false);
     expect(config.features.corpus_light_profile).toBe(false);
+    expect(config.features.post_load_gc).toBe(false);
     expect(config.corpus_light_omit_fields).toBeNull();
     expect(config.presentation_index_fields).toContain('indications');
   });

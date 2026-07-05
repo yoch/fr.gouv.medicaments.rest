@@ -24,12 +24,15 @@ function createPaginate(getMetadata) {
  *   - si `q` présent : recherche via `search(dataType, q)` puis pagination
  *   - sinon : `listCorpusPage(dataType, page, limit)` (méthode propre au loader)
  */
-function createListHandler({ getMetadata, search, listCorpusPage }) {
+function createListHandler({ getMetadata, search, searchPage, listCorpusPage }) {
   const paginateLocal = createPaginate(getMetadata);
   return function listHandler(dataType, defaultLimit = 100) {
     return (req, res) => {
       const { q, page = 1, limit = defaultLimit } = req.query;
       if (q) {
+        if (searchPage) {
+          return res.json(searchPage(dataType, q, page, limit));
+        }
         const data = search(dataType, q);
         return res.json(paginateLocal(data, page, limit));
       }

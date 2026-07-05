@@ -41,6 +41,7 @@ const config = Object.freeze({
   reloadStrategy: parseReloadStrategy(process.env.RELOAD_STRATEGY),
   vetLoadDeferred: parseBoolFlag(process.env.VET_LOAD_DEFERRED, false),
   vetLoadDelayMs: parsePositiveInt(process.env.VET_LOAD_DELAY_MS, 0),
+  postLoadGc: parseBoolFlag(process.env.POST_LOAD_GC, false),
 
   // Rate limiting
   enableRateLimit: parseBoolFlag(process.env.ENABLE_RATE_LIMIT, false),

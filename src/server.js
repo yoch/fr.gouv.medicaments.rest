@@ -6,12 +6,42 @@ const { downloadVetDataIfNeeded } = require('./services/vetDataDownloader');
 const { loadData } = require('./services/dataLoader');
 const { loadVetData } = require('./services/vetDataLoader');
 const { createApp } = require('./app');
+const { logMemoryUsage } = require('./utils/processMemory');
 
 const PORT = config.port;
 const BDPM_REFRESH_MS = config.bdpmCheckIntervalHours * 60 * 60 * 1000;
 const VET_REFRESH_MS = config.vetCheckIntervalHours * 60 * 60 * 1000;
 const VET_LOAD_DEFERRED = config.vetLoadDeferred;
 const VET_LOAD_DELAY_MS = config.vetLoadDelayMs;
+const MEMORY_PLATEAU_DELAYS_MS = [
+  ['+30s', 30 * 1000],
+  ['+2min', 2 * 60 * 1000],
+  ['+5min', 5 * 60 * 1000]
+];
+
+function scheduleMemoryPlateauLogs(scope) {
+  logMemoryUsage(`${scope}:done`);
+  for (const [suffix, delayMs] of MEMORY_PLATEAU_DELAYS_MS) {
+    const timer = setTimeout(() => {
+      logMemoryUsage(`${scope}:${suffix}`);
+    }, delayMs);
+    if (typeof timer.unref === 'function') timer.unref();
+  }
+}
+
+function maybeRunPostLoadGc(scope) {
+  if (!config.postLoadGc) return;
+  if (config.nodeEnv === 'production') {
+    console.warn('POST_LOAD_GC=true ignoré en production');
+    return;
+  }
+  if (typeof global.gc !== 'function') {
+    console.warn('POST_LOAD_GC=true mais global.gc indisponible — lancer Node avec --expose-gc');
+    return;
+  }
+  global.gc();
+  logMemoryUsage(`${scope}:post_gc`);
+}
 
 function shouldRestartOnDataChange() {
   return config.reloadStrategy === 'restart' || config.reloadStrategy === 'exit';
@@ -23,6 +53,7 @@ async function reloadBdpmAfterChange() {
     process.exit(0);
   }
   await loadData();
+  scheduleMemoryPlateauLogs('bdpm_reload');
 }
 
 async function reloadVetAfterChange() {
@@ -31,6 +62,8 @@ async function reloadVetAfterChange() {
     process.exit(0);
   }
   await loadVetData();
+  scheduleMemoryPlateauLogs('vet_reload');
+  maybeRunPostLoadGc('vet_reload');
 }
 
 async function delayBeforeVetLoad() {
@@ -43,6 +76,8 @@ async function loadVetDataSafe() {
   try {
     await downloadVetDataIfNeeded();
     await loadVetData();
+    scheduleMemoryPlateauLogs('vet_load');
+    maybeRunPostLoadGc('vet_load');
   } catch (err) {
     console.warn('⚠ Données vétérinaires indisponibles (le serveur continue sans):', err.message);
   }
@@ -73,6 +108,7 @@ async function startServer() {
 
     console.log('Chargement des données en mémoire...');
     await loadData();
+    scheduleMemoryPlateauLogs('bdpm_load');
 
     if (!VET_LOAD_DEFERRED) {
       await delayBeforeVetLoad();

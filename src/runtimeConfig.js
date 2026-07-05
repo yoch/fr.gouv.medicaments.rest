@@ -25,6 +25,7 @@ function getRuntimeConfig() {
       load_mitm: config.loadMitm,
       corpus_light_profile: corpusLight,
       vet_load_deferred: config.vetLoadDeferred,
+      post_load_gc: config.postLoadGc,
       enable_rate_limit: config.enableRateLimit
     },
     intervals_hours: {

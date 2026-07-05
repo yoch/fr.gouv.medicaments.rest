@@ -10,22 +10,10 @@ const swaggerUi = require('swagger-ui-express');
 const config = require('./config');
 const { getMetadata } = require('./services/dataLoader');
 const { getRuntimeConfig } = require('./runtimeConfig');
+const { memoryUsageMb } = require('./utils/processMemory');
 const medicamentRoutes = require('./routes/medicaments');
 const veterinaireRoutes = require('./routes/veterinaires');
 const swaggerSpecs = require('./swagger');
-
-function memoryUsageMb() {
-  const n = (bytes) => Math.round((bytes / 1024 / 1024) * 10) / 10;
-  const u = process.memoryUsage();
-  return {
-    rss_mb: n(u.rss),
-    heap_used_mb: n(u.heapUsed),
-    heap_total_mb: n(u.heapTotal),
-    external_mb: n(u.external),
-    array_buffers_mb: n(u.arrayBuffers ?? 0),
-    non_heap_mb: n(Math.max(0, u.rss - u.heapUsed))
-  };
-}
 
 function healthHandler(req, res) {
   const metadata = getMetadata();

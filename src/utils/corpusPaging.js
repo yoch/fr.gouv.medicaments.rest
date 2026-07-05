@@ -39,5 +39,6 @@ function buildPagedResponse({ total, page, limit, metadata, materializePage }) {
 }
 
 module.exports = {
+  parseListPaging,
   buildPagedResponse
 };

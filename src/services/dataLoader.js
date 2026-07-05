@@ -19,7 +19,11 @@ const { loadMemoryMark } = require('../utils/memorySampler');
 const { buildPagedResponse } = require('../utils/corpusPaging');
 const { miniSearchIndexConfig } = require('../utils/miniSearchIndexConfig');
 const { BDPM_SCHEMAS } = require('../utils/corpusSchemas');
-const { rankAndMaterializeSearch } = require('../utils/corpusSearch');
+const {
+  rankSearchResults,
+  materializeRankedSearchRange,
+  rankAndMaterializeSearch
+} = require('../utils/corpusSearch');
 const {
   clearCorpus,
   push,
@@ -208,6 +212,47 @@ function search(type, query) {
   });
 }
 
+function rankedSearch(type, query) {
+  const rows = corpus[type];
+  if (!rows || !query) return [];
+  if (!searchIndexes[type]) return [];
+
+  const spec = BDPM_INDEX_SPECS[type];
+  return rankSearchResults(rows, searchIndexes[type].search(query), query, {
+    primaryField: spec.primaryField,
+    idField: spec.idField
+  });
+}
+
+function searchPage(type, query, page = 1, limit = 100) {
+  const rows = corpus[type];
+  const ranked = rankedSearch(type, query);
+  return buildPagedResponse({
+    total: ranked.length,
+    page,
+    limit,
+    metadata,
+    materializePage: (offset, end) =>
+      materializeRankedSearchRange(rows, ranked, offset, end)
+  });
+}
+
+function searchKeyMatches(type, query) {
+  const rows = corpus[type];
+  const spec = BDPM_INDEX_SPECS[type];
+  if (!spec || !spec.idField) return [];
+  const ranked = rankedSearch(type, query);
+  const out = new Array(ranked.length);
+  for (let i = 0; i < ranked.length; i++) {
+    const r = ranked[i];
+    out[i] = {
+      [spec.idField]: rows[r.rowIndex][spec.idField],
+      match_quality: r.match_quality
+    };
+  }
+  return out;
+}
+
 function listCorpusPage(type, page = 1, limit = 100) {
   const rows = corpus[type];
   if (!rows) {
@@ -234,6 +279,14 @@ function getSpecialiteByCis(cis) {
   const rowIndex = cisIndexes.specialitesByCis.get(cis);
   if (rowIndex === undefined) return undefined;
   return corpus.specialites[rowIndex].toJSON();
+}
+
+function getSpecialiteLabelByCis(cis) {
+  const cisIndexes = state.cisIndexes;
+  if (!cisIndexes) return '';
+  const rowIndex = cisIndexes.specialitesByCis.get(cis);
+  if (rowIndex === undefined) return '';
+  return corpus.specialites[rowIndex].denomination || '';
 }
 
 function getRelatedByCis(type, cis, limit = HYDRATE_RELATED_LIMIT) {
@@ -297,10 +350,13 @@ module.exports = {
   exportBdpmCorpusDocuments,
   listCorpusPage,
   search,
+  searchPage,
+  searchKeyMatches,
   getMetadata,
   isHasAvisLoaded,
   isMitmLoaded,
   getSpecialiteByCis,
+  getSpecialiteLabelByCis,
   getRelatedByCis,
   getGeneriquesForCis,
   bdpmExtraitUrl,

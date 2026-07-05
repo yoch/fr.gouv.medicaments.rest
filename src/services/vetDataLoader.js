@@ -9,7 +9,11 @@
  * inchangé pour les callers existants).
  */
 
-const { rankAndMaterializeSearch } = require('../utils/corpusSearch');
+const {
+  rankSearchResults,
+  materializeRankedSearchRange,
+  rankAndMaterializeSearch
+} = require('../utils/corpusSearch');
 const {
   rowCount,
   materializeRange,
@@ -34,8 +38,7 @@ function searchVet(type, query) {
   if (!query) return [];
   if (type === 'presentations') {
     // Pas d'index FrozenMiniSearch sur les présentations vet : scan linéaire
-    // (libellé + GTIN). Retourne tous les matchs materializés — la pagination
-    // est appliquée par la route via `createPaginate`.
+    // (libellé + GTIN). L'API paginée matérialise seulement la page demandée.
     const indices = collectPresentationMatchIndices(query);
     return materializeIndices(corpus.presentations, indices);
   }
@@ -48,6 +51,59 @@ function searchVet(type, query) {
     primaryField: spec.primaryField,
     idField: spec.idField
   });
+}
+
+function rankedSearchVet(type, query) {
+  if (!query) return [];
+  if (!searchIndexes[type]) return [];
+
+  const rows = corpus[type];
+  const spec = VET_INDEX_SPECS[type];
+  return rankSearchResults(rows, searchIndexes[type].search(query), query, {
+    primaryField: spec.primaryField,
+    idField: spec.idField
+  });
+}
+
+function searchVetPage(type, query, page = 1, limit = 100) {
+  if (type === 'presentations') {
+    const indices = query ? collectPresentationMatchIndices(query) : [];
+    return buildPagedResponse({
+      total: indices.length,
+      page,
+      limit,
+      metadata,
+      materializePage: (offset, end) =>
+        materializeIndices(corpus.presentations, indices.slice(offset, end))
+    });
+  }
+
+  const rows = corpus[type];
+  const ranked = rankedSearchVet(type, query);
+  return buildPagedResponse({
+    total: ranked.length,
+    page,
+    limit,
+    metadata,
+    materializePage: (offset, end) =>
+      materializeRankedSearchRange(rows, ranked, offset, end)
+  });
+}
+
+function searchVetKeyMatches(type, query) {
+  const rows = corpus[type];
+  const spec = VET_INDEX_SPECS[type];
+  if (!spec || !spec.idField) return [];
+  const ranked = rankedSearchVet(type, query);
+  const out = new Array(ranked.length);
+  for (let i = 0; i < ranked.length; i++) {
+    const r = ranked[i];
+    out[i] = {
+      [spec.idField]: rows[r.rowIndex][spec.idField],
+      match_quality: r.match_quality
+    };
+  }
+  return out;
 }
 
 function collectPresentationMatchIndices(query) {
@@ -97,6 +153,14 @@ function getMedicamentByNum(num) {
   return corpus.medicaments[rowIndex].toJSON();
 }
 
+function getMedicamentLabelByNum(num) {
+  const numIndexes = state.numIndexes;
+  if (!numIndexes) return '';
+  const rowIndex = numIndexes.medicamentsByNum.get(normalizeNum(num));
+  if (rowIndex === undefined) return '';
+  return corpus.medicaments[rowIndex].nom || '';
+}
+
 function getRelatedByNum(type, num, limit = config.searchHydrateRelatedLimit) {
   if (!num) return [];
   const normalized = normalizeNum(num);
@@ -131,9 +195,12 @@ module.exports = {
   exportVetSearchIndexes,
   exportVetCorpusDocuments,
   searchVet,
+  searchVetPage,
+  searchVetKeyMatches,
   listVetCorpusPage,
   getVetMetadata,
   getMedicamentByNum,
+  getMedicamentLabelByNum,
   getRelatedByNum,
   buildLienRcpFromNom,
   ANMV_RCP_URL_PREFIX,

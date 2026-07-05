@@ -1,15 +1,20 @@
 const {
   search,
+  searchKeyMatches,
   getSpecialiteByCis,
+  getSpecialiteLabelByCis,
   getRelatedByCis,
   bdpmExtraitUrl,
   HYDRATE_RELATED_LIMIT
 } = require('./dataLoader');
 const {
   searchVet,
+  searchVetKeyMatches,
   getMedicamentByNum,
+  getMedicamentLabelByNum,
   getRelatedByNum
 } = require('./vetDataLoader');
+const { parseListPaging } = require('../utils/corpusPaging');
 const {
   isStrongMatchQuality,
   MATCH_QUALITY_RANK,
@@ -110,6 +115,38 @@ function searchBdpm(q) {
   });
 }
 
+function collectBdpmMatches(q) {
+  return mergeSearchHits({
+    keyField: 'cis',
+    searches: [
+      { items: searchKeyMatches('specialites', q), via: 'denomination' },
+      { items: searchKeyMatches('presentations', q), via: 'presentation' },
+      { items: searchKeyMatches('compositions', q), via: 'composition' }
+    ],
+    onExactKey: ({ qualityByKey, metaByKey, recordMatchMeta }) => {
+      const normalizedQuery = String(q).trim();
+      if (/^\d+$/.test(normalizedQuery) && qualityByKey[normalizedQuery] === 'exact') {
+        recordMatchMeta(metaByKey, normalizedQuery, {
+          cis: normalizedQuery,
+          match_quality: 'exact'
+        }, 'cis');
+      }
+    }
+  });
+}
+
+function hydrateBdpmResult(cis, qualityByKey, metaByKey) {
+  const result = {
+    type: 'medicament',
+    match_quality: qualityByKey[cis],
+    ...(getSpecialiteByCis(cis) || { cis, url_bdpm: bdpmExtraitUrl(cis) }),
+    presentations: getRelatedByCis('presentations', cis, HYDRATE_RELATED_LIMIT),
+    compositions: getRelatedByCis('compositions', cis, HYDRATE_RELATED_LIMIT)
+  };
+  attachMatchFields(result, metaByKey[cis]);
+  return result;
+}
+
 function searchVeterinary(q) {
   const { qualityByKey, metaByKey } = mergeSearchHits({
     keyField: 'num',
@@ -141,6 +178,37 @@ function searchVeterinary(q) {
   });
 }
 
+function collectVeterinaryMatches(q) {
+  return mergeSearchHits({
+    keyField: 'num',
+    searches: [
+      { items: searchVetKeyMatches('medicaments', q), via: 'denomination' },
+      { items: searchVetKeyMatches('compositions', q), via: 'composition' }
+    ],
+    onExactKey: ({ qualityByKey, metaByKey, recordMatchMeta }) => {
+      const normalizedQuery = String(q).trim();
+      if (/^\d+$/.test(normalizedQuery)) {
+        const num = normalizedQuery.padStart(7, '0');
+        if (qualityByKey[num] === 'exact') {
+          recordMatchMeta(metaByKey, num, { num, match_quality: 'exact' }, 'num');
+        }
+      }
+    }
+  });
+}
+
+function hydrateVeterinaryResult(num, qualityByKey, metaByKey) {
+  const result = {
+    type: 'medicament_veterinaire',
+    match_quality: qualityByKey[num],
+    ...(getMedicamentByNum(num) || { num }),
+    presentations: getRelatedByNum('presentations', num),
+    compositions: getRelatedByNum('compositions', num)
+  };
+  attachMatchFields(result, metaByKey[num]);
+  return result;
+}
+
 function sortMergedResults(results) {
   return [...results].sort((a, b) => {
     const rankA = MATCH_QUALITY_RANK[a.match_quality] || 0;
@@ -150,6 +218,42 @@ function sortMergedResults(results) {
     const labelB = b.denomination || b.nom || '';
     return labelA.localeCompare(labelB, 'fr');
   });
+}
+
+function sortResultRefs(refs) {
+  return [...refs].sort((a, b) => {
+    const rankA = MATCH_QUALITY_RANK[a.match_quality] || 0;
+    const rankB = MATCH_QUALITY_RANK[b.match_quality] || 0;
+    if (rankB !== rankA) return rankB - rankA;
+    return a.label.localeCompare(b.label, 'fr');
+  });
+}
+
+function bdpmRefs(matches) {
+  return Object.keys(matches.qualityByKey).map((cis) => ({
+    source: 'bdpm',
+    key: cis,
+    match_quality: matches.qualityByKey[cis],
+    label: getSpecialiteLabelByCis(cis)
+  }));
+}
+
+function vetRefs(matches) {
+  return Object.keys(matches.qualityByKey).map((num) => ({
+    source: 'vet',
+    key: num,
+    match_quality: matches.qualityByKey[num],
+    label: getMedicamentLabelByNum(num)
+  }));
+}
+
+function hydrateResultRef(ref, matchesBySource) {
+  if (ref.source === 'bdpm') {
+    const matches = matchesBySource.bdpm;
+    return hydrateBdpmResult(ref.key, matches.qualityByKey, matches.metaByKey);
+  }
+  const matches = matchesBySource.vet;
+  return hydrateVeterinaryResult(ref.key, matches.qualityByKey, matches.metaByKey);
 }
 
 function buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource }) {
@@ -228,6 +332,61 @@ function executeHybridSearch(q, source) {
   };
 }
 
+function executeHybridSearchPage(q, source, page = 1, limit = 50) {
+  const sourceMode = normalizeSource(source);
+  const explicitSource = source != null && String(source).trim() !== '';
+  const plan = SEARCH_PLANS[sourceMode];
+  const queried = [];
+  const withResults = [];
+  const matchesBySource = {};
+
+  let refs = [];
+
+  if (plan.bdpm) {
+    queried.push('bdpm');
+    matchesBySource.bdpm = collectBdpmMatches(q);
+    refs = bdpmRefs(matchesBySource.bdpm);
+    if (refs.length > 0) withResults.push('bdpm');
+  }
+
+  const bdpmStrong =
+    refs.length > 0 && refs.some((r) => isStrongMatchQuality(r.match_quality));
+  if (plan.merge === 'auto' && bdpmStrong) {
+    const { offset, safeLimit } = parseListPaging(page, limit);
+    const pageRefs = refs.slice(offset, offset + safeLimit);
+    return {
+      total: refs.length,
+      results: pageRefs.map((ref) => hydrateResultRef(ref, matchesBySource)),
+      search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
+    };
+  }
+
+  let vetResultRefs = [];
+  if (plan.vet) {
+    queried.push('anmv');
+    matchesBySource.vet = collectVeterinaryMatches(q);
+    vetResultRefs = vetRefs(matchesBySource.vet);
+    if (vetResultRefs.length > 0) withResults.push('anmv');
+  }
+
+  if (plan.merge === 'concat') {
+    refs = sortResultRefs([...refs, ...vetResultRefs]);
+  } else if (plan.merge === 'replace') {
+    refs = plan.bdpm ? refs : vetResultRefs;
+  } else {
+    refs = vetResultRefs;
+  }
+
+  const { offset, safeLimit } = parseListPaging(page, limit);
+  const pageRefs = refs.slice(offset, offset + safeLimit);
+  return {
+    total: refs.length,
+    results: pageRefs.map((ref) => hydrateResultRef(ref, matchesBySource)),
+    search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
+  };
+}
+
 module.exports = {
-  executeHybridSearch
+  executeHybridSearch,
+  executeHybridSearchPage
 };
