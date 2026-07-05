@@ -161,6 +161,19 @@ function getMedicamentLabelByNum(num) {
   return corpus.medicaments[rowIndex].nom || '';
 }
 
+function getMedicamentSearchRecordByNum(num) {
+  const numIndexes = state.numIndexes;
+  if (!numIndexes) return null;
+  const rowIndex = numIndexes.medicamentsByNum.get(normalizeNum(num));
+  if (rowIndex === undefined) return null;
+  const row = corpus.medicaments[rowIndex];
+  return {
+    denomination: row.nom,
+    forme_pharmaceutique: row.forme_pharmaceutique,
+    voies_admin: ''
+  };
+}
+
 function getRelatedByNum(type, num, limit = config.searchHydrateRelatedLimit) {
   if (!num) return [];
   const normalized = normalizeNum(num);
@@ -201,6 +214,7 @@ module.exports = {
   getVetMetadata,
   getMedicamentByNum,
   getMedicamentLabelByNum,
+  getMedicamentSearchRecordByNum,
   getRelatedByNum,
   buildLienRcpFromNom,
   ANMV_RCP_URL_PREFIX,

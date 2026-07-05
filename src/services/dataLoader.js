@@ -291,6 +291,19 @@ function getSpecialiteLabelByCis(cis) {
   return corpus.specialites[rowIndex].denomination || '';
 }
 
+function getSpecialiteSearchRecordByCis(cis) {
+  const cisIndexes = state.cisIndexes;
+  if (!cisIndexes) return null;
+  const rowIndex = cisIndexes.specialitesByCis.get(cis);
+  if (rowIndex === undefined) return null;
+  const row = corpus.specialites[rowIndex];
+  return {
+    denomination: row.denomination,
+    forme_pharma: row.forme_pharma,
+    voies_admin: row.voies_admin
+  };
+}
+
 function getRelatedByCis(type, cis, limit = HYDRATE_RELATED_LIMIT) {
   const cisIndexes = state.cisIndexes;
   if (!cisIndexes || !cis) return [];
@@ -359,6 +372,7 @@ module.exports = {
   isMitmLoaded,
   getSpecialiteByCis,
   getSpecialiteLabelByCis,
+  getSpecialiteSearchRecordByCis,
   getRelatedByCis,
   getGeneriquesForCis,
   bdpmExtraitUrl,

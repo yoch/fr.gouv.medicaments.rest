@@ -12,6 +12,7 @@
     "download-data": "node src/scripts/download-initial-data.js",
     "export-search-indexes": "node src/scripts/export-search-indexes.js",
     "export-corpus-documents": "node src/scripts/export-corpus-documents.js",
+    "benchmark:csv-loading": "node --expose-gc scripts/benchmark/benchmark-csv-loading.js",
     "benchmark:vet-xml": "node --expose-gc scripts/benchmark/vet-xml-parsers.js",
     "analyze:interning": "node scripts/benchmark/analyze-interning-candidates.js",
     "measure:bdpm-resident": "node --expose-gc scripts/memory/measure-interning-resident.js",

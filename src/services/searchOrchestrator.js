@@ -3,6 +3,7 @@ const {
   searchKeyMatches,
   getSpecialiteByCis,
   getSpecialiteLabelByCis,
+  getSpecialiteSearchRecordByCis,
   getRelatedByCis,
   bdpmExtraitUrl,
   HYDRATE_RELATED_LIMIT
@@ -12,6 +13,7 @@ const {
   searchVetKeyMatches,
   getMedicamentByNum,
   getMedicamentLabelByNum,
+  getMedicamentSearchRecordByNum,
   getRelatedByNum
 } = require('./vetDataLoader');
 const { parseListPaging } = require('../utils/corpusPaging');
@@ -272,21 +274,9 @@ function hydrateResultRef(ref, matchesBySource) {
  */
 function structuredRecordForRef(ref) {
   if (ref.source === 'bdpm') {
-    const spec = getSpecialiteByCis(ref.key);
-    if (!spec) return null;
-    return {
-      denomination: spec.denomination,
-      forme_pharma: spec.forme_pharma,
-      voies_admin: spec.voies_admin
-    };
+    return getSpecialiteSearchRecordByCis(ref.key);
   }
-  const med = getMedicamentByNum(ref.key);
-  if (!med) return null;
-  return {
-    denomination: med.nom,
-    forme_pharma: med.forme_pharmaceutique,
-    voies_admin: ''
-  };
+  return getMedicamentSearchRecordByNum(ref.key);
 }
 
 /**

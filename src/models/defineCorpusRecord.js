@@ -24,11 +24,9 @@ function defineCorpusRecord(className, options) {
   const numericSet = new Set(numericFields);
   const arraySet = new Set(arrayFields);
   const lowCardSet = new Set(lowCardinalityFields);
-
-  function resolveOmitStoredFields() {
-    const resolved = typeof omitStoredFields === 'function' ? omitStoredFields() : omitStoredFields;
-    return new Set(resolved);
-  }
+  const resolvedOmitStoredFields =
+    typeof omitStoredFields === 'function' ? omitStoredFields() : omitStoredFields;
+  const omitStoredSet = new Set(resolvedOmitStoredFields);
 
   class CorpusRecord {
     constructor(...values) {
@@ -46,24 +44,22 @@ function defineCorpusRecord(className, options) {
     }
 
     static fromCsv(record) {
-      const omitSet = resolveOmitStoredFields();
       const args = new Array(fields.length);
       for (let i = 0; i < fields.length; i++) {
         const f = fields[i];
         let v = record[f];
-        if (omitSet.has(f)) v = '';
+        if (omitStoredSet.has(f)) v = '';
         args[i] = lowCardSet.has(f) ? intern(v) : v;
       }
       return new CorpusRecord(...args);
     }
 
     static fromObject(record) {
-      const omitSet = resolveOmitStoredFields();
       const args = new Array(fields.length);
       for (let i = 0; i < fields.length; i++) {
         const f = fields[i];
         let v = record ? record[f] : undefined;
-        if (omitSet.has(f)) v = '';
+        if (omitStoredSet.has(f)) v = '';
         args[i] = lowCardSet.has(f) ? intern(v) : v;
       }
       return new CorpusRecord(...args);

@@ -27,6 +27,7 @@ const {
 } = require('../src/utils/corpusStore');
 const { rankAndMaterializeSearch } = require('../src/utils/corpusSearch');
 const { bdpmExtraitUrl } = require('../src/models/bdpm/constants');
+const { defineCorpusRecord } = require('../src/models/defineCorpusRecord');
 
 function emptyCsv(fields, overrides = {}) {
   return { ...Object.fromEntries(fields.map((f) => [f, ''])), ...overrides };
@@ -39,6 +40,23 @@ describe('BDPM schema alignment', () => {
       expect(FROM_CSV[type]).toBe(BDPM_RECORD_CLASSES[type].fromCsv);
     });
   }
+});
+
+describe('defineCorpusRecord', () => {
+  it('résout omitStoredFields une seule fois par classe', () => {
+    let calls = 0;
+    const TestRecord = defineCorpusRecord('TestRecord', {
+      fields: ['keep', 'drop'],
+      omitStoredFields: () => {
+        calls += 1;
+        return ['drop'];
+      }
+    });
+
+    expect(TestRecord.fromCsv({ keep: 'a', drop: 'x' }).toJSON()).toEqual({ keep: 'a' });
+    expect(TestRecord.fromCsv({ keep: 'b', drop: 'y' }).toJSON()).toEqual({ keep: 'b' });
+    expect(calls).toBe(1);
+  });
 });
 
 describe('Presentation CIS_CIP_bdpm.txt', () => {

@@ -23,7 +23,12 @@ describe('pipeline ANMV fixture', () => {
   });
 
   it('mappe SULTRIAN 100 sans décaler les champs vétérinaires', async () => {
-    const { loadVetData, getMedicamentByNum, getRelatedByNum } = require('../src/services/vetDataLoader');
+    const {
+      loadVetData,
+      getMedicamentByNum,
+      getMedicamentSearchRecordByNum,
+      getRelatedByNum
+    } = require('../src/services/vetDataLoader');
 
     await loadVetData();
 
@@ -53,5 +58,10 @@ describe('pipeline ANMV fixture', () => {
       gtin: '03660176013166'
     });
     expect(getRelatedByNum('temps_attente', '0452300')).toEqual([]);
+    expect(getMedicamentSearchRecordByNum('0452300')).toEqual({
+      denomination: 'SULTRIAN 100',
+      forme_pharmaceutique: 'Comprimé',
+      voies_admin: ''
+    });
   });
 });
