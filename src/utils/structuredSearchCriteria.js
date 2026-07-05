@@ -1,6 +1,6 @@
 'use strict';
 
-const { normalizeSearchText } = require('./searchRanking');
+const { normalizeSearchText, MATCH_QUALITY_RANK } = require('./searchRanking');
 
 const UNIT_ALIASES = {
   mg: 'mg',
@@ -97,19 +97,26 @@ function textOverlapScore(needle, haystack) {
   return hits / needleTokens.size;
 }
 
-const MATCH_QUALITY_RANK = { exact: 3, prefix: 2, fuzzy: 1 };
-
 function hasStructuredCriteria(criteria) {
   return Boolean(criteria && (criteria.dosage || criteria.forme || criteria.voie));
 }
 
+function getStructuredDenomination(hit) {
+  return hit.denomination || hit.nom || '';
+}
+
+function getStructuredForme(hit) {
+  return hit.forme_pharma || hit.forme_pharmaceutique || '';
+}
+
 /**
- * Sources de dosage pour le scoring : uniquement la dénomination de la spécialité.
+ * Sources de dosage pour le scoring : uniquement la dénomination / nom.
  * Le champ `compositions.dosage` est volontairement ignoré (dilutions homéo, sels FT,
  * dosages par substance) — le dosage pertinent pour l'agent vit dans la dénomination.
  */
 function collectDosageSources(hit) {
-  return hit.denomination ? [hit.denomination] : [];
+  const denomination = getStructuredDenomination(hit);
+  return denomination ? [denomination] : [];
 }
 
 /**
@@ -133,7 +140,7 @@ function scoreStructuredCriteria(hit, criteria = {}) {
   }
 
   if (forme) {
-    const score = textOverlapScore(forme, hit.forme_pharma || '');
+    const score = textOverlapScore(forme, getStructuredForme(hit));
     if (score >= 0.5) {
       match.forme = true;
       boost += score >= 1 ? 2 : 1;

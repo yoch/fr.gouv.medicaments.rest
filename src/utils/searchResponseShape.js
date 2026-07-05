@@ -118,6 +118,10 @@ function normalizeDetail(detail) {
 function shapeSearchHit(hit, options = {}) {
   const detail = normalizeDetail(options.detail);
   if (detail === 'full') {
+    if (hit.criteria_boost != null) {
+      const { criteria_boost, ...publicHit } = hit;
+      return publicHit;
+    }
     return hit;
   }
   if (hit.type === 'medicament_veterinaire') {

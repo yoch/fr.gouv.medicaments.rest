@@ -60,6 +60,19 @@ describe('structuredSearchCriteria', () => {
       expect(criteria_match.dosage).toBe(false);
     });
 
+    it('score aussi les médicaments vétérinaires via nom et forme_pharmaceutique', () => {
+      const vetHit = {
+        nom: 'VETMED 100 mg',
+        forme_pharmaceutique: 'Comprimé'
+      };
+      const { criteria_match } = scoreStructuredCriteria(vetHit, {
+        dosage: '100 mg',
+        forme: 'comprimé'
+      });
+      expect(criteria_match.dosage).toBe(true);
+      expect(criteria_match.forme).toBe(true);
+    });
+
     it('réordonne à l’intérieur d’un même niveau de match_quality', () => {
       const autre = {
         denomination: 'AUTRE 500 mg, comprimé',

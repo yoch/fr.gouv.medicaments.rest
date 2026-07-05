@@ -61,6 +61,17 @@ describe('searchResponseShape', () => {
     expect(shapeSearchHit(fullHit, { detail: 'full' }).compositions).toBeDefined();
   });
 
+  it('detail=full hides internal criteria_boost but keeps criteria_match', () => {
+    const shaped = shapeSearchHit({
+      ...fullHit,
+      criteria_boost: 4,
+      criteria_match: { dosage: true, forme: true, voie: false }
+    }, { detail: 'full' });
+    expect(shaped.criteria_boost).toBeUndefined();
+    expect(shaped.criteria_match).toEqual({ dosage: true, forme: true, voie: false });
+    expect(shaped.compositions).toBeDefined();
+  });
+
   it('detail=summary strips nested fields and caps presentations', () => {
     const summary = shapeSearchHit(fullHit, { detail: 'summary' });
     expect(summary.statut_amm).toBeUndefined();
