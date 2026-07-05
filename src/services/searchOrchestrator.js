@@ -20,6 +20,12 @@ const {
   MATCH_QUALITY_RANK,
   MATCH_VIA_RANK
 } = require('../utils/searchRanking');
+const {
+  hasStructuredCriteria,
+  scoreStructuredCriteria,
+  compareByQualityThenBoost,
+  rerankWithStructuredCriteria
+} = require('../utils/structuredSearchCriteria');
 
 function recordMatchMeta(metaByKey, key, item, via) {
   if (!key) return;
@@ -248,12 +254,64 @@ function vetRefs(matches) {
 }
 
 function hydrateResultRef(ref, matchesBySource) {
+  let result;
   if (ref.source === 'bdpm') {
     const matches = matchesBySource.bdpm;
-    return hydrateBdpmResult(ref.key, matches.qualityByKey, matches.metaByKey);
+    result = hydrateBdpmResult(ref.key, matches.qualityByKey, matches.metaByKey);
+  } else {
+    const matches = matchesBySource.vet;
+    result = hydrateVeterinaryResult(ref.key, matches.qualityByKey, matches.metaByKey);
   }
-  const matches = matchesBySource.vet;
-  return hydrateVeterinaryResult(ref.key, matches.qualityByKey, matches.metaByKey);
+  if (ref.criteria_match) result.criteria_match = ref.criteria_match;
+  return result;
+}
+
+/**
+ * Construit un enregistrement minimal (dénomination / forme / voie) pour scorer
+ * une réf sans hydrater ses relations. Le dosage est évalué sur la dénomination.
+ */
+function structuredRecordForRef(ref) {
+  if (ref.source === 'bdpm') {
+    const spec = getSpecialiteByCis(ref.key);
+    if (!spec) return null;
+    return {
+      denomination: spec.denomination,
+      forme_pharma: spec.forme_pharma,
+      voies_admin: spec.voies_admin
+    };
+  }
+  const med = getMedicamentByNum(ref.key);
+  if (!med) return null;
+  return {
+    denomination: med.nom,
+    forme_pharma: med.forme_pharmaceutique,
+    voies_admin: ''
+  };
+}
+
+/**
+ * Réordonnancement non destructif des réfs selon dosage/forme/voie.
+ * Tier-first : le boost ne réordonne qu'à l'intérieur d'un même `match_quality`,
+ * donc aucun résultat sans rapport ne remonte au-dessus d'un match plus fort.
+ */
+function applyCriteriaToRefs(refs, criteria) {
+  if (!hasStructuredCriteria(criteria)) return refs;
+
+  const scored = refs.map((ref, index) => {
+    const record = structuredRecordForRef(ref);
+    const { boost, criteria_match } = record
+      ? scoreStructuredCriteria(record, criteria)
+      : { boost: 0, criteria_match: { dosage: false, forme: false, voie: false } };
+    return { ...ref, criteria_boost: boost, criteria_match, _index: index };
+  });
+
+  scored.sort((a, b) => {
+    const byQuality = compareByQualityThenBoost(a, b);
+    if (byQuality !== 0) return byQuality;
+    return a._index - b._index;
+  });
+
+  return scored.map(({ _index, ...ref }) => ref);
 }
 
 function buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource }) {
@@ -276,7 +334,7 @@ function buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource }
  * redondantes dans `executeHybridSearch`. `merge`:
  *   - 'replace'  : un seul référentiel retenu (human ou veterinary)
  *   - 'concat'   : union triée (mixed)
- *   - 'auto'     : bdpm prioritaire si match fort, sinon vet
+ *   - 'auto'     : bdpm prioritaire si match fort, sinon vet, puis bdpm faible si vet vide
  */
 const SEARCH_PLANS = {
   human:     { bdpm: true,  vet: false, merge: 'replace' },
@@ -285,7 +343,7 @@ const SEARCH_PLANS = {
   auto:      { bdpm: true,  vet: true,  merge: 'auto' }
 };
 
-function executeHybridSearch(q, source) {
+function executeHybridSearch(q, source, criteria = {}) {
   const sourceMode = normalizeSource(source);
   const explicitSource = source != null && String(source).trim() !== '';
   const plan = SEARCH_PLANS[sourceMode];
@@ -306,7 +364,7 @@ function executeHybridSearch(q, source) {
     bdpmResults.length > 0 && bdpmResults.some((r) => isStrongMatchQuality(r.match_quality));
   if (plan.merge === 'auto' && bdpmStrong) {
     return {
-      results: bdpmResults,
+      results: rerankWithStructuredCriteria(bdpmResults, criteria),
       search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
     };
   }
@@ -323,16 +381,17 @@ function executeHybridSearch(q, source) {
   } else if (plan.merge === 'replace') {
     results = plan.bdpm ? bdpmResults : vetResults;
   } else {
-    results = vetResults;
+    // auto : match fort BDPM déjà sorti ; sinon vet si dispo, sinon conserver BDPM faible
+    results = vetResults.length > 0 ? vetResults : bdpmResults;
   }
 
   return {
-    results,
+    results: rerankWithStructuredCriteria(results, criteria),
     search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
   };
 }
 
-function executeHybridSearchPage(q, source, page = 1, limit = 50) {
+function executeHybridSearchPage(q, source, page = 1, limit = 50, criteria = {}) {
   const sourceMode = normalizeSource(source);
   const explicitSource = source != null && String(source).trim() !== '';
   const plan = SEARCH_PLANS[sourceMode];
@@ -352,10 +411,11 @@ function executeHybridSearchPage(q, source, page = 1, limit = 50) {
   const bdpmStrong =
     refs.length > 0 && refs.some((r) => isStrongMatchQuality(r.match_quality));
   if (plan.merge === 'auto' && bdpmStrong) {
+    const finalRefs = applyCriteriaToRefs(refs, criteria);
     const { offset, safeLimit } = parseListPaging(page, limit);
-    const pageRefs = refs.slice(offset, offset + safeLimit);
+    const pageRefs = finalRefs.slice(offset, offset + safeLimit);
     return {
-      total: refs.length,
+      total: finalRefs.length,
       results: pageRefs.map((ref) => hydrateResultRef(ref, matchesBySource)),
       search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
     };
@@ -374,13 +434,14 @@ function executeHybridSearchPage(q, source, page = 1, limit = 50) {
   } else if (plan.merge === 'replace') {
     refs = plan.bdpm ? refs : vetResultRefs;
   } else {
-    refs = vetResultRefs;
+    refs = vetResultRefs.length > 0 ? vetResultRefs : refs;
   }
 
+  const finalRefs = applyCriteriaToRefs(refs, criteria);
   const { offset, safeLimit } = parseListPaging(page, limit);
-  const pageRefs = refs.slice(offset, offset + safeLimit);
+  const pageRefs = finalRefs.slice(offset, offset + safeLimit);
   return {
-    total: refs.length,
+    total: finalRefs.length,
     results: pageRefs.map((ref) => hydrateResultRef(ref, matchesBySource)),
     search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
   };

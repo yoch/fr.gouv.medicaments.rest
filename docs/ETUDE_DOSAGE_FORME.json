@@ -1,0 +1,1029 @@
+{
+  "generated_at": "2026-07-05T20:34:22.927Z",
+  "profile": {
+    "specialites": {
+      "total": 15848,
+      "empty_forme_pharma": 0,
+      "empty_forme_pct": 0,
+      "distinct_forme_pharma": 367,
+      "top_forme_pharma": [
+        {
+          "value": "comprimé pelliculé",
+          "count": 2887
+        },
+        {
+          "value": "solution injectable",
+          "count": 1300
+        },
+        {
+          "value": "comprimé",
+          "count": 1289
+        },
+        {
+          "value": "gélule",
+          "count": 1109
+        },
+        {
+          "value": "comprimé et solution(s) et granules et poudre et pommade",
+          "count": 1059
+        },
+        {
+          "value": "comprimé pelliculé sécable",
+          "count": 679
+        },
+        {
+          "value": "comprimé sécable",
+          "count": 672
+        },
+        {
+          "value": "solution buvable",
+          "count": 274
+        },
+        {
+          "value": "solution à diluer pour perfusion",
+          "count": 272
+        },
+        {
+          "value": "solution pour perfusion",
+          "count": 270
+        },
+        {
+          "value": "poudre et  solvant pour solution injectable",
+          "count": 231
+        },
+        {
+          "value": "comprimé à libération prolongée",
+          "count": 211
+        },
+        {
+          "value": "collyre en solution",
+          "count": 200
+        },
+        {
+          "value": "comprimé orodispersible",
+          "count": 185
+        },
+        {
+          "value": "gélule à libération prolongée",
+          "count": 185
+        }
+      ],
+      "empty_voies_admin": 0,
+      "empty_voie_pct": 0,
+      "distinct_voies_admin": 156,
+      "top_voies_admin": [
+        {
+          "value": "orale",
+          "count": 9298
+        },
+        {
+          "value": "intraveineuse",
+          "count": 1473
+        },
+        {
+          "value": "cutanée;orale;sublinguale",
+          "count": 1145
+        },
+        {
+          "value": "sous-cutanée",
+          "count": 613
+        },
+        {
+          "value": "cutanée",
+          "count": 543
+        },
+        {
+          "value": "ophtalmique",
+          "count": 306
+        },
+        {
+          "value": "inhalée",
+          "count": 294
+        },
+        {
+          "value": "intramusculaire",
+          "count": 216
+        },
+        {
+          "value": "orale;sublinguale",
+          "count": 206
+        },
+        {
+          "value": "intramusculaire;intraveineuse",
+          "count": 195
+        },
+        {
+          "value": "sublinguale",
+          "count": 172
+        },
+        {
+          "value": "intraveineuse;sous-cutanée",
+          "count": 167
+        },
+        {
+          "value": "voie buccale autre",
+          "count": 146
+        },
+        {
+          "value": "transdermique",
+          "count": 133
+        },
+        {
+          "value": "rectale",
+          "count": 87
+        }
+      ]
+    },
+    "compositions": {
+      "total": 32396,
+      "empty_dosage": 2823,
+      "empty_dosage_pct": 8.7,
+      "distinct_dosage": 3940,
+      "parseable_dosage": 23025,
+      "parseable_dosage_pct": 77.9,
+      "top_units": [
+        {
+          "value": "mg",
+          "count": 15973
+        },
+        {
+          "value": "g",
+          "count": 3726
+        },
+        {
+          "value": "%",
+          "count": 1776
+        },
+        {
+          "value": "ug",
+          "count": 1205
+        },
+        {
+          "value": "ui",
+          "count": 616
+        },
+        {
+          "value": "ml",
+          "count": 391
+        },
+        {
+          "value": "l",
+          "count": 17
+        }
+      ],
+      "top_dosages": [
+        {
+          "value": "2CH à 30CH et 4DH à 60DH",
+          "count": 3198
+        },
+        {
+          "value": "4CH à 30CH et 8DH à 60DH",
+          "count": 1487
+        },
+        {
+          "value": "10 mg",
+          "count": 1159
+        },
+        {
+          "value": "20 mg",
+          "count": 835
+        },
+        {
+          "value": "5 mg",
+          "count": 754
+        },
+        {
+          "value": "100 mg",
+          "count": 718
+        },
+        {
+          "value": "50 mg",
+          "count": 610
+        },
+        {
+          "value": "200 mg",
+          "count": 536
+        },
+        {
+          "value": "500 mg",
+          "count": 532
+        },
+        {
+          "value": "25 mg",
+          "count": 438
+        },
+        {
+          "value": "4CH à 30CH et 7DH à 60DH",
+          "count": 392
+        },
+        {
+          "value": "40 mg",
+          "count": 364
+        },
+        {
+          "value": "3CH à 30CH et 6DH à 60DH",
+          "count": 363
+        },
+        {
+          "value": "2CH à 30CH et 4DH à 60DH (pommade à 4 %)",
+          "count": 363
+        },
+        {
+          "value": "1 mg",
+          "count": 325
+        }
+      ],
+      "cis_with_multiple_dosages": 5348,
+      "cis_with_multiple_dosages_pct": 33.8
+    }
+  },
+  "evaluations": [
+    {
+      "id": "doliprane_1g",
+      "note": "Rapport: Doliprane 1 gramme",
+      "params": {
+        "q": "Doliprane",
+        "dosage": "1 gramme",
+        "forme": "comprimé",
+        "voie": null
+      },
+      "composite_q": "Doliprane 1 gramme comprimé",
+      "counts": {
+        "composite_and_fail": 0,
+        "q_only_current": 31,
+        "recall_current": 31,
+        "recall_target": 31,
+        "recall_delta": 0
+      },
+      "top": {
+        "composite": null,
+        "q_only": {
+          "cis": "60234100",
+          "denomination": "DOLIPRANE 1000 mg, comprimé",
+          "forme_pharma": "comprimé",
+          "voies_admin": "orale",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "1000 mg"
+          ]
+        },
+        "target_reranked": {
+          "cis": "60234100",
+          "denomination": "DOLIPRANE 1000 mg, comprimé",
+          "forme_pharma": "comprimé",
+          "voies_admin": "orale",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "1000 mg"
+          ],
+          "criteria_boost": 4,
+          "criteria_match": {
+            "dosage": true,
+            "forme": true,
+            "voie": false
+          }
+        },
+        "target_second": {
+          "cis": "66567738",
+          "denomination": "DOLIPRANE 1000 mg, comprimé effervescent sécable",
+          "forme_pharma": "comprimé effervescent(e) sécable",
+          "voies_admin": "orale",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "1000 mg"
+          ],
+          "criteria_boost": 4,
+          "criteria_match": {
+            "dosage": true,
+            "forme": true,
+            "voie": false
+          }
+        }
+      },
+      "verdict": "structured_fixes_composite_failure"
+    },
+    {
+      "id": "esomeprazole_40",
+      "note": "Rapport: Esomeprazole 40mg",
+      "params": {
+        "q": "Esomeprazole",
+        "dosage": "40 mg",
+        "forme": null,
+        "voie": null
+      },
+      "composite_q": "Esomeprazole 40 mg",
+      "counts": {
+        "composite_and_fail": 25,
+        "q_only_current": 97,
+        "recall_current": 97,
+        "recall_target": 97,
+        "recall_delta": 0
+      },
+      "top": {
+        "composite": {
+          "cis": "60920487",
+          "denomination": "ESOMEPRAZOLE SUN PHARMA 40 mg, poudre pour solution injectable/pour perfusion",
+          "forme_pharma": "poudre pour solution injectable ou pour perfusion",
+          "voies_admin": "intraveineuse",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "40 mg"
+          ]
+        },
+        "q_only": {
+          "cis": "60357359",
+          "denomination": "NEXIUM CONTROL 20 mg, comprimé gastro-résistant",
+          "forme_pharma": "comprimé gastro-résistant(e)",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "20 mg",
+            "22,30 mg"
+          ]
+        },
+        "target_reranked": {
+          "cis": "69836147",
+          "denomination": "ESOMEPRAZOLE ALMUS 40 mg, gélule gastro-résistante",
+          "forme_pharma": "gélule gastro-résistant(e)",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "40 mg"
+          ],
+          "criteria_boost": 2,
+          "criteria_match": {
+            "dosage": true,
+            "forme": false,
+            "voie": false
+          }
+        },
+        "target_second": {
+          "cis": "61424743",
+          "denomination": "ESOMEPRAZOLE ALTER 40 mg, comprimé gastro-résistant",
+          "forme_pharma": "comprimé gastro-résistant(e)",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "40 mg",
+            "43,5 mg"
+          ],
+          "criteria_boost": 2,
+          "criteria_match": {
+            "dosage": true,
+            "forme": false,
+            "voie": false
+          }
+        }
+      },
+      "verdict": "structured_improves_ranking"
+    },
+    {
+      "id": "ozempic_025",
+      "note": "Rapport: Ozempic 0,25mg",
+      "params": {
+        "q": "Ozempic",
+        "dosage": "0,25 mg",
+        "forme": null,
+        "voie": null
+      },
+      "composite_q": "Ozempic 0,25 mg",
+      "counts": {
+        "composite_and_fail": 1,
+        "q_only_current": 3,
+        "recall_current": 3,
+        "recall_target": 3,
+        "recall_delta": 0
+      },
+      "top": {
+        "composite": {
+          "cis": "65766192",
+          "denomination": "OZEMPIC 0,25 mg, solution injectable en stylo prérempli",
+          "forme_pharma": "solution injectable",
+          "voies_admin": "sous-cutanée",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "0,25 mg"
+          ]
+        },
+        "q_only": {
+          "cis": "61400703",
+          "denomination": "OZEMPIC 0,5 mg, solution injectable en stylo prérempli",
+          "forme_pharma": "solution injectable",
+          "voies_admin": "sous-cutanée",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "0,5 mg"
+          ]
+        },
+        "target_reranked": {
+          "cis": "65766192",
+          "denomination": "OZEMPIC 0,25 mg, solution injectable en stylo prérempli",
+          "forme_pharma": "solution injectable",
+          "voies_admin": "sous-cutanée",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "0,25 mg"
+          ],
+          "criteria_boost": 2,
+          "criteria_match": {
+            "dosage": true,
+            "forme": false,
+            "voie": false
+          }
+        },
+        "target_second": {
+          "cis": "61400703",
+          "denomination": "OZEMPIC 0,5 mg, solution injectable en stylo prérempli",
+          "forme_pharma": "solution injectable",
+          "voies_admin": "sous-cutanée",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "0,5 mg"
+          ],
+          "criteria_boost": 0,
+          "criteria_match": {
+            "dosage": false,
+            "forme": false,
+            "voie": false
+          }
+        }
+      },
+      "verdict": "structured_improves_ranking"
+    },
+    {
+      "id": "prednisolone_oro_20",
+      "note": "Rapport: prednisolone orodispersible 20mg",
+      "params": {
+        "q": "prednisolone",
+        "dosage": "20 mg",
+        "forme": "comprimé orodispersible",
+        "voie": null
+      },
+      "composite_q": "prednisolone 20 mg comprimé orodispersible",
+      "counts": {
+        "composite_and_fail": 10,
+        "q_only_current": 43,
+        "recall_current": 43,
+        "recall_target": 40,
+        "recall_delta": -3
+      },
+      "top": {
+        "composite": {
+          "cis": "63080629",
+          "denomination": "PREDNISOLONE CRISTERS 20 mg, comprimé orodispersible",
+          "forme_pharma": "comprimé orodispersible",
+          "voies_admin": "orale",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "20 mg",
+            "31,44 mg"
+          ]
+        },
+        "q_only": {
+          "cis": "60118715",
+          "denomination": "CORTANCYL 1 mg, comprimé",
+          "forme_pharma": "comprimé",
+          "voies_admin": "orale",
+          "match_quality": "fuzzy",
+          "match_via": "composition",
+          "dosages_sample": [
+            "1 mg"
+          ]
+        },
+        "target_reranked": {
+          "cis": "65009278",
+          "denomination": "PREDNISOLONE ARROW 20 mg, comprimé orodispersible",
+          "forme_pharma": "comprimé orodispersible",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "20 mg",
+            "31,44 mg"
+          ],
+          "criteria_boost": 4,
+          "criteria_match": {
+            "dosage": true,
+            "forme": true,
+            "voie": false
+          }
+        },
+        "target_second": {
+          "cis": "66216486",
+          "denomination": "PREDNISOLONE BIOGARAN 20 mg, comprimé orodispersible",
+          "forme_pharma": "comprimé orodispersible",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "20 mg",
+            "31,44 mg"
+          ],
+          "criteria_boost": 4,
+          "criteria_match": {
+            "dosage": true,
+            "forme": true,
+            "voie": false
+          }
+        }
+      },
+      "verdict": "structured_improves_ranking"
+    },
+    {
+      "id": "progesterone_ovule",
+      "note": "Rapport: progesterone ovule",
+      "params": {
+        "q": "progesterone",
+        "dosage": null,
+        "forme": "ovule",
+        "voie": "vaginale"
+      },
+      "composite_q": "progesterone ovule vaginale",
+      "counts": {
+        "composite_and_fail": 0,
+        "q_only_current": 21,
+        "recall_current": 21,
+        "recall_target": 21,
+        "recall_delta": 0
+      },
+      "top": {
+        "composite": null,
+        "q_only": {
+          "cis": "60114485",
+          "denomination": "PROGESTERONUM BOIRON, degré de dilution compris entre 4CH et 30CH ou entre 8DH et 60DH",
+          "forme_pharma": "comprimé et solution(s) et granules et poudre et pommade",
+          "voies_admin": "cutanée;orale;sublinguale",
+          "match_quality": "fuzzy",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "4CH à 30CH et 8DH à 60DH",
+            "4CH à 30CH et 8DH à 60DH (pommade à 4 %)"
+          ]
+        },
+        "target_reranked": {
+          "cis": "60880975",
+          "denomination": "AMELGEN 400 mg, ovule",
+          "forme_pharma": "ovule",
+          "voies_admin": "vaginale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "400 mg"
+          ],
+          "criteria_boost": 3,
+          "criteria_match": {
+            "dosage": false,
+            "forme": true,
+            "voie": true
+          }
+        },
+        "target_second": {
+          "cis": "65015968",
+          "denomination": "CRINONE 80 mg/g, gel vaginal",
+          "forme_pharma": "gel",
+          "voies_admin": "vaginale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "90 mg"
+          ],
+          "criteria_boost": 1,
+          "criteria_match": {
+            "dosage": false,
+            "forme": false,
+            "voie": true
+          }
+        }
+      },
+      "verdict": "structured_fixes_composite_failure"
+    },
+    {
+      "id": "cerulyse_spray",
+      "note": "Rapport: Cerulyse spray",
+      "params": {
+        "q": "Cerulyse",
+        "dosage": null,
+        "forme": "solution",
+        "voie": "auriculaire"
+      },
+      "composite_q": "Cerulyse solution auriculaire",
+      "counts": {
+        "composite_and_fail": 1,
+        "q_only_current": 1,
+        "recall_current": 1,
+        "recall_target": 1,
+        "recall_delta": 0
+      },
+      "top": {
+        "composite": {
+          "cis": "69170503",
+          "denomination": "CERULYSE 5 g/100 g, solution pour instillation auriculaire",
+          "forme_pharma": "solution pour instillation",
+          "voies_admin": "auriculaire",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "5,00 g"
+          ]
+        },
+        "q_only": {
+          "cis": "69170503",
+          "denomination": "CERULYSE 5 g/100 g, solution pour instillation auriculaire",
+          "forme_pharma": "solution pour instillation",
+          "voies_admin": "auriculaire",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "5,00 g"
+          ]
+        },
+        "target_reranked": {
+          "cis": "69170503",
+          "denomination": "CERULYSE 5 g/100 g, solution pour instillation auriculaire",
+          "forme_pharma": "solution pour instillation",
+          "voies_admin": "auriculaire",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "5,00 g"
+          ],
+          "criteria_boost": 3,
+          "criteria_match": {
+            "dosage": false,
+            "forme": true,
+            "voie": true
+          }
+        },
+        "target_second": null
+      },
+      "verdict": "structured_improves_ranking"
+    },
+    {
+      "id": "nexium_40",
+      "note": "Rapport: NEXIUM 40mg",
+      "params": {
+        "q": "NEXIUM",
+        "dosage": "40 mg",
+        "forme": null,
+        "voie": null
+      },
+      "composite_q": "NEXIUM 40 mg",
+      "counts": {
+        "composite_and_fail": 2,
+        "q_only_current": 8,
+        "recall_current": 8,
+        "recall_target": 8,
+        "recall_delta": 0
+      },
+      "top": {
+        "composite": {
+          "cis": "62824142",
+          "denomination": "INEXIUM 40 mg, comprimé gastro-résistant",
+          "forme_pharma": "comprimé gastro-résistant(e)",
+          "voies_admin": "orale",
+          "match_quality": "fuzzy",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "40 mg"
+          ]
+        },
+        "q_only": {
+          "cis": "60357359",
+          "denomination": "NEXIUM CONTROL 20 mg, comprimé gastro-résistant",
+          "forme_pharma": "comprimé gastro-résistant(e)",
+          "voies_admin": "orale",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "20 mg",
+            "22,30 mg"
+          ]
+        },
+        "target_reranked": {
+          "cis": "62824142",
+          "denomination": "INEXIUM 40 mg, comprimé gastro-résistant",
+          "forme_pharma": "comprimé gastro-résistant(e)",
+          "voies_admin": "orale",
+          "match_quality": "fuzzy",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "40 mg"
+          ],
+          "criteria_boost": 2,
+          "criteria_match": {
+            "dosage": true,
+            "forme": false,
+            "voie": false
+          }
+        },
+        "target_second": {
+          "cis": "64742740",
+          "denomination": "INEXIUM 40 mg, poudre pour solution injectable ou pour perfusion",
+          "forme_pharma": "poudre pour solution injectable ou pour perfusion",
+          "voies_admin": "intraveineuse",
+          "match_quality": "fuzzy",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "40 mg"
+          ],
+          "criteria_boost": 2,
+          "criteria_match": {
+            "dosage": true,
+            "forme": false,
+            "voie": false
+          }
+        }
+      },
+      "verdict": "structured_improves_ranking"
+    },
+    {
+      "id": "paracetamol_1g",
+      "note": "Rapport: paracetamol 1 gramme",
+      "params": {
+        "q": "paracetamol",
+        "dosage": "1 gramme",
+        "forme": "comprimé",
+        "voie": null
+      },
+      "composite_q": "paracetamol 1 gramme comprimé",
+      "counts": {
+        "composite_and_fail": 0,
+        "q_only_current": 229,
+        "recall_current": 229,
+        "recall_target": 229,
+        "recall_delta": 0
+      },
+      "top": {
+        "composite": null,
+        "q_only": {
+          "cis": "60009573",
+          "denomination": "PARACETAMOL/CODEINE TEVA 500 mg/30 mg, comprimé pelliculé",
+          "forme_pharma": "comprimé pelliculé",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "500 mg",
+            "30 mg"
+          ]
+        },
+        "target_reranked": {
+          "cis": "63264636",
+          "denomination": "DAFALGAN 1000 mg, comprimé effervescent",
+          "forme_pharma": "comprimé effervescent(e)",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "1000 mg"
+          ],
+          "criteria_boost": 4,
+          "criteria_match": {
+            "dosage": true,
+            "forme": true,
+            "voie": false
+          }
+        },
+        "target_second": {
+          "cis": "62887947",
+          "denomination": "DAFALGAN 1000 mg, comprimé pelliculé",
+          "forme_pharma": "comprimé pelliculé",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "1 g"
+          ],
+          "criteria_boost": 4,
+          "criteria_match": {
+            "dosage": true,
+            "forme": true,
+            "voie": false
+          }
+        }
+      },
+      "verdict": "structured_fixes_composite_failure"
+    },
+    {
+      "id": "sertraline_25",
+      "note": "Rapport: sertraline 25",
+      "params": {
+        "q": "sertraline",
+        "dosage": "25 mg",
+        "forme": "gélule",
+        "voie": null
+      },
+      "composite_q": "sertraline 25 mg gélule",
+      "counts": {
+        "composite_and_fail": 11,
+        "q_only_current": 27,
+        "recall_current": 27,
+        "recall_target": 27,
+        "recall_delta": 0
+      },
+      "top": {
+        "composite": {
+          "cis": "60606586",
+          "denomination": "SERTRALINE EG 25 mg, gélule",
+          "forme_pharma": "gélule",
+          "voies_admin": "orale",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "dosages_sample": [
+            "25 mg"
+          ]
+        },
+        "q_only": {
+          "cis": "60155788",
+          "denomination": "ZOLOFT 25 mg, gélule",
+          "forme_pharma": "gélule",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "25,000 mg",
+            "27,977 mg"
+          ]
+        },
+        "target_reranked": {
+          "cis": "65090846",
+          "denomination": "SERTRALINE ARROW LAB 25 mg, gélule",
+          "forme_pharma": "gélule",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "25 mg"
+          ],
+          "criteria_boost": 4,
+          "criteria_match": {
+            "dosage": true,
+            "forme": true,
+            "voie": false
+          }
+        },
+        "target_second": {
+          "cis": "66614337",
+          "denomination": "SERTRALINE VIATRIS 25 mg, gélule",
+          "forme_pharma": "gélule",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "25 mg"
+          ],
+          "criteria_boost": 4,
+          "criteria_match": {
+            "dosage": true,
+            "forme": true,
+            "voie": false
+          }
+        }
+      },
+      "verdict": "structured_improves_ranking"
+    },
+    {
+      "id": "methotrexate_per_os",
+      "note": "Rapport: méthotrexate per os",
+      "params": {
+        "q": "méthotrexate",
+        "dosage": "25 mg",
+        "forme": "comprimé",
+        "voie": "orale"
+      },
+      "composite_q": "méthotrexate 25 mg comprimé orale",
+      "counts": {
+        "composite_and_fail": 0,
+        "q_only_current": 88,
+        "recall_current": 88,
+        "recall_target": 70,
+        "recall_delta": -18
+      },
+      "top": {
+        "composite": null,
+        "q_only": {
+          "cis": "60035714",
+          "denomination": "SIMPONI 50 mg, solution injectable en seringue préremplie",
+          "forme_pharma": "solution injectable",
+          "voies_admin": "sous-cutanée",
+          "match_quality": "fuzzy",
+          "match_via": "presentation",
+          "dosages_sample": [
+            "50 mg"
+          ]
+        },
+        "target_reranked": {
+          "cis": "65787731",
+          "denomination": "IMENOR 10 mg, comprimé sécable",
+          "forme_pharma": "comprimé sécable",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "10 mg"
+          ],
+          "criteria_boost": 3,
+          "criteria_match": {
+            "dosage": false,
+            "forme": true,
+            "voie": true
+          }
+        },
+        "target_second": {
+          "cis": "67791835",
+          "denomination": "IMENOR 2,5 mg, comprimé",
+          "forme_pharma": "comprimé",
+          "voies_admin": "orale",
+          "match_quality": "exact",
+          "match_via": "composition",
+          "dosages_sample": [
+            "2,5 mg"
+          ],
+          "criteria_boost": 3,
+          "criteria_match": {
+            "dosage": false,
+            "forme": true,
+            "voie": true
+          }
+        }
+      },
+      "verdict": "structured_partial_fix"
+    }
+  ],
+  "recommendations": {
+    "interface": {
+      "add_params": [
+        "dosage",
+        "forme"
+      ],
+      "optional_later": [
+        "voie"
+      ],
+      "scoring_mode": "non_destructive_boost",
+      "remove_from_text_recall": [
+        "compositions.dosage",
+        "presentations.libelle"
+      ],
+      "keep_exact_code_recall": [
+        "cis",
+        "cip7",
+        "cip13"
+      ]
+    },
+    "confidence": {
+      "forme_pharma": "high",
+      "dosage_normalization": "low",
+      "voie_separate_param": "recommended_if_forme_ambiguous"
+    },
+    "study_results": {
+      "composite_failures_fixed": 3,
+      "partial_fixes": 1,
+      "ranking_improvements": 6,
+      "no_gain": 0
+    },
+    "llm_examples": [
+      {
+        "call": "q=Doliprane&dosage=1 gramme&forme=comprimé",
+        "avoid": "Doliprane 1 gramme comprimé",
+        "top_result": "DOLIPRANE 1000 mg, comprimé"
+      },
+      {
+        "call": "q=Esomeprazole&dosage=40 mg",
+        "avoid": "Esomeprazole 40 mg",
+        "top_result": "ESOMEPRAZOLE ALMUS 40 mg, gélule gastro-résistante"
+      },
+      {
+        "call": "q=Ozempic&dosage=0,25 mg",
+        "avoid": "Ozempic 0,25 mg",
+        "top_result": "OZEMPIC 0,25 mg, solution injectable en stylo prérempli"
+      },
+      {
+        "call": "q=prednisolone&dosage=20 mg&forme=comprimé orodispersible",
+        "avoid": "prednisolone 20 mg comprimé orodispersible",
+        "top_result": "PREDNISOLONE ARROW 20 mg, comprimé orodispersible"
+      },
+      {
+        "call": "q=progesterone&forme=ovule&voie=vaginale",
+        "avoid": "progesterone ovule vaginale",
+        "top_result": "AMELGEN 400 mg, ovule"
+      },
+      {
+        "call": "q=Cerulyse&forme=solution&voie=auriculaire",
+        "avoid": "Cerulyse solution auriculaire",
+        "top_result": "CERULYSE 5 g/100 g, solution pour instillation auriculaire"
+      }
+    ]
+  }
+}

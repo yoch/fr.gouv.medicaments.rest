@@ -9,14 +9,32 @@ const { buildPagedResponse } = require('../../utils/corpusPaging');
 
 const router = express.Router();
 
+function pickCriterion(value) {
+  if (value == null) return null;
+  const trimmed = String(value).trim();
+  return trimmed === '' ? null : trimmed;
+}
+
 router.get('/search', (req, res) => {
-  const { q, page = 1, limit = 50, source, format, detail } = req.query;
+  const { q, page = 1, limit = 50, source, format, detail, dosage, forme, voie } = req.query;
 
   if (!q) {
     return res.status(400).json({ error: 'Paramètre de recherche "q" requis' });
   }
 
-  const { results, total, search: searchMeta } = executeHybridSearchPage(q, source, page, limit);
+  const criteria = {
+    dosage: pickCriterion(dosage),
+    forme: pickCriterion(forme),
+    voie: pickCriterion(voie)
+  };
+
+  const { results, total, search: searchMeta } = executeHybridSearchPage(
+    q,
+    source,
+    page,
+    limit,
+    criteria
+  );
   const shaped = shapeSearchResults(results, { detail: normalizeDetail(detail) });
   const response = buildPagedResponse({
     total,
@@ -26,6 +44,13 @@ router.get('/search', (req, res) => {
     materializePage: () => shaped
   });
   response.search = searchMeta;
+
+  const activeCriteria = Object.fromEntries(
+    Object.entries(criteria).filter(([, value]) => value != null)
+  );
+  if (Object.keys(activeCriteria).length > 0) {
+    response.search.criteria = activeCriteria;
+  }
 
   if (normalizeFormat(format) === 'markdown') {
     const markdown = renderSearchMarkdown(response.data, response.pagination, searchMeta);

@@ -43,6 +43,29 @@ describe('searchRanking', () => {
         computeMatchPriority('AUTRE NOM', '60234100', { idValue: '60234100' })
       ).toBe(2);
     });
+
+    it('exact sur code CIP13 même si le libellé ne matche pas', () => {
+      expect(
+        computeMatchPriority(
+          'plaquette thermoformée',
+          '3400935955838',
+          { idValue: '60234100', codeValues: ['3400935955838', '3595583'] }
+        )
+      ).toBe(2);
+    });
+
+    it('ne classe pas les codes en prefix', () => {
+      expect(
+        computeMatchPriority(
+          'plaquette thermoformée',
+          '340093',
+          { idValue: '60234100', codeValues: ['3400935955838', '3595583'] }
+        )
+      ).toBe(0);
+      expect(
+        computeMatchPriority('AUTRE NOM', '6023', { idValue: '60234100' })
+      ).toBe(0);
+    });
   });
 
   describe('isStrongMatchQuality', () => {

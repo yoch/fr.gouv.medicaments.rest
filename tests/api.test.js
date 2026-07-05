@@ -212,6 +212,60 @@ describeSlow('API Medicaments', () => {
             const firstFour = all.body.data.map((item) => item.cis);
             expect([...page1.body.data, ...page2.body.data].map((item) => item.cis)).toEqual(firstFour);
         });
+
+        describe('critères structurés dosage/forme/voie (scoring non destructif)', () => {
+            it('dosage+forme remonte le bon variant en tête et expose criteria_match', async () => {
+                const res = await request(app).get(
+                    '/api/medicaments/search?q=doliprane&limit=5&detail=summary&dosage=1%20gramme&forme=comprim%C3%A9'
+                );
+                expect(res.statusCode).toBe(200);
+                const top = res.body.data[0];
+                expect(top.denomination).toMatch(/1000 mg/i);
+                expect(top.denomination).toMatch(/comprim/i);
+                expect(top.criteria_match).toEqual({ dosage: true, forme: true, voie: false });
+                expect(res.body.search.criteria).toEqual({ dosage: '1 gramme', forme: 'comprimé' });
+            });
+
+            it('ne filtre pas : le total est identique avec ou sans critères', async () => {
+                const base = await request(app).get(
+                    '/api/medicaments/search?q=doliprane&limit=5&detail=summary'
+                );
+                const withCriteria = await request(app).get(
+                    '/api/medicaments/search?q=doliprane&limit=5&detail=summary&dosage=1%20gramme&forme=comprim%C3%A9'
+                );
+                expect(withCriteria.body.pagination.total).toBe(base.body.pagination.total);
+            });
+
+            it("préserve l'ordre initial si aucun critère ne matche", async () => {
+                const base = await request(app).get(
+                    '/api/medicaments/search?q=doliprane&limit=5&detail=summary'
+                );
+                const withCriteria = await request(app).get(
+                    '/api/medicaments/search?q=doliprane&limit=5&detail=summary&dosage=123%20mg&forme=xyzforme'
+                );
+                expect(withCriteria.statusCode).toBe(200);
+                expect(withCriteria.body.data.map((item) => item.cis))
+                    .toEqual(base.body.data.map((item) => item.cis));
+            });
+
+            it('ne remonte pas un match plus faible : les exact restent en tête (forme=suppositoire)', async () => {
+                const res = await request(app).get(
+                    '/api/medicaments/search?q=paracetamol&limit=6&detail=summary&forme=suppositoire'
+                );
+                expect(res.statusCode).toBe(200);
+                expect(res.body.data[0].match_quality).toBe('exact');
+                const forme = res.body.data[0].forme_pharma || '';
+                expect(forme.toLowerCase()).toContain('suppositoire');
+            });
+
+            it('format=markdown affiche la ligne Critères', async () => {
+                const res = await request(app).get(
+                    '/api/medicaments/search?q=doliprane&limit=3&format=markdown&dosage=1%20g&forme=comprim%C3%A9'
+                );
+                expect(res.statusCode).toBe(200);
+                expect(res.text).toMatch(/- Critères: .*✓/);
+            });
+        });
     });
 
     describe('GET /api/medicaments/presentations', () => {

@@ -30,3 +30,5 @@ MiniSearch canonique.
 - `stress-test-prod.js` — charge contre une instance locale/prod.
 - `analyze_boosting.js`, `analyze_search_llm.js`, `benchmark_boosting.js`,
   `benchmark_search_after.js` — diagnostics ad hoc ranking/boosting.
+- `study_dosage_forme.js` — étude empirique des paramètres structurés `dosage` /
+  `forme` pour `/search` (génère `docs/ETUDE_DOSAGE_FORME.md`).

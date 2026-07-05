@@ -21,7 +21,7 @@ Exports publics stables :
 - `createApp()` : construit l'application Express complète.
 - `bdpm` : façade médicaments humains (`loadData`, `search`, `listCorpusPage`, détails et exports).
 - `vet` : façade ANMV (`loadVetData`, `searchVet`, listes, détails et exports).
-- `executeHybridSearch(q, source)` : recherche globale BDPM/ANMV.
+- `executeHybridSearch(q, source, criteria)` : recherche globale BDPM/ANMV. `criteria` (`{ dosage, forme, voie }`) réordonne les résultats sans filtrer.
 - `swaggerSpecs` : spécification OpenAPI générée.
 
 ## Endpoints
@@ -94,9 +94,14 @@ Recherche globale multi-critères (spécialités, présentations, compositions a
     - `mixed` : fusion des deux référentiels.
   - `format` (optionnel): `json` (défaut) ou `markdown`. En `markdown`, le corps est du texte `text/markdown` (pas de JSON) ; la pagination n’apparaît que dans l’en-tête du document.
   - `detail` (optionnel): `full` (défaut) ou `summary`. Voir ci-dessous.
+  - `dosage`, `forme`, `voie` (string, optionnels): **critères de scoring non destructifs**. Ils ne filtrent jamais les résultats et ne participent pas au rappel : ils ne font que **réordonner à l'intérieur d'un même niveau de pertinence** (`match_quality`). Un résultat sans rapport ne peut donc jamais remonter au-dessus d'un match plus fort.
+    - `dosage` : ex. `1 g`, `500 mg`, `40 mg/ml`. Comparé au dosage porté par la **dénomination** de la spécialité (les unités équivalentes sont normalisées, `1 gramme` ↔ `1000 mg`). Le critère de scoring ne s'appuie que sur la dénomination — `compositions.dosage` reste indexé et interrogeable via `q` / `GET /medicaments/compositions`, mais n'entre pas dans ce boost.
+    - `forme` : ex. `comprimé`, `solution injectable`. Comparé à `forme_pharma`.
+    - `voie` : ex. `orale`, `cutanée`. Comparé à `voies_admin`.
+    - Chaque fiche renvoie alors `criteria_match` (`{ dosage, forme, voie }` en booléens) pour tracer les critères satisfaits.
 - **Réponse BDPM** (`detail=full`): Objets `medicament` agrégés par `cis`, avec `presentations` et `compositions` (jusqu’à `SEARCH_HYDRATE_RELATED_LIMIT` entrées par tableau, défaut 50).
 - **Réponse ANMV**: Objets `medicament_veterinaire` agrégés par `num`, avec `presentations` et `compositions`.
-- **Métadonnées** (`search` à la racine, JSON uniquement) : `query`. Si `source` est fourni ou si le fallback ANMV est utilisé : `source` et `referentiels` (`queried`, `with_results`).
+- **Métadonnées** (`search` à la racine, JSON uniquement) : `query`. Si `source` est fourni ou si le fallback ANMV est utilisé : `source` et `referentiels` (`queried`, `with_results`). Si des critères structurés sont passés : `criteria` (echo des `dosage`/`forme`/`voie` actifs).
 
 ##### `detail=summary` (réponse allégée)
 Remplace `compositions[]` par `substances[]` (dénomination, dosage, nature). Chaque présentation ne conserve que `libelle`, `cip13`, `taux_remboursement`, `etat_commercialisation`, `prix_public` (champs non vides). Maximum **3** présentations par fiche + `presentations_count` si troncature. Champs spécialité retirés : `statut_amm`, `type_amm`, `date_amm`, `statut_bdm`, `num_autorisation_euro`.

@@ -11,6 +11,7 @@ const medicamentRoutes = require('../src/routes/medicaments');
 const veterinaireRoutes = require('../src/routes/veterinaires');
 const { loadData } = require('../src/services/dataLoader');
 const { loadVetData } = require('../src/services/vetDataLoader');
+const { DOLIPRANE_CIP13, DOLIPRANE_CIS } = require('./fixtures/cis-cip-samples');
 const { describeSlow } = require('./helpers/slowTests');
 
 const app = express();
@@ -123,6 +124,15 @@ describeSlow('API Vétérinaires ANMV', () => {
       expect(res.body.search.referentiels.queried).toEqual(expect.arrayContaining(['bdpm', 'anmv']));
     });
 
+    it('source=auto conserve un match BDPM fuzzy si ANMV est vide', async () => {
+      const res = await request(app).get('/api/medicaments/search?q=dolipranr&source=auto&limit=5');
+      expect(res.statusCode).toBe(200);
+      expect(res.body.data.length).toBeGreaterThan(0);
+      expect(res.body.data[0].type).toBe('medicament');
+      expect(res.body.data[0].match_quality).toBe('fuzzy');
+      expect(res.body.search.referentiels.with_results).toEqual(['bdpm']);
+    });
+
     it('SULTRIAN 100 ne matche pas les spécialités BDPM (régression OR + 100)', async () => {
       const res = await request(app).get('/api/medicaments/specialites?q=SULTRIAN%20100&limit=5');
       expect(res.statusCode).toBe(200);
@@ -135,6 +145,17 @@ describeSlow('API Vétérinaires ANMV', () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.search).toEqual({ query: 'paracetamol' });
       expect(res.body.data[0].type).toBe('medicament');
+    });
+
+    it('source=auto retrouve une spécialité par CIP13 (match exact, pas fuzzy perdu)', async () => {
+      const res = await request(app).get(
+        `/api/medicaments/search?q=${DOLIPRANE_CIP13}&source=auto&limit=1`
+      );
+      expect(res.statusCode).toBe(200);
+      expect(res.body.pagination.total).toBe(1);
+      expect(res.body.data[0].cis).toBe(DOLIPRANE_CIS);
+      expect(res.body.data[0].match_quality).toBe('exact');
+      expect(res.body.data[0].match_via).toBe('presentation');
     });
   });
 });

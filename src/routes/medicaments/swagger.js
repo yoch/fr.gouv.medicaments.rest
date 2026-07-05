@@ -493,6 +493,21 @@
  *           enum: [full, summary]
  *           default: full
  *         description: "full = réponse actuelle ; summary = champs réduits, substances dédupliquées, max 3 présentations"
+ *       - in: query
+ *         name: dosage
+ *         schema:
+ *           type: string
+ *         description: "Critère de scoring optionnel (non filtrant). Ex. '1 g', '500 mg'. Comparé au dosage présent dans la dénomination ; réordonne à l'intérieur d'un même niveau de pertinence sans écarter de résultats."
+ *       - in: query
+ *         name: forme
+ *         schema:
+ *           type: string
+ *         description: "Critère de scoring optionnel (non filtrant). Ex. 'comprimé', 'solution injectable'. Comparé à forme_pharma."
+ *       - in: query
+ *         name: voie
+ *         schema:
+ *           type: string
+ *         description: "Critère de scoring optionnel (non filtrant). Ex. 'orale', 'cutanée'. Comparé à voies_admin."
  *     responses:
  *       200:
  *         description: Résultats de recherche (médicaments humains et/ou vétérinaires agrégés avec présentations et compositions)

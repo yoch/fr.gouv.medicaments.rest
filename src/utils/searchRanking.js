@@ -30,14 +30,14 @@ function termMatchesAsWord(haystack, term) {
 /**
  * Classement match_quality : couverture des termes de la requête dans le libellé
  * (plus fiable que l'égalité de la chaîne entière seule).
- * - exact : libellé égal à la requête, identifiant (CIS/num) égal, ou tous les termes en mots entiers
+ * - exact : libellé égal à la requête, code égal (CIS/num/CIP), ou tous les termes en mots entiers
  * - prefix : commence par la requête ou par le 1er terme avec tous les termes présents
  * - fuzzy : match MiniSearch (typo / terme partiel) sans couverture complète
  *
  * Idée non implémentée : rejeter ou restreindre les requêtes trop "code", par ex. seulement
  * numériques ou alphanumériques très courts.
  */
-function computeMatchPriority(primaryValue, query, { idValue = '' } = {}) {
+function computeMatchPriority(primaryValue, query, { idValue = '', codeValues = [] } = {}) {
   const normalizedQuery = normalizeSearchText(query);
   const terms = queryTerms(query);
   if (!terms.length) return 0;
@@ -46,7 +46,10 @@ function computeMatchPriority(primaryValue, query, { idValue = '' } = {}) {
   const normalizedId = normalizeSearchText(idValue);
 
   if (value === normalizedQuery || normalizedId === normalizedQuery) return 2;
-  if (value.startsWith(normalizedQuery) || normalizedId.startsWith(normalizedQuery)) return 1;
+  for (const codeValue of codeValues) {
+    if (normalizeSearchText(codeValue) === normalizedQuery) return 2;
+  }
+  if (value.startsWith(normalizedQuery)) return 1;
 
   const haystack = value || normalizedId;
   if (!haystack) return 0;

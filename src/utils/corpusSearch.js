@@ -7,7 +7,17 @@ const { computeMatchPriority, matchQualityFromPriority } = require('./searchRank
  * @param {object[]} corpus
  * @param {Function} [mapRow] - (instance, rowIndex, match_quality) => réponse API
  */
-function rankSearchResults(corpus, searchResults, query, { primaryField, idField = null }) {
+function collectCodeValues(row, codeFields) {
+  if (!codeFields || codeFields.length === 0) return [];
+  const values = [];
+  for (const field of codeFields) {
+    const value = row[field];
+    if (value != null && value !== '') values.push(value);
+  }
+  return values;
+}
+
+function rankSearchResults(corpus, searchResults, query, { primaryField, idField = null, codeFields = null }) {
   const ranked = new Array(searchResults.length);
   for (let i = 0; i < searchResults.length; i++) {
     const res = searchResults[i];
@@ -15,7 +25,10 @@ function rankSearchResults(corpus, searchResults, query, { primaryField, idField
     const primaryValue = row[primaryField] != null && row[primaryField] !== '' ? row[primaryField] : '';
     const idValue =
       idField && row[idField] != null && row[idField] !== '' ? row[idField] : '';
-    const priority = computeMatchPriority(primaryValue, query, { idValue });
+    const priority = computeMatchPriority(primaryValue, query, {
+      idValue,
+      codeValues: collectCodeValues(row, codeFields)
+    });
 
     ranked[i] = {
       rowIndex: res.id,
@@ -56,10 +69,10 @@ function rankAndMaterializeSearch(
   corpus,
   searchResults,
   query,
-  { primaryField, idField = null },
+  { primaryField, idField = null, codeFields = null },
   mapRow = null
 ) {
-  const ranked = rankSearchResults(corpus, searchResults, query, { primaryField, idField });
+  const ranked = rankSearchResults(corpus, searchResults, query, { primaryField, idField, codeFields });
   return materializeRankedSearchRange(corpus, ranked, 0, ranked.length, mapRow);
 }
 

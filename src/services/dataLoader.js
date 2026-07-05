@@ -208,7 +208,8 @@ function search(type, query) {
   const results = searchIndexes[type].search(query);
   return rankAndMaterializeSearch(rows, results, query, {
     primaryField: spec.primaryField,
-    idField: spec.idField
+    idField: spec.idField,
+    codeFields: spec.codeFields
   });
 }
 
@@ -220,7 +221,8 @@ function rankedSearch(type, query) {
   const spec = BDPM_INDEX_SPECS[type];
   return rankSearchResults(rows, searchIndexes[type].search(query), query, {
     primaryField: spec.primaryField,
-    idField: spec.idField
+    idField: spec.idField,
+    codeFields: spec.codeFields
   });
 }
 

@@ -38,6 +38,16 @@ function formatMatchLine(hit) {
   return `- Match: ${quality} (sur ${viaLabel})`;
 }
 
+function formatCriteriaLine(hit) {
+  const match = hit.criteria_match;
+  if (!match) return null;
+  const satisfied = Object.entries(match)
+    .filter(([, ok]) => ok)
+    .map(([key]) => key);
+  if (satisfied.length === 0) return null;
+  return `- Critères: ${satisfied.join(', ')} ✓`;
+}
+
 function formatHumanPresentationLine(p) {
   const parts = [p.libelle];
   if (p.cip13) parts.push(`CIP13 ${p.cip13}`);
@@ -77,6 +87,9 @@ function renderHumanHit(hit, index) {
     formatMatchLine(hit)
   ];
 
+  const criteriaLine = formatCriteriaLine(hit);
+  if (criteriaLine) lines.push(criteriaLine);
+
   const formeParts = [];
   if (hit.forme_pharma) formeParts.push(hit.forme_pharma);
   if (hit.voies_admin) formeParts.push(`voie ${hit.voies_admin}`);
@@ -109,6 +122,9 @@ function renderVetHit(hit, index) {
     `## ${index}. ${hit.nom} — NUM ${hit.num}`,
     formatMatchLine(hit)
   ];
+
+  const criteriaLine = formatCriteriaLine(hit);
+  if (criteriaLine) lines.push(criteriaLine);
 
   const metaParts = [];
   if (hit.forme_pharmaceutique) metaParts.push(hit.forme_pharmaceutique);

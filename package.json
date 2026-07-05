@@ -1,6 +1,6 @@
 {
   "name": "fr.gouv.medicaments.rest",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "API REST pour la base de données publique des médicaments du gouvernement français",
   "main": "src/index.js",
   "engines": {

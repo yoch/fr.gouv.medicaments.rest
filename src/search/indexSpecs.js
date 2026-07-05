@@ -33,7 +33,8 @@ const BDPM_INDEX_SPECS = {
       return presentationIndexBoost();
     },
     primaryField: 'libelle',
-    idField: 'cis'
+    idField: 'cis',
+    codeFields: ['cis', 'cip7', 'cip13']
   },
   compositions: {
     file: 'CIS_COMPO_bdpm.txt',
