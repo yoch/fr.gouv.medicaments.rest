@@ -37,6 +37,8 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 - `GET /api/medicaments/groupes-generiques` - Groupes génériques
 - `GET /api/medicaments/conditions` - Conditions de prescription
 - `GET /api/medicaments/disponibilite` - Ruptures de stock
+- `GET /api/medicaments/disponibilite/alerts` - Alertes MVP BDPM (liste tool-ready)
+- `GET /api/medicaments/disponibilite/alerts/:alertId` - Détail alerte MVP
 - `GET /api/medicaments/interet-therapeutique-majeur` - MITM
 - `GET /api/medicaments/substances` - Substances actives
 - `GET /api/medicaments/search?q=aspirine` - Recherche globale (BDPM, avec fallback ANMV en `source=auto`)

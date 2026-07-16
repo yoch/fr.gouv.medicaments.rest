@@ -89,6 +89,7 @@ public/*
 
 # Temporary folders
 tmp/
+tmp-audit/
 temp/
 
 # Editor directories and files

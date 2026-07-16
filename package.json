@@ -17,6 +17,8 @@
     "analyze:interning": "node scripts/benchmark/analyze-interning-candidates.js",
     "measure:bdpm-resident": "node --expose-gc scripts/memory/measure-interning-resident.js",
     "stress:prod": "node scripts/benchmark/stress-test-prod.js",
+    "audit:ansm-dispo": "node scripts/audit/compare-ansm-export-vs-bdpm-dispo.js",
+    "audit:ema-monitoring": "node scripts/audit/compare-ema-additional-monitoring-vs-bdpm.js",
     "test": "jest",
     "test:serial": "jest --runInBand",
     "test:integration": "RUN_SLOW_TESTS=1 jest --runInBand tests/api.test.js tests/coherence.test.js tests/veterinaires.test.js",
@@ -34,7 +36,8 @@
     "fs-extra": "^11.3.6",
     "helmet": "^8.2.0",
     "swagger-jsdoc": "^6.3.0",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "fast-xml-parser": "^5.9.3",

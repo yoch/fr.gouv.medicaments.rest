@@ -80,6 +80,7 @@ module.exports = {
   rowCount,
   materializeRange,
   materializeIndices,
+  appendToKeyList,
   buildKeyIndex,
   buildIndexDocument
 };

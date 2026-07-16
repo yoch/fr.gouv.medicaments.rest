@@ -128,15 +128,40 @@ const options = {
                 },
                 Disponibilite: {
                     type: 'object',
+                    description:
+                        'Entrée du fichier BDPM CIS_CIP_Dispo_Spec.txt. Champs absents omis s\'ils sont vides. Dates au format JJ/MM/AAAA.',
                     properties: {
-                        cis: { type: 'string' },
-                        cip13: { type: 'string' },
-                        code_statut: { type: 'string' },
+                        cis: { type: 'string', description: 'Code Identifiant de Spécialité' },
+                        cip13: {
+                            type: 'string',
+                            description:
+                                'Présentation concernée ; absent si toutes les présentations de la spécialité sont concernées'
+                        },
+                        code_statut: {
+                            type: 'string',
+                            enum: ['1', '2', '3', '4'],
+                            description:
+                                '1 Rupture, 2 Tension, 3 Arrêt de commercialisation, 4 Remise à disposition'
+                        },
                         libelle_statut: { type: 'string' },
-                        date_debut: { type: 'string' },
-                        date_mise_a_jour: { type: 'string' },
-                        date_remise_dispo: { type: 'string' },
-                        lien_ansm: { type: 'string' }
+                        date_debut: {
+                            type: 'string',
+                            description:
+                                'JJ/MM/AAAA. Pour fiches antérieures au 06/10/2023, la doc BDPM indique que ce n\'est pas forcément le vrai début.'
+                        },
+                        date_mise_a_jour: {
+                            type: 'string',
+                            description: 'JJ/MM/AAAA — date de mise à jour de la fiche ANSM'
+                        },
+                        date_remise_dispo: {
+                            type: 'string',
+                            description: 'JJ/MM/AAAA — surtout renseigné pour le code statut 4'
+                        },
+                        lien_ansm: {
+                            type: 'string',
+                            format: 'uri',
+                            description: 'URL de la fiche ANSM (clé de jointure avec l\'export Excel)'
+                        }
                     }
                 },
                 MITM: {

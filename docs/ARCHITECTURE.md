@@ -51,7 +51,8 @@ src/routes/
   medicaments/
     index.js            # montage router (agrégation)
     listHandlers.js     # /specialites, /presentations, /compositions
-    listHandlersMisc.js # /groupes-generiques, /conditions, /disponibilite, /substances
+    listHandlersMisc.js # /groupes-generiques, /conditions, /substances
+    disponibiliteHandlers.js # /disponibilite, /disponibilite/alerts
     detailHandlers.js   # /specialites/:cis
     avisHandlers.js     # /avis-smr, /avis-asmr, /interet-therapeutique-majeur (410 si HAS désactivée)
     searchHandler.js    # /search

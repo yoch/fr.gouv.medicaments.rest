@@ -8,6 +8,7 @@ require('./swagger');
 const router = express.Router();
 
 router.use(require('./listHandlers'));
+router.use(require('./disponibiliteHandlers'));
 router.use(require('./listHandlersMisc'));
 router.use(require('./avisHandlers'));
 router.use(require('./detailHandlers'));

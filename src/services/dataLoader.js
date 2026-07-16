@@ -31,10 +31,13 @@ const {
   materializeRange,
   materializeIndices,
   buildKeyIndex,
-  buildIndexDocument
+  buildIndexDocument,
+  appendToKeyList
 } = require('../utils/corpusStore');
 const { FROM_CSV, bdpmExtraitUrl, Substance } = require('../models/bdpm');
 const { BDPM_INDEX_SPECS } = require('../search/indexSpecs');
+const { normalizeAnsmUrl } = require('../utils/ansmUrl');
+const { buildDisponibiliteAlertId } = require('../utils/disponibiliteQuery');
 const config = require('../config');
 const state = require('./bdpm/state');
 const { exportBdpmSearchIndexes, exportBdpmCorpusDocuments } = require('./bdpm/exportApi');
@@ -107,6 +110,15 @@ async function indexInMemoryCorpus(type, fields, boost = null) {
 }
 
 function buildCisIndexes() {
+  const rupturesByLienAnsm = new Map();
+  const rupturesByAlertId = new Map();
+  const rupturesRows = corpus.ruptures;
+  for (let i = 0; i < rupturesRows.length; i++) {
+    const normalized = normalizeAnsmUrl(rupturesRows[i].lien_ansm);
+    if (normalized) appendToKeyList(rupturesByLienAnsm, normalized, i);
+    rupturesByAlertId.set(buildDisponibiliteAlertId(rupturesRows[i]), i);
+  }
+
   state.cisIndexes = {
     specialitesByCis: buildKeyIndex(corpus.specialites, 'cis', { unique: true }),
     presentationsByCis: buildKeyIndex(corpus.presentations, 'cis'),
@@ -115,7 +127,10 @@ function buildCisIndexes() {
     avisAsmrByCis: buildKeyIndex(corpus.avis_asmr, 'cis'),
     conditionsByCis: buildKeyIndex(corpus.conditions, 'cis'),
     generiquesByCis: buildKeyIndex(corpus.generiques, 'cis'),
-    generiquesByGroupe: buildKeyIndex(corpus.generiques, 'id_groupe')
+    generiquesByGroupe: buildKeyIndex(corpus.generiques, 'id_groupe'),
+    rupturesByCis: buildKeyIndex(corpus.ruptures, 'cis'),
+    rupturesByLienAnsm,
+    rupturesByAlertId
   };
 }
 

@@ -317,4 +317,51 @@ describeSlow('API Medicaments', () => {
         }
     });
 
+    describe('GET /api/medicaments/disponibilite/alerts', () => {
+        it('returns MVP-shaped alerts and detail by id', async () => {
+            const list = await request(app).get('/api/medicaments/disponibilite/alerts?limit=5');
+            expect(list.statusCode).toEqual(200);
+            expect(list.body).toHaveProperty('generated_at');
+            expect(list.body).toHaveProperty('alerts');
+            expect(Array.isArray(list.body.alerts)).toBe(true);
+            if (list.body.alerts.length === 0) return;
+
+            const alert = list.body.alerts[0];
+            expect(alert).toHaveProperty('id');
+            expect(alert).toHaveProperty('status');
+            expect(alert).toHaveProperty('cis');
+            expect(alert).not.toHaveProperty('medical_domain');
+
+            const detail = await request(app).get(
+                `/api/medicaments/disponibilite/alerts/${encodeURIComponent(alert.id)}`
+            );
+            expect(detail.statusCode).toEqual(200);
+            expect(detail.body.alert_id).toBe(alert.id);
+            expect(detail.body.source).toBe('bdpm');
+            expect(detail.body).toHaveProperty('ruptures');
+            expect(Array.isArray(detail.body.ruptures)).toBe(true);
+
+            if (alert.lien_ansm || alert.detail_url) {
+                const byLien = await request(app).get(
+                    `/api/medicaments/disponibilite?lien_ansm=${encodeURIComponent(alert.detail_url)}&limit=5`
+                );
+                expect(byLien.statusCode).toEqual(200);
+                expect(byLien.body.data.length).toBeGreaterThan(0);
+            }
+
+            const specialite = await request(app).get(`/api/medicaments/specialites/${alert.cis}`);
+            if (specialite.statusCode === 200) {
+                expect(specialite.body).toHaveProperty('ruptures');
+                expect(Array.isArray(specialite.body.ruptures)).toBe(true);
+            }
+        });
+
+        it('returns 404 for unknown alert id', async () => {
+            const res = await request(app).get(
+                '/api/medicaments/disponibilite/alerts/000000000000'
+            );
+            expect(res.statusCode).toEqual(404);
+        });
+    });
+
 });

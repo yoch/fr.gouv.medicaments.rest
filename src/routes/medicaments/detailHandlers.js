@@ -26,6 +26,7 @@ router.get('/specialites/:cis', (req, res) => {
     presentations: getRelatedByCis('presentations', cis, detailLimit),
     compositions: getRelatedByCis('compositions', cis, detailLimit),
     conditions: getRelatedByCis('conditions', cis, detailLimit),
+    ruptures: getRelatedByCis('ruptures', cis, detailLimit),
     generiques: getGeneriquesForCis(cis)
   };
 

@@ -50,7 +50,8 @@ const state = {
     compositions: 'compositionsByCis',
     avis_smr: 'avisSmrByCis',
     avis_asmr: 'avisAsmrByCis',
-    conditions: 'conditionsByCis'
+    conditions: 'conditionsByCis',
+    ruptures: 'rupturesByCis'
   },
 
   /**

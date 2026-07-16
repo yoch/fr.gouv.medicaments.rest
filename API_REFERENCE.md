@@ -66,7 +66,9 @@ Informations de sécurité importantes (alertes, messages ANSM).
 - `GET /medicaments/avis-asmr`: Avis d'Amélioration du SMR (idem).
 - `GET /medicaments/groupes-generiques`: Groupes génériques.
 - `GET /medicaments/conditions`: Conditions de prescription/délivrance.
-- `GET /medicaments/disponibilite`: Ruptures de stock et disponibilités.
+- `GET /medicaments/disponibilite`: Ruptures de stock et disponibilités (source BDPM). Filtres exacts optionnels : `cis`, `cip13`, `code_statut` (`1`–`4`), `date_mise_a_jour_min`, `lien_ansm` (URL fiche ANSM normalisée). Voir `docs/MVP_BDPM_DISPONIBILITE.md`.
+- `GET /medicaments/disponibilite/alerts`: Forme tool MVP (`get_bdpm_disponibilite_alerts`) — tri par date de mise à jour desc ; champs `id`, `medicine_name`, `status`, `updated_at`, `expected_return`, `detail_url`, `cis`, `cip13`, `code_statut`. Pas de `medical_domain`.
+- `GET /medicaments/disponibilite/alerts/:alertId`: Détail tool MVP (`get_bdpm_disponibilite_details`) — spécialité + `ruptures` du CIS + `detail_url`.
 - `GET /medicaments/interet-therapeutique-majeur`: Liste des MITM.
 
 #### Paramètres Communs aux "Autres Endpoints"
@@ -79,7 +81,7 @@ Tous ces endpoints acceptent les paramètres standards :
 - **Medicament**: inclut `url_bdpm` — lien vers `https://base-donnees-publique.medicaments.gouv.fr/medicament/{cis}/extrait` (RCP, notice, fiche info).
 - **AvisSMR**: `valeur_smr`, `libelle_smr`, `motif_evaluation`, `date_avis`.
 - **AvisASMR**: `valeur_asmr`, `libelle_asmr`, `motif_evaluation`, `date_avis`.
-- **Disponibilite**: `libelle_statut` (ex: Rupture de stock), `date_debut`, `date_remise_dispo`, `lien_ansm`.
+- **Disponibilite**: `cis`, `cip13` (souvent absent), `code_statut` (`1`–`4`), `libelle_statut`, dates `JJ/MM/AAAA` (`date_debut`, `date_mise_a_jour`, `date_remise_dispo`), `lien_ansm`.
 - **MITM**: `code_atc`, `denomination`, `lien_fi` (Lien Fiche Info).
 
 #### `GET /medicaments/search`
@@ -114,7 +116,7 @@ En `format=markdown`, les substances sont listées séparées par des virgules ;
 ```
 GET /api/medicaments/search?q={query}&limit=10&format=markdown&detail=summary&source=auto
 ```
-Pour prescription, ruptures ou génériques : noter le `cis` / `num` et appeler `GET /medicaments/specialites/:cis` ou `GET /veterinaires/medicaments/:num`. Pour les avis HAS : `GET /medicaments/avis-smr` / `avis-asmr` (si chargés), ou la fiche spécialité lorsque `LOAD_HAS_AVIS=true`.
+Pour prescription, ruptures ou génériques : noter le `cis` / `num` et appeler `GET /medicaments/specialites/:cis` (inclut `ruptures` si présentes) ou `GET /veterinaires/medicaments/:num`. Pour la liste d’alertes de disponibilité MVP : `GET /medicaments/disponibilite/alerts`. Pour les avis HAS : `GET /medicaments/avis-smr` / `avis-asmr` (si chargés), ou la fiche spécialité lorsque `LOAD_HAS_AVIS=true`.
 
 #### `LOAD_HAS_AVIS` (variable d'environnement)
 
