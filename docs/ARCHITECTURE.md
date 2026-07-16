@@ -60,7 +60,7 @@ src/routes/
   veterinaires.js
 ```
 
-Helpers partagés : `utils/routeHelpers.js` (`createPaginate`, `createListHandler`).
+Helpers partagés : `utils/routeHelpers.js` (`createListHandler`).
 
 ## Endpoints et sources désactivés (réserve stratégique)
 

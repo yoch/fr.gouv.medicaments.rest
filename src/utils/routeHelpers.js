@@ -41,4 +41,4 @@ function createListHandler({ getMetadata, search, searchPage, listCorpusPage }) 
   };
 }
 
-module.exports = { createPaginate, createListHandler };
+module.exports = { createListHandler };

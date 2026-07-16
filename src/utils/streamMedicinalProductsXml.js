@@ -141,7 +141,6 @@ async function streamMedicinalProducts(productsPath, onProduct, options = {}) {
 }
 
 module.exports = {
-  DEFAULT_STRIP_TAGS,
   stripIgnoredProductTags,
   streamMedicinalProducts
 };
