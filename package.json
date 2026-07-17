@@ -18,6 +18,7 @@
     "measure:bdpm-resident": "node --expose-gc scripts/memory/measure-interning-resident.js",
     "stress:prod": "node scripts/benchmark/stress-test-prod.js",
     "audit:ansm-dispo": "node scripts/audit/compare-ansm-export-vs-bdpm-dispo.js",
+    "audit:ansm-fiches": "node scripts/audit/probe-ansm-fiche-bot.js",
     "audit:ema-monitoring": "node scripts/audit/compare-ema-additional-monitoring-vs-bdpm.js",
     "test": "jest",
     "test:serial": "jest --runInBand",
