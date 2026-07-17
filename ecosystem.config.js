@@ -2,11 +2,9 @@ module.exports = {
   apps: [
     {
       name: 'medicaments-api',
-      // Bun en binaire direct : évite ProcessContainerForkBun.js qui
-      // casse `require.main === module` et empêche startServer().
-      script: `${process.env.HOME}/.bun/bin/bun`,
-      args: '--env-file=.env src/server.js',
-      interpreter: 'none',
+      script: 'src/server.js',
+      interpreter: 'bun',
+      interpreter_args: '--env-file=.env',
       time: true,
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       env: {
