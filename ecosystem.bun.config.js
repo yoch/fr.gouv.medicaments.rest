@@ -1,8 +1,12 @@
 /**
- * Config PM2 par défaut — Node.
+ * Variante PM2 + Bun (expérimentale).
  *
- * Variante Bun (expérimentale, pas de gain mesuré en prod) :
- *   ecosystem.bun.config.js
+ * Défaut prod = ecosystem.config.js (Node). Bun n’a pas montré de gain
+ * mesurable ; à n’utiliser que pour retester.
+ *
+ * Important : ne pas utiliser `interpreter: 'bun'` + `script: src/server.js`
+ * (ProcessContainerForkBun casse `require.main` → startServer ne part pas).
+ * Ici Bun est le binaire lancé directement (`interpreter: 'none'`).
  *
  * Basculer Node → Bun :
  *   pm2 delete medicaments-api
@@ -16,17 +20,19 @@
  *   pm2 save
  *   curl -sS http://127.0.0.1:3100/health
  *
- * Prérequis : PORT=3100 dans .env (proxy Apache).
+ * Prérequis : Bun installé (~/.bun/bin/bun), PORT=3100 dans .env.
  */
 module.exports = {
   apps: [
     {
       name: 'medicaments-api',
-      script: 'src/server.js',
+      script: `${process.env.HOME}/.bun/bin/bun`,
+      args: '--env-file=.env src/server.js',
+      interpreter: 'none',
       time: true,
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
-      node_args: '--env-file=.env',
       env: {
+        PATH: `${process.env.HOME}/.bun/bin:${process.env.PATH}`,
         NODE_ENV: 'production',
         RELOAD_STRATEGY: 'restart',
         CORPUS_LIGHT_PROFILE: 'true',
