@@ -7,6 +7,17 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.5.0] - 2026-07-17
+
+### Ajouté
+
+- Routes BDPM disponibilités / alertes (`/disponibilite`, `/disponibilite/alerts`) et audit des fiches HTML ANSM (`npm run audit:ansm-fiches`).
+
+### Modifié
+
+- Dépendances mises à jour (`npm update`, dont knip 6).
+- PM2 reste sur Node (tentative Bun annulée, pas de gain en prod).
+
 ## [1.3.0] - 2026-07-05
 
 ### Ajouté
