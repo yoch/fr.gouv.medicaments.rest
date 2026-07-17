@@ -157,7 +157,7 @@ async function startServer() {
   }
 }
 
-if (require.main === module) {
+if (require.main === module || process.env.pm_id != null) {
   startServer();
 }
 
