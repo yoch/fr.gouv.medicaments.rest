@@ -7,12 +7,6 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
-## [1.5.0] - 2026-07-16
-
-### Modifié
-
-- PM2 lance l'API avec Bun (`interpreter` / `interpreter_args` dans `ecosystem.config.js`).
-
 ## [1.3.0] - 2026-07-05
 
 ### Ajouté
