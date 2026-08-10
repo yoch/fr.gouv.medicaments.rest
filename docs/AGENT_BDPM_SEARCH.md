@@ -195,12 +195,15 @@ Source : fichier BDPM `CIS_CIP_Dispo_Spec`, **pas** l’export ANSM. Pas de doma
 | Besoin | Appel |
 |--------|-------|
 | Liste d’alertes récentes | `GET /medicaments/disponibilite/alerts?limit=30` |
+| Par nom / DCI / CIS / CIP13 | `GET /medicaments/disponibilite/alerts?q=amoxicilline` (1 appel ; liste vide = pas d’alerte BDPM) |
 | Filtrer par statut | `code_statut=1` (rupture), `2` (tension), `3` (arrêt), `4` (remise) |
 | Jointure URL fiche ANSM | `lien_ansm=` (URL normalisée) sur `/disponibilite` ou `/disponibilite/alerts` |
 | Détail d’une alerte | `GET /medicaments/disponibilite/alerts/{id}` (id renvoyé par la liste) |
 | Ruptures d’un CIS | champ `ruptures` sur `GET /medicaments/specialites/:cis` |
 
 Dates brutes BDPM : `JJ/MM/AAAA`. Sur `/disponibilite/alerts`, `updated_at` / `expected_return` sont en `YYYY-MM-DD` si parseables.
+
+**Attention** : `GET /disponibilite?q=` cherche dans le **libellé de statut**, pas le nom du médicament. Pour une recherche par nom, utiliser **`/disponibilite/alerts?q=`**. Ne pas mettre `q=rupture` : préférer `code_statut`.
 
 Ne pas inventer de recommandations pharmacien / ville / hôpital : hors corpus. Tu peux citer `detail_url` (lien ANSM) sans scraper.
 

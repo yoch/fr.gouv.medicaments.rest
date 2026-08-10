@@ -362,6 +362,74 @@ describeSlow('API Medicaments', () => {
             );
             expect(res.statusCode).toEqual(404);
         });
+
+        it('filters alerts by q (medicine name / DCI) without changing raw /disponibilite?q= semantics', async () => {
+            const baseline = await request(app).get('/api/medicaments/disponibilite/alerts?limit=1');
+            expect(baseline.statusCode).toEqual(200);
+            if (baseline.body.alerts.length === 0) return;
+
+            const sample = baseline.body.alerts[0];
+            expect(sample.cis).toBeTruthy();
+
+            const byCis = await request(app).get(
+                `/api/medicaments/disponibilite/alerts?cis=${encodeURIComponent(sample.cis)}&limit=50`
+            );
+            expect(byCis.statusCode).toEqual(200);
+            expect(byCis.body.pagination.total).toBeGreaterThan(0);
+            expect(byCis.body.alerts.every((a) => a.cis === sample.cis)).toBe(true);
+
+            const byQCis = await request(app).get(
+                `/api/medicaments/disponibilite/alerts?q=${encodeURIComponent(sample.cis)}&limit=50`
+            );
+            expect(byQCis.statusCode).toEqual(200);
+            expect(byQCis.body.pagination.total).toBe(byCis.body.pagination.total);
+            expect(byQCis.body.alerts.map((a) => a.id).sort()).toEqual(
+                byCis.body.alerts.map((a) => a.id).sort()
+            );
+
+            if (sample.medicine_name) {
+                const token = String(sample.medicine_name).split(/\s+/)[0];
+                const byName = await request(app).get(
+                    `/api/medicaments/disponibilite/alerts?q=${encodeURIComponent(token)}&limit=50`
+                );
+                expect(byName.statusCode).toEqual(200);
+                expect(byName.body.pagination.total).toBeGreaterThan(0);
+                expect(byName.body.alerts.some((a) => a.cis === sample.cis)).toBe(true);
+                expect(byName.body.alerts.every((a) => a.medicine_name != null || a.cis)).toBe(true);
+            }
+
+            const rawStatusQ = await request(app).get(
+                '/api/medicaments/disponibilite?q=amoxicilline&limit=5'
+            );
+            expect(rawStatusQ.statusCode).toEqual(200);
+            // Sur /disponibilite, q cherche le libellé de statut — pas le nom du médicament.
+            expect(rawStatusQ.body.pagination.total).toBe(0);
+        });
+
+        it('intersects q with code_statut and returns empty list for unknown query', async () => {
+            const unknown = await request(app).get(
+                '/api/medicaments/disponibilite/alerts?q=zzznominexistantxyz999&limit=5'
+            );
+            expect(unknown.statusCode).toEqual(200);
+            expect(unknown.body.alerts).toEqual([]);
+            expect(unknown.body.pagination.total).toBe(0);
+
+            const withStatus = await request(app).get(
+                '/api/medicaments/disponibilite/alerts?code_statut=1&limit=5'
+            );
+            expect(withStatus.statusCode).toEqual(200);
+            if (withStatus.body.alerts.length === 0) return;
+
+            const cis = withStatus.body.alerts[0].cis;
+            const intersect = await request(app).get(
+                `/api/medicaments/disponibilite/alerts?q=${encodeURIComponent(cis)}&code_statut=1&limit=50`
+            );
+            expect(intersect.statusCode).toEqual(200);
+            expect(intersect.body.alerts.length).toBeGreaterThan(0);
+            expect(intersect.body.alerts.every((a) => a.cis === cis && a.code_statut === '1')).toBe(
+                true
+            );
+        });
     });
 
 });

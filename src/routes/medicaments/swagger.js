@@ -307,9 +307,20 @@
  *     description: |
  *       Surface tool-ready pour `get_bdpm_disponibilite_alerts`.
  *       Tri par `date_mise_a_jour` décroissante. Pas de `medical_domain`.
- *       Voir docs/MVP_BDPM_DISPONIBILITE.md.
+ *       `q` résout nom/DCI/CIS/CIP13 via les indexes search (comme `/medicaments/search`),
+ *       puis projette les lignes ruptures (`rupturesByCis`). Liste vide = aucune alerte BDPM
+ *       pour la requête (pas de 404). Ne confondre pas avec `/disponibilite?q=` qui cherche
+ *       dans le libellé de statut. Voir docs/MVP_BDPM_DISPONIBILITE.md.
  *     tags: [Médicaments]
  *     parameters:
+ *       - in: query
+ *         name: q
+ *         schema:
+ *           type: string
+ *         description: |
+ *           Recherche par nom commercial, DCI, CIS ou CIP13 (même esprit que `/medicaments/search`).
+ *           Combinable avec les filtres exacts. Borne interne ~100 CIS résolus.
+ *           Pour filtrer par statut, utiliser `code_statut` (pas `q=rupture`).
  *       - in: query
  *         name: limit
  *         schema:

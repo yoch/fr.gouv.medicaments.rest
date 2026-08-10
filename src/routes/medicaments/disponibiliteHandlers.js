@@ -19,10 +19,10 @@ function rejectInvalidLienFilter(filters, res) {
 }
 
 router.get('/disponibilite/alerts', (req, res) => {
-  const { page = 1, limit = 30 } = req.query;
+  const { q, page = 1, limit = 30 } = req.query;
   const filters = parseDisponibiliteFilters(req.query);
   if (rejectInvalidLienFilter(filters, res)) return;
-  res.json(listDisponibiliteAlerts({ filters, page, limit }));
+  res.json(listDisponibiliteAlerts({ q, filters, page, limit }));
 });
 
 router.get('/disponibilite/alerts/:alertId', (req, res) => {

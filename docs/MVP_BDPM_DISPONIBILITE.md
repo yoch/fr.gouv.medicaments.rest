@@ -31,6 +31,14 @@ Grain = **1 ligne BDPM** (CIS ± CIP). Une même `detail_url` ANSM peut regroupe
 
 Filtres exacts (`cis`, `cip13`, `code_statut`, `date_mise_a_jour_min`, `lien_ansm`) : si `lien_ansm` et `cis` sont fournis ensemble, la map URL est utilisée en premier, puis les autres critères filtrent. Un `lien_ansm` non normalisable → **HTTP 400**.
 
+### Recherche texte `q` (liste alerts uniquement)
+
+`GET /disponibilite/alerts?q=<nom|DCI|CIS|CIP13>` résout les CIS comme `/medicaments/search` (indexes specialites / presentations / compositions), puis projette les lignes ruptures via `rupturesByCis`. Combinable avec les filtres exacts (intersection). Au plus ~100 CIS résolus.
+
+- Liste vide (`alerts: []`, `total: 0`) = aucune alerte BDPM pour la requête (médicament inconnu **ou** connu sans ligne de rupture) — **pas** de 404.
+- Ne pas confondre avec `GET /disponibilite?q=` : sur l’endpoint brut, `q` cherche dans `libelle_statut` uniquement.
+- Filtrer par statut : `code_statut=1|2|3|4`, jamais `q=rupture`.
+
 ## Détail
 
 Réponse : `alert_id`, `cis`, `medicine_name`, `specialite`, `ruptures[]`, `detail_url`, `source: "bdpm"`.

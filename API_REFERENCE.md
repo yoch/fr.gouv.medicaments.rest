@@ -66,8 +66,8 @@ Informations de sécurité importantes (alertes, messages ANSM).
 - `GET /medicaments/avis-asmr`: Avis d'Amélioration du SMR (idem).
 - `GET /medicaments/groupes-generiques`: Groupes génériques.
 - `GET /medicaments/conditions`: Conditions de prescription/délivrance.
-- `GET /medicaments/disponibilite`: Ruptures de stock et disponibilités (source BDPM). Filtres exacts optionnels : `cis`, `cip13`, `code_statut` (`1`–`4`), `date_mise_a_jour_min`, `lien_ansm` (URL fiche ANSM normalisée). Voir `docs/MVP_BDPM_DISPONIBILITE.md`.
-- `GET /medicaments/disponibilite/alerts`: Forme tool MVP (`get_bdpm_disponibilite_alerts`) — tri par date de mise à jour desc ; champs `id`, `medicine_name`, `status`, `updated_at`, `expected_return`, `detail_url`, `cis`, `cip13`, `code_statut`. Pas de `medical_domain`.
+- `GET /medicaments/disponibilite`: Ruptures de stock et disponibilités (source BDPM). `q` = recherche sur **libellé de statut**. Filtres exacts optionnels : `cis`, `cip13`, `code_statut` (`1`–`4`), `date_mise_a_jour_min`, `lien_ansm` (URL fiche ANSM normalisée). Voir `docs/MVP_BDPM_DISPONIBILITE.md`.
+- `GET /medicaments/disponibilite/alerts`: Forme tool MVP (`get_bdpm_disponibilite_alerts`) — tri par date de mise à jour desc ; champs `id`, `medicine_name`, `status`, `updated_at`, `expected_return`, `detail_url`, `cis`, `cip13`, `code_statut`. Pas de `medical_domain`. Paramètre `q` optionnel : nom commercial / DCI / CIS / CIP13 (résolution comme `/search`, puis projection ruptures). Liste vide = aucune alerte BDPM pour la requête.
 - `GET /medicaments/disponibilite/alerts/:alertId`: Détail tool MVP (`get_bdpm_disponibilite_details`) — spécialité + `ruptures` du CIS + `detail_url`.
 - `GET /medicaments/interet-therapeutique-majeur`: Liste des MITM.
 

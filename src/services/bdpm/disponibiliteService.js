@@ -15,11 +15,15 @@ const {
   mapRowToDisponibiliteAlert,
   compareDisponibiliteRowsByMajDesc
 } = require('../../utils/disponibiliteQuery');
+const { resolveBdpmCisKeys } = require('../searchOrchestrator');
 const config = require('../../config');
 const state = require('./state');
 
 const { corpus, metadata, searchIndexes } = state;
 const DETAIL_HYDRATE_RELATED_LIMIT = config.detailHydrateRelatedLimit;
+
+/** Borne le nombre de CIS résolus depuis `q` avant projection ruptures. */
+const DISPONIBILITE_ALERTS_Q_CIS_LIMIT = 100;
 
 function allRowIndices(rows) {
   const indices = new Array(rows.length);
@@ -44,6 +48,9 @@ function rankedRupturesSearch(query) {
  *
  * Précédence des maps quand plusieurs filtres : `lien_ansm` avant `cis`
  * (les autres filtres restent appliqués ensuite via rowMatches).
+ *
+ * Note : `q` ici = recherche MiniSearch sur `libelle_statut` (endpoint brut
+ * `/disponibilite`). Pour nom/DCI sur `/alerts`, voir `selectAlertRuptureIndices`.
  */
 function selectRuptureIndices({ q, filters } = {}) {
   const rows = corpus.ruptures;
@@ -68,6 +75,42 @@ function selectRuptureIndices({ q, filters } = {}) {
 
   if (useFilters) {
     indices = indices.filter((rowIndex) => rowMatchesDisponibiliteFilters(rows[rowIndex], filters));
+  }
+  return indices;
+}
+
+/**
+ * Indices ruptures pour `/disponibilite/alerts`.
+ * Si `q` est fourni : résolution CIS (specialites/presentations/compositions)
+ * puis union `rupturesByCis` — sans toucher à la sémantique de `/disponibilite?q=`.
+ */
+function selectAlertRuptureIndices({ q, filters } = {}) {
+  const rows = corpus.ruptures;
+  if (!rows) return [];
+  if (filters?.lienFilterInvalid) return [];
+
+  const query = q != null ? String(q).trim() : '';
+  if (!query) {
+    let indices = selectRuptureIndices({ filters });
+    if (indices === null) indices = allRowIndices(rows);
+    return indices;
+  }
+
+  const cisKeys = resolveBdpmCisKeys(query, { limit: DISPONIBILITE_ALERTS_Q_CIS_LIMIT });
+  const byCis = state.cisIndexes?.rupturesByCis;
+  const seen = new Set();
+  const indices = [];
+  for (const cis of cisKeys) {
+    const rowIndices = byCis?.get(cis) || [];
+    for (const rowIndex of rowIndices) {
+      if (seen.has(rowIndex)) continue;
+      seen.add(rowIndex);
+      indices.push(rowIndex);
+    }
+  }
+
+  if (filters?.hasExactFilters) {
+    return indices.filter((rowIndex) => rowMatchesDisponibiliteFilters(rows[rowIndex], filters));
   }
   return indices;
 }
@@ -134,7 +177,7 @@ function getRupturesForCis(cis) {
   return materializeIndices(rows, slice);
 }
 
-function listDisponibiliteAlerts({ filters, page = 1, limit = 30 } = {}) {
+function listDisponibiliteAlerts({ q, filters, page = 1, limit = 30 } = {}) {
   const rows = corpus.ruptures;
   const pageNum = Math.max(1, Number(page) || 1);
   const limitNum = Math.min(500, Math.max(1, Number(limit) || 30));
@@ -149,8 +192,7 @@ function listDisponibiliteAlerts({ filters, page = 1, limit = 30 } = {}) {
 
   if (!rows || rows.length === 0) return empty;
 
-  let indices = selectRuptureIndices({ filters });
-  if (indices === null) indices = allRowIndices(rows);
+  const indices = selectAlertRuptureIndices({ q, filters });
 
   indices.sort((ia, ib) => compareDisponibiliteRowsByMajDesc(rows[ia], rows[ib]));
 
@@ -195,7 +237,9 @@ function getDisponibiliteAlertById(alertId) {
 
 module.exports = {
   selectRuptureIndices,
+  selectAlertRuptureIndices,
   listDisponibilitePage,
   listDisponibiliteAlerts,
-  getDisponibiliteAlertById
+  getDisponibiliteAlertById,
+  DISPONIBILITE_ALERTS_Q_CIS_LIMIT
 };

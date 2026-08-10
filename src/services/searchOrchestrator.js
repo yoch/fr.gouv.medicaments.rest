@@ -143,6 +143,30 @@ function collectBdpmMatches(q) {
   });
 }
 
+/**
+ * Résout une requête texte (nom / DCI / CIS / CIP13) en clés CIS, sans hydrater
+ * présentations ni compositions. Utilisé par `/disponibilite/alerts?q=`.
+ *
+ * @param {string} q
+ * @param {{ limit?: number }} [options]
+ * @returns {string[]} CIS triés par qualité de match décroissante, bornés à `limit`
+ */
+function resolveBdpmCisKeys(q, { limit = 100 } = {}) {
+  const trimmed = String(q || '').trim();
+  if (!trimmed) return [];
+
+  const max = Math.max(1, Number(limit) || 100);
+  const { qualityByKey } = collectBdpmMatches(trimmed);
+  const keys = Object.keys(qualityByKey);
+  keys.sort((a, b) => {
+    const rankA = MATCH_QUALITY_RANK[qualityByKey[a]] || 0;
+    const rankB = MATCH_QUALITY_RANK[qualityByKey[b]] || 0;
+    if (rankB !== rankA) return rankB - rankA;
+    return a.localeCompare(b);
+  });
+  return keys.slice(0, max);
+}
+
 function hydrateBdpmResult(cis, qualityByKey, metaByKey) {
   const result = {
     type: 'medicament',
@@ -439,5 +463,7 @@ function executeHybridSearchPage(q, source, page = 1, limit = 50, criteria = {})
 
 module.exports = {
   executeHybridSearch,
-  executeHybridSearchPage
+  executeHybridSearchPage,
+  resolveBdpmCisKeys,
+  collectBdpmMatches
 };
