@@ -26,26 +26,26 @@
     "test:all": "RUN_SLOW_TESTS=1 jest --runInBand"
   },
   "dependencies": {
-    "@nodable/flexible-xml-parser": "^1.11.2",
-    "@yoch/frozenminisearch": "^1.8.0",
+    "@nodable/flexible-xml-parser": "^1.11.3",
+    "@yoch/frozenminisearch": "^1.9.0",
     "7zip-bin": "^5.2.0",
-    "axios": "^1.18.1",
+    "axios": "^1.20.0",
     "cors": "^2.8.6",
-    "csv-parse": "^7.0.1",
+    "csv-parse": "^7.0.3",
     "express": "^5.2.1",
-    "express-rate-limit": "^8.5.2",
-    "fs-extra": "^11.3.6",
+    "express-rate-limit": "^8.7.0",
+    "fs-extra": "^11.4.1",
     "helmet": "^8.3.0",
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "fast-xml-parser": "^5.10.1",
-    "jest": "^30.4.2",
-    "knip": "^6.27.0",
+    "fast-xml-parser": "^5.11.1",
+    "jest": "^30.5.2",
+    "knip": "^6.38.0",
     "nodemon": "^3.1.14",
-    "supertest": "^7.2.2"
+    "supertest": "^7.3.0"
   },
   "keywords": [
     "medicaments",
