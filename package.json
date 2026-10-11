@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node --env-file=.env src/server.js",
-    "dev": "nodemon --exec 'node --env-file=.env' src/server.js",
+    "dev": "node --watch --env-file=.env src/server.js",
     "download-data": "node src/scripts/download-initial-data.js",
     "export-search-indexes": "node src/scripts/export-search-indexes.js",
     "export-corpus-documents": "node src/scripts/export-corpus-documents.js",
@@ -44,7 +44,6 @@
     "fast-xml-parser": "^5.11.2",
     "jest": "^30.5.2",
     "knip": "^6.41.0",
-    "nodemon": "^3.1.14",
     "supertest": "^7.3.1",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
