@@ -38,15 +38,15 @@
     "fs-extra": "^11.4.1",
     "helmet": "^8.3.0",
     "swagger-jsdoc": "^6.3.0",
-    "swagger-ui-express": "^5.0.1",
-    "xlsx": "^0.18.5"
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "fast-xml-parser": "^5.11.2",
     "jest": "^30.5.2",
     "knip": "^6.41.0",
     "nodemon": "^3.1.14",
-    "supertest": "^7.3.1"
+    "supertest": "^7.3.1",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "keywords": [
     "medicaments",

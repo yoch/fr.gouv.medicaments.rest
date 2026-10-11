@@ -7,6 +7,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Sécurité
+
+- `xlsx` passe en 0.20.3, distribuée par le CDN SheetJS (le registre npm s'arrête à 0.18.5), et en `devDependencies` : seuls les scripts `audit:ansm-dispo` et `audit:ema-monitoring` l'utilisent. Corrige [GHSA-4r6h-8v6p-xvw6](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6) et [GHSA-5pgg-2g8v-p4x9](https://github.com/advisories/GHSA-5pgg-2g8v-p4x9) ; `npm audit --omit=dev` ne signale plus de vulnérabilité.
+
 ## [1.5.2] - 2026-10-11
 
 ### Modifié
