@@ -7,15 +7,28 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.5.2] - 2026-10-11
+
 ### Modifié
 
 - FrozenMiniSearch mis à jour en 1.10.0 ; les recherches de liste BDPM et ANMV réutilisent les qualités et le total de la dernière requête pour sélectionner les pages suivantes avec `limit`, en conservant le classement qualité puis score et les totaux exacts. Le cache n'est créé que si une page suivante existe.
 - Normalisation et expressions régulières de classement préparées une seule fois par requête.
-- Express 5.3.0, express-rate-limit 8.7.1, fast-xml-parser 5.11.2, Knip 6.41.0 et Supertest 7.3.1 ; lockfile actualisé. Le runtime reste compatible avec Node.js 20.
+- Express 5.3.0, express-rate-limit 8.7.1, fast-xml-parser 5.11.2, Knip 6.41.0 et Supertest 7.3.1 ; dépendances transitives actualisées dans leurs plages semver. Le runtime reste compatible avec Node.js 20.
 
 ### Ajouté
 
-- Tests de pagination de recherche et benchmark reproductible (`npm run benchmark:search-pagination`).
+- Tests de pagination de recherche, benchmark reproductible (`npm run benchmark:search-pagination`) et documentation `docs/SEARCH_PAGINATION.md`.
+
+## [1.5.1] - 2026-08-10
+
+### Ajouté
+
+- Paramètre `q` sur `GET /api/medicaments/disponibilite/alerts` : nom commercial, DCI, CIS ou CIP13, résolu comme `/search` via les index BDPM, puis projeté sur les alertes par CIS.
+- Configuration PM2 optionnelle pour Bun (`ecosystem.bun.config.js`) ; la configuration Node reste celle par défaut.
+
+### Modifié
+
+- Dépendances npm mises à jour (`npm update`, `npm audit fix`).
 
 ## [1.5.0] - 2026-07-17
 
@@ -27,6 +40,21 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 - Dépendances mises à jour (`npm update`, dont knip 6).
 - PM2 reste sur Node (tentative Bun annulée, pas de gain en prod).
+
+## [1.4.0] - 2026-07-06
+
+### Ajouté
+
+- Critères structurés optionnels `dosage`, `forme` et `voie` sur `GET /api/medicaments/search` : ils réordonnent les résultats à l'intérieur d'un même niveau de `match_quality`, sans jamais filtrer ; chaque fiche indique les critères satisfaits dans `criteria_match`.
+
+### Modifié
+
+- Mémoire réduite au chargement et pendant la pagination de recherche : la recherche globale n'hydrate que la page demandée, le flux XML ANMV écarte les balises inutiles pendant la lecture, et l'usage mémoire est journalisé après chargement puis à +30 s, +2 min et +5 min. Option de mise au point `POST_LOAD_GC` (ignorée en production).
+
+### Corrigé
+
+- `source=auto` conserve les correspondances BDPM faibles au lieu de les écarter.
+- Classement `exact` des recherches par code CIS ou CIP.
 
 ## [1.3.0] - 2026-07-05
 
@@ -124,7 +152,11 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.3.0...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.2...HEAD
+[1.5.2]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.1...v1.5.2
+[1.5.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.0...v1.5.1
+[1.5.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.4.0...v1.5.0
+[1.4.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.5...v1.3.0
 [1.2.5]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.4...v1.2.5
 [1.2.4]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.2.2...v1.2.4
