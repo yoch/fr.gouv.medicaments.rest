@@ -9,7 +9,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ### Modifié
 
-- FrozenMiniSearch mis à jour en 1.10.0 ; les recherches de liste BDPM et ANMV réutilisent les qualités et le total de la dernière requête pour sélectionner les pages suivantes avec `limit`, en conservant le classement qualité puis score et les totaux exacts.
+- FrozenMiniSearch mis à jour en 1.10.0 ; les recherches de liste BDPM et ANMV réutilisent les qualités et le total de la dernière requête pour sélectionner les pages suivantes avec `limit`, en conservant le classement qualité puis score et les totaux exacts. Le cache n'est créé que si une page suivante existe.
 - Normalisation et expressions régulières de classement préparées une seule fois par requête.
 - Express 5.3.0, express-rate-limit 8.7.1, fast-xml-parser 5.11.2, Knip 6.41.0 et Supertest 7.3.1 ; lockfile actualisé. Le runtime reste compatible avec Node.js 20.
 

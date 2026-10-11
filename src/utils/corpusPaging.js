@@ -16,6 +16,8 @@ function parseListPaging(page, limit, maxLimit = MAX_LIST_LIMIT) {
  *
  * `materializePage(offset, end)` produit le tableau `data` pour la page courante
  * (slice JS, `materializeRange`, `materializeIndices` — selon la nature du corpus).
+ * Un appelant qui a déjà sélectionné la page (recherche paginée) peut ignorer
+ * `offset` et `end`.
  */
 function buildPagedResponse({ total, page, limit, metadata, materializePage }) {
   const { safePage, safeLimit, offset } = parseListPaging(page, limit);

@@ -3,8 +3,8 @@
 const { createMatchPriorityClassifier, matchQualityFromPriority } = require('./searchRanking');
 const { parseListPaging } = require('./corpusPaging');
 
-// One query per immutable index: bounded memory and automatic invalidation
-// when a loader replaces its FrozenMiniSearch instance on reload.
+// Une seule requête par index immuable : mémoire bornée, et invalidation
+// automatique quand un loader remplace son instance FrozenMiniSearch au rechargement.
 const pageSearchCache = new WeakMap();
 
 function collectCodeValues(row, codeFields) {
@@ -48,9 +48,11 @@ function rankSearchResults(corpus, searchResults, query, spec) {
 }
 
 /**
- * Preserve exact totals and quality-before-score ranking. The first request
- * computes all matches; repeated pages reuse only counts and quality-by-id,
- * selecting a score prefix with limit when the page lies within one tier.
+ * Page classée qualité puis score, avec un total exact. La première requête
+ * classe toutes les correspondances ; si une page suivante existe, elle met en
+ * cache les effectifs et la qualité par ligne. Les pages suivantes contenues
+ * dans un seul niveau de qualité sélectionnent alors un préfixe de scores avec
+ * `filter` et `limit`.
  */
 function searchRankedPage(corpus, index, query, spec, page, limit) {
   if (!corpus || !index || !query) return { total: 0, ranked: [] };
@@ -79,11 +81,12 @@ function searchRankedPage(corpus, index, query, spec, page, limit) {
       }
       tierStart = tierEnd;
     }
-    // A page spanning tiers needs the complete quality-before-score ordering.
+    // Une page à cheval sur plusieurs niveaux exige le classement complet.
   }
 
   const ranked = rankSearchResults(corpus, index.search(query), query, spec);
-  if (!sameQuery) {
+  // Sans page suivante, l'entrée d'une autre requête en cours de pagination est conservée.
+  if (!sameQuery && ranked.length > end) {
     const priorities = new Uint8Array(corpus.length);
     const counts = [0, 0, 0];
     for (const hit of ranked) {
