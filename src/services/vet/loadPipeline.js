@@ -331,8 +331,16 @@ async function loadVetData() {
   const medicamentFields = VET_INDEX_SPECS.medicaments.fields;
   const compositionFields = VET_INDEX_SPECS.compositions.fields;
 
+  const malformed = [];
   await streamMedicinalProducts(productsPath, async (blockXml) => {
-    const product = parseProductBlock(blockXml, defaultProductParser);
+    let product;
+    try {
+      product = parseProductBlock(blockXml, defaultProductParser);
+    } catch (err) {
+      const num = blockXml.match(/<num>([^<]*)<\/num>/)?.[1] ?? '?';
+      malformed.push(`${num} (${err.message})`);
+      return;
+    }
     if (!product) return;
 
     const rowIndex = pushMedicament(corpus.medicaments, product, dict);
@@ -345,6 +353,11 @@ async function loadVetData() {
       state.tempsAttente.set(medNum, waiting);
     }
   });
+  if (malformed.length > 0) {
+    console.warn(
+      `⚠ ${malformed.length} produit(s) vétérinaire(s) au XML invalide ignoré(s) : ${malformed.slice(0, 5).join(' ; ')}`
+    );
+  }
   loadMemoryMark('vet_stream_done', {
     medicaments: rowCount(corpus.medicaments),
     compositions: rowCount(corpus.compositions)
