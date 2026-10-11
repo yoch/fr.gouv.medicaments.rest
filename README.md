@@ -62,6 +62,7 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 ## Documentation
 
 - **[API Reference (Markdown)](API_REFERENCE.md)**
+- **[Pagination et performances de recherche](docs/SEARCH_PAGINATION.md)** : exploitation de FrozenMiniSearch `limit`, périmètre et benchmark reproductible.
 - **Swagger UI**: `http://localhost:3000/api-docs`
 - **OpenAPI Spec**: `http://localhost:3000/api-docs.json`
 

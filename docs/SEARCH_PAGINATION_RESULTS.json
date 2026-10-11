@@ -1,0 +1,120 @@
+{
+  "node": "v24.19.0",
+  "platform": "linux",
+  "arch": "x64",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "frozenMiniSearch": "1.10.0",
+  "runs": 5,
+  "warmup": 50,
+  "iterations": 50,
+  "results": [
+    {
+      "type": "specialites",
+      "query": "comprime",
+      "page": 1,
+      "limit": 20,
+      "corpusRows": 15883,
+      "total": 8148,
+      "fullMs": 12.257089499999893,
+      "boundedMs": 1.5412659999997231,
+      "coldMs": 12.353995499999655,
+      "changePercent": -87.42551402598686
+    },
+    {
+      "type": "specialites",
+      "query": "comprime",
+      "page": 2,
+      "limit": 20,
+      "corpusRows": 15883,
+      "total": 8148,
+      "fullMs": 12.176010000001042,
+      "boundedMs": 1.5534715000012511,
+      "coldMs": 12.72656349999852,
+      "changePercent": -87.24153889491618
+    },
+    {
+      "type": "specialites",
+      "query": "comprime",
+      "page": 1,
+      "limit": 100,
+      "corpusRows": 15883,
+      "total": 8148,
+      "fullMs": 12.749225500003377,
+      "boundedMs": 1.578301499994268,
+      "coldMs": 12.49670199999673,
+      "changePercent": -87.62041270668676
+    },
+    {
+      "type": "specialites",
+      "query": "comprime",
+      "page": 1,
+      "limit": 1000,
+      "corpusRows": 15883,
+      "total": 8148,
+      "fullMs": 12.62243049999961,
+      "boundedMs": 1.9790964999992866,
+      "coldMs": 12.594493999997212,
+      "changePercent": -84.32079701291009
+    },
+    {
+      "type": "specialites",
+      "query": "doliprane",
+      "page": 1,
+      "limit": 20,
+      "corpusRows": 15883,
+      "total": 31,
+      "fullMs": 0.13648150000153692,
+      "boundedMs": 0.11651050000000396,
+      "coldMs": 0.1397110000034445,
+      "changePercent": -14.63275242527966
+    },
+    {
+      "type": "specialites",
+      "query": "dolipranr",
+      "page": 1,
+      "limit": 20,
+      "corpusRows": 15883,
+      "total": 18,
+      "fullMs": 0.11827899999843794,
+      "boundedMs": 0.11201399999845307,
+      "coldMs": 0.12097249999715132,
+      "changePercent": -5.2967982482668985
+    },
+    {
+      "type": "specialites",
+      "query": "amoxicilline",
+      "page": 1,
+      "limit": 20,
+      "corpusRows": 15883,
+      "total": 125,
+      "fullMs": 0.20705250000173692,
+      "boundedMs": 0.1334710000010091,
+      "coldMs": 0.2168825000007928,
+      "changePercent": -35.53760519680302
+    },
+    {
+      "type": "presentations",
+      "query": "plaquette",
+      "page": 1,
+      "limit": 20,
+      "corpusRows": 20911,
+      "total": 11367,
+      "fullMs": 21.490560999998706,
+      "boundedMs": 1.441600500002096,
+      "coldMs": 22.345837500004563,
+      "changePercent": -93.29193639941656
+    },
+    {
+      "type": "compositions",
+      "query": "paracetamol",
+      "page": 1,
+      "limit": 20,
+      "corpusRows": 32439,
+      "total": 224,
+      "fullMs": 0.21557600000232924,
+      "boundedMs": 0.11205399999744259,
+      "coldMs": 0.22559049999836134,
+      "changePercent": -48.02111552481172
+    }
+  ]
+}

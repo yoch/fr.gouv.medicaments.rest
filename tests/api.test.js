@@ -1,7 +1,7 @@
 const request = require('supertest');
 const express = require('express');
 const medicamentRoutes = require('../src/routes/medicaments');
-const { loadData } = require('../src/services/dataLoader');
+const { loadData, search } = require('../src/services/dataLoader');
 const { describeSlow } = require('./helpers/slowTests');
 const { DOLIPRANE_CIS, DOLIPRANE_CIP13, DOLIPRANE_CIP7 } = require('./fixtures/cis-cip-samples');
 const { isPlausibleCip13 } = require('./helpers/bdpmPresentation');
@@ -292,6 +292,23 @@ describeSlow('API Medicaments', () => {
                 all.body.data.map((item) => item.cip13)
             );
         });
+    });
+
+    test.each([
+        ['specialites', 'comprime'],
+        ['presentations', 'plaquette'],
+        ['compositions', 'paracetamol']
+    ])('préserve le classement complet et le total sur les pages de %s', async (type, query) => {
+        const expected = search(type, query);
+        expect(expected.length).toBeGreaterThan(40);
+        for (const page of [1, 2, 1]) {
+            const response = await request(app).get(
+                `/api/medicaments/${type}?q=${query}&limit=20&page=${page}`
+            );
+            expect(response.statusCode).toBe(200);
+            expect(response.body.pagination.total).toBe(expected.length);
+            expect(response.body.data).toEqual(expected.slice((page - 1) * 20, page * 20));
+        }
     });
 
     // Verify other lookups exist
