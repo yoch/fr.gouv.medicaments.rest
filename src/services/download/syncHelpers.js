@@ -64,6 +64,11 @@ async function downloadFile(url, filepath, { headers = {}, timeoutMs = 30000 } =
     });
     await pipeline(response.data, fs.createWriteStream(filepath), { signal: controller.signal });
     return await hashFile(filepath);
+  } catch (error) {
+    // Axios rejette les statuts HTTP avant d'affecter `response` : le corps
+    // streaming appartient alors à l'erreur et doit lui aussi être fermé.
+    error.response?.data?.destroy?.();
+    throw error;
   } finally {
     clearTimeout(timer);
     response?.data.destroy();

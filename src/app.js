@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
+const { errorMonitor } = require('node:events');
 
 const config = require('./config');
 const { getMetadata } = require('./services/dataLoader');
@@ -79,12 +80,27 @@ function createApp() {
       store?.init({ windowMs: config.rateLimitWindowMs });
       disposed = false;
     }
-    const server = listen(...args);
+    let server;
+    try {
+      server = listen(...args);
+    } catch (error) {
+      if (servers === 0) app.locals.dispose();
+      throw error;
+    }
     servers++;
-    server.once('close', () => {
+    const release = () => {
+      server.off('close', release);
+      server.off(errorMonitor, release);
+      server.off('listening', onListening);
       servers--;
       if (servers === 0) app.locals.dispose();
-    });
+    };
+    const onListening = () => server.off(errorMonitor, release);
+    // Un échec de bind n'émet pas nécessairement `close`. errorMonitor permet
+    // le nettoyage sans absorber l'erreur destinée à l'appelant.
+    server.once(errorMonitor, release);
+    server.once('listening', onListening);
+    server.once('close', release);
     return server;
   };
 

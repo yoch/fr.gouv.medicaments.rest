@@ -87,7 +87,8 @@ async function fetchRemoteFingerprint(url, { timeout = 30000, userAgent } = {}) 
       } finally {
         response.data.destroy();
       }
-    } catch {
+    } catch (rangeError) {
+      rangeError.response?.data?.destroy?.();
       throw headError;
     }
   }

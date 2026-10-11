@@ -1,5 +1,7 @@
 'use strict';
 
+const { validateTimerDelay } = require('./periodicTask');
+
 /**
  * Échantillonnage mémoire haute fréquence (sans GC entre mesures → pic RSS réaliste).
  *
@@ -11,6 +13,7 @@
  */
 function createMemorySampler(opts = {}) {
   const intervalMs = Math.max(50, parseInt(opts.intervalMs || '200', 10));
+  validateTimerDelay(intervalMs, 'intervalMs du sampler');
   const gcBeforeSample = opts.gcBeforeSample === true;
   const maxSamples = opts.maxSamples ?? 10000;
   const maxMarks = opts.maxMarks ?? 1000;

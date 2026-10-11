@@ -10,9 +10,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 ### Corrigé
 
 - Pools de chaînes renouvelés à chaque génération BDPM et ANMV, sans conserver les valeurs des anciens corpus. Les chargements et téléchargements simultanés d'un même domaine partagent le travail en cours.
-- Téléchargements, hashing et parsing CSV ferment les flux sur erreur ; le téléchargement a un délai global et la sonde Range abandonne le corps après réception des headers. Le descripteur du header ANMV est fermé même si sa lecture échoue.
+- Téléchargements, hashing et parsing CSV ferment les flux sur erreur, y compris les corps HTTP 4xx/5xx rejetés par Axios ; le téléchargement a un délai global et la sonde Range abandonne le corps après réception des headers. Le descripteur du header ANMV est fermé même si sa lecture échoue.
 - Rafraîchissements programmés après la fin du cycle précédent ; durées des timers validées. `startServer()` retourne un handle avec `stop()` qui ferme le serveur, arrête les tâches et annule le chargement différé. Le MemoryStore du rate limiter est fermé avec le serveur HTTP.
-- Parsing CSV et XML borné sur les entrées anormales ; exemples d'erreurs XML et historique du sampler mémoire limités en taille, avec conservation des pics et compteurs globaux.
+- Le MemoryStore est aussi fermé après un échec de `listen()` ; le comptage des serveurs permet un nouvel essai sans retenir le timer précédent.
+- Parsing CSV et XML borné sur les entrées anormales ; exemples d'erreurs XML et historique du sampler mémoire limités en taille, avec conservation des pics et compteurs globaux. L'intervalle du sampler refuse les débordements des timers Node.
 
 ### Ajouté
 

@@ -20,7 +20,40 @@ Les résultats après correction sont dans [AUDIT_MEMOIRE_FIX_RESULTS.json](AUDI
 
 Sur les mêmes corpus réels, 900 requêtes courantes et trois rechargements donnent un tas de **79,34 Mio initialement**, puis **78,84 Mio après rechargements et GC**, avec les anciens index libérés et les descripteurs revenus au niveau initial. Le RSS passe de 222,30 à 268,81 Mio : les pages conservées par Node restent visibles malgré un tas vivant stable. Ces mesures ne sont pas un comparatif de performances contrôlé.
 
-La suite complète comprend **27 suites et 245 tests réussis, aucun ignoré**, incluant les erreurs de lecture, d'écriture, d'indexation, le délai global sur un flux continu, les générations changeantes, la concurrence, les durées, l'arrêt et la réutilisation du serveur et les bornes de parsing et de profilage. Les observations des sections suivantes décrivent la révision initiale `5bc82b2`.
+La première validation des correctifs comprend **27 suites et 245 tests réussis, aucun ignoré**, incluant les erreurs de lecture, d'écriture, d'indexation, le délai global sur un flux continu, les générations changeantes, la concurrence, les durées, l'arrêt et la réutilisation du serveur et les bornes de parsing et de profilage.
+
+## Contre-audit de la PR #5
+
+La relecture de la révision `37c3fef` a révélé **deux défauts supplémentaires de nettoyage** et une validation de durée incomplète. Ils sont corrigés dans la même PR. Les premiers tests couvraient les erreurs des flux et les arrêts normaux, mais pas le rejet HTTP avant affectation de la réponse ni les échecs de `listen()`.
+
+| Priorité | Défaut reproduit | Correction et preuve |
+| --- | --- | --- |
+| P1 | Axios rejette les réponses 4xx/5xx streaming avant l'affectation de `response`. Le téléchargement et le fallback Range laissaient `error.response.data` ouvert. | Destruction explicite du corps dans les deux `catch`. Huit essais HTTP réels : 404/503, téléchargement/sonde, corps brut/gzip, réponse jamais terminée par le serveur. Tous vérifient la fermeture côté serveur avant le timeout réseau. |
+| P2 | Un port occupé n'émet pas nécessairement `close`. Le compteur de serveurs restait incrémenté ; le MemoryStore n'était plus arrêté, même après fermeture d'un nouvel essai réussi. Une exception synchrone de `listen()` laissait aussi le timer actif. | Nettoyage des erreurs de bind via `errorMonitor`, retrait des listeners et nettoyage des exceptions synchrones. L'erreur reste transmise à l'appelant. Tests de port occupé, redémarrage et port invalide. |
+| P2 | Le sampler acceptait un intervalle de 2 147 483 648 ms, que Node transforme en 1 ms. | Validation par la même borne que les autres timers. Concerne les outils de profilage, pas le serveur par défaut. |
+
+Les nouveaux contrôles échouaient avant les modifications : **11 tests en échec**, dont huit pour les réponses HTTP d'erreur. Après correction, la suite complète passe : **28 suites, 255 tests, aucun ignoré**. Les preuves, mesures et empreintes du code testé sont dans [AUDIT_MEMOIRE_REVIEW_RESULTS.json](AUDIT_MEMOIRE_REVIEW_RESULTS.json).
+
+Un nouvel essai sur les corpus réels comprend **1 800 requêtes mixtes**, dont les recherches à un caractère et les requêtes uniques, puis **six rechargements**. Le tas après GC passe de **79,34 Mio à 78,81 Mio après trafic**, puis **78,96 Mio après rechargement**. Le pool reste à **25 508 entrées** ; les **72 anciens index** suivis sont collectés. Les descripteurs reviennent de 29 sous trafic à **21**, leur niveau initial. Le RSS atteint **420,05 Mio**, tandis qu'`external` revient à **14,02 Mio** : aucune rétention cumulative supplémentaire n'est mise en évidence dans ce scénario.
+
+Un essai distinct, limité à la BDPM avec rate limiting actif, interrompt **1 000 réponses après leurs premiers octets**. Les descripteurs restent à **20** après chaque lot, et le tas revient d'environ **68,27 Mio à 67,96 Mio**. Après **30 créations/fermetures d'applications**, les 30 applications et les 30 serveurs suivis par références faibles sont collectés ; les descripteurs sont à **19**, comme avant ces cycles.
+
+La relecture couvre aussi les pools AsyncLocalStorage, les remplacements de corpus/index, le cache WeakMap de pagination, les index FrozenMiniSearch, les flux CSV/XML, les descripteurs d'export, les promesses partagées, le planificateur et l'arrêt différé. Aucune autre fuite n'a été confirmée sur ces chemins. Le cache de pagination garde au plus une entrée par index ; les collections du rate limiter expirent ; les corpus et leurs index restent volontairement résidents. Les appels directs à `createApp()` sans serveur nécessitent toujours `app.locals.dispose()` si l'application est abandonnée avec le rate limiting actif.
+
+Ces essais locaux ne prouvent pas l'absence absolue de fuite, notamment dans un processus de production observé plusieurs jours. Ils n'attribuent pas les 149 → 154 Mo signalés à un défaut précis. Les recherches larges restent coûteuses en allocations, et les commandes externes de conversion/extraction ne disposent pas d'un délai global ; un blocage peut retenir leur cycle en cours, mais les appels partagés empêchent leur accumulation par le planificateur.
+
+Reproduction complémentaire :
+
+```sh
+npm run test:serial -- tests/httpErrorCleanup.test.js tests/serverLifecycle.test.js tests/memorySampler.test.js
+CORPUS_LIGHT_PROFILE=true AUDIT_TRAFFIC_MODE=mixed \
+  AUDIT_BATCHES=6 AUDIT_REQUESTS=300 AUDIT_RELOADS=6 AUDIT_IDLE_MS=10000 \
+  node --expose-gc --max-semi-space-size=8 scripts/memory/audit-retention.js
+CORPUS_LIGHT_PROFILE=true \
+  node --expose-gc --max-semi-space-size=8 scripts/memory/audit-http-disconnects.js
+```
+
+Les sections suivantes décrivent la révision initiale `5bc82b2`.
 
 ## Périmètre et méthode
 

@@ -28,4 +28,5 @@ test('borne l’historique sans perdre le pic ou les compteurs globaux', () => {
 
 test('refuse une cadence invalide qui ferait tourner un timer à 1 ms', () => {
   expect(() => createMemorySampler({ intervalMs: 'invalid' })).toThrow(RangeError);
+  expect(() => createMemorySampler({ intervalMs: 2147483648 })).toThrow(RangeError);
 });
