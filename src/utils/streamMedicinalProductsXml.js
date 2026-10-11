@@ -95,9 +95,14 @@ function stripIgnoredProductTags(text, state, stripTags = DEFAULT_STRIP_TAGS) {
  * Lit un fichier produits ANMV bloc par bloc (sans charger tout le XML en mémoire).
  * @param {string} productsPath
  * @param {(blockXml: string) => void | Promise<void>} onProduct
- * @param {{ stripTags?: string[] }} [options]
+ * @param {{ stripTags?: string[], maxLineChars?: number, maxProductChars?: number }} [options]
  */
 async function streamMedicinalProducts(productsPath, onProduct, options = {}) {
+  const maxLineChars = options.maxLineChars ?? 1024 * 1024;
+  const maxProductChars = options.maxProductChars ?? 4 * 1024 * 1024;
+  for (const limit of [maxLineChars, maxProductChars]) {
+    if (!Number.isSafeInteger(limit) || limit < 1) throw new RangeError('Limite XML positive requise');
+  }
   const stream = fs.createReadStream(productsPath, { encoding: 'utf8' });
   const stripTags = options.stripTags ?? DEFAULT_STRIP_TAGS;
   const stripState = { skipTag: null };
@@ -107,6 +112,7 @@ async function streamMedicinalProducts(productsPath, onProduct, options = {}) {
 
   function* productBlocks(lines) {
     for (const line of lines) {
+      if (line.length > maxLineChars) throw new Error('Ligne ANMV trop longue');
       let fragment;
       if (inProduct) {
         fragment = stripIgnoredProductTags(`\n${line}`, stripState, stripTags);
@@ -122,6 +128,9 @@ async function streamMedicinalProducts(productsPath, onProduct, options = {}) {
       // aplatit les chaînes concaténées sous JavaScriptCore et recopie le produit.
       const fragmentCloseIdx = fragment.indexOf(PRODUCT_CLOSE);
       const previousLength = buffer.length;
+      if (previousLength + fragment.length > maxProductChars) {
+        throw new Error('Produit ANMV trop volumineux ou non fermé');
+      }
       buffer += fragment;
       if (fragmentCloseIdx === -1) continue;
       let closeIdx = previousLength + fragmentCloseIdx;
@@ -148,6 +157,7 @@ async function streamMedicinalProducts(productsPath, onProduct, options = {}) {
     const end = text.endsWith('\r') ? text.length - 1 : text.length;
     const lines = text.slice(0, end).split(/\r\n|[\r\n]/);
     pendingLine = lines.pop() + text.slice(end);
+    if (pendingLine.length > maxLineChars) throw new Error('Ligne ANMV trop longue');
     for (const block of productBlocks(lines)) await onProduct(block);
   }
   if (pendingLine) {

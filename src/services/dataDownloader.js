@@ -5,6 +5,7 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 const { shouldRecheckFile } = require('../utils/remoteFileProbe');
 const config = require('../config');
+const { singleFlight } = require('../utils/singleFlight');
 const {
   hashFile,
   loadJsonMeta,
@@ -98,7 +99,9 @@ async function checkAndConvertToUTF8(filepath) {
   }
 }
 
-async function downloadDataIfNeeded() {
+const downloadDataIfNeeded = singleFlight(downloadDataCycle);
+
+async function downloadDataCycle() {
   await fs.ensureDir(DATA_DIR);
   let metadata = await loadJsonMeta(META_FILE);
   let changed = false;

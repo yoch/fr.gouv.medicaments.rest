@@ -11,6 +11,9 @@
 const fs = require('fs');
 const path = require('path');
 const { parse } = require('csv-parse');
+const { pipeline } = require('node:stream/promises');
+const { singleFlight } = require('../utils/singleFlight');
+const { withInternPool } = require('../utils/stringPool');
 const {
   buildFrozenIndexFromAsyncIterable,
   buildFrozenIndexFromRows
@@ -64,7 +67,8 @@ function csvParserOptions(columns) {
     quote: false,
     escape: false,
     relax_quotes: true,
-    relax_column_count: true
+    relax_column_count: true,
+    max_record_size: 8 * 1024 * 1024
   };
 }
 
@@ -83,20 +87,20 @@ async function loadParseAndIndex(type, filename, fields, boost = null) {
     return;
   }
 
-  async function* documents() {
-    const parser = fs
-      .createReadStream(filepath, { encoding: 'utf8' })
-      .pipe(parse(csvParserOptions(BDPM_SCHEMAS[type])));
-
+  async function* documents(records) {
     let rowIndex = 0;
-    for await (const record of parser) {
+    for await (const record of records) {
       push(rows, fromCsv(record));
       yield buildIndexDocument(rows[rowIndex], rowIndex, fields);
       rowIndex++;
     }
   }
 
-  searchIndexes[type] = await buildFrozenIndexFromAsyncIterable(documents(), options);
+  searchIndexes[type] = await pipeline(
+    fs.createReadStream(filepath, { encoding: 'utf8' }),
+    parse(csvParserOptions(BDPM_SCHEMAS[type])),
+    (records) => buildFrozenIndexFromAsyncIterable(documents(records), options)
+  );
 }
 
 async function indexInMemoryCorpus(type, fields, boost = null) {
@@ -148,7 +152,9 @@ async function loadOne(type, markLabel) {
   if (markLabel) loadMemoryMark(markLabel, { rows: rowCount(corpus[type]) });
 }
 
-async function loadData() {
+const loadData = singleFlight(() => withInternPool('bdpm', loadDataGeneration));
+
+async function loadDataGeneration() {
   const mainFilePath = path.join(DATA_DIR, 'CIS_bdpm.txt');
   try {
     const stats = fs.statSync(mainFilePath);

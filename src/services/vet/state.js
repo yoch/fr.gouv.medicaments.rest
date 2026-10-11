@@ -6,7 +6,7 @@
  * aux sous-modules (loadPipeline, exportApi) de partager la même source.
  *
  * Objet unique à propriétés mutables — pas de getters/setters partiels.
- * Le reload passe par `reset()` pour rester atomique.
+ * Le reset synchrone invalide les index avant le rechargement progressif.
  */
 
 const { createCorpus } = require('../../utils/corpusStore');
@@ -38,7 +38,7 @@ const state = {
   },
 
   /**
-   * Remet l'état à zéro avant un reload. Atomique : appelé en tête de
+   * Remet l'état à zéro avant un reload. Appelé en tête de
    * `loadVetData()`. Les corpus sont vidés par `clearCorpus` côté pipeline.
    */
   reset() {

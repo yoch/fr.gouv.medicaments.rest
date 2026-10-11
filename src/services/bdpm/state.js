@@ -6,7 +6,7 @@
  * (loadPipeline, exportApi) de partager la même source de vérité.
  *
  * Objet unique à propriétés mutables — pas de getters/setters partiels.
- * Le reload passe par `reset()` pour rester atomique.
+ * Le reset synchrone invalide les index avant le rechargement progressif.
  */
 
 const { createCorpus } = require('../../utils/corpusStore');
@@ -55,7 +55,7 @@ const state = {
   },
 
   /**
-   * Remet l'état à zéro avant un reload (index nullés). Atomique : appelé
+   * Remet l'état à zéro avant un reload (index nullés). Appelé
    * en tête de `loadData()`. Les corpus sont vidés par `clearCorpus` côté
    * loader (conserve les instances de tableau).
    */

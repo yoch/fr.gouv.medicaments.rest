@@ -6,14 +6,37 @@
  * @param {object} opts
  * @param {number} [opts.intervalMs=200] — 5 échantillons/s par défaut
  * @param {boolean} [opts.gcBeforeSample=false] — true fausse les pics (réservé baseline)
+ * @param {number} [opts.maxSamples=10000] — historique récent, pics globaux conservés
+ * @param {number} [opts.maxMarks=1000] — marqueurs récents
  */
 function createMemorySampler(opts = {}) {
   const intervalMs = Math.max(50, parseInt(opts.intervalMs || '200', 10));
   const gcBeforeSample = opts.gcBeforeSample === true;
+  const maxSamples = opts.maxSamples ?? 10000;
+  const maxMarks = opts.maxMarks ?? 1000;
+  for (const value of [intervalMs, maxSamples, maxMarks]) {
+    if (!Number.isSafeInteger(value) || value < 1) throw new RangeError('Paramètre du sampler invalide');
+  }
   const samples = [];
   const marks = [];
   let timer = null;
   let t0 = 0;
+  let first;
+  let last;
+  let sampleCount = 0;
+  let markCount = 0;
+  let peakRss;
+  let peakHeap;
+
+  function remember(row) {
+    first ??= row;
+    last = row;
+    if (!peakRss || row.rss_mb > peakRss.rss_mb) peakRss = { rss_mb: row.rss_mb, t_ms: row.t_ms, phase: row.phase || null };
+    if (!peakHeap || row.heapUsed_mb > peakHeap.heapUsed_mb) peakHeap = { heapUsed_mb: row.heapUsed_mb, t_ms: row.t_ms, phase: row.phase || null };
+    if (row.kind === 'sample') sampleCount++;
+    if (samples.length === maxSamples) samples.shift();
+    samples.push(row);
+  }
 
   function mb(bytes) {
     return Math.round((bytes / 1024 / 1024) * 1000) / 1000;
@@ -38,9 +61,11 @@ function createMemorySampler(opts = {}) {
     t0 = Date.now();
     samples.length = 0;
     marks.length = 0;
-    samples.push({ ...sampleMemory(), kind: 'sample' });
+    first = last = peakRss = peakHeap = undefined;
+    sampleCount = markCount = 0;
+    remember({ ...sampleMemory(), kind: 'sample' });
     timer = setInterval(() => {
-      samples.push({ ...sampleMemory(), kind: 'sample' });
+      remember({ ...sampleMemory(), kind: 'sample' });
     }, intervalMs);
     if (typeof timer.unref === 'function') timer.unref();
   }
@@ -49,39 +74,27 @@ function createMemorySampler(opts = {}) {
     if (!timer) return;
     clearInterval(timer);
     timer = null;
-    samples.push({ ...sampleMemory(), kind: 'sample' });
+    remember({ ...sampleMemory(), kind: 'sample' });
   }
 
   /** Marqueur instantané (phase métier) — pas de GC. */
   function mark(phase, extra = {}) {
     const row = { ...sampleMemory(), kind: 'mark', phase, ...extra };
+    markCount++;
+    if (marks.length === maxMarks) marks.shift();
     marks.push(row);
-    samples.push(row);
+    remember(row);
     return row;
   }
 
   function summarize() {
-    const onlySamples = samples.filter((s) => s.kind === 'sample' || s.kind === 'mark');
-    let peakRss = { rss_mb: 0, t_ms: 0, phase: null };
-    let peakHeap = { heapUsed_mb: 0, t_ms: 0, phase: null };
-
-    for (const s of onlySamples) {
-      if (s.rss_mb > peakRss.rss_mb) {
-        peakRss = { rss_mb: s.rss_mb, t_ms: s.t_ms, phase: s.phase || null };
-      }
-      if (s.heapUsed_mb > peakHeap.heapUsed_mb) {
-        peakHeap = { heapUsed_mb: s.heapUsed_mb, t_ms: s.t_ms, phase: s.phase || null };
-      }
-    }
-
-    const first = onlySamples[0];
-    const last = onlySamples[onlySamples.length - 1];
     const durationMs = last ? last.t_ms - (first?.t_ms || 0) : 0;
 
     return {
       interval_ms: intervalMs,
-      sample_count: onlySamples.filter((s) => s.kind === 'sample').length,
-      mark_count: marks.length,
+      sample_count: sampleCount,
+      mark_count: markCount,
+      dropped_sample_count: Math.max(0, sampleCount + markCount - samples.length),
       duration_ms: durationMs,
       peak_rss: peakRss,
       peak_heap: peakHeap,

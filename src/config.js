@@ -10,6 +10,7 @@
 
 const path = require('path');
 const { parseIntervalHours } = require('./utils/remoteFileProbe');
+const { validateTimerDelay } = require('./utils/periodicTask');
 
 function parsePositiveInt(raw, fallback) {
   const parsed = parseInt(raw ?? String(fallback), 10);
@@ -40,12 +41,12 @@ const config = Object.freeze({
   // Cycle de vie / rechargement
   reloadStrategy: parseReloadStrategy(process.env.RELOAD_STRATEGY),
   vetLoadDeferred: parseBoolFlag(process.env.VET_LOAD_DEFERRED, false),
-  vetLoadDelayMs: parsePositiveInt(process.env.VET_LOAD_DELAY_MS, 0),
+  vetLoadDelayMs: validateTimerDelay(parsePositiveInt(process.env.VET_LOAD_DELAY_MS, 0), 'VET_LOAD_DELAY_MS', true),
   postLoadGc: parseBoolFlag(process.env.POST_LOAD_GC, false),
 
   // Rate limiting
   enableRateLimit: parseBoolFlag(process.env.ENABLE_RATE_LIMIT, false),
-  rateLimitWindowMs: parsePositiveInt(process.env.RATE_LIMIT_WINDOW_MS, 60000),
+  rateLimitWindowMs: validateTimerDelay(parsePositiveInt(process.env.RATE_LIMIT_WINDOW_MS, 60000), 'RATE_LIMIT_WINDOW_MS'),
   rateLimitMax: parsePositiveInt(process.env.RATE_LIMIT_MAX, 500),
 
   // Corpus BDPM

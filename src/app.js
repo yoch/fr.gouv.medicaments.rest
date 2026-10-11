@@ -42,13 +42,23 @@ function healthHandler(req, res) {
 
 function createApp() {
   const app = express();
+  let store = null;
+  let servers = 0;
+  let disposed = false;
+  app.locals.dispose = () => {
+    if (disposed) return;
+    disposed = true;
+    store?.shutdown();
+  };
 
   app.use(cors());
   app.use(express.json());
   app.use(helmet());
 
   if (config.enableRateLimit) {
+    store = new rateLimit.MemoryStore();
     const limiter = rateLimit({
+      store,
       windowMs: config.rateLimitWindowMs,
       max: config.rateLimitMax,
       standardHeaders: true,
@@ -62,6 +72,21 @@ function createApp() {
 
     app.use(limiter);
   }
+
+  const listen = app.listen.bind(app);
+  app.listen = (...args) => {
+    if (disposed) {
+      store?.init({ windowMs: config.rateLimitWindowMs });
+      disposed = false;
+    }
+    const server = listen(...args);
+    servers++;
+    server.once('close', () => {
+      servers--;
+      if (servers === 0) app.locals.dispose();
+    });
+    return server;
+  };
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
   app.get('/api-docs.json', (req, res) => {

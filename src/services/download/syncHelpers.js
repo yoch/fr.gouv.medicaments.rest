@@ -12,20 +12,17 @@ const axios = require('axios');
 const crypto = require('crypto');
 const fs = require('fs-extra');
 const path = require('path');
+const { pipeline } = require('node:stream/promises');
+const { validateTimerDelay } = require('../../utils/periodicTask');
 const {
   fetchRemoteFingerprint,
   remoteFingerprintUnchanged
 } = require('../../utils/remoteFileProbe');
 
-function hashFile(filepath) {
-  return new Promise((resolve, reject) => {
-    const hash = crypto.createHash('sha256');
-    const reader = fs.createReadStream(filepath);
-    reader.pipe(hash);
-    hash.on('finish', () => resolve(hash.digest('hex')));
-    reader.on('error', reject);
-    hash.on('error', reject);
-  });
+async function hashFile(filepath) {
+  const hash = crypto.createHash('sha256');
+  await pipeline(fs.createReadStream(filepath), hash);
+  return hash.digest('hex');
 }
 
 async function loadJsonMeta(metaFile) {
@@ -53,25 +50,24 @@ async function saveJsonMeta(metaFile, metadata, targetDir) {
  * fichier écrit. `headers` (ex. User-Agent) et `timeoutMs` sont injectés.
  */
 async function downloadFile(url, filepath, { headers = {}, timeoutMs = 30000 } = {}) {
+  validateTimerDelay(timeoutMs, 'timeoutMs');
   console.log(`Téléchargement de ${path.basename(filepath)}...`);
-  const response = await axios({
-    method: 'GET',
-    url,
-    responseType: 'stream',
-    headers,
-    timeout: timeoutMs
-  });
-
   await fs.ensureDir(path.dirname(filepath));
-  const writer = fs.createWriteStream(filepath);
-  response.data.pipe(writer);
-
-  await new Promise((resolve, reject) => {
-    writer.on('finish', resolve);
-    writer.on('error', reject);
-  });
-
-  return hashFile(filepath);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  timer.unref?.();
+  let response;
+  try {
+    response = await axios({
+      method: 'GET', url, responseType: 'stream', headers,
+      timeout: timeoutMs, signal: controller.signal
+    });
+    await pipeline(response.data, fs.createWriteStream(filepath), { signal: controller.signal });
+    return await hashFile(filepath);
+  } finally {
+    clearTimeout(timer);
+    response?.data.destroy();
+  }
 }
 
 /**

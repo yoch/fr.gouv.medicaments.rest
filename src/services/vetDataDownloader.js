@@ -6,6 +6,7 @@ const { promisify } = require('util');
 const sevenBin = require('7zip-bin');
 const { shouldRecheckFile } = require('../utils/remoteFileProbe');
 const config = require('../config');
+const { singleFlight } = require('../utils/singleFlight');
 const {
   hashFile,
   loadJsonMeta,
@@ -134,7 +135,9 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
   }
 }
 
-async function downloadVetDataIfNeeded() {
+const downloadVetDataIfNeeded = singleFlight(downloadVetDataCycle);
+
+async function downloadVetDataCycle() {
   await fs.ensureDir(VET_DATA_DIR);
   let metadata = await loadJsonMeta(META_FILE);
   let changed = false;

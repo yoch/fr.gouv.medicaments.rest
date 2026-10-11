@@ -106,6 +106,13 @@ describe('streamMedicinalProductsXml', () => {
     await expect(streamMedicinalProducts(file, () => { throw error; })).rejects.toBe(error);
   });
 
+  it('rejette les lignes géantes et les produits non fermés au lieu de les accumuler', async () => {
+    await expect(readProducts('x'.repeat(100), { maxLineChars: 50 }))
+      .rejects.toThrow('Ligne ANMV trop longue');
+    await expect(readProducts('<medicinal-product>\n' + 'x\n'.repeat(100), { maxProductChars: 50 }))
+      .rejects.toThrow('Produit ANMV trop volumineux');
+  });
+
   it('supprime les sous-arbres ignorés sur plusieurs chunks', () => {
     const state = { skipTag: null };
     const first = stripIgnoredProductTags(

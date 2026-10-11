@@ -1,11 +1,16 @@
 const axios = require('axios');
+const { MAX_TIMER_MS } = require('./periodicTask');
 
 const DEFAULT_USER_AGENT =
   'Mozilla/5.0 (compatible; fr.gouv.medicaments.rest/1.1)';
 
 function parseIntervalHours(envValue, defaultHours) {
   const parsed = parseInt(envValue ?? String(defaultHours), 10);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : defaultHours;
+  const hours = Number.isFinite(parsed) && parsed > 0 ? parsed : defaultHours;
+  if (hours * 60 * 60 * 1000 > MAX_TIMER_MS) {
+    throw new RangeError('Intervalle de rafraîchissement supérieur à la limite des timers Node (596 heures)');
+  }
+  return hours;
 }
 
 function hoursSince(isoDate) {
@@ -75,9 +80,13 @@ async function fetchRemoteFingerprint(url, { timeout = 30000, userAgent } = {}) 
         timeout,
         maxRedirects: 5,
         validateStatus: (status) => status >= 200 && status < 400,
-        responseType: 'arraybuffer'
+        responseType: 'stream'
       });
-      return normalizeFingerprint(response.headers);
+      try {
+        return normalizeFingerprint(response.headers);
+      } finally {
+        response.data.destroy();
+      }
     } catch {
       throw headError;
     }

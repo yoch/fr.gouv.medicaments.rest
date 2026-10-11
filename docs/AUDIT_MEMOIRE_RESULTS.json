@@ -1,0 +1,3539 @@
+{
+  "audit_date": "2026-10-12",
+  "units": "bytes sauf suffixe kib ou ms",
+  "sources": {
+    "data/CIS_CIP_Dispo_Spec.txt": {
+      "bytes": 154021,
+      "sha256": "568e245e4db9709c5696c1dcb6839c05888aed5a7900fa8eb7a66fce4a41e7ff"
+    },
+    "data/CIS_CIP_bdpm.txt": {
+      "bytes": 4151150,
+      "sha256": "84418427fa7ac07581710fc2b25e25c9ff6fcdd0f2b8469ba4a0886821332e77"
+    },
+    "data/CIS_COMPO_bdpm.txt": {
+      "bytes": 2821255,
+      "sha256": "eab5ceabd032723c65b00cef6cc292cb13c0b7447cf0ffff4f2eee55799787a0"
+    },
+    "data/CIS_CPD_bdpm.txt": {
+      "bytes": 1380210,
+      "sha256": "159cde70988f1a78e85ec4c19b01041352fa9bc9fff770d09f4fa5f52af0397f"
+    },
+    "data/CIS_GENER_bdpm.txt": {
+      "bytes": 1250147,
+      "sha256": "c4cd20f287c83caf2959aa376d520950977c8398b5c440873e08becb441b7fe4"
+    },
+    "data/CIS_HAS_ASMR_bdpm.txt": {
+      "bytes": 4787901,
+      "sha256": "1fbc29fea05e2d1992e12e0267b914a56b1585956bf697e011f4ea0749244817"
+    },
+    "data/CIS_HAS_SMR_bdpm.txt": {
+      "bytes": 4770966,
+      "sha256": "fea92ce046188d282f17e356444dc4f7cbc611ce88405da0965b88941a8c8b1b"
+    },
+    "data/CIS_MITM.txt": {
+      "bytes": 1147407,
+      "sha256": "ed00a1f3ca793727d10704c0675610c0fef9ad95f76177c0606f6a52d212e226"
+    },
+    "data/CIS_bdpm.txt": {
+      "bytes": 3264449,
+      "sha256": "fc0eb50e3a5fb7cfc53ed7fd835d905ec7bc0ffe6415a34381b307617d7dc1a8"
+    },
+    "data/veterinaires/amm-vet-fr-v2-v.xml": {
+      "bytes": 53472419,
+      "sha256": "336634be4e16effc3e189d25bce2a3c55715078583da37b13bcb63213c78a2ff"
+    },
+    "data/veterinaires/amm-vet-fr-v2-d.xml": {
+      "bytes": 917505,
+      "sha256": "5ee17fcbc9afcd9faf853de9f32c4919c6acb928bc7bf1b8d2df48dcc137baef"
+    }
+  },
+  "runs": {
+    "light-gc": {
+      "runtime": "v24.19.0",
+      "exec_args": [
+        "--expose-gc",
+        "--max-semi-space-size=8"
+      ],
+      "dependency": "1.11.0",
+      "configuration": {
+        "forceGc": true,
+        "batches": 6,
+        "requests": 400,
+        "concurrency": 8,
+        "reloads": 5,
+        "idleMs": 30000,
+        "corpus_light_profile": "true"
+      },
+      "revision": "5bc82b2e5db6f92190e6cadcc7dcad8945444936",
+      "traffic": [
+        {
+          "batch": 1,
+          "requests": 400,
+          "response_bytes": 242309,
+          "duration_ms": 3957
+        },
+        {
+          "batch": 2,
+          "requests": 400,
+          "response_bytes": 693188,
+          "duration_ms": 3462
+        },
+        {
+          "batch": 3,
+          "requests": 400,
+          "response_bytes": 1166178,
+          "duration_ms": 3477
+        },
+        {
+          "batch": 4,
+          "requests": 400,
+          "response_bytes": 1647868,
+          "duration_ms": 3316
+        },
+        {
+          "batch": 5,
+          "requests": 400,
+          "response_bytes": 1653758,
+          "duration_ms": 3345
+        },
+        {
+          "batch": 6,
+          "requests": 400,
+          "response_bytes": 1642612,
+          "duration_ms": 3247
+        }
+      ],
+      "samples": [
+        {
+          "label": "loaded",
+          "elapsed_ms": 4036,
+          "port": 46835,
+          "memory": {
+            "rss": 235741184,
+            "heapTotal": 108408832,
+            "heapUsed": 83028752,
+            "external": 14699912,
+            "arrayBuffers": 10867591
+          },
+          "sampled_peak_rss": 237109248,
+          "max_rss_kib": 234748,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "traffic_1_natural",
+          "elapsed_ms": 7996,
+          "memory": {
+            "rss": 447299584,
+            "heapTotal": 370843648,
+            "heapUsed": 356113288,
+            "external": 16241975,
+            "arrayBuffers": 12409654
+          },
+          "sampled_peak_rss": 447299584,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_1_gc",
+          "elapsed_ms": 8042,
+          "memory": {
+            "rss": 409550848,
+            "heapTotal": 108933120,
+            "heapUsed": 83079720,
+            "external": 14765153,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 409550848,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_2_natural",
+          "elapsed_ms": 11505,
+          "memory": {
+            "rss": 433819648,
+            "heapTotal": 280903680,
+            "heapUsed": 267051880,
+            "external": 15654036,
+            "arrayBuffers": 11825707
+          },
+          "sampled_peak_rss": 441073664,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_2_gc",
+          "elapsed_ms": 11548,
+          "memory": {
+            "rss": 411582464,
+            "heapTotal": 109195264,
+            "heapUsed": 83194296,
+            "external": 14765153,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 411582464,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_3_natural",
+          "elapsed_ms": 15026,
+          "memory": {
+            "rss": 437071872,
+            "heapTotal": 283521024,
+            "heapUsed": 270599992,
+            "external": 15832337,
+            "arrayBuffers": 12004008
+          },
+          "sampled_peak_rss": 446525440,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "FSReqCallback": 1,
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_3_gc",
+          "elapsed_ms": 15080,
+          "memory": {
+            "rss": 411643904,
+            "heapTotal": 109457408,
+            "heapUsed": 83224520,
+            "external": 14765153,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 411643904,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_4_natural",
+          "elapsed_ms": 18398,
+          "memory": {
+            "rss": 436604928,
+            "heapTotal": 284168192,
+            "heapUsed": 265692880,
+            "external": 15834152,
+            "arrayBuffers": 12004008
+          },
+          "sampled_peak_rss": 443289600,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_4_gc",
+          "elapsed_ms": 18444,
+          "memory": {
+            "rss": 411668480,
+            "heapTotal": 109457408,
+            "heapUsed": 83238256,
+            "external": 14765153,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 411668480,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_5_natural",
+          "elapsed_ms": 21790,
+          "memory": {
+            "rss": 436023296,
+            "heapTotal": 278753280,
+            "heapUsed": 264498512,
+            "external": 15819353,
+            "arrayBuffers": 11991024
+          },
+          "sampled_peak_rss": 442150912,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_5_gc",
+          "elapsed_ms": 21835,
+          "memory": {
+            "rss": 411594752,
+            "heapTotal": 109457408,
+            "heapUsed": 83331192,
+            "external": 14765153,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 411594752,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_6_natural",
+          "elapsed_ms": 25082,
+          "memory": {
+            "rss": 439279616,
+            "heapTotal": 284782592,
+            "heapUsed": 269211160,
+            "external": 15687672,
+            "arrayBuffers": 11859343
+          },
+          "sampled_peak_rss": 442867712,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_6_gc",
+          "elapsed_ms": 25128,
+          "memory": {
+            "rss": 411262976,
+            "heapTotal": 108933120,
+            "heapUsed": 82563184,
+            "external": 14763704,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 411262976,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "idle_10000_natural",
+          "elapsed_ms": 35131,
+          "memory": {
+            "rss": 411262976,
+            "heapTotal": 108933120,
+            "heapUsed": 82706976,
+            "external": 14763748,
+            "arrayBuffers": 10936868
+          },
+          "sampled_peak_rss": 411262976,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "idle_20000_natural",
+          "elapsed_ms": 45137,
+          "memory": {
+            "rss": 411262976,
+            "heapTotal": 108933120,
+            "heapUsed": 82783832,
+            "external": 14763792,
+            "arrayBuffers": 10936912
+          },
+          "sampled_peak_rss": 411262976,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "idle_30000_natural",
+          "elapsed_ms": 55144,
+          "memory": {
+            "rss": 411394048,
+            "heapTotal": 108933120,
+            "heapUsed": 82861624,
+            "external": 14763836,
+            "arrayBuffers": 10936956
+          },
+          "sampled_peak_rss": 411394048,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "idle_gc",
+          "elapsed_ms": 55187,
+          "memory": {
+            "rss": 411394048,
+            "heapTotal": 94253056,
+            "heapUsed": 82465568,
+            "external": 14763704,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 411394048,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_1",
+          "elapsed_ms": 58483,
+          "port": 46835,
+          "memory": {
+            "rss": 425418752,
+            "heapTotal": 129642496,
+            "heapUsed": 83058016,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 431853568,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 12,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_2",
+          "elapsed_ms": 61884,
+          "port": 46835,
+          "memory": {
+            "rss": 431534080,
+            "heapTotal": 118370304,
+            "heapUsed": 83067232,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 446308352,
+          "max_rss_kib": 437376,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 24,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_3",
+          "elapsed_ms": 65139,
+          "port": 46835,
+          "memory": {
+            "rss": 431788032,
+            "heapTotal": 114700288,
+            "heapUsed": 83058984,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 448323584,
+          "max_rss_kib": 439692,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 36,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_4",
+          "elapsed_ms": 68273,
+          "port": 46835,
+          "memory": {
+            "rss": 432553984,
+            "heapTotal": 125972480,
+            "heapUsed": 83088208,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 450576384,
+          "max_rss_kib": 440152,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 48,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_5",
+          "elapsed_ms": 71439,
+          "port": 46835,
+          "memory": {
+            "rss": 432701440,
+            "heapTotal": 125186048,
+            "heapUsed": 83093368,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 450850816,
+          "max_rss_kib": 440424,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 60,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        }
+      ]
+    },
+    "light-natural": {
+      "runtime": "v24.19.0",
+      "exec_args": [
+        "--max-semi-space-size=8"
+      ],
+      "dependency": "1.11.0",
+      "configuration": {
+        "forceGc": false,
+        "batches": 8,
+        "requests": 400,
+        "concurrency": 8,
+        "reloads": 3,
+        "idleMs": 60000,
+        "corpus_light_profile": "true"
+      },
+      "revision": "5bc82b2e5db6f92190e6cadcc7dcad8945444936",
+      "traffic": [
+        {
+          "batch": 1,
+          "requests": 400,
+          "response_bytes": 1615646,
+          "duration_ms": 4327
+        },
+        {
+          "batch": 2,
+          "requests": 400,
+          "response_bytes": 2519965,
+          "duration_ms": 3681
+        },
+        {
+          "batch": 3,
+          "requests": 400,
+          "response_bytes": 1619726,
+          "duration_ms": 3340
+        },
+        {
+          "batch": 4,
+          "requests": 400,
+          "response_bytes": 1666874,
+          "duration_ms": 3511
+        },
+        {
+          "batch": 5,
+          "requests": 400,
+          "response_bytes": 725175,
+          "duration_ms": 3615
+        },
+        {
+          "batch": 6,
+          "requests": 400,
+          "response_bytes": 296412,
+          "duration_ms": 3968
+        },
+        {
+          "batch": 7,
+          "requests": 400,
+          "response_bytes": 2106846,
+          "duration_ms": 3855
+        },
+        {
+          "batch": 8,
+          "requests": 400,
+          "response_bytes": 1539838,
+          "duration_ms": 3739
+        }
+      ],
+      "samples": [
+        {
+          "label": "loaded",
+          "elapsed_ms": 3815,
+          "port": 39343,
+          "memory": {
+            "rss": 217448448,
+            "heapTotal": 141107200,
+            "heapUsed": 124101224,
+            "external": 19521433,
+            "arrayBuffers": 15689133
+          },
+          "sampled_peak_rss": 217448448,
+          "max_rss_kib": 212480,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "traffic_1_natural",
+          "elapsed_ms": 8145,
+          "memory": {
+            "rss": 459268096,
+            "heapTotal": 193040384,
+            "heapUsed": 179014752,
+            "external": 15742246,
+            "arrayBuffers": 11909946
+          },
+          "sampled_peak_rss": 476168192,
+          "max_rss_kib": 477680,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "FSReqCallback": 1,
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_2_natural",
+          "elapsed_ms": 11827,
+          "memory": {
+            "rss": 512798720,
+            "heapTotal": 342491136,
+            "heapUsed": 326483264,
+            "external": 16432021,
+            "arrayBuffers": 12603713
+          },
+          "sampled_peak_rss": 512798720,
+          "max_rss_kib": 509160,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_3_natural",
+          "elapsed_ms": 15168,
+          "memory": {
+            "rss": 503992320,
+            "heapTotal": 203149312,
+            "heapUsed": 118195640,
+            "external": 14929462,
+            "arrayBuffers": 11101154
+          },
+          "sampled_peak_rss": 536031232,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_4_natural",
+          "elapsed_ms": 18682,
+          "memory": {
+            "rss": 522588160,
+            "heapTotal": 293376000,
+            "heapUsed": 274556888,
+            "external": 16267850,
+            "arrayBuffers": 12439542
+          },
+          "sampled_peak_rss": 535339008,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_5_natural",
+          "elapsed_ms": 22306,
+          "memory": {
+            "rss": 539496448,
+            "heapTotal": 393994240,
+            "heapUsed": 378546448,
+            "external": 16405147,
+            "arrayBuffers": 12578288
+          },
+          "sampled_peak_rss": 539496448,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_6_natural",
+          "elapsed_ms": 26275,
+          "memory": {
+            "rss": 518713344,
+            "heapTotal": 260431872,
+            "heapUsed": 240347904,
+            "external": 15451191,
+            "arrayBuffers": 11624332
+          },
+          "sampled_peak_rss": 535666688,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_7_natural",
+          "elapsed_ms": 30131,
+          "memory": {
+            "rss": 536027136,
+            "heapTotal": 371314688,
+            "heapUsed": 354758640,
+            "external": 16255849,
+            "arrayBuffers": 12428990
+          },
+          "sampled_peak_rss": 537333760,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_8_natural",
+          "elapsed_ms": 33871,
+          "memory": {
+            "rss": 515276800,
+            "heapTotal": 238080000,
+            "heapUsed": 214106400,
+            "external": 15805875,
+            "arrayBuffers": 11979016
+          },
+          "sampled_peak_rss": 539193344,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "idle_10000_natural",
+          "elapsed_ms": 43879,
+          "memory": {
+            "rss": 515276800,
+            "heapTotal": 238080000,
+            "heapUsed": 214270064,
+            "external": 15805919,
+            "arrayBuffers": 11979060
+          },
+          "sampled_peak_rss": 515276800,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "idle_20000_natural",
+          "elapsed_ms": 53881,
+          "memory": {
+            "rss": 515276800,
+            "heapTotal": 238080000,
+            "heapUsed": 214343200,
+            "external": 15805963,
+            "arrayBuffers": 11979104
+          },
+          "sampled_peak_rss": 515276800,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "idle_30000_natural",
+          "elapsed_ms": 63883,
+          "memory": {
+            "rss": 515276800,
+            "heapTotal": 238080000,
+            "heapUsed": 214423096,
+            "external": 15806007,
+            "arrayBuffers": 11979148
+          },
+          "sampled_peak_rss": 515276800,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "idle_40000_natural",
+          "elapsed_ms": 73889,
+          "memory": {
+            "rss": 515276800,
+            "heapTotal": 238080000,
+            "heapUsed": 214482904,
+            "external": 15806051,
+            "arrayBuffers": 11979192
+          },
+          "sampled_peak_rss": 515276800,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "idle_50000_natural",
+          "elapsed_ms": 83896,
+          "memory": {
+            "rss": 515276800,
+            "heapTotal": 238080000,
+            "heapUsed": 214539616,
+            "external": 15806095,
+            "arrayBuffers": 11979236
+          },
+          "sampled_peak_rss": 515276800,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "idle_60000_natural",
+          "elapsed_ms": 93898,
+          "memory": {
+            "rss": 515276800,
+            "heapTotal": 238080000,
+            "heapUsed": 214597520,
+            "external": 15806139,
+            "arrayBuffers": 11979280
+          },
+          "sampled_peak_rss": 515276800,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_1",
+          "elapsed_ms": 97252,
+          "port": 39343,
+          "memory": {
+            "rss": 510967808,
+            "heapTotal": 163725312,
+            "heapUsed": 111436832,
+            "external": 16000855,
+            "arrayBuffers": 12173996
+          },
+          "sampled_peak_rss": 518828032,
+          "max_rss_kib": 530484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 12,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_2",
+          "elapsed_ms": 100366,
+          "port": 39343,
+          "memory": {
+            "rss": 566108160,
+            "heapTotal": 278294528,
+            "heapUsed": 262215312,
+            "external": 59314966,
+            "arrayBuffers": 55488107
+          },
+          "sampled_peak_rss": 566108160,
+          "max_rss_kib": 553032,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 24,
+          "retired_indexes_alive": 13,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_3",
+          "elapsed_ms": 103428,
+          "port": 39343,
+          "memory": {
+            "rss": 545681408,
+            "heapTotal": 187047936,
+            "heapUsed": 102582976,
+            "external": 15730511,
+            "arrayBuffers": 11757056
+          },
+          "sampled_peak_rss": 581210112,
+          "max_rss_kib": 570404,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 36,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        }
+      ]
+    },
+    "full-gc": {
+      "runtime": "v24.19.0",
+      "exec_args": [
+        "--expose-gc",
+        "--max-semi-space-size=8"
+      ],
+      "dependency": "1.11.0",
+      "configuration": {
+        "forceGc": true,
+        "batches": 3,
+        "requests": 200,
+        "concurrency": 8,
+        "reloads": 5,
+        "idleMs": 10000,
+        "corpus_light_profile": "false"
+      },
+      "revision": "5bc82b2e5db6f92190e6cadcc7dcad8945444936",
+      "traffic": [
+        {
+          "batch": 1,
+          "requests": 200,
+          "response_bytes": 144641,
+          "duration_ms": 1765
+        },
+        {
+          "batch": 2,
+          "requests": 200,
+          "response_bytes": 681420,
+          "duration_ms": 1657
+        },
+        {
+          "batch": 3,
+          "requests": 200,
+          "response_bytes": 1038824,
+          "duration_ms": 1607
+        }
+      ],
+      "samples": [
+        {
+          "label": "loaded",
+          "elapsed_ms": 4081,
+          "port": 43613,
+          "memory": {
+            "rss": 203677696,
+            "heapTotal": 109981696,
+            "heapUsed": 84049536,
+            "external": 14699912,
+            "arrayBuffers": 10867591
+          },
+          "sampled_peak_rss": 204558336,
+          "max_rss_kib": 204148,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "traffic_1_natural",
+          "elapsed_ms": 5849,
+          "memory": {
+            "rss": 371482624,
+            "heapTotal": 294309888,
+            "heapUsed": 280547304,
+            "external": 16606203,
+            "arrayBuffers": 12773882
+          },
+          "sampled_peak_rss": 371482624,
+          "max_rss_kib": 363628,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_1_gc",
+          "elapsed_ms": 5916,
+          "memory": {
+            "rss": 346918912,
+            "heapTotal": 111030272,
+            "heapUsed": 85455128,
+            "external": 14769145,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 346918912,
+          "max_rss_kib": 363628,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_2_natural",
+          "elapsed_ms": 7574,
+          "memory": {
+            "rss": 382083072,
+            "heapTotal": 305053696,
+            "heapUsed": 288939016,
+            "external": 16506099,
+            "arrayBuffers": 12673778
+          },
+          "sampled_peak_rss": 382083072,
+          "max_rss_kib": 373128,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_2_gc",
+          "elapsed_ms": 7636,
+          "memory": {
+            "rss": 356372480,
+            "heapTotal": 110768128,
+            "heapUsed": 85486792,
+            "external": 14769145,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 356372480,
+          "max_rss_kib": 373128,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_3_natural",
+          "elapsed_ms": 9244,
+          "memory": {
+            "rss": 384471040,
+            "heapTotal": 301441024,
+            "heapUsed": 286793760,
+            "external": 16472311,
+            "arrayBuffers": 12639990
+          },
+          "sampled_peak_rss": 384471040,
+          "max_rss_kib": 376220,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_3_gc",
+          "elapsed_ms": 9300,
+          "memory": {
+            "rss": 358543360,
+            "heapTotal": 110768128,
+            "heapUsed": 85617576,
+            "external": 14769145,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 358543360,
+          "max_rss_kib": 376220,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "idle_10000_natural",
+          "elapsed_ms": 19308,
+          "memory": {
+            "rss": 358543360,
+            "heapTotal": 110768128,
+            "heapUsed": 85770088,
+            "external": 14769188,
+            "arrayBuffers": 10936867
+          },
+          "sampled_peak_rss": 358543360,
+          "max_rss_kib": 376220,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "idle_gc",
+          "elapsed_ms": 19385,
+          "memory": {
+            "rss": 358543360,
+            "heapTotal": 96088064,
+            "heapUsed": 85528152,
+            "external": 14769145,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 358543360,
+          "max_rss_kib": 376220,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_1",
+          "elapsed_ms": 26985,
+          "port": 43613,
+          "memory": {
+            "rss": 616124416,
+            "heapTotal": 142487552,
+            "heapUsed": 83973024,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 616124416,
+          "max_rss_kib": 605492,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 12,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_2",
+          "elapsed_ms": 31760,
+          "port": 43613,
+          "memory": {
+            "rss": 650665984,
+            "heapTotal": 129904640,
+            "heapUsed": 83797384,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 651288576,
+          "max_rss_kib": 650760,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 24,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_3",
+          "elapsed_ms": 36521,
+          "port": 43613,
+          "memory": {
+            "rss": 654094336,
+            "heapTotal": 142225408,
+            "heapUsed": 83802904,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 669528064,
+          "max_rss_kib": 656104,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 36,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_4",
+          "elapsed_ms": 41447,
+          "port": 43613,
+          "memory": {
+            "rss": 664850432,
+            "heapTotal": 145633280,
+            "heapUsed": 83780376,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 689528832,
+          "max_rss_kib": 677208,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 48,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_5",
+          "elapsed_ms": 46323,
+          "port": 43613,
+          "memory": {
+            "rss": 665485312,
+            "heapTotal": 142225408,
+            "heapUsed": 83817656,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 694071296,
+          "max_rss_kib": 678196,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 60,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "after_reload_handlers_gc",
+          "elapsed_ms": 46391,
+          "memory": {
+            "rss": 665485312,
+            "heapTotal": 141963264,
+            "heapUsed": 83734944,
+            "external": 14694471,
+            "arrayBuffers": 10867591
+          },
+          "sampled_peak_rss": 665485312,
+          "max_rss_kib": 678196,
+          "string_pool_size": 26453,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 60,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        }
+      ]
+    },
+    "normal-gc": {
+      "runtime": "v24.19.0",
+      "exec_args": [
+        "--expose-gc",
+        "--max-semi-space-size=8"
+      ],
+      "dependency": "1.11.0",
+      "configuration": {
+        "forceGc": true,
+        "batches": 6,
+        "requests": 600,
+        "concurrency": 8,
+        "reloads": 5,
+        "idleMs": 10000,
+        "trafficMode": "normal",
+        "corpus_light_profile": "true"
+      },
+      "revision": "5bc82b2e5db6f92190e6cadcc7dcad8945444936",
+      "traffic": [
+        {
+          "batch": 1,
+          "requests": 600,
+          "response_bytes": 2254881,
+          "duration_ms": 922
+        },
+        {
+          "batch": 2,
+          "requests": 600,
+          "response_bytes": 1626795,
+          "duration_ms": 855
+        },
+        {
+          "batch": 3,
+          "requests": 600,
+          "response_bytes": 2258934,
+          "duration_ms": 802
+        },
+        {
+          "batch": 4,
+          "requests": 600,
+          "response_bytes": 2731855,
+          "duration_ms": 827
+        },
+        {
+          "batch": 5,
+          "requests": 600,
+          "response_bytes": 1214336,
+          "duration_ms": 808
+        },
+        {
+          "batch": 6,
+          "requests": 600,
+          "response_bytes": 1326518,
+          "duration_ms": 817
+        }
+      ],
+      "samples": [
+        {
+          "label": "loaded",
+          "elapsed_ms": 3707,
+          "port": 46165,
+          "memory": {
+            "rss": 214237184,
+            "heapTotal": 109457408,
+            "heapUsed": 83027184,
+            "external": 14699912,
+            "arrayBuffers": 10867591
+          },
+          "sampled_peak_rss": 216977408,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "traffic_1_natural",
+          "elapsed_ms": 4631,
+          "memory": {
+            "rss": 218234880,
+            "heapTotal": 111583232,
+            "heapUsed": 91247512,
+            "external": 16222371,
+            "arrayBuffers": 12390050
+          },
+          "sampled_peak_rss": 218234880,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_1_gc",
+          "elapsed_ms": 4691,
+          "memory": {
+            "rss": 217579520,
+            "heapTotal": 110768128,
+            "heapUsed": 84686360,
+            "external": 14769145,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 217735168,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_2_natural",
+          "elapsed_ms": 5546,
+          "memory": {
+            "rss": 218062848,
+            "heapTotal": 111398912,
+            "heapUsed": 92083920,
+            "external": 16346399,
+            "arrayBuffers": 12514078
+          },
+          "sampled_peak_rss": 218300416,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "FSReqCallback": 1,
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_2_gc",
+          "elapsed_ms": 5619,
+          "memory": {
+            "rss": 217747456,
+            "heapTotal": 111292416,
+            "heapUsed": 84612784,
+            "external": 14769145,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 217747456,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_3_natural",
+          "elapsed_ms": 6422,
+          "memory": {
+            "rss": 218083328,
+            "heapTotal": 111661056,
+            "heapUsed": 87689240,
+            "external": 16346759,
+            "arrayBuffers": 12514438
+          },
+          "sampled_peak_rss": 218476544,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 30,
+          "resources": {
+            "FSReqCallback": 1,
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_3_gc",
+          "elapsed_ms": 6487,
+          "memory": {
+            "rss": 217767936,
+            "heapTotal": 111292416,
+            "heapUsed": 84763880,
+            "external": 14769145,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 217767936,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_4_natural",
+          "elapsed_ms": 7314,
+          "memory": {
+            "rss": 218284032,
+            "heapTotal": 111845376,
+            "heapUsed": 90524456,
+            "external": 16287061,
+            "arrayBuffers": 12454740
+          },
+          "sampled_peak_rss": 218492928,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "FSReqCallback": 1,
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_4_gc",
+          "elapsed_ms": 7375,
+          "memory": {
+            "rss": 217784320,
+            "heapTotal": 111292416,
+            "heapUsed": 84789008,
+            "external": 14769145,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 217784320,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_5_natural",
+          "elapsed_ms": 8188,
+          "memory": {
+            "rss": 218656768,
+            "heapTotal": 112214016,
+            "heapUsed": 90969968,
+            "external": 16147254,
+            "arrayBuffers": 12314933
+          },
+          "sampled_peak_rss": 219201536,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_5_gc",
+          "elapsed_ms": 8259,
+          "memory": {
+            "rss": 217788416,
+            "heapTotal": 111292416,
+            "heapUsed": 84745784,
+            "external": 14769145,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 217788416,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_6_natural",
+          "elapsed_ms": 9076,
+          "memory": {
+            "rss": 218316800,
+            "heapTotal": 111845376,
+            "heapUsed": 90434984,
+            "external": 16087514,
+            "arrayBuffers": 12255193
+          },
+          "sampled_peak_rss": 218497024,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "traffic_6_gc",
+          "elapsed_ms": 9135,
+          "memory": {
+            "rss": 217817088,
+            "heapTotal": 111292416,
+            "heapUsed": 84864200,
+            "external": 14769145,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 217817088,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 29,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1,
+            "TCPSocketWrap": 8
+          }
+        },
+        {
+          "label": "idle_10000_natural",
+          "elapsed_ms": 19140,
+          "memory": {
+            "rss": 217817088,
+            "heapTotal": 111292416,
+            "heapUsed": 84986120,
+            "external": 14769189,
+            "arrayBuffers": 10936868
+          },
+          "sampled_peak_rss": 217817088,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "idle_gc",
+          "elapsed_ms": 19191,
+          "memory": {
+            "rss": 217817088,
+            "heapTotal": 96612352,
+            "heapUsed": 84761048,
+            "external": 14769145,
+            "arrayBuffers": 10936824
+          },
+          "sampled_peak_rss": 217817088,
+          "max_rss_kib": 214912,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 0,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_1",
+          "elapsed_ms": 22448,
+          "port": 46165,
+          "memory": {
+            "rss": 265969664,
+            "heapTotal": 119681024,
+            "heapUsed": 83801056,
+            "external": 14857654,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 266911744,
+          "max_rss_kib": 264496,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 12,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_2",
+          "elapsed_ms": 25559,
+          "port": 46165,
+          "memory": {
+            "rss": 273784832,
+            "heapTotal": 123351040,
+            "heapUsed": 83794656,
+            "external": 14857654,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 284647424,
+          "max_rss_kib": 279484,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 24,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_3",
+          "elapsed_ms": 28693,
+          "port": 46165,
+          "memory": {
+            "rss": 279773184,
+            "heapTotal": 127021056,
+            "heapUsed": 83060768,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 292753408,
+          "max_rss_kib": 286064,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 36,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_4",
+          "elapsed_ms": 31875,
+          "port": 46165,
+          "memory": {
+            "rss": 281526272,
+            "heapTotal": 114700288,
+            "heapUsed": 83075992,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 298778624,
+          "max_rss_kib": 292360,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 48,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "reload_5",
+          "elapsed_ms": 35283,
+          "port": 46165,
+          "memory": {
+            "rss": 282058752,
+            "heapTotal": 114700288,
+            "heapUsed": 83076864,
+            "external": 14856205,
+            "arrayBuffers": 11029325
+          },
+          "sampled_peak_rss": 296857600,
+          "max_rss_kib": 293444,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 60,
+          "retired_indexes_alive": 1,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        },
+        {
+          "label": "after_reload_handlers_gc",
+          "elapsed_ms": 35319,
+          "memory": {
+            "rss": 282058752,
+            "heapTotal": 114700288,
+            "heapUsed": 82984760,
+            "external": 14694471,
+            "arrayBuffers": 10867591
+          },
+          "sampled_peak_rss": 282058752,
+          "max_rss_kib": 293444,
+          "string_pool_size": 25505,
+          "rows": [
+            {
+              "specialites": 15883,
+              "presentations": 20911,
+              "compositions": 32439,
+              "avis_smr": 15547,
+              "avis_asmr": 10117,
+              "generiques": 10737,
+              "conditions": 28532,
+              "ruptures": 705,
+              "substances": 3907,
+              "mitm": 7711
+            },
+            {
+              "medicaments": 3221,
+              "compositions": 4925,
+              "presentations": 19886
+            }
+          ],
+          "retired_indexes": 60,
+          "retired_indexes_alive": 0,
+          "fd_count": 21,
+          "resources": {
+            "PipeWrap": 1,
+            "TCPServerWrap": 1
+          }
+        }
+      ]
+    }
+  },
+  "resource_errors": {
+    "runtime": "v24.19.0",
+    "results": [
+      {
+        "name": "pool-reload",
+        "cycles": [
+          {
+            "cycle": 0,
+            "pool": 2000,
+            "rows": 1000,
+            "heap_used": 11873200
+          },
+          {
+            "cycle": 1,
+            "pool": 4000,
+            "rows": 1000,
+            "heap_used": 12109728
+          },
+          {
+            "cycle": 2,
+            "pool": 6000,
+            "rows": 1000,
+            "heap_used": 12477464
+          }
+        ],
+        "pool_after_corpus_reset": 6000,
+        "pool_after_explicit_clear": 0
+      },
+      {
+        "name": "download-source-error",
+        "promise_status": "pending",
+        "source_destroyed": true,
+        "source_error_listeners": 0,
+        "writer_created": true,
+        "writer_destroyed": false,
+        "writer_finished": false,
+        "uncaught_errors": [
+          "AUDIT_SOCKET_RESET"
+        ]
+      },
+      {
+        "name": "download-writer-error",
+        "promise_status": "rejected: AUDIT_DISK_FULL",
+        "source_destroyed": false,
+        "source_error_listeners": 0,
+        "writer_created": true,
+        "writer_destroyed": true,
+        "writer_finished": false,
+        "uncaught_errors": []
+      },
+      {
+        "name": "download-directory-error",
+        "promise_status": "rejected: AUDIT_DIRECTORY_FAILURE",
+        "source_destroyed": false,
+        "source_error_listeners": 0,
+        "writer_created": false,
+        "writer_destroyed": null,
+        "writer_finished": null,
+        "uncaught_errors": []
+      },
+      {
+        "name": "csv-source-error",
+        "promise_status": "pending",
+        "source_error_listeners": 0,
+        "uncaught_errors": [
+          "AUDIT_CSV_READ_FAILURE"
+        ]
+      },
+      {
+        "name": "header-fd-error",
+        "header_fds_opened": 1,
+        "header_fds_closed": 0
+      },
+      {
+        "name": "refresh-overlap",
+        "startup_bdpm_calls": 1,
+        "total_bdpm_calls": 4,
+        "simultaneous_refreshes": 3,
+        "configured_refresh_ms": 259200000
+      },
+      {
+        "name": "timer-overflow",
+        "accepted_hours": 597,
+        "requested_ms": 2149200000,
+        "node_effective_ms": 1
+      },
+      {
+        "name": "range-ignored",
+        "range_header": "bytes=0-0",
+        "payload_bytes": 4194304,
+        "fingerprint": {
+          "etag": null,
+          "lastModified": null,
+          "contentLength": 4194304
+        },
+        "before": {
+          "rss": 31174656,
+          "heapTotal": 6287360,
+          "heapUsed": 5180408,
+          "external": 2187422,
+          "arrayBuffers": 137759
+        },
+        "after": {
+          "rss": 68571136,
+          "heapTotal": 14880768,
+          "heapUsed": 11004840,
+          "external": 20714969,
+          "arrayBuffers": 16924060
+        }
+      }
+    ]
+  },
+  "heap_snapshots": [
+    {
+      "file": "after-reloads.heapsnapshot",
+      "node_count": 1140986,
+      "self_bytes_total": 98511806,
+      "frozen_objects": {
+        "FrozenMiniSearchCore": 1,
+        "FrozenMiniSearch": 12
+      },
+      "corpus_objects": {
+        "CorpusRecord": 180238
+      },
+      "sliced_strings": 22011,
+      "unique_slice_parent_bytes": 3111952,
+      "large_slice_parents": 15,
+      "xml_string_nodes": 3,
+      "xml_string_self_bytes": 5152
+    },
+    {
+      "file": "before-reloads.heapsnapshot",
+      "node_count": 1153673,
+      "self_bytes_total": 99152631,
+      "frozen_objects": {
+        "FrozenMiniSearch": 12,
+        "FrozenMiniSearchCore": 1
+      },
+      "corpus_objects": {
+        "CorpusRecord": 180238
+      },
+      "sliced_strings": 21997,
+      "unique_slice_parent_bytes": 2785696,
+      "large_slice_parents": 12,
+      "xml_string_nodes": 3,
+      "xml_string_self_bytes": 5152
+    }
+  ],
+  "tests": {
+    "numPassedTests": 216,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numPassedTestSuites": 21,
+    "numFailedTestSuites": 0,
+    "success": true
+  }
+}
