@@ -129,6 +129,36 @@ describe('searchRankedPage', () => {
     }
   });
 
+  test('does not cache a query without a next page', () => {
+    searchRankedPage(rows, index, 'alpha', spec, 1, 1);
+    const single = searchRankedPage(rows, index, '60000000', spec, 1, 1000);
+    expect(single.total).toBeGreaterThan(1);
+    expect(single.total).toBeLessThanOrEqual(1000);
+    const search = jest.spyOn(index, 'search');
+    try {
+      searchRankedPage(rows, index, '60000000', spec, 1, 1);
+      expect(search).toHaveBeenCalledTimes(1);
+      expect(search).toHaveBeenCalledWith('60000000');
+    } finally {
+      search.mockRestore();
+    }
+  });
+
+  test('keeps the paginated query cached across a single-page query', () => {
+    const full = rankSearchResults(rows, index.search('alpha'), 'alpha', spec);
+    searchRankedPage(rows, index, 'alpha', spec, 1, 10);
+    searchRankedPage(rows, index, '60000000', spec, 1, 1000);
+    const search = jest.spyOn(index, 'search');
+    try {
+      const result = searchRankedPage(rows, index, 'alpha', spec, 2, 10);
+      expect(result.ranked).toEqual(full.slice(10, 20));
+      expect(search).toHaveBeenCalledTimes(1);
+      expect(search.mock.calls[0][1].limit).toBe(20);
+    } finally {
+      search.mockRestore();
+    }
+  });
+
   test('replaces the cache after a different query and rebuilds it for a new index', () => {
     searchRankedPage(rows, index, 'alpha', spec, 1, 1);
     searchRankedPage(rows, index, 'alphe', spec, 1, 1);

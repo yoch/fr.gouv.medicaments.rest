@@ -29,12 +29,10 @@ function queryTerms(query) {
  * - prefix : commence par la requête, contient tous les termes en mots entiers,
  *   ou commence par le 1er terme avec tous les termes présents
  * - fuzzy : match MiniSearch (typo / terme partiel) sans couverture complète
+ *
+ * La requête est normalisée et ses expressions régulières compilées une seule
+ * fois ; la fonction retournée classe ensuite chaque candidat.
  */
-function computeMatchPriority(primaryValue, query, { idValue = '', codeValues = [] } = {}) {
-  return createMatchPriorityClassifier(query)(primaryValue, { idValue, codeValues });
-}
-
-/** Normalize and compile the query once for a batch of corpus candidates. */
 function createMatchPriorityClassifier(query) {
   const normalizedQuery = normalizeSearchText(query);
   const terms = queryTerms(query);
@@ -93,7 +91,6 @@ const MATCH_VIA_RANK = { cis: 4, num: 4, denomination: 3, presentation: 2, compo
 module.exports = {
   miniSearchOptions,
   normalizeSearchText,
-  computeMatchPriority,
   createMatchPriorityClassifier,
   matchQualityFromPriority,
   isStrongMatchQuality,

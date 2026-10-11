@@ -1,11 +1,14 @@
 const { FrozenMiniSearch } = require('@yoch/frozenminisearch');
 const {
   miniSearchOptions,
-  computeMatchPriority,
+  createMatchPriorityClassifier,
   matchQualityFromPriority,
   isStrongMatchQuality,
   queryTerms
 } = require('../src/utils/searchRanking');
+
+const computeMatchPriority = (primaryValue, query, options) =>
+  createMatchPriorityClassifier(query)(primaryValue, options);
 
 describe('searchRanking', () => {
   describe('queryTerms', () => {
@@ -18,7 +21,15 @@ describe('searchRanking', () => {
     });
   });
 
-  describe('computeMatchPriority', () => {
+  describe('createMatchPriorityClassifier', () => {
+    it('réutilise la même requête compilée pour plusieurs candidats', () => {
+      const classify = createMatchPriorityClassifier('doliprane 500');
+      expect(classify('DOLIPRANE 500 mg, gélule')).toBe(1);
+      expect(classify('DOLIPRANE 500 mg, gélule')).toBe(1);
+      expect(classify('doliprane 500')).toBe(2);
+      expect(classify('DOLIPRANE 1000 mg')).toBe(0);
+    });
+
     it('exact si libellé égal à la requête multi-termes', () => {
       expect(
         computeMatchPriority('SULTRIAN 100', 'SULTRIAN 100')

@@ -14,7 +14,10 @@ par exemple le titulaire. Il faut aussi préserver `pagination.total`.
 Pour chaque index immuable, un `WeakMap` conserve uniquement la dernière requête,
 son total, les trois effectifs et un `Uint8Array` des qualités par identifiant de
 ligne. La première requête effectue une recherche et un classement complets,
-en un seul passage de calcul des scores. Les requêtes suivantes qui portent sur
+en un seul passage de calcul des scores. Elle ne crée une entrée que si une page
+suivante existe : une recherche dont tous les résultats tiennent dans la page
+demandée ne remplace pas l'entrée d'une autre requête en cours de pagination.
+Les requêtes suivantes qui portent sur
 la même chaîne et demandent une page contenue dans un niveau de qualité utilisent :
 
 - `filter` pour retenir ce niveau de qualité ;
@@ -49,6 +52,9 @@ JSON ou résultats complets. Son tableau occupe un octet par ligne du corpus,
 plus la chaîne et les petits objets de comptage. Par exemple : 15 883 octets
 pour les spécialités du jeu mesuré, 20 911 pour les présentations et 32 439 pour
 les compositions. Ce sont les tailles des tableaux, pas une mesure du RSS.
+Avec une entrée sur chacun des 12 index de recherche (BDPM et ANMV), les
+tableaux totalisent 154 204 octets sur le jeu du 11 octobre 2026 ; la part du
+tas JS est inférieure au bruit de mesure, pour un RSS d'environ 340 Mo.
 Une requête différente remplace l'entrée ; un nouvel index après rechargement
 n'a pas d'entrée. Des clients qui alternent leurs requêtes peuvent donc perdre
 le bénéfice du cache. Les pages profondes demandent un préfixe plus grand.
@@ -91,6 +97,10 @@ incluent les tailles des corpus et toutes les variantes.
 | Spécialités / `dolipranr` | 1 / 20 | 18 | 0,118 ms | 0,112 ms | 0,121 ms |
 | Spécialités / `amoxicilline` | 1 / 20 | 125 | 0,207 ms | 0,133 ms | 0,217 ms |
 | Compositions / `paracetamol` | 1 / 20 | 224 | 0,216 ms | 0,112 ms | 0,226 ms |
+
+Ces mesures précèdent la règle « pas d'entrée sans page suivante » : `dolipranr`
+(18 résultats pour une limite de 20) n'est plus mis en cache et garde le coût
+complet, de l'ordre de 0,12 ms.
 
 Sur ces recherches larges et répétées, le temps mesuré diminue de 84 à 93 %.
 Sur les petites recherches, le gain absolu reste inférieur à 0,11 ms.
