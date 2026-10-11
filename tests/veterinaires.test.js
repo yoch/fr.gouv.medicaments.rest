@@ -10,7 +10,7 @@ const express = require('express');
 const medicamentRoutes = require('../src/routes/medicaments');
 const veterinaireRoutes = require('../src/routes/veterinaires');
 const { loadData } = require('../src/services/dataLoader');
-const { loadVetData } = require('../src/services/vetDataLoader');
+const { loadVetData, searchVet } = require('../src/services/vetDataLoader');
 const { DOLIPRANE_CIP13, DOLIPRANE_CIS } = require('./fixtures/cis-cip-samples');
 const { describeSlow } = require('./helpers/slowTests');
 
@@ -37,6 +37,20 @@ describeSlow('API Vétérinaires ANMV', () => {
       expect(res.body.data[0].nom).toMatch(/SULTRIAN/i);
       expect(res.body.data[0].match_quality).toBeDefined();
     });
+  });
+
+  test.each([
+    ['medicaments', 'sultrian'],
+    ['compositions', 'trimethoprime']
+  ])('conserve classement et total des pages vétérinaires de %s', async (type, query) => {
+    const expected = searchVet(type, query);
+    expect(expected.length).toBeGreaterThan(0);
+    for (const page of [1, 2, 1]) {
+      const response = await request(app).get(`/api/veterinaires/${type}?q=${query}&limit=1&page=${page}`);
+      expect(response.statusCode).toBe(200);
+      expect(response.body.pagination.total).toBe(expected.length);
+      expect(response.body.data).toEqual(expected.slice(page - 1, page));
+    }
   });
 
   describe('GET /api/veterinaires/medicaments/:num', () => {

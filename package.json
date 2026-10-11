@@ -13,6 +13,7 @@
     "export-search-indexes": "node src/scripts/export-search-indexes.js",
     "export-corpus-documents": "node src/scripts/export-corpus-documents.js",
     "benchmark:csv-loading": "node --expose-gc scripts/benchmark/benchmark-csv-loading.js",
+    "benchmark:search-pagination": "node --expose-gc scripts/benchmark/benchmark-search-pagination.js",
     "benchmark:vet-xml": "node --expose-gc scripts/benchmark/vet-xml-parsers.js",
     "analyze:interning": "node scripts/benchmark/analyze-interning-candidates.js",
     "measure:bdpm-resident": "node --expose-gc scripts/memory/measure-interning-resident.js",
@@ -27,13 +28,13 @@
   },
   "dependencies": {
     "@nodable/flexible-xml-parser": "^1.11.3",
-    "@yoch/frozenminisearch": "^1.9.0",
+    "@yoch/frozenminisearch": "^1.10.0",
     "7zip-bin": "^5.2.0",
     "axios": "^1.20.0",
     "cors": "^2.8.6",
     "csv-parse": "^7.0.3",
-    "express": "^5.2.1",
-    "express-rate-limit": "^8.7.0",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
     "fs-extra": "^11.4.1",
     "helmet": "^8.3.0",
     "swagger-jsdoc": "^6.3.0",
@@ -41,11 +42,11 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "fast-xml-parser": "^5.11.1",
+    "fast-xml-parser": "^5.11.2",
     "jest": "^30.5.2",
-    "knip": "^6.38.0",
+    "knip": "^6.41.0",
     "nodemon": "^3.1.14",
-    "supertest": "^7.3.0"
+    "supertest": "^7.3.1"
   },
   "keywords": [
     "medicaments",

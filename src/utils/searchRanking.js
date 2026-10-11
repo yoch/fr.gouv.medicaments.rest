@@ -22,48 +22,49 @@ function queryTerms(query) {
   return tokenizeSearchText(query).map((term) => normalizeSearchText(term)).filter(Boolean);
 }
 
-function termMatchesAsWord(haystack, term) {
-  const re = new RegExp(`(?:^|[^a-z0-9])${escapeRegExp(term)}(?:[^a-z0-9]|$)`);
-  return re.test(haystack);
-}
-
 /**
  * Classement match_quality : couverture des termes de la requête dans le libellé
  * (plus fiable que l'égalité de la chaîne entière seule).
- * - exact : libellé égal à la requête, code égal (CIS/num/CIP), ou tous les termes en mots entiers
- * - prefix : commence par la requête ou par le 1er terme avec tous les termes présents
+ * - exact : libellé égal à la requête ou code égal (CIS/num/CIP)
+ * - prefix : commence par la requête, contient tous les termes en mots entiers,
+ *   ou commence par le 1er terme avec tous les termes présents
  * - fuzzy : match MiniSearch (typo / terme partiel) sans couverture complète
- *
- * Idée non implémentée : rejeter ou restreindre les requêtes trop "code", par ex. seulement
- * numériques ou alphanumériques très courts.
  */
 function computeMatchPriority(primaryValue, query, { idValue = '', codeValues = [] } = {}) {
+  return createMatchPriorityClassifier(query)(primaryValue, { idValue, codeValues });
+}
+
+/** Normalize and compile the query once for a batch of corpus candidates. */
+function createMatchPriorityClassifier(query) {
   const normalizedQuery = normalizeSearchText(query);
   const terms = queryTerms(query);
-  if (!terms.length) return 0;
+  const wordMatchers = terms.map((term) =>
+    new RegExp(`(?:^|[^a-z0-9])${escapeRegExp(term)}(?:[^a-z0-9]|$)`));
 
-  const value = normalizeSearchText(primaryValue);
-  const normalizedId = normalizeSearchText(idValue);
+  return (primaryValue, { idValue = '', codeValues = [] } = {}) => {
+    if (!terms.length) return 0;
 
-  if (value === normalizedQuery || normalizedId === normalizedQuery) return 2;
-  for (const codeValue of codeValues) {
-    if (normalizeSearchText(codeValue) === normalizedQuery) return 2;
-  }
-  if (value.startsWith(normalizedQuery)) return 1;
+    const value = normalizeSearchText(primaryValue);
+    const normalizedId = normalizeSearchText(idValue);
 
-  const haystack = value || normalizedId;
-  if (!haystack) return 0;
+    if (value === normalizedQuery || normalizedId === normalizedQuery) return 2;
+    for (const codeValue of codeValues) {
+      if (normalizeSearchText(codeValue) === normalizedQuery) return 2;
+    }
+    if (value.startsWith(normalizedQuery)) return 1;
 
-  const allTermsPresent = terms.every((term) => haystack.includes(term));
-  if (!allTermsPresent) return 0;
+    const haystack = value || normalizedId;
+    if (!haystack) return 0;
 
-  if (terms.every((term) => termMatchesAsWord(haystack, term))) {
-    return value === normalizedQuery ? 2 : 1;
-  }
+    const allTermsPresent = terms.every((term) => haystack.includes(term));
+    if (!allTermsPresent) return 0;
 
-  if (haystack.startsWith(terms[0])) return 1;
+    if (wordMatchers.every((matcher) => matcher.test(haystack))) return 1;
 
-  return 0;
+    if (haystack.startsWith(terms[0])) return 1;
+
+    return 0;
+  };
 }
 
 function matchQualityFromPriority(priority) {
@@ -93,6 +94,7 @@ module.exports = {
   miniSearchOptions,
   normalizeSearchText,
   computeMatchPriority,
+  createMatchPriorityClassifier,
   matchQualityFromPriority,
   isStrongMatchQuality,
   queryTerms,

@@ -21,6 +21,7 @@ const { miniSearchIndexConfig } = require('../utils/miniSearchIndexConfig');
 const { BDPM_SCHEMAS } = require('../utils/corpusSchemas');
 const {
   rankSearchResults,
+  searchRankedPage,
   materializeRankedSearchRange,
   rankAndMaterializeSearch
 } = require('../utils/corpusSearch');
@@ -243,14 +244,16 @@ function rankedSearch(type, query) {
 
 function searchPage(type, query, page = 1, limit = 100) {
   const rows = corpus[type];
-  const ranked = rankedSearch(type, query);
+  const { total, ranked } = searchRankedPage(
+    rows, searchIndexes[type], query, BDPM_INDEX_SPECS[type], page, limit
+  );
   return buildPagedResponse({
-    total: ranked.length,
+    total,
     page,
     limit,
     metadata,
-    materializePage: (offset, end) =>
-      materializeRankedSearchRange(rows, ranked, offset, end)
+    materializePage: () =>
+      materializeRankedSearchRange(rows, ranked, 0, ranked.length)
   });
 }
 
