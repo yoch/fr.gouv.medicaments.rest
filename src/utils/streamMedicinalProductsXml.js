@@ -107,40 +107,35 @@ async function streamMedicinalProducts(productsPath, onProduct, options = {}) {
 
   function* productBlocks(lines) {
     for (const line of lines) {
-      if (!inProduct) {
+      let fragment;
+      if (inProduct) {
+        fragment = stripIgnoredProductTags(`\n${line}`, stripState, stripTags);
+      } else {
         const openIdx = indexOfProductOpen(line);
         if (openIdx === -1) continue;
         inProduct = true;
-        buffer = stripIgnoredProductTags(line.slice(openIdx), stripState, stripTags);
-        const closeIdx = buffer.indexOf(PRODUCT_CLOSE);
-        if (closeIdx !== -1) {
-          const block = buffer.slice(0, closeIdx + PRODUCT_CLOSE.length);
-          buffer = '';
-          inProduct = false;
-          yield block;
-        }
-        continue;
+        buffer = '';
+        fragment = stripIgnoredProductTags(line.slice(openIdx), stripState, stripTags);
       }
 
-      const fragment = stripIgnoredProductTags(`\n${line}`, stripState, stripTags);
       // Scanner seulement le fragment ajouté : scanner le buffer à chaque ligne
       // aplatit les chaînes concaténées sous JavaScriptCore et recopie le produit.
       const fragmentCloseIdx = fragment.indexOf(PRODUCT_CLOSE);
       const previousLength = buffer.length;
       buffer += fragment;
       if (fragmentCloseIdx === -1) continue;
-      const closeIdx = previousLength + fragmentCloseIdx;
+      let closeIdx = previousLength + fragmentCloseIdx;
 
-      const block = buffer.slice(0, closeIdx + PRODUCT_CLOSE.length);
-      buffer = buffer.slice(closeIdx + PRODUCT_CLOSE.length);
-      inProduct = indexOfProductOpen(buffer) !== -1;
-      if (inProduct) {
-        const nextOpen = indexOfProductOpen(buffer);
-        buffer = buffer.slice(nextOpen);
-      } else {
-        buffer = '';
+      // Une même ligne peut fermer un produit puis en contenir d'autres, complets ou non.
+      while (closeIdx !== -1) {
+        const end = closeIdx + PRODUCT_CLOSE.length;
+        const block = buffer.slice(0, end);
+        const nextOpen = indexOfProductOpen(buffer, end);
+        inProduct = nextOpen !== -1;
+        buffer = inProduct ? buffer.slice(nextOpen) : '';
+        yield block;
+        closeIdx = inProduct ? buffer.indexOf(PRODUCT_CLOSE) : -1;
       }
-      yield block;
     }
   }
 

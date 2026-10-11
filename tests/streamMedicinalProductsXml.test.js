@@ -46,6 +46,22 @@ describe('streamMedicinalProductsXml', () => {
     ]);
   });
 
+  it('sépare plusieurs produits ouverts ou fermés sur une même ligne', async () => {
+    const products = await readProducts([
+      '<medicinal-product-group><medicinal-product><num>1</num><nom>A</nom></medicinal-product><medicinal-product><num>2</num>',
+      '<nom>B</nom>',
+      '</medicinal-product><medicinal-product><num>3</num><nom>C</nom></medicinal-product> <medicinal-product><num>4</num>',
+      '</medicinal-product></medicinal-product-group>'
+    ].join('\n'));
+
+    expect(products).toEqual([
+      '<medicinal-product><num>1</num><nom>A</nom></medicinal-product>',
+      '<medicinal-product><num>2</num>\n<nom>B</nom>\n</medicinal-product>',
+      '<medicinal-product><num>3</num><nom>C</nom></medicinal-product>',
+      '<medicinal-product><num>4</num>\n</medicinal-product>'
+    ]);
+  });
+
   it('gère un CRLF et un caractère UTF-8 coupés à la frontière de lecture', async () => {
     const prefix = '<medicinal-product><num>1</num>\n<nom>';
     // Le ReadStream lit 64 Kio ; le premier octet de é est à l'offset 65535.
