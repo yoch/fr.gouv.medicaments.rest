@@ -7,10 +7,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Modifié
+
+- Produits ANMV analysés avec `saxes` à la place de `@nodable/flexible-xml-parser`, retiré des dépendances. Avec le nouveau lecteur, le chargement vétérinaire passe d'environ 4,5 s à 1,4–1,7 s sous Node 24. Les valeurs du XML restent en texte : une quantité `8.0` n'est plus réécrite en `8`. Voir `docs/VET_XML_PARSER_PHASES.md`.
+
 ### Corrigé
 
+- Temps d'attente vétérinaires de 0 (par exemple « lait : 0 heure ») : ils étaient ignorés car convertis en nombre, puis pris pour une valeur absente. `temps_attente` expose désormais ces 2 507 entrées ; 520 médicaments qui renvoyaient une liste vide en ont maintenant.
 - Lecteur XML ANMV : évite les scans répétés du produit accumulé et les promesses par ligne. Sur les corpus mesurés sous Bun 1.4.3, le pic RSS médian au chargement passe de 466 à 338 Mio et la durée de 5,63 à 4,28 s ; les produits extraits sont identiques. Voir `docs/BUN_LOAD_MEMORY.md`.
-
 ## [1.5.3] - 2026-10-11
 
 ### Modifié

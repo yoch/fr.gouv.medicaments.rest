@@ -6,36 +6,29 @@
  *
  * Usage:
  *   npm run benchmark:vet-xml
- *   node --expose-gc scripts/benchmark-vet-xml-parsers.js --phase=phase1
- *   BENCHMARK_PHASES=baseline,phase1,phase2 node --expose-gc scripts/benchmark-vet-xml-parsers.js
+ *   node --expose-gc scripts/benchmark/vet-xml-parsers.js --phase=saxes
+ *   BENCHMARK_PHASES=baseline,saxes node --expose-gc scripts/benchmark/vet-xml-parsers.js
  *
- * Phases (défaut : baseline + phase1) :
- *   baseline — fast-xml-parser + stopNodes + readline (ancien comportement)
- *   phase1   — flexible-xml-parser + skip.tags + readline (prod)
- *   phase2   — parseStream, arbre complet en mémoire (expérimental, peut OOM)
+ * Phases (défaut : baseline + saxes) :
+ *   baseline — fast-xml-parser + stopNodes (ancien comportement)
+ *   saxes    — saxes, sous-arbres RCP ignorés (prod)
+ * Les deux phases partagent le découpage en blocs de `streamMedicinalProductsXml`.
  */
 
 const fs = require('fs');
 const path = require('path');
 const { XMLParser: FxpParser } = require('fast-xml-parser');
 const { streamMedicinalProducts } = require('../../src/utils/streamMedicinalProductsXml');
-const {
-  createVetProductBlockParser,
-  defaultProductParser,
-  extractMedicinalProduct,
-  extractMedicinalProductsFromGroup,
-  parseProductBlock,
-  wrapProductBlockXml
-} = require('../../src/utils/vetXmlParser');
+const { defaultProductParser, parseProductBlock } = require('../../src/utils/vetXmlParser');
 
 const { gcBeforeMeasure } = require('../../src/utils/loadGc');
 
 const DEFAULT_PRODUCTS = path.join(
   __dirname,
-  '../data/veterinaires/amm-vet-fr-v2-v.xml'
+  '../../data/veterinaires/amm-vet-fr-v2-v.xml'
 );
 
-const DEFAULT_PHASES = 'baseline,phase1';
+const DEFAULT_PHASES = 'baseline,saxes';
 
 function parseArgs(argv) {
   let productsPath = DEFAULT_PRODUCTS;
@@ -86,8 +79,8 @@ const fxpParser = new FxpParser({
 });
 
 function parseBlockFxp(blockXml) {
-  const parsed = fxpParser.parse(wrapProductBlockXml(blockXml));
-  return extractMedicinalProduct(parsed);
+  const product = fxpParser.parse(blockXml)['medicinal-product']?.[0];
+  return product?.num && product?.nom ? product : null;
 }
 
 async function runBaseline(productsPath) {
@@ -114,11 +107,11 @@ async function runBaseline(productsPath) {
   };
 }
 
-async function runPhase1(productsPath) {
+async function runSaxes(productsPath) {
   let count = 0;
   let rcpKeys = 0;
   const t0 = Date.now();
-  const before = snapshot('phase1_start');
+  const before = snapshot('saxes_start');
 
   await streamMedicinalProducts(productsPath, (blockXml) => {
     const product = parseProductBlock(blockXml, defaultProductParser);
@@ -127,9 +120,9 @@ async function runPhase1(productsPath) {
     if ('paragraphes-rcp' in product) rcpKeys++;
   });
 
-  const after = snapshot('phase1_end');
+  const after = snapshot('saxes_end');
   return {
-    phase: 'phase1',
+    phase: 'saxes',
     ms: Date.now() - t0,
     products: count,
     products_with_paragraphes_rcp_key: rcpKeys,
@@ -137,50 +130,8 @@ async function runPhase1(productsPath) {
   };
 }
 
-/** Phase 2 expérimentale — ne pas utiliser en prod (voir docs/VET_XML_PARSER_PHASES.md). */
-async function parseAllProductsViaStream(productsPath) {
-  const parser = createVetProductBlockParser();
-  const parsed = await parser.parseStream(
-    fs.createReadStream(productsPath, { encoding: 'utf8' })
-  );
-  return extractMedicinalProductsFromGroup(parsed);
-}
-
-async function runPhase2(productsPath) {
-  const t0 = Date.now();
-  const before = snapshot('phase2_start');
-
-  const products = await parseAllProductsViaStream(productsPath);
-  const afterParse = snapshot('phase2_after_parse');
-  let rcpKeys = 0;
-  for (const p of products) {
-    if (p && 'paragraphes-rcp' in p) rcpKeys++;
-  }
-
-  const after = snapshot('phase2_end');
-  return {
-    phase: 'phase2',
-    ms: Date.now() - t0,
-    products: products.length,
-    products_with_paragraphes_rcp_key: rcpKeys,
-    mem: {
-      before,
-      after_parse: afterParse,
-      after,
-      delta_heap_parse_mb: afterParse.heapUsed_mb - before.heapUsed_mb,
-      delta_heap_total_mb: after.heapUsed_mb - before.heapUsed_mb
-    }
-  };
-}
-
 async function main() {
   const { productsPath, phases } = parseArgs(process.argv.slice(2));
-
-  if (phases.includes('phase2')) {
-    console.warn(
-      'Attention : phase2 charge tout le XML en arbre JS — risque OOM sur gros fichiers. Voir docs/VET_XML_PARSER_PHASES.md.'
-    );
-  }
 
   if (!fs.existsSync(productsPath)) {
     console.error(`Fichier introuvable: ${productsPath}`);
@@ -199,8 +150,7 @@ async function main() {
 
   for (const phase of phases) {
     if (phase === 'baseline') results.push(await runBaseline(productsPath));
-    else if (phase === 'phase1') results.push(await runPhase1(productsPath));
-    else if (phase === 'phase2') results.push(await runPhase2(productsPath));
+    else if (phase === 'saxes') results.push(await runSaxes(productsPath));
     else console.warn(`Phase inconnue: ${phase}`);
   }
 

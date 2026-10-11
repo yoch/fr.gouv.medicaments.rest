@@ -21,7 +21,7 @@ MiniSearch canonique.
 ## Autres scripts
 
 - `vet-xml-parsers.js` — compare les parsers XML vétérinaires (`fast-xml-parser`,
-  `@nodable/flexible-xml-parser`). `fast-xml-parser` est en `devDependencies`.
+  ancien comportement, et `saxes`, prod). `fast-xml-parser` est en `devDependencies`.
 - `analyze-interning-candidates.js` — liste les champs BDPM à faible cardinalité
   candidats à l'interning.
 - `analyze-bdpm-corpus-size.js` — empreinte par colonne du corpus BDPM.
