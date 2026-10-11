@@ -1,5 +1,4 @@
 const fs = require('fs');
-const readline = require('readline');
 
 const PRODUCT_CLOSE = '</medicinal-product>';
 const DEFAULT_STRIP_TAGS = ['paragraphes-rcp', 'lien-rcp'];
@@ -100,43 +99,61 @@ function stripIgnoredProductTags(text, state, stripTags = DEFAULT_STRIP_TAGS) {
  */
 async function streamMedicinalProducts(productsPath, onProduct, options = {}) {
   const stream = fs.createReadStream(productsPath, { encoding: 'utf8' });
-  const rl = readline.createInterface({ input: stream, crlfDelay: Infinity });
   const stripTags = options.stripTags ?? DEFAULT_STRIP_TAGS;
   const stripState = { skipTag: null };
 
   let buffer = '';
   let inProduct = false;
 
-  for await (const line of rl) {
-    if (!inProduct) {
-      const openIdx = indexOfProductOpen(line);
-      if (openIdx === -1) continue;
-      inProduct = true;
-      buffer = stripIgnoredProductTags(line.slice(openIdx), stripState, stripTags);
-      const closeIdx = buffer.indexOf(PRODUCT_CLOSE);
-      if (closeIdx !== -1) {
-        const block = buffer.slice(0, closeIdx + PRODUCT_CLOSE.length);
+  function* productBlocks(lines) {
+    for (const line of lines) {
+      let fragment;
+      if (inProduct) {
+        fragment = stripIgnoredProductTags(`\n${line}`, stripState, stripTags);
+      } else {
+        const openIdx = indexOfProductOpen(line);
+        if (openIdx === -1) continue;
+        inProduct = true;
         buffer = '';
-        inProduct = false;
-        await onProduct(block);
+        fragment = stripIgnoredProductTags(line.slice(openIdx), stripState, stripTags);
       }
-      continue;
-    }
 
-    buffer += stripIgnoredProductTags(`\n${line}`, stripState, stripTags);
-    const closeIdx = buffer.indexOf(PRODUCT_CLOSE);
-    if (closeIdx === -1) continue;
+      // Scanner seulement le fragment ajouté : scanner le buffer à chaque ligne
+      // aplatit les chaînes concaténées sous JavaScriptCore et recopie le produit.
+      const fragmentCloseIdx = fragment.indexOf(PRODUCT_CLOSE);
+      const previousLength = buffer.length;
+      buffer += fragment;
+      if (fragmentCloseIdx === -1) continue;
+      let closeIdx = previousLength + fragmentCloseIdx;
 
-    const block = buffer.slice(0, closeIdx + PRODUCT_CLOSE.length);
-    buffer = buffer.slice(closeIdx + PRODUCT_CLOSE.length);
-    inProduct = indexOfProductOpen(buffer) !== -1;
-    if (inProduct) {
-      const nextOpen = indexOfProductOpen(buffer);
-      buffer = buffer.slice(nextOpen);
-    } else {
-      buffer = '';
+      // Une même ligne peut fermer un produit puis en contenir d'autres, complets ou non.
+      while (closeIdx !== -1) {
+        const end = closeIdx + PRODUCT_CLOSE.length;
+        const block = buffer.slice(0, end);
+        const nextOpen = indexOfProductOpen(buffer, end);
+        inProduct = nextOpen !== -1;
+        buffer = inProduct ? buffer.slice(nextOpen) : '';
+        yield block;
+        closeIdx = inProduct ? buffer.indexOf(PRODUCT_CLOSE) : -1;
+      }
     }
-    await onProduct(block);
+  }
+
+  // Traiter les lignes synchroniquement dans chaque chunk : l'itérateur async
+  // de readline crée une promesse par ligne (près de 800 000 sur le corpus ANMV).
+  // N'attendre que les chunks et les callbacks produits, avec backpressure.
+  let pendingLine = '';
+  for await (const chunk of stream) {
+    const text = pendingLine + chunk;
+    const end = text.endsWith('\r') ? text.length - 1 : text.length;
+    const lines = text.slice(0, end).split(/\r\n|[\r\n]/);
+    pendingLine = lines.pop() + text.slice(end);
+    for (const block of productBlocks(lines)) await onProduct(block);
+  }
+  if (pendingLine) {
+    for (const block of productBlocks([pendingLine.replace(/\r$/, '')])) {
+      await onProduct(block);
+    }
   }
 }
 

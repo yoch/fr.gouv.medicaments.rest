@@ -1,0 +1,521 @@
+{
+  "baseline_commit": "212fd142bef753a620313feb8f43cb67600cc737",
+  "date": "2026-10-11",
+  "platform": "Linux x86_64",
+  "cpu_quota": 4,
+  "memory_limit_mib": 16384,
+  "versions": {
+    "bun": "1.4.3",
+    "node": "v24.19.0",
+    "frozenminisearch": "1.11.0"
+  },
+  "settings": {
+    "NODE_ENV": "production",
+    "CORPUS_LIGHT_PROFILE": "true",
+    "LOAD_HAS_AVIS": "true",
+    "LOAD_MITM": "true",
+    "PROFILE_SAMPLE_MS": 50,
+    "PROFILE_BDPM": true,
+    "PROFILE_VET": true
+  },
+  "method": "Fresh process per run; sequential BDPM then ANMV, no downloads, no forced GC, GNU time -v maximum RSS; 3 alternated before/after runs per runtime. Durations from loader memory sampler. Node flag --max-semi-space-size=8. No deferred-load delay or HTTP traffic in this matrix. End RSS is not settled resident memory.",
+  "inputs": {
+    "data/CIS_CIP_Dispo_Spec.txt": {
+      "bytes": 154021,
+      "sha256": "568e245e4db9709c5696c1dcb6839c05888aed5a7900fa8eb7a66fce4a41e7ff"
+    },
+    "data/CIS_CIP_bdpm.txt": {
+      "bytes": 4151150,
+      "sha256": "84418427fa7ac07581710fc2b25e25c9ff6fcdd0f2b8469ba4a0886821332e77"
+    },
+    "data/CIS_COMPO_bdpm.txt": {
+      "bytes": 2821255,
+      "sha256": "eab5ceabd032723c65b00cef6cc292cb13c0b7447cf0ffff4f2eee55799787a0"
+    },
+    "data/CIS_CPD_bdpm.txt": {
+      "bytes": 1380210,
+      "sha256": "159cde70988f1a78e85ec4c19b01041352fa9bc9fff770d09f4fa5f52af0397f"
+    },
+    "data/CIS_GENER_bdpm.txt": {
+      "bytes": 1250147,
+      "sha256": "c4cd20f287c83caf2959aa376d520950977c8398b5c440873e08becb441b7fe4"
+    },
+    "data/CIS_HAS_ASMR_bdpm.txt": {
+      "bytes": 4787901,
+      "sha256": "1fbc29fea05e2d1992e12e0267b914a56b1585956bf697e011f4ea0749244817"
+    },
+    "data/CIS_HAS_SMR_bdpm.txt": {
+      "bytes": 4770966,
+      "sha256": "fea92ce046188d282f17e356444dc4f7cbc611ce88405da0965b88941a8c8b1b"
+    },
+    "data/CIS_MITM.txt": {
+      "bytes": 1147407,
+      "sha256": "ed00a1f3ca793727d10704c0675610c0fef9ad95f76177c0606f6a52d212e226"
+    },
+    "data/CIS_bdpm.txt": {
+      "bytes": 3264449,
+      "sha256": "fc0eb50e3a5fb7cfc53ed7fd835d905ec7bc0ffe6415a34381b307617d7dc1a8"
+    },
+    "data/veterinaires/amm-vet-fr-v2-d.xml": {
+      "bytes": 917505,
+      "sha256": "5ee17fcbc9afcd9faf853de9f32c4919c6acb928bc7bf1b8d2df48dcc137baef"
+    },
+    "data/veterinaires/amm-vet-fr-v2-v.xml": {
+      "bytes": 53472419,
+      "sha256": "336634be4e16effc3e189d25bce2a3c55715078583da37b13bcb63213c78a2ff"
+    }
+  },
+  "summary": {
+    "bun": {
+      "before": {
+        "median_max_rss_mib": 466.359,
+        "median_duration_ms": 5629,
+        "min_max_rss_mib": 441.891,
+        "max_max_rss_mib": 514.184
+      },
+      "after": {
+        "median_max_rss_mib": 337.594,
+        "median_duration_ms": 4283,
+        "min_max_rss_mib": 319.773,
+        "max_max_rss_mib": 339.23
+      }
+    },
+    "bun-smol": {
+      "before": {
+        "median_max_rss_mib": 451.043,
+        "median_duration_ms": 5602,
+        "min_max_rss_mib": 398.398,
+        "max_max_rss_mib": 478.395
+      },
+      "after": {
+        "median_max_rss_mib": 365.043,
+        "median_duration_ms": 4398,
+        "min_max_rss_mib": 324.117,
+        "max_max_rss_mib": 382.512
+      }
+    },
+    "node-8": {
+      "before": {
+        "median_max_rss_mib": 228.984,
+        "median_duration_ms": 5200,
+        "min_max_rss_mib": 221.402,
+        "max_max_rss_mib": 229.57
+      },
+      "after": {
+        "median_max_rss_mib": 227.098,
+        "median_duration_ms": 4114,
+        "min_max_rss_mib": 226.336,
+        "max_max_rss_mib": 227.098
+      }
+    }
+  },
+  "runs": [
+    {
+      "revision": "before",
+      "runtime": "bun",
+      "run": 1,
+      "max_rss_mib": 514.184,
+      "duration_ms": 5565,
+      "sampled_peak_rss_mib": 511.559,
+      "end_rss_mib": 401.664,
+      "bdpm_peak_rss_mib": 360.254
+    },
+    {
+      "revision": "after",
+      "runtime": "bun",
+      "run": 1,
+      "max_rss_mib": 337.594,
+      "duration_ms": 4283,
+      "sampled_peak_rss_mib": 336.961,
+      "end_rss_mib": 331.785,
+      "bdpm_peak_rss_mib": 336.961
+    },
+    {
+      "revision": "before",
+      "runtime": "bun-smol",
+      "run": 1,
+      "max_rss_mib": 478.395,
+      "duration_ms": 5751,
+      "sampled_peak_rss_mib": 476.52,
+      "end_rss_mib": 446.801,
+      "bdpm_peak_rss_mib": 368.438
+    },
+    {
+      "revision": "after",
+      "runtime": "bun-smol",
+      "run": 1,
+      "max_rss_mib": 365.043,
+      "duration_ms": 4282,
+      "sampled_peak_rss_mib": 364.918,
+      "end_rss_mib": 364.918,
+      "bdpm_peak_rss_mib": 356.52
+    },
+    {
+      "revision": "before",
+      "runtime": "node-8",
+      "run": 1,
+      "max_rss_mib": 221.402,
+      "duration_ms": 5050,
+      "sampled_peak_rss_mib": 219.836,
+      "end_rss_mib": 219.836,
+      "bdpm_peak_rss_mib": 200.934
+    },
+    {
+      "revision": "after",
+      "runtime": "node-8",
+      "run": 1,
+      "max_rss_mib": 227.098,
+      "duration_ms": 3814,
+      "sampled_peak_rss_mib": 227.098,
+      "end_rss_mib": 226.969,
+      "bdpm_peak_rss_mib": 220.707
+    },
+    {
+      "revision": "before",
+      "runtime": "bun",
+      "run": 2,
+      "max_rss_mib": 441.891,
+      "duration_ms": 5629,
+      "sampled_peak_rss_mib": 437.965,
+      "end_rss_mib": 385.609,
+      "bdpm_peak_rss_mib": 350.488
+    },
+    {
+      "revision": "after",
+      "runtime": "bun",
+      "run": 2,
+      "max_rss_mib": 319.773,
+      "duration_ms": 4093,
+      "sampled_peak_rss_mib": 318.332,
+      "end_rss_mib": 318.332,
+      "bdpm_peak_rss_mib": 303.703
+    },
+    {
+      "revision": "before",
+      "runtime": "bun-smol",
+      "run": 2,
+      "max_rss_mib": 451.043,
+      "duration_ms": 5602,
+      "sampled_peak_rss_mib": 450.418,
+      "end_rss_mib": 445.621,
+      "bdpm_peak_rss_mib": 381.148
+    },
+    {
+      "revision": "after",
+      "runtime": "bun-smol",
+      "run": 2,
+      "max_rss_mib": 382.512,
+      "duration_ms": 4398,
+      "sampled_peak_rss_mib": 382.387,
+      "end_rss_mib": 382.387,
+      "bdpm_peak_rss_mib": 303.152
+    },
+    {
+      "revision": "before",
+      "runtime": "node-8",
+      "run": 2,
+      "max_rss_mib": 228.984,
+      "duration_ms": 5641,
+      "sampled_peak_rss_mib": 228.859,
+      "end_rss_mib": 228.859,
+      "bdpm_peak_rss_mib": 221.367
+    },
+    {
+      "revision": "after",
+      "runtime": "node-8",
+      "run": 2,
+      "max_rss_mib": 227.098,
+      "duration_ms": 4284,
+      "sampled_peak_rss_mib": 226.977,
+      "end_rss_mib": 226.848,
+      "bdpm_peak_rss_mib": 221.012
+    },
+    {
+      "revision": "before",
+      "runtime": "bun",
+      "run": 3,
+      "max_rss_mib": 466.359,
+      "duration_ms": 6630,
+      "sampled_peak_rss_mib": 466.359,
+      "end_rss_mib": 385.906,
+      "bdpm_peak_rss_mib": 314.387
+    },
+    {
+      "revision": "after",
+      "runtime": "bun",
+      "run": 3,
+      "max_rss_mib": 339.23,
+      "duration_ms": 4774,
+      "sampled_peak_rss_mib": 339.105,
+      "end_rss_mib": 339.105,
+      "bdpm_peak_rss_mib": 326.363
+    },
+    {
+      "revision": "before",
+      "runtime": "bun-smol",
+      "run": 3,
+      "max_rss_mib": 398.398,
+      "duration_ms": 5586,
+      "sampled_peak_rss_mib": 398.148,
+      "end_rss_mib": 394.934,
+      "bdpm_peak_rss_mib": 306.516
+    },
+    {
+      "revision": "after",
+      "runtime": "bun-smol",
+      "run": 3,
+      "max_rss_mib": 324.117,
+      "duration_ms": 4509,
+      "sampled_peak_rss_mib": 322.078,
+      "end_rss_mib": 293.176,
+      "bdpm_peak_rss_mib": 285.172
+    },
+    {
+      "revision": "before",
+      "runtime": "node-8",
+      "run": 3,
+      "max_rss_mib": 229.57,
+      "duration_ms": 5200,
+      "sampled_peak_rss_mib": 229.32,
+      "end_rss_mib": 229.32,
+      "bdpm_peak_rss_mib": 221.074
+    },
+    {
+      "revision": "after",
+      "runtime": "node-8",
+      "run": 3,
+      "max_rss_mib": 226.336,
+      "duration_ms": 4114,
+      "sampled_peak_rss_mib": 226.086,
+      "end_rss_mib": 226.086,
+      "bdpm_peak_rss_mib": 220.469
+    }
+  ],
+  "xml_equivalence": {
+    "products": 3221,
+    "sha256": {
+      "default": "522658b203bd1ce74a60a67db2a363334a0350287856499bd150d23f2f7f3d04",
+      "keep_lien_rcp": "d3153a45dddb17c0bcc8a1e9a09df76db15954e4cc8ebf3aa13cd06ecf48d2ae",
+      "keep_all": "f894c1e395bfb888ea27b2f8108a307e94a07013ec687d86cf60a130f41f27ac"
+    }
+  },
+  "validation": {
+    "node_tests": {
+      "suites": 20,
+      "passed": 208
+    },
+    "bun_xml_tests": {
+      "suites": 2,
+      "passed": 9
+    },
+    "http_parity": {
+      "responses": 28,
+      "ignored_volatile_fields": [
+        "generated_at (validated as a timestamp)"
+      ]
+    },
+    "http_stress": {
+      "runtime": "Bun 1.4.3",
+      "method": "Separate local Bun process, production light profile, API opens after BDPM; ANMV starts after 5 s. 10 concurrent clients, 8 s mixed traffic during startup then 20 s all scenario. RSS externally sampled from /proc at 25 ms; sampled values are not a hard bound. Node test suite was running concurrently, so throughput is only a smoke test, not a runtime comparison.",
+      "startup_sampled_peak_rss_mib": 516.765625,
+      "stress_sampled_peak_rss_mib": 561.6328125,
+      "after_rss_mib": 346.7,
+      "phases": {
+        "startup": {
+          "config": {
+            "baseUrl": "http://127.0.0.1:35725",
+            "durationS": 8,
+            "concurrency": 10,
+            "scenario": "mixed",
+            "dryRun": false,
+            "json": true
+          },
+          "summary": {
+            "requests": 10350,
+            "ok": 10350,
+            "errors": 0,
+            "success_rate_pct": 100,
+            "rps": 1292.9,
+            "latency": {
+              "min_ms": 0,
+              "mean_ms": 8,
+              "p50_ms": 5,
+              "p95_ms": 24,
+              "p99_ms": 43,
+              "max_ms": 132
+            },
+            "status_codes": {
+              "200": 10350
+            },
+            "error_types": {},
+            "by_endpoint": {
+              "specialites-search": {
+                "total": 2687,
+                "ok": 2687,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 7,
+                  "p50_ms": 5,
+                  "p95_ms": 23,
+                  "p99_ms": 40
+                }
+              },
+              "search": {
+                "total": 3027,
+                "ok": 3027,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 9,
+                  "p50_ms": 6,
+                  "p95_ms": 25,
+                  "p99_ms": 46
+                }
+              },
+              "specialite-detail": {
+                "total": 2084,
+                "ok": 2084,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 7,
+                  "p50_ms": 4,
+                  "p95_ms": 23,
+                  "p99_ms": 39
+                }
+              },
+              "health": {
+                "total": 1035,
+                "ok": 1035,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 7,
+                  "p50_ms": 5,
+                  "p95_ms": 23,
+                  "p99_ms": 46
+                }
+              },
+              "substances-search": {
+                "total": 1014,
+                "ok": 1014,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 7,
+                  "p50_ms": 5,
+                  "p95_ms": 23,
+                  "p99_ms": 45
+                }
+              },
+              "specialites-list": {
+                "total": 503,
+                "ok": 503,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 8,
+                  "p50_ms": 4,
+                  "p95_ms": 24,
+                  "p99_ms": 50
+                }
+              }
+            }
+          }
+        },
+        "stress": {
+          "config": {
+            "baseUrl": "http://127.0.0.1:35725",
+            "durationS": 20,
+            "concurrency": 10,
+            "scenario": "all",
+            "dryRun": false,
+            "json": true
+          },
+          "summary": {
+            "requests": 38928,
+            "ok": 38928,
+            "errors": 0,
+            "success_rate_pct": 100,
+            "rps": 1946.1,
+            "latency": {
+              "min_ms": 0,
+              "mean_ms": 5,
+              "p50_ms": 5,
+              "p95_ms": 9,
+              "p99_ms": 15,
+              "max_ms": 81
+            },
+            "status_codes": {
+              "200": 38928
+            },
+            "error_types": {},
+            "by_endpoint": {
+              "health": {
+                "total": 6488,
+                "ok": 6488,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 4,
+                  "p50_ms": 3,
+                  "p95_ms": 8,
+                  "p99_ms": 13
+                }
+              },
+              "search": {
+                "total": 6488,
+                "ok": 6488,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 5,
+                  "p50_ms": 5,
+                  "p95_ms": 9,
+                  "p99_ms": 15
+                }
+              },
+              "specialites-search": {
+                "total": 6488,
+                "ok": 6488,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 6,
+                  "p50_ms": 5,
+                  "p95_ms": 9,
+                  "p99_ms": 16
+                }
+              },
+              "specialite-detail": {
+                "total": 6488,
+                "ok": 6488,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 6,
+                  "p50_ms": 5,
+                  "p95_ms": 9,
+                  "p99_ms": 15
+                }
+              },
+              "substances-search": {
+                "total": 6488,
+                "ok": 6488,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 5,
+                  "p50_ms": 5,
+                  "p95_ms": 9,
+                  "p99_ms": 15
+                }
+              },
+              "specialites-list": {
+                "total": 6488,
+                "ok": 6488,
+                "error_rate_pct": 0,
+                "latency": {
+                  "mean_ms": 5,
+                  "p50_ms": 4,
+                  "p95_ms": 8,
+                  "p99_ms": 14
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

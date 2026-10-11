@@ -56,6 +56,8 @@ async function main() {
   });
 
   const meta = {
+    runtime: process.versions.bun ? 'bun' : 'node',
+    runtime_version: process.versions.bun || process.version,
     node: process.version,
     PROFILE_SAMPLE_MS,
     PROFILE_VET,
@@ -91,6 +93,8 @@ async function main() {
   const samples = sampler.getSamples();
   const marks = sampler.getMarks();
   const summary = sampler.summarize();
+  // Maximum du noyau : couvre aussi les pointes entre deux ticks du sampler.
+  summary.max_rss_mb = process.resourceUsage().maxRSS / 1024;
 
   const phases = {};
   const vetStream = markTime(marks, 'vet_stream_done');

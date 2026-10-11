@@ -1,75 +1,78 @@
 'use strict';
 
-const XMLParser = require('@nodable/flexible-xml-parser').default;
+const { SaxesParser } = require('saxes');
 
-/** Chemins skip.tags (`..tag`). Voir docs/VET_XML_PARSER_PHASES.md. */
-/** Prod : ignore RCP volumineux et lien-rcp (URL reconstruite depuis nom + maj-rcp). */
-const VET_SKIP_PRODUCT_TAGS = ['..paragraphes-rcp', '..lien-rcp'];
+/** Prod : ignore RCP volumineux et lien-rcp (URL reconstruite depuis nom + maj-rcp). Voir docs/VET_XML_PARSER_PHASES.md. */
+const VET_SKIP_PRODUCT_TAGS = ['paragraphes-rcp', 'lien-rcp'];
 
 /** Tests scan RCP : garde lien-rcp pour équivalence avec le XML source. */
-const VET_SKIP_SCAN_TAGS = ['..paragraphes-rcp'];
+const VET_SKIP_SCAN_TAGS = ['paragraphes-rcp'];
 
-function createVetDictionaryParser() {
-  return new XMLParser({
-    skip: { attributes: true }
-  });
-}
+const PRODUCT_TAG = 'medicinal-product';
+const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
 /**
- * @param {string[]} [skipTags]
+ * @param {string[]} [skipTags] — balises ignorées avec leur sous-arbre, à toute profondeur.
  */
 function createVetProductBlockParser(skipTags = VET_SKIP_PRODUCT_TAGS) {
-  return new XMLParser({
-    skip: {
-      attributes: true,
-      tags: skipTags
-    }
-  });
+  return { skipTags: new Set(skipTags) };
 }
 
-const defaultDictionaryParser = createVetDictionaryParser();
 const defaultProductParser = createVetProductBlockParser();
 
-function wrapProductBlockXml(blockXml) {
-  return `<?xml version="1.0" encoding="UTF-8"?><root>${blockXml}</root>`;
+function addChild(obj, key, value) {
+  if (UNSAFE_KEYS.has(key)) return;
+  if (!Object.hasOwn(obj, key)) obj[key] = value;
+  else if (Array.isArray(obj[key])) obj[key].push(value);
+  else obj[key] = [obj[key], value];
 }
 
 /**
- * @param {object} parsed — racine flexible-xml (souvent `{ root: … }` ou groupe ANMV).
- * @returns {object|null}
- */
-function extractMedicinalProduct(parsed) {
-  const root = parsed.root ?? parsed['medicinal-product-group'] ?? parsed;
-  const raw = root['medicinal-product'];
-  const product = Array.isArray(raw) ? raw[0] : raw;
-  if (!product || !product.num || !product.nom) return null;
-  return product;
-}
-
-/**
- * Liste tous les médicaments sous medicinal-product-group (parse fichier entier).
- * @param {object} parsed
- * @returns {object[]}
- */
-function extractMedicinalProductsFromGroup(parsed) {
-  const group = parsed['medicinal-product-group'] ?? parsed;
-  const raw = group['medicinal-product'];
-  if (raw == null) return [];
-  const list = Array.isArray(raw) ? raw : [raw];
-  return list.filter((p) => p && p.num && p.nom);
-}
-
-/**
- * Parse un bloc `<medicinal-product>…</medicinal-product>` (après découpe readline).
+ * Parse un bloc `<medicinal-product>…</medicinal-product>` en objet compact :
+ * une balise feuille donne son texte (espaces normalisés, sans conversion de
+ * type), une balise répétée donne un tableau.
  * @param {string} blockXml
- * @param {ReturnType<typeof createVetProductBlockParser>} parser — instance réutilisable (obligatoire).
+ * @param {ReturnType<typeof createVetProductBlockParser>} parser — configuration (obligatoire).
+ * @returns {object|null} null si le bloc n'est pas un médicament avec `num` et `nom`.
  */
 function parseProductBlock(blockXml, parser) {
   if (!parser) {
     throw new Error('parseProductBlock: parser requis (ex. defaultProductParser)');
   }
-  const parsed = parser.parse(wrapProductBlockXml(blockXml));
-  return extractMedicinalProduct(parsed);
+  const { skipTags } = parser;
+  const xml = new SaxesParser();
+  const stack = [];
+  let skipDepth = 0;
+  let root = null;
+
+  const onText = (text) => {
+    if (skipDepth === 0 && stack.length > 0) stack[stack.length - 1].text += text;
+  };
+  xml.on('opentag', ({ name }) => {
+    if (skipDepth > 0 || skipTags.has(name)) {
+      skipDepth++;
+      return;
+    }
+    stack.push({ name, children: null, text: '' });
+  });
+  xml.on('text', onText);
+  xml.on('cdata', onText);
+  xml.on('closetag', () => {
+    if (skipDepth > 0) {
+      skipDepth--;
+      return;
+    }
+    const node = stack.pop();
+    const value = node.children ?? node.text.replace(/\s+/g, ' ').trim();
+    const parent = stack[stack.length - 1];
+    if (parent) addChild((parent.children ??= {}), node.name, value);
+    else root = { name: node.name, value };
+  });
+  xml.write(blockXml).close();
+
+  const product = root?.name === PRODUCT_TAG ? root.value : null;
+  if (!product || typeof product !== 'object' || !product.num || !product.nom) return null;
+  return product;
 }
 
 module.exports = {
@@ -77,8 +80,5 @@ module.exports = {
   VET_SKIP_SCAN_TAGS,
   createVetProductBlockParser,
   defaultProductParser,
-  wrapProductBlockXml,
-  extractMedicinalProduct,
-  extractMedicinalProductsFromGroup,
   parseProductBlock
 };

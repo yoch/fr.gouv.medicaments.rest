@@ -20,7 +20,7 @@ function resolveFullProductsXmlPath() {
   return null;
 }
 
-/** ANMV encode parfois des espaces doubles en `++` dans `<lien-rcp>` alors que `<nom>` n'en a qu'un (flexible-xml-parser 1.4+ les préserve). */
+/** ANMV encode parfois des espaces doubles en `++` dans `<lien-rcp>` alors que `<nom>` n'en garde qu'un après normalisation des espaces. */
 function normalizeRcpLinkForCompare(url) {
   return String(url).replace(/\++/g, '+');
 }

@@ -21,7 +21,7 @@ MiniSearch canonique.
 ## Autres scripts
 
 - `vet-xml-parsers.js` — compare les parsers XML vétérinaires (`fast-xml-parser`,
-  `@nodable/flexible-xml-parser`). `fast-xml-parser` est en `devDependencies`.
+  ancien comportement, et `saxes`, prod). `fast-xml-parser` est en `devDependencies`.
 - `analyze-interning-candidates.js` — liste les champs BDPM à faible cardinalité
   candidats à l'interning.
 - `analyze-bdpm-corpus-size.js` — empreinte par colonne du corpus BDPM.
@@ -32,3 +32,10 @@ MiniSearch canonique.
   `benchmark_search_after.js` — diagnostics ad hoc ranking/boosting.
 - `study_dosage_forme.js` — étude empirique des paramètres structurés `dosage` /
   `forme` pour `/search` (génère `docs/ETUDE_DOSAGE_FORME.md`).
+
+## Validation Bun / Node
+
+- `verify-runtime-parity.js` — compare 28 réponses HTTP avec les corpus locaux,
+  sans téléchargement : `NODE_BIN=node BUN_BIN=bun node scripts/benchmark/verify-runtime-parity.js`.
+- Mesures de pic mémoire et correctif du lecteur ANMV :
+  [`docs/BUN_LOAD_MEMORY.md`](../../docs/BUN_LOAD_MEMORY.md).
