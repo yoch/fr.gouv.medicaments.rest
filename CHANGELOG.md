@@ -7,6 +7,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Corrigé
+
+- Lecteur XML ANMV : évite les scans répétés du produit accumulé et les promesses par ligne. Sur les corpus mesurés sous Bun 1.4.3, le pic RSS médian au chargement passe de 466 à 338 Mio et la durée de 5,63 à 4,28 s ; les produits extraits sont identiques. Voir `docs/BUN_LOAD_MEMORY.md`.
+
 ## [1.5.3] - 2026-10-11
 
 ### Modifié

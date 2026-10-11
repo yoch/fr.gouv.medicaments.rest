@@ -32,3 +32,10 @@ MiniSearch canonique.
   `benchmark_search_after.js` — diagnostics ad hoc ranking/boosting.
 - `study_dosage_forme.js` — étude empirique des paramètres structurés `dosage` /
   `forme` pour `/search` (génère `docs/ETUDE_DOSAGE_FORME.md`).
+
+## Validation Bun / Node
+
+- `verify-runtime-parity.js` — compare 28 réponses HTTP avec les corpus locaux,
+  sans téléchargement : `NODE_BIN=node BUN_BIN=bun node scripts/benchmark/verify-runtime-parity.js`.
+- Mesures de pic mémoire et correctif du lecteur ANMV :
+  [`docs/BUN_LOAD_MEMORY.md`](../../docs/BUN_LOAD_MEMORY.md).
