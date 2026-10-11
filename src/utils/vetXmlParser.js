@@ -27,6 +27,15 @@ function addChild(obj, key, value) {
   else obj[key] = [obj[key], value];
 }
 
+// saxes découpe le texte dans la chaîne du bloc. Sous V8, une sous-chaîne d'au
+// moins 13 caractères référence sa chaîne parente : sans copie, chaque valeur
+// gardée dans le corpus retiendrait tout le bloc XML (~18 Mo sur le corpus ANMV).
+// La concaténation puis le slice forcent V8 à recopier dans une chaîne propre.
+function leafText(text) {
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  return normalized.length < 13 ? normalized : ` ${normalized}`.slice(1);
+}
+
 /**
  * Parse un bloc `<medicinal-product>…</medicinal-product>` en objet compact :
  * une balise feuille donne son texte (espaces normalisés, sans conversion de
@@ -63,7 +72,7 @@ function parseProductBlock(blockXml, parser) {
       return;
     }
     const node = stack.pop();
-    const value = node.children ?? node.text.replace(/\s+/g, ' ').trim();
+    const value = node.children ?? leafText(node.text);
     const parent = stack[stack.length - 1];
     if (parent) addChild((parent.children ??= {}), node.name, value);
     else root = { name: node.name, value };

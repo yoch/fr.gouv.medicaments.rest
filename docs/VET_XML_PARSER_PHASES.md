@@ -19,6 +19,9 @@
 |-------|----------------------------------------|-------|
 | `loadVetData` complet | 4,3–5,0 s | 1,4–1,7 s |
 | Parsing des blocs seul | ~1,3 s | ~0,25 s |
+| Heap retenu après chargement et GC | 11,4 Mo | 11,8 Mo |
+
+**Copie des valeurs :** saxes renvoie des sous-chaînes du bloc. Sous V8, elles gardaient le bloc entier en vie (29,3 Mo retenus au lieu de 11,8 Mo) ; `leafText` recopie donc chaque valeur d'au moins 13 caractères. JavaScriptCore (Bun) n'est pas concerné.
 
 Les RCP représentent 74 % du fichier (38 M de caractères sur 52 M) : ils sont retirés avant le parsing, ce qui reste plus rapide que de les faire traverser par un parseur.
 
