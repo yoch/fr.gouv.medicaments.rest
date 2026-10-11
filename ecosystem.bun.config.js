@@ -37,7 +37,7 @@ module.exports = {
         RELOAD_STRATEGY: 'restart',
         CORPUS_LIGHT_PROFILE: 'true',
         VET_LOAD_DEFERRED: 'true',
-        VET_LOAD_DELAY_MS: '5000'
+        VET_LOAD_DELAY_MS: '2000'
       }
     }
   ]
