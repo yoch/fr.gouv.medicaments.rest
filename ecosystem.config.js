@@ -25,7 +25,8 @@ module.exports = {
       script: 'src/server.js',
       time: true,
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
-      node_args: '--env-file=.env',
+      // Plafonne la jeune génération V8 : pic RSS au chargement ~350 → ~225 Mo (Node 24).
+      node_args: '--env-file=.env --max-semi-space-size=8',
       env: {
         NODE_ENV: 'production',
         RELOAD_STRATEGY: 'restart',

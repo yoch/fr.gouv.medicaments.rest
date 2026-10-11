@@ -7,6 +7,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.5.3] - 2026-10-11
+
+### Modifié
+
+- PM2 lance Node avec `--max-semi-space-size=8` : la jeune génération V8 est plafonnée à 16 Mo au lieu d'un dimensionnement automatique (128 Mo mesurés sous Node 24). Pic RSS au chargement mesuré : environ 350 → 225 Mo, pour une durée de chargement inchangée. Prise en compte au prochain `pm2 startOrRestart ecosystem.config.js`.
+- FrozenMiniSearch mis à jour en 1.11.0 (ajout de `searchPage()`, non utilisé ici ; `search()` et le format des index sont inchangés).
+
 ### Sécurité
 
 - `xlsx` passe en 0.20.3, distribuée par le CDN SheetJS (le registre npm s'arrête à 0.18.5), et en `devDependencies` : seuls les scripts `audit:ansm-dispo` et `audit:ema-monitoring` l'utilisent. Corrige [GHSA-4r6h-8v6p-xvw6](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6) et [GHSA-5pgg-2g8v-p4x9](https://github.com/advisories/GHSA-5pgg-2g8v-p4x9) ; `npm audit --omit=dev` ne signale plus de vulnérabilité.
@@ -157,7 +164,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.2...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.3...HEAD
+[1.5.3]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.4.0...v1.5.0
