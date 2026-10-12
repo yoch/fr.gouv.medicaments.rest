@@ -23,7 +23,8 @@ const { buildPagedResponse } = require('../utils/corpusPaging');
 const { miniSearchIndexConfig } = require('../utils/miniSearchIndexConfig');
 const { BDPM_SCHEMAS } = require('../utils/corpusSchemas');
 const {
-  rankSearchResults,
+  scoredSearch,
+  searchKeyQualities,
   searchRankedPage,
   materializeRankedSearchRange,
   rankAndMaterializeSearch
@@ -229,21 +230,8 @@ function search(type, query) {
   if (!searchIndexes[type]) return [];
 
   const spec = BDPM_INDEX_SPECS[type];
-  const results = searchIndexes[type].search(query);
+  const results = scoredSearch(searchIndexes[type], query);
   return rankAndMaterializeSearch(rows, results, query, {
-    primaryField: spec.primaryField,
-    idField: spec.idField,
-    codeFields: spec.codeFields
-  });
-}
-
-function rankedSearch(type, query) {
-  const rows = corpus[type];
-  if (!rows || !query) return [];
-  if (!searchIndexes[type]) return [];
-
-  const spec = BDPM_INDEX_SPECS[type];
-  return rankSearchResults(rows, searchIndexes[type].search(query), query, {
     primaryField: spec.primaryField,
     idField: spec.idField,
     codeFields: spec.codeFields
@@ -265,20 +253,16 @@ function searchPage(type, query, page = 1, limit = 100) {
   });
 }
 
+/**
+ * `{ cis, match_quality }` de chaque correspondance, dans l'ordre du corpus.
+ * Les CIS sont des clés entières : la fusion les ordonne numériquement, quel
+ * que soit l'ordre des correspondances, d'où l'absence de score.
+ */
 function searchKeyMatches(type, query) {
   const rows = corpus[type];
   const spec = BDPM_INDEX_SPECS[type];
-  if (!spec || !spec.idField) return [];
-  const ranked = rankedSearch(type, query);
-  const out = new Array(ranked.length);
-  for (let i = 0; i < ranked.length; i++) {
-    const r = ranked[i];
-    out[i] = {
-      [spec.idField]: rows[r.rowIndex][spec.idField],
-      match_quality: r.match_quality
-    };
-  }
-  return out;
+  if (!rows || !query || !spec || !spec.idField || !searchIndexes[type]) return [];
+  return searchKeyQualities(rows, searchIndexes[type], query, spec);
 }
 
 function listCorpusPage(type, page = 1, limit = 100) {

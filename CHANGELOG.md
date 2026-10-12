@@ -9,6 +9,7 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ### Modifié
 
+- FrozenMiniSearch mis à jour en 1.12.0. `/search` et la résolution des CIS de `/disponibilite/alerts?q=` ne demandent plus que les identifiants des correspondances (`matchIds()`), car leur fusion par CIS n'utilise pas le score. Les listes paginées, les ruptures et les recherches vétérinaires, triées par score, ne construisent plus les informations de correspondance (`matchInfo: false`). Réponses identiques ; pour `q=a`, `/search` alloue 23 Mo au lieu de 50 Mo.
 - Qualité des correspondances (`match_quality`) calculée en comparant les libellés caractère par caractère, accents et casse repliés, sans créer de chaîne normalisée par résultat. Classement identique ; pour `q=a`, la recherche paginée sur les spécialités, présentations et compositions alloue 40 Mo au lieu de 66 Mo.
 
 ### Corrigé

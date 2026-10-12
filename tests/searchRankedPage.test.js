@@ -2,7 +2,7 @@
 
 const { FrozenMiniSearch } = require('@yoch/frozenminisearch');
 const { miniSearchOptions } = require('../src/utils/searchRanking');
-const { rankSearchResults, searchRankedPage } = require('../src/utils/corpusSearch');
+const { rankSearchResults, searchKeyQualities, searchRankedPage } = require('../src/utils/corpusSearch');
 const { parseListPaging } = require('../src/utils/corpusPaging');
 
 const rows = Array.from({ length: 1400 }, (_, id) => ({
@@ -16,6 +16,16 @@ const spec = { primaryField: 'denomination', idField: 'cis', codeFields: ['cis',
 const index = FrozenMiniSearch.fromDocuments(rows, {
   fields: ['cis', 'cip13', 'denomination', 'titulaire'],
   ...miniSearchOptions,
+});
+
+describe('searchKeyQualities', () => {
+  test.each(['alpha', 'alphe', 'alpha 1', '60000000', '3400000000001', 'introuvable', 'comprime'])
+  ('returns the key and quality of every ranked match, in corpus order, for %s', (query) => {
+    const full = rankSearchResults(rows, index.search(query), query, spec)
+      .sort((a, b) => a.rowIndex - b.rowIndex)
+      .map((hit) => ({ cis: rows[hit.rowIndex].cis, match_quality: hit.match_quality }));
+    expect(searchKeyQualities(rows, index, query, spec)).toEqual(full);
+  });
 });
 
 describe('searchRankedPage', () => {
@@ -53,7 +63,7 @@ describe('searchRankedPage', () => {
     try {
       const actual = searchRankedPage(rows, index, 'alpha', spec, 1, exact + 2);
       expect(actual.ranked).toEqual(full.slice(0, exact + 2));
-      expect(search).toHaveBeenCalledWith('alpha');
+      expect(search).toHaveBeenCalledWith('alpha', { matchInfo: false });
     } finally {
       search.mockRestore();
     }
@@ -138,7 +148,7 @@ describe('searchRankedPage', () => {
     try {
       searchRankedPage(rows, index, '60000000', spec, 1, 1);
       expect(search).toHaveBeenCalledTimes(1);
-      expect(search).toHaveBeenCalledWith('60000000');
+      expect(search).toHaveBeenCalledWith('60000000', { matchInfo: false });
     } finally {
       search.mockRestore();
     }
@@ -165,7 +175,7 @@ describe('searchRankedPage', () => {
     const search = jest.spyOn(index, 'search');
     try {
       searchRankedPage(rows, index, 'alpha', spec, 1, 1);
-      expect(search).toHaveBeenCalledWith('alpha');
+      expect(search).toHaveBeenCalledWith('alpha', { matchInfo: false });
     } finally {
       search.mockRestore();
     }

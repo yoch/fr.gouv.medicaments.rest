@@ -1,5 +1,4 @@
 const {
-  search,
   searchKeyMatches,
   getSpecialiteByCis,
   getSpecialiteLabelByCis,
@@ -9,7 +8,6 @@ const {
   HYDRATE_RELATED_LIMIT
 } = require('./dataLoader');
 const {
-  searchVet,
   searchVetKeyMatches,
   getMedicamentByNum,
   getMedicamentLabelByNum,
@@ -92,35 +90,8 @@ function mergeSearchHits({ keyField, searches, onExactKey }) {
 }
 
 function searchBdpm(q) {
-  const { qualityByKey, metaByKey } = mergeSearchHits({
-    keyField: 'cis',
-    searches: [
-      { items: search('specialites', q), via: 'denomination' },
-      { items: search('presentations', q), via: 'presentation' },
-      { items: search('compositions', q), via: 'composition' }
-    ],
-    onExactKey: ({ qualityByKey, metaByKey, recordMatchMeta }) => {
-      const normalizedQuery = String(q).trim();
-      if (/^\d+$/.test(normalizedQuery) && qualityByKey[normalizedQuery] === 'exact') {
-        recordMatchMeta(metaByKey, normalizedQuery, {
-          cis: normalizedQuery,
-          match_quality: 'exact'
-        }, 'cis');
-      }
-    }
-  });
-
-  return Object.keys(qualityByKey).map((cis) => {
-    const result = {
-      type: 'medicament',
-      match_quality: qualityByKey[cis],
-      ...(getSpecialiteByCis(cis) || { cis, url_bdpm: bdpmExtraitUrl(cis) }),
-      presentations: getRelatedByCis('presentations', cis, HYDRATE_RELATED_LIMIT),
-      compositions: getRelatedByCis('compositions', cis, HYDRATE_RELATED_LIMIT)
-    };
-    attachMatchFields(result, metaByKey[cis]);
-    return result;
-  });
+  const { qualityByKey, metaByKey } = collectBdpmMatches(q);
+  return Object.keys(qualityByKey).map((cis) => hydrateBdpmResult(cis, qualityByKey, metaByKey));
 }
 
 function collectBdpmMatches(q) {
@@ -180,34 +151,8 @@ function hydrateBdpmResult(cis, qualityByKey, metaByKey) {
 }
 
 function searchVeterinary(q) {
-  const { qualityByKey, metaByKey } = mergeSearchHits({
-    keyField: 'num',
-    searches: [
-      { items: searchVet('medicaments', q), via: 'denomination' },
-      { items: searchVet('compositions', q), via: 'composition' }
-    ],
-    onExactKey: ({ qualityByKey, metaByKey, recordMatchMeta }) => {
-      const normalizedQuery = String(q).trim();
-      if (/^\d+$/.test(normalizedQuery)) {
-        const num = normalizedQuery.padStart(7, '0');
-        if (qualityByKey[num] === 'exact') {
-          recordMatchMeta(metaByKey, num, { num, match_quality: 'exact' }, 'num');
-        }
-      }
-    }
-  });
-
-  return Object.keys(qualityByKey).map((num) => {
-    const result = {
-      type: 'medicament_veterinaire',
-      match_quality: qualityByKey[num],
-      ...(getMedicamentByNum(num) || { num }),
-      presentations: getRelatedByNum('presentations', num),
-      compositions: getRelatedByNum('compositions', num)
-    };
-    attachMatchFields(result, metaByKey[num]);
-    return result;
-  });
+  const { qualityByKey, metaByKey } = collectVeterinaryMatches(q);
+  return Object.keys(qualityByKey).map((num) => hydrateVeterinaryResult(num, qualityByKey, metaByKey));
 }
 
 function collectVeterinaryMatches(q) {

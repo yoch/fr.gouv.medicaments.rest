@@ -10,6 +10,7 @@
  */
 
 const {
+  scoredSearch,
   rankSearchResults,
   searchRankedPage,
   materializeRankedSearchRange,
@@ -47,7 +48,7 @@ function searchVet(type, query) {
 
   const rows = corpus[type];
   const spec = VET_INDEX_SPECS[type];
-  const results = searchIndexes[type].search(query);
+  const results = scoredSearch(searchIndexes[type], query);
   return rankAndMaterializeSearch(rows, results, query, {
     primaryField: spec.primaryField,
     idField: spec.idField
@@ -60,7 +61,7 @@ function rankedSearchVet(type, query) {
 
   const rows = corpus[type];
   const spec = VET_INDEX_SPECS[type];
-  return rankSearchResults(rows, searchIndexes[type].search(query), query, {
+  return rankSearchResults(rows, scoredSearch(searchIndexes[type], query), query, {
     primaryField: spec.primaryField,
     idField: spec.idField
   });
@@ -93,6 +94,8 @@ function searchVetPage(type, query, page = 1, limit = 100) {
   });
 }
 
+// Les `num` (« 0001234 ») ne sont pas des clés entières : la fusion garde leur
+// ordre d'insertion, donc ce classement par score.
 function searchVetKeyMatches(type, query) {
   const rows = corpus[type];
   const spec = VET_INDEX_SPECS[type];

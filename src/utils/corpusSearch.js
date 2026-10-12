@@ -17,22 +17,47 @@ function collectCodeValues(row, codeFields) {
   return values;
 }
 
-function rankSearchHit(corpus, res, matchPriority, { primaryField, idField = null, codeFields = null }) {
-  const row = corpus[res.id];
+/** Correspondances triées par score ; l'application ne lit ni `terms` ni `match`. */
+function scoredSearch(index, query, options) {
+  return index.search(query, { ...options, matchInfo: false });
+}
+
+function classifyRow(row, matchPriority, { primaryField, idField = null, codeFields = null }) {
   const primaryValue = row[primaryField] != null && row[primaryField] !== '' ? row[primaryField] : '';
   const idValue =
     idField && row[idField] != null && row[idField] !== '' ? row[idField] : '';
-  const priority = matchPriority(primaryValue, {
+  return matchPriority(primaryValue, {
     idValue,
     codeValues: collectCodeValues(row, codeFields)
   });
+}
 
+function rankSearchHit(corpus, res, matchPriority, spec) {
+  const priority = classifyRow(corpus[res.id], matchPriority, spec);
   return {
     rowIndex: res.id,
     score: res.score,
     priority,
     match_quality: matchQualityFromPriority(priority)
   };
+}
+
+/**
+ * Identifiant (`spec.idField`) et qualité de chaque correspondance, dans l'ordre
+ * du corpus et sans score : pour les fusions par clé qui ordonnent elles-mêmes.
+ */
+function searchKeyQualities(corpus, index, query, spec) {
+  const matchPriority = createMatchPriorityClassifier(query);
+  const ids = index.matchIds(query);
+  const out = new Array(ids.length);
+  for (let i = 0; i < ids.length; i++) {
+    const row = corpus[ids[i]];
+    out[i] = {
+      [spec.idField]: row[spec.idField],
+      match_quality: matchQualityFromPriority(classifyRow(row, matchPriority, spec))
+    };
+  }
+  return out;
 }
 
 function compareRankedHits(a, b) {
@@ -67,7 +92,7 @@ function searchRankedPage(corpus, index, query, spec, page, limit) {
     for (let priority = 2; priority >= 0; priority--) {
       const tierEnd = tierStart + cached.counts[priority];
       if (offset >= tierStart && Math.min(end, cached.total) <= tierEnd) {
-        const hits = index.search(query, {
+        const hits = scoredSearch(index, query, {
           limit: Math.min(end, cached.total) - tierStart,
           filter: (hit) => cached.priorities[hit.id] === priority
         });
@@ -84,7 +109,7 @@ function searchRankedPage(corpus, index, query, spec, page, limit) {
     // Une page à cheval sur plusieurs niveaux exige le classement complet.
   }
 
-  const ranked = rankSearchResults(corpus, index.search(query), query, spec);
+  const ranked = rankSearchResults(corpus, scoredSearch(index, query), query, spec);
   // Sans page suivante, l'entrée d'une autre requête en cours de pagination est conservée.
   if (!sameQuery && ranked.length > end) {
     const priorities = new Uint8Array(corpus.length);
@@ -129,6 +154,8 @@ function rankAndMaterializeSearch(
 }
 
 module.exports = {
+  scoredSearch,
+  searchKeyQualities,
   rankSearchResults,
   searchRankedPage,
   materializeRankedSearchRange,

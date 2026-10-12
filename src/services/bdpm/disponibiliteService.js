@@ -7,7 +7,7 @@
 
 const { buildPagedResponse } = require('../../utils/corpusPaging');
 const { materializeIndices, materializeRange, rowCount } = require('../../utils/corpusStore');
-const { rankSearchResults } = require('../../utils/corpusSearch');
+const { rankSearchResults, scoredSearch } = require('../../utils/corpusSearch');
 const { BDPM_INDEX_SPECS } = require('../../search/indexSpecs');
 const {
   rowMatchesDisponibiliteFilters,
@@ -35,7 +35,7 @@ function rankedRupturesSearch(query) {
   const rows = corpus.ruptures;
   if (!rows || !query || !searchIndexes.ruptures) return [];
   const spec = BDPM_INDEX_SPECS.ruptures;
-  return rankSearchResults(rows, searchIndexes.ruptures.search(query), query, {
+  return rankSearchResults(rows, scoredSearch(searchIndexes.ruptures, query), query, {
     primaryField: spec.primaryField,
     idField: spec.idField,
     codeFields: spec.codeFields
