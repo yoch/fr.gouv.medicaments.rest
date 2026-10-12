@@ -7,6 +7,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.7.0] - 2026-10-12
+
 ### Modifié
 
 - FrozenMiniSearch mis à jour en 1.12.0. `/search` et la résolution des CIS de `/disponibilite/alerts?q=` ne demandent plus que les identifiants des correspondances (`matchIds()`), car leur fusion par CIS n'utilise pas le score. Les listes paginées, les ruptures et les recherches vétérinaires, triées par score, ne construisent plus les informations de correspondance (`matchInfo: false`). Réponses identiques ; pour `q=a`, `/search` alloue 23 Mo au lieu de 50 Mo.
@@ -204,7 +206,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.6.1...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.3...v1.6.0
 [1.5.3]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.2...v1.5.3
