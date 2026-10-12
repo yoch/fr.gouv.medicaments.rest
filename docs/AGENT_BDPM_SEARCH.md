@@ -60,6 +60,12 @@ Depuis la v1.4.0, ces champs complètent `q` — ils ne le remplacent pas.
 - **Anti-bruit** : un match faible (`fuzzy`) ne remonte jamais au-dessus d'un match fort (`prefix` / `exact`), même si le critère matche parfaitement.
 - Si aucun résultat ne satisfait un critère, la liste complète est quand même renvoyée.
 
+Les concentrations par `ml` ou `l` tiennent compte du dénominateur : `40 mg/ml`
+correspond à `200 mg/5 ml`, mais pas à `40 mg/5 ml` ni à une quantité simple
+de `40 mg`. Le dosage reste une comparaison de quantités dans la dénomination :
+les quantités de plusieurs substances ne sont pas associées à chaque substance,
+et les dénominateurs en masse, temps ou poids corporel ne sont pas normalisés.
+
 ✅ Bon usage :
 
 ```

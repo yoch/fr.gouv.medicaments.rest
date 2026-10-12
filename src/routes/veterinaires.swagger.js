@@ -19,6 +19,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *         description: Terme de recherche (nom ou numéro AMM)
  *       - in: query
  *         name: page
@@ -98,6 +99,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *       - in: query
  *         name: page
  *         schema:
@@ -136,6 +138,7 @@
  *         required: true
  *         schema:
  *           type: string
+ *           maxLength: 512
  *         description: Sous-chaîne recherchée dans le libellé ou le GTIN
  *       - in: query
  *         name: page

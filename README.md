@@ -52,7 +52,7 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 - `GET /api/veterinaires/presentations` - Présentations (filtre libellé / GTIN)
 
 ### Paramètres de requête
-- `q` - Terme de recherche (supporte prefix search et fuzzy search)
+- `q` - Terme de recherche, limité à 512 caractères (supporte prefix search et fuzzy search)
 - `page` - Numéro de page (défaut: 1)
 - `limit` - Nombre d'éléments par page (défaut: 100, max: 1000)
 - `source` - Sur `/api/medicaments/search` : `auto` (défaut), `human`, `veterinary`, `mixed`
@@ -63,6 +63,7 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 
 - **[API Reference (Markdown)](API_REFERENCE.md)**
 - **[Pagination et performances de recherche](docs/SEARCH_PAGINATION.md)** : exploitation de FrozenMiniSearch `limit`, périmètre et benchmark reproductible.
+- **[Audit de recherche et de rétention](docs/AUDIT_RECHERCHE.md)** : défauts corrigés, vérifications et limites du moteur.
 - **Swagger UI**: `http://localhost:3000/api-docs`
 - **OpenAPI Spec**: `http://localhost:3000/api-docs.json`
 

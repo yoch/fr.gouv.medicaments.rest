@@ -9,11 +9,13 @@ const {
 } = require('../services/vetDataLoader');
 const config = require('../config');
 const { createListHandler } = require('../utils/routeHelpers');
+const { validateSearchQuery } = require('../utils/validateSearchQuery');
 
 // Annotations OpenAPI dans `veterinaires.swagger.js` (scannées par swagger-jsdoc).
 require('./veterinaires.swagger');
 
 const router = express.Router();
+router.use(validateSearchQuery);
 
 const listHandler = createListHandler({
   getMetadata: getVetMetadata,

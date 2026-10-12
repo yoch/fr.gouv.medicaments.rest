@@ -14,6 +14,7 @@ const UNIT_ALIASES = {
   iu: 'ui',
   ug: 'ug',
   µg: 'ug',
+  μg: 'ug',
   mcg: 'ug',
   microgramme: 'ug',
   microgrammes: 'ug',
@@ -21,7 +22,7 @@ const UNIT_ALIASES = {
 };
 
 const DOSAGE_TOKEN_RE =
-  /(\d+(?:[.,]\d+)?)\s*(mg|g|grammes?|ml|l|ui|iu|u|µg|ug|mcg|microgrammes?|%)/giu;
+  /(\d+(?:[.,]\d+)?)\s*(mg|g|grammes?|ml|l|ui|iu|u|µg|μg|ug|mcg|microgrammes?|%)(?![\p{L}])(?:\s*\/\s*(?:(\d+(?:[.,]\d+)?)\s*)?(ml|l)(?![\p{L}]))?/giu;
 
 /**
  * Parse une chaîne dosage en quantités normalisées (mg, g, ml, ui, ug, %).
@@ -40,35 +41,58 @@ function parseDosageTokens(value) {
     const unitKey = match[2].normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const unit = UNIT_ALIASES[unitKey];
     if (!unit) continue;
-    tokens.push({ amount, unit });
+    const token = { amount, unit };
+    if (match[4]) {
+      const volume = match[3] == null ? 1 : Number.parseFloat(match[3].replace(',', '.'));
+      if (!Number.isFinite(volume) || volume <= 0) continue;
+      token.per = { amount: volume, unit: match[4] };
+    }
+    tokens.push(token);
   }
   return tokens;
 }
 
-function toCanonicalMg(token) {
+function toCanonicalQuantity(token) {
   if (!token) return null;
   switch (token.unit) {
     case 'mg':
-      return token.amount;
+      return { amount: token.amount, unit: 'mg' };
     case 'g':
-      return token.amount * 1000;
+      return { amount: token.amount * 1000, unit: 'mg' };
     case 'ug':
-      return token.amount / 1000;
+      return { amount: token.amount / 1000, unit: 'mg' };
+    case 'ml':
+      return { amount: token.amount, unit: 'ml' };
+    case 'l':
+      return { amount: token.amount * 1000, unit: 'ml' };
+    case 'ui':
+    case '%':
+      return token;
     default:
       return null;
   }
 }
 
 function dosageTokensMatch(requested, candidate, { toleranceRatio = 0.02 } = {}) {
-  const reqMg = requested.map(toCanonicalMg).filter((v) => v != null);
-  const candMg = candidate.map(toCanonicalMg).filter((v) => v != null);
-  if (reqMg.length === 0 || candMg.length === 0) return false;
+  const canonical = (token) => {
+    const quantity = toCanonicalQuantity(token);
+    if (!quantity) return null;
+    const per = token.per && toCanonicalQuantity(token.per);
+    const normalized = per
+      ? { amount: quantity.amount / per.amount, unit: `${quantity.unit}/${per.unit}` }
+      : quantity;
+    return Number.isFinite(normalized.amount) ? normalized : null;
+  };
+  const requestedQuantities = requested.map(canonical).filter((v) => v != null);
+  const candidateQuantities = candidate.map(canonical).filter((v) => v != null);
+  if (requestedQuantities.length === 0 || candidateQuantities.length === 0) return false;
 
-  return reqMg.some((req) =>
-    candMg.some((cand) => {
-      const delta = Math.abs(req - cand);
-      const tol = Math.max(req, cand) * toleranceRatio;
-      return delta <= Math.max(tol, 0.001);
+  return requestedQuantities.some((req) =>
+    candidateQuantities.some((cand) => {
+      if (req.unit !== cand.unit) return false;
+      const delta = Math.abs(req.amount - cand.amount);
+      const tol = Math.max(req.amount, cand.amount) * toleranceRatio;
+      return delta <= tol;
     })
   );
 }
@@ -159,15 +183,13 @@ function scoreStructuredCriteria(hit, criteria = {}) {
 }
 
 /**
- * Comparateur anti-bruit : si les critères n'apportent aucun différentiel de
- * boost, l'ordre existant est conservé. Dès qu'un boost structuré déplacerait
- * un candidat, `match_quality` garde la priorité pour empêcher un match faible
- * de passer devant un match fort.
+ * La qualité reste le premier critère, même à boost égal : cette comparaison
+ * lexicographique est transitive et empêche un match faible de passer devant
+ * un match fort. À qualité et boost égaux, l'appelant garde l'ordre initial.
  */
 function compareByQualityThenBoost(a, b) {
   const boostA = a.criteria_boost || 0;
   const boostB = b.criteria_boost || 0;
-  if (boostB === boostA) return 0;
   const rankA = MATCH_QUALITY_RANK[a.match_quality] || 0;
   const rankB = MATCH_QUALITY_RANK[b.match_quality] || 0;
   if (rankB !== rankA) return rankB - rankA;

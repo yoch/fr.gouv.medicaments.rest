@@ -19,6 +19,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *         description: Terme de recherche (recherche par début de mot et approximative)
  *       - in: query
  *         name: page
@@ -59,6 +60,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *       - in: query
  *         name: page
  *         schema:
@@ -96,6 +98,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *       - in: query
  *         name: page
  *         schema:
@@ -133,6 +136,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *       - in: query
  *         name: page
  *         schema:
@@ -170,6 +174,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *       - in: query
  *         name: page
  *         schema:
@@ -211,6 +216,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *         description: Recherche textuelle (libellé de statut)
  *       - in: query
  *         name: cis
@@ -317,6 +323,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *         description: |
  *           Recherche par nom commercial, DCI, CIS ou CIP13 (même esprit que `/medicaments/search`).
  *           Combinable avec les filtres exacts. Borne interne ~100 CIS résolus.
@@ -434,6 +441,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *     responses:
  *       200:
  *         description: Liste des substances
@@ -457,6 +465,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *       - in: query
  *         name: page
  *         schema:
@@ -506,6 +515,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *       - in: query
  *         name: page
  *         schema:
@@ -554,6 +564,7 @@
  *         name: q
  *         schema:
  *           type: string
+ *           maxLength: 512
  *       - in: query
  *         name: page
  *         schema:
@@ -657,6 +668,7 @@
  *         required: true
  *         schema:
  *           type: string
+ *           maxLength: 512
  *         description: Terme de recherche
  *       - in: query
  *         name: source

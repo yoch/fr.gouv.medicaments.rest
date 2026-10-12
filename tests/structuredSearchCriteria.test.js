@@ -10,6 +10,10 @@ const {
 
 describe('structuredSearchCriteria', () => {
   describe('parseDosageTokens', () => {
+    it('ne confond pas les nombres de gélules ou de gouttes avec des grammes', () => {
+      expect(parseDosageTokens('10 gélules, 20 gouttes')).toEqual([]);
+      expect(parseDosageTokens('25 μg')).toEqual([{ amount: 25, unit: 'ug' }]);
+    });
     it('parse 1 gramme en g', () => {
       expect(parseDosageTokens('1 gramme')).toEqual([{ amount: 1, unit: 'g' }]);
     });
@@ -22,9 +26,26 @@ describe('structuredSearchCriteria', () => {
     it('parse 1000 mg', () => {
       expect(parseDosageTokens('1000 mg')).toEqual([{ amount: 1000, unit: 'mg' }]);
     });
+
+    it('garde le volume d’une concentration sans en faire un dosage indépendant', () => {
+      expect(parseDosageTokens('40 mg/5 ml')).toEqual([
+        { amount: 40, unit: 'mg', per: { amount: 5, unit: 'ml' } }
+      ]);
+      expect(parseDosageTokens('40 mg/0 ml')).toEqual([]);
+    });
   });
 
   describe('dosageTokensMatch', () => {
+    it.each([
+      ['1000 UI', '1000 IU', true], ['0,5 l', '500 ml', true],
+      ['5 %', '5 %', true], ['5 mg', '5 ml', false],
+      ['0,1 µg', '1 µg', false], ['25 µg', '0,025 mg', true],
+      ['40 mg/ml', '40 mg/5 ml', false], ['40 mg/ml', '200 mg/5 ml', true],
+      ['1 mg/ml', '1 g/l', true], ['40 mg', '40 mg/ml', false],
+      ['5 ml', '40 mg/5 ml', false]
+    ])('compare %s à %s sans confondre les unités', (a, b, matches) => {
+      expect(dosageTokensMatch(parseDosageTokens(a), parseDosageTokens(b))).toBe(matches);
+    });
     it('1 gramme matche 1000 mg', () => {
       expect(
         dosageTokensMatch(parseDosageTokens('1 gramme'), parseDosageTokens('1000 mg'))
@@ -33,6 +54,17 @@ describe('structuredSearchCriteria', () => {
   });
 
   describe('scoreStructuredCriteria', () => {
+    it('garde une priorité transitive à qualité différente, même si deux boosts sont égaux', () => {
+      const hits = [
+        { denomination: 'A 1000 mg', match_quality: 'fuzzy' },
+        { denomination: 'B 1000 mg', match_quality: 'prefix' },
+        { denomination: 'C 500 mg', match_quality: 'fuzzy' }
+      ];
+      for (const order of [hits, [hits[2], hits[0], hits[1]], [...hits].reverse()]) {
+        expect(rerankWithStructuredCriteria(order, { dosage: '1000 mg' }).map(x => x.denomination))
+          .toEqual(['B 1000 mg', 'A 1000 mg', 'C 500 mg']);
+      }
+    });
     const hit = {
       denomination: 'DOLIPRANE 1000 mg, comprimé',
       forme_pharma: 'comprimé',
