@@ -2,7 +2,7 @@
 
 const {
   parseDosageTokens,
-  dosageTokensMatch,
+  matchDosageTokens,
   textOverlapScore,
   scoreStructuredCriteria,
   rerankWithStructuredCriteria
@@ -10,50 +10,91 @@ const {
 
 describe('structuredSearchCriteria', () => {
   describe('parseDosageTokens', () => {
-    it('ne confond pas les nombres de gélules ou de gouttes avec des grammes', () => {
-      expect(parseDosageTokens('10 gélules, 20 gouttes')).toEqual([]);
-      expect(parseDosageTokens('25 μg')).toEqual([{ amount: 25, unit: 'ug' }]);
-    });
-    it('parse 1 gramme en g', () => {
-      expect(parseDosageTokens('1 gramme')).toEqual([{ amount: 1, unit: 'g' }]);
+    it.each([
+      ['1 gramme', [{ amount: 1000, unit: 'mg' }]],
+      ['40mg', [{ amount: 40, unit: 'mg' }]],
+      ['0,25 mg', [{ amount: 0.25, unit: 'mg' }]],
+      ['25 μg', [{ amount: 0.025, unit: 'mg' }]],
+      ['100 microgrammes/dose', [{ amount: 0.1, unit: 'mg' }]],
+      ['10 gélules, 20 gouttes', []],
+      ['250 mg/5 ml', [{ amount: 250, unit: 'mg' }, { amount: 5, unit: 'ml' }]],
+      ['40 mg/ml', [{ amount: 40, unit: 'mg/ml' }]],
+      ['20 mg/1 ml', [{ amount: 20, unit: 'mg' }, { amount: 1, unit: 'ml' }]],
+      ['10 mg/10 ml', [{ amount: 10, unit: 'mg' }, { amount: 10, unit: 'ml' }]],
+      ['9 g/l', [{ amount: 9, unit: 'mg/ml' }]],
+      ['100 unités/mL', [{ amount: 100, unit: 'ui/ml' }]],
+      ['UVEDOSE 100 000 UI', [{ amount: 100000, unit: 'ui' }]],
+      ['A 313 50 000 U.I., capsule molle', [{ amount: 50000, unit: 'ui' }]],
+      ['5 POUR CENT, crème', [{ amount: 5, unit: '%' }]],
+      ['500 mg/62,5 mg', [{ amount: 500, unit: 'mg' }, { amount: 62.5, unit: 'mg' }]]
+    ])('lit %s', (text, tokens) => {
+      expect(parseDosageTokens(text)).toEqual(tokens);
     });
 
-    it('parse 40mg et 0,25 mg', () => {
-      expect(parseDosageTokens('40mg')).toEqual([{ amount: 40, unit: 'mg' }]);
-      expect(parseDosageTokens('0,25 mg')).toEqual([{ amount: 0.25, unit: 'mg' }]);
-    });
-
-    it('parse 1000 mg', () => {
-      expect(parseDosageTokens('1000 mg')).toEqual([{ amount: 1000, unit: 'mg' }]);
-    });
-
-    it('garde le volume d’une concentration sans en faire un dosage indépendant', () => {
-      expect(parseDosageTokens('40 mg/5 ml')).toEqual([
-        { amount: 40, unit: 'mg', per: { amount: 5, unit: 'ml' } }
+    it('ne colle pas un chiffre du nom au dosage', () => {
+      expect(parseDosageTokens('CACIT VITAMINE D3 500 mg/1000 U.I.')).toEqual([
+        { amount: 500, unit: 'mg' }, { amount: 1000, unit: 'ui' }
       ]);
-      expect(parseDosageTokens('40 mg/0 ml')).toEqual([]);
+      expect(parseDosageTokens('MAG 2 100 mg')).toEqual([{ amount: 100, unit: 'mg' }]);
     });
   });
 
-  describe('dosageTokensMatch', () => {
+  describe('matchDosageTokens', () => {
     it.each([
-      ['1000 UI', '1000 IU', true], ['0,5 l', '500 ml', true],
-      ['5 %', '5 %', true], ['5 mg', '5 ml', false],
-      ['0,1 µg', '1 µg', false], ['25 µg', '0,025 mg', true],
-      ['40 mg/ml', '40 mg/5 ml', false], ['40 mg/ml', '200 mg/5 ml', true],
-      ['1 mg/ml', '1 g/l', true], ['40 mg', '40 mg/ml', false],
-      ['5 ml', '40 mg/5 ml', false]
-    ])('compare %s à %s sans confondre les unités', (a, b, matches) => {
-      expect(dosageTokensMatch(parseDosageTokens(a), parseDosageTokens(b))).toBe(matches);
-    });
-    it('1 gramme matche 1000 mg', () => {
-      expect(
-        dosageTokensMatch(parseDosageTokens('1 gramme'), parseDosageTokens('1000 mg'))
-      ).toBe(true);
+      ['1 gramme', '1000 mg', 1, 0],
+      ['1000 UI', '1000 IU', 1, 0],
+      ['0,5 l', '500 ml', 1, 0],
+      ['25 µg', '0,025 mg', 1, 0],
+      ['0,1 µg', '1 µg', 0, 1],
+      ['5 mg', '5 ml', 0, 1],
+      ['5 %', '5 POUR CENT', 1, 0],
+      ['50 000 UI', '100 000 UI', 0, 1],
+      ['250 mg', '250 mg/5 ml', 1, 1],
+      ['250 mg/5 ml', '250 mg/5 ml', 2, 0],
+      ['40 mg/ml', '40 mg/5 ml', 0, 2],
+      ['20 mg', '20 mg/1 ml', 1, 1],
+      ['40 mg', '40 mg/ml', 0, 1],
+      ['1 mg/ml', '1 g/l', 1, 0],
+      ['500 mg/62,5 mg', '500 mg', 1, 0],
+      ['500 mg/500 mg', '500 mg', 1, 0]
+    ])('%s dans %s : %i retrouvée(s), %i en trop', (requested, candidate, matched, extra) => {
+      expect(matchDosageTokens(parseDosageTokens(requested), parseDosageTokens(candidate)))
+        .toEqual({ matched, extra });
     });
   });
 
   describe('scoreStructuredCriteria', () => {
+    it('boost proportionnel ; criteria_match.dosage seulement si tout est retrouvé', () => {
+      const partial = scoreStructuredCriteria({ denomination: 'AMOX 250 mg, gélule' }, { dosage: '250 mg/5 ml' });
+      expect(partial).toMatchObject({ boost: 1, criteria_match: { dosage: false }, dosage_extra: 0 });
+      const full = scoreStructuredCriteria({ denomination: 'AMOX 250 mg/5 ml, suspension' }, { dosage: '250 mg/5 ml' });
+      expect(full).toMatchObject({ boost: 2, criteria_match: { dosage: true }, dosage_extra: 0 });
+      const none = scoreStructuredCriteria({ denomination: 'AMOX 500 mg' }, { dosage: '250 mg' });
+      expect(none).toMatchObject({ boost: 0, dosage_extra: null });
+    });
+
+    it('à boost égal, préfère le candidat sans quantité non demandée', () => {
+      const hits = [
+        { denomination: 'IMETH 10 mg/0,4 ml, seringue', match_quality: 'exact' },
+        { denomination: 'IMETH 10 mg, comprimé', match_quality: 'exact' },
+        { denomination: 'IMETH 2,5 mg, comprimé', match_quality: 'exact' }
+      ];
+      const ranked = rerankWithStructuredCriteria(hits, { dosage: '10 mg' });
+      expect(ranked.map(x => x.denomination)).toEqual([
+        'IMETH 10 mg, comprimé', 'IMETH 10 mg/0,4 ml, seringue', 'IMETH 2,5 mg, comprimé'
+      ]);
+      expect(ranked[0]).not.toHaveProperty('_dosageExtra');
+    });
+
+    it('une concentration écrite avec son volume passe devant une quantité simple', () => {
+      const hits = [
+        { denomination: 'AMOX 250 mg, gélule', match_quality: 'exact' },
+        { denomination: 'AMOX 250 mg/5 ml, suspension', match_quality: 'exact' }
+      ];
+      expect(rerankWithStructuredCriteria(hits, { dosage: '250 mg/5 ml' })[0].denomination)
+        .toContain('suspension');
+    });
+
     it('garde une priorité transitive à qualité différente, même si deux boosts sont égaux', () => {
       const hits = [
         { denomination: 'A 1000 mg', match_quality: 'fuzzy' },

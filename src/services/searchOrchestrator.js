@@ -258,10 +258,10 @@ function applyCriteriaToRefs(refs, criteria) {
 
   const scored = refs.map((ref, index) => {
     const record = structuredRecordForRef(ref);
-    const { boost, criteria_match } = record
+    const { boost, criteria_match, dosage_extra } = record
       ? scoreStructuredCriteria(record, criteria)
-      : { boost: 0, criteria_match: { dosage: false, forme: false, voie: false } };
-    return { ...ref, criteria_boost: boost, criteria_match, _index: index };
+      : { boost: 0, criteria_match: { dosage: false, forme: false, voie: false }, dosage_extra: null };
+    return { ...ref, criteria_boost: boost, criteria_match, _dosageExtra: dosage_extra, _index: index };
   });
 
   scored.sort((a, b) => {
@@ -270,7 +270,7 @@ function applyCriteriaToRefs(refs, criteria) {
     return a._index - b._index;
   });
 
-  return scored.map(({ _index, ...ref }) => ref);
+  return scored.map(({ _index, _dosageExtra, ...ref }) => ref);
 }
 
 function buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource }) {
