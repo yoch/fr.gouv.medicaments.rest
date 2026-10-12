@@ -1,11 +1,13 @@
 'use strict';
 
 const express = require('express');
+const { validateSearchQuery } = require('../../utils/validateSearchQuery');
 
 // Annotations OpenAPI centralisées (scannées par swagger-jsdoc).
 require('./swagger');
 
 const router = express.Router();
+router.use(validateSearchQuery);
 
 router.use(require('./listHandlers'));
 router.use(require('./disponibiliteHandlers'));

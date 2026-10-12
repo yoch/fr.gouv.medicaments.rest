@@ -7,6 +7,13 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Corrigé
+
+- Recherche globale classée par qualité de correspondance avant pagination pour toutes les sources ; les critères dosage/forme/voie ne font plus passer une correspondance faible devant une forte à boost égal.
+- Poids des champs effectivement transmis aux options de recherche FrozenMiniSearch, notamment pour privilégier la dénomination dans les listes classées par score.
+- Critère de dosage : comparaison littérale des quantités écrites, sans calcul de concentration. Le boost est proportionnel aux quantités retrouvées, le moins de quantités en trop départage les égalités et `criteria_match.dosage` exige toutes les quantités. Masses, volumes, UI, pourcentages et concentrations `/ml` ne se confondent plus ; `100 000 UI`, `POUR CENT`, `unités` et `μg` sont lus ; les faux grammes de « gélules » ou « gouttes » et la tolérance absolue sur les faibles doses disparaissent. Mesure reproductible : `scripts/audit/audit-dosage-matching.js`.
+- Paramètres de recherche répétés refusés en JSON avec HTTP 400 ; `q` limité à 512 caractères pour borner les allocations de recherche floue. Limite documentée dans OpenAPI.
+
 ## [1.7.0] - 2026-10-12
 
 ### Modifié

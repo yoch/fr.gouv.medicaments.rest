@@ -8,7 +8,7 @@ function miniSearchIndexConfig(fields, boost = null) {
     storeFields: [],
     ...miniSearchOptions
   };
-  if (boost) indexConfig.boost = boost;
+  if (boost) indexConfig.searchOptions = { ...indexConfig.searchOptions, boost };
   return indexConfig;
 }
 

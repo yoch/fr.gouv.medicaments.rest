@@ -60,6 +60,19 @@ Depuis la v1.4.0, ces champs complètent `q` — ils ne le remplacent pas.
 - **Anti-bruit** : un match faible (`fuzzy`) ne remonte jamais au-dessus d'un match fort (`prefix` / `exact`), même si le critère matche parfaitement.
 - Si aucun résultat ne satisfait un critère, la liste complète est quand même renvoyée.
 
+Le dosage compare les quantités écrites, sans calcul de concentration. Plus il y a de
+quantités demandées retrouvées dans la dénomination, plus le produit remonte ; à égalité,
+celui qui n'a pas d'autre quantité passe devant. `criteria_match.dosage` vaut `true`
+seulement si toutes les quantités demandées sont retrouvées.
+
+- Recopie le dosage tel qu'il est écrit : `250 mg/5 ml`, `500 mg/62,5 mg`, `100 000 UI`.
+- Une quantité seule trouve aussi les formes qui la contiennent : `250 mg` remonte
+  la suspension `250 mg/5 ml`.
+- `40 mg/ml` est une concentration : elle ne correspond ni à `40 mg`, ni à `40 mg/5 ml`,
+  et `200 mg/5 ml` n'est pas converti en `40 mg/ml`.
+- Les unités sont converties (`1 g` = `1000 mg`, `25 µg` = `25 microgrammes`) ;
+  `UI`, `unités`, `%` et `POUR CENT` sont reconnus.
+
 ✅ Bon usage :
 
 ```

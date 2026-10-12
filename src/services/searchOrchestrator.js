@@ -258,10 +258,10 @@ function applyCriteriaToRefs(refs, criteria) {
 
   const scored = refs.map((ref, index) => {
     const record = structuredRecordForRef(ref);
-    const { boost, criteria_match } = record
+    const { boost, criteria_match, dosage_extra } = record
       ? scoreStructuredCriteria(record, criteria)
-      : { boost: 0, criteria_match: { dosage: false, forme: false, voie: false } };
-    return { ...ref, criteria_boost: boost, criteria_match, _index: index };
+      : { boost: 0, criteria_match: { dosage: false, forme: false, voie: false }, dosage_extra: null };
+    return { ...ref, criteria_boost: boost, criteria_match, _dosageExtra: dosage_extra, _index: index };
   });
 
   scored.sort((a, b) => {
@@ -270,7 +270,7 @@ function applyCriteriaToRefs(refs, criteria) {
     return a._index - b._index;
   });
 
-  return scored.map(({ _index, ...ref }) => ref);
+  return scored.map(({ _index, _dosageExtra, ...ref }) => ref);
 }
 
 function buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource }) {
@@ -323,7 +323,7 @@ function executeHybridSearch(q, source, criteria = {}) {
     bdpmResults.length > 0 && bdpmResults.some((r) => isStrongMatchQuality(r.match_quality));
   if (plan.merge === 'auto' && bdpmStrong) {
     return {
-      results: rerankWithStructuredCriteria(bdpmResults, criteria),
+      results: rerankWithStructuredCriteria(sortMergedResults(bdpmResults), criteria),
       search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
     };
   }
@@ -336,7 +336,7 @@ function executeHybridSearch(q, source, criteria = {}) {
 
   let results;
   if (plan.merge === 'concat') {
-    results = sortMergedResults([...bdpmResults, ...vetResults]);
+    results = [...bdpmResults, ...vetResults];
   } else if (plan.merge === 'replace') {
     results = plan.bdpm ? bdpmResults : vetResults;
   } else {
@@ -345,7 +345,7 @@ function executeHybridSearch(q, source, criteria = {}) {
   }
 
   return {
-    results: rerankWithStructuredCriteria(results, criteria),
+    results: rerankWithStructuredCriteria(sortMergedResults(results), criteria),
     search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
   };
 }
@@ -370,7 +370,7 @@ function executeHybridSearchPage(q, source, page = 1, limit = 50, criteria = {})
   const bdpmStrong =
     refs.length > 0 && refs.some((r) => isStrongMatchQuality(r.match_quality));
   if (plan.merge === 'auto' && bdpmStrong) {
-    const finalRefs = applyCriteriaToRefs(refs, criteria);
+    const finalRefs = applyCriteriaToRefs(sortResultRefs(refs), criteria);
     const { offset, safeLimit } = parseListPaging(page, limit);
     const pageRefs = finalRefs.slice(offset, offset + safeLimit);
     return {
@@ -389,14 +389,14 @@ function executeHybridSearchPage(q, source, page = 1, limit = 50, criteria = {})
   }
 
   if (plan.merge === 'concat') {
-    refs = sortResultRefs([...refs, ...vetResultRefs]);
+    refs = [...refs, ...vetResultRefs];
   } else if (plan.merge === 'replace') {
     refs = plan.bdpm ? refs : vetResultRefs;
   } else {
     refs = vetResultRefs.length > 0 ? vetResultRefs : refs;
   }
 
-  const finalRefs = applyCriteriaToRefs(refs, criteria);
+  const finalRefs = applyCriteriaToRefs(sortResultRefs(refs), criteria);
   const { offset, safeLimit } = parseListPaging(page, limit);
   const pageRefs = finalRefs.slice(offset, offset + safeLimit);
   return {
