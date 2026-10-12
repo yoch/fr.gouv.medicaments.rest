@@ -4,6 +4,7 @@ const {
   createMatchPriorityClassifier,
   matchQualityFromPriority,
   isStrongMatchQuality,
+  normalizeSearchText,
   queryTerms
 } = require('../src/utils/searchRanking');
 
@@ -76,6 +77,66 @@ describe('searchRanking', () => {
       expect(
         computeMatchPriority('AUTRE NOM', '6023', { idValue: '60234100' })
       ).toBe(0);
+    });
+
+    it('ignore accents et casse, y compris en forme décomposée', () => {
+      expect(computeMatchPriority('ÉFFERALGAN', 'efferalgan')).toBe(2);
+      expect(computeMatchPriority('E\u0301FFERALGAN 500', 'Efferalgan')).toBe(1);
+      expect(computeMatchPriority('acide acétylsalicylique', 'ACETYLSALICYLIQUE')).toBe(1);
+    });
+
+    it('délimite les mots entiers après repli', () => {
+      expect(computeMatchPriority('noir cafe\u0301', 'cafe')).toBe(1);
+      expect(computeMatchPriority('noir caféine', 'cafe')).toBe(0);
+      expect(computeMatchPriority('cafeine noire', 'cafe')).toBe(1);
+    });
+
+    it('retombe sur la normalisation complète quand le repli dépend du contexte', () => {
+      expect(computeMatchPriority('ΑΣ', 'ας')).toBe(2);
+      expect(computeMatchPriority('한글 sirop', '한글')).toBe(1);
+      expect(computeMatchPriority('dose 𝟏 mg', 'dose')).toBe(1);
+    });
+
+    it('classe comme la normalisation complète sur des libellés aléatoires', () => {
+      const reference = (query) => {
+        const normalizedQuery = normalizeSearchText(query);
+        const terms = queryTerms(query);
+        const matchers = terms.map((term) =>
+          new RegExp(`(?:^|[^a-z0-9])${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:[^a-z0-9]|$)`));
+        return (primaryValue, { idValue = '', codeValues = [] } = {}) => {
+          if (!terms.length) return 0;
+          const value = normalizeSearchText(primaryValue);
+          const id = normalizeSearchText(idValue);
+          if (value === normalizedQuery || id === normalizedQuery) return 2;
+          if (codeValues.some((code) => normalizeSearchText(code) === normalizedQuery)) return 2;
+          if (value.startsWith(normalizedQuery)) return 1;
+          const haystack = value || id;
+          if (!haystack || !terms.every((term) => haystack.includes(term))) return 0;
+          if (matchers.every((matcher) => matcher.test(haystack))) return 1;
+          return haystack.startsWith(terms[0]) ? 1 : 0;
+        };
+      };
+      const alphabet = ['a', 'b', 'e', 'A', 'É', 'é', 'e\u0301', '\u0301', ' ', '-', ',', '1', '0', 'Σ', 'ς', '한', 'œ', 'İ', '\u00a0'];
+      let seed = 42;
+      const random = (n) => {
+        seed = (seed * 48271) % 2147483647;
+        return seed % n;
+      };
+      const randomText = (max) => {
+        let text = '';
+        for (let length = random(max + 1); length > 0; length--) text += alphabet[random(alphabet.length)];
+        return text;
+      };
+      for (let round = 0; round < 300; round++) {
+        const query = randomText(4);
+        const expected = reference(query);
+        const actual = createMatchPriorityClassifier(query);
+        for (let candidate = 0; candidate < 30; candidate++) {
+          const value = randomText(8);
+          const options = { idValue: randomText(3), codeValues: [randomText(3)] };
+          expect([query, value, actual(value, options)]).toEqual([query, value, expected(value, options)]);
+        }
+      }
     });
   });
 

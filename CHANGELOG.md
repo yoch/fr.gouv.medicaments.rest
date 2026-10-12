@@ -7,6 +7,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Modifié
+
+- Qualité des correspondances (`match_quality`) calculée en comparant les libellés caractère par caractère, accents et casse repliés, sans créer de chaîne normalisée par résultat. Classement identique ; pour `q=a`, la recherche paginée sur les spécialités, présentations et compositions alloue 40 Mo au lieu de 66 Mo.
+
 ### Corrigé
 
 - Textes BDPM et vétérinaires nettoyés au chargement, pour l'API comme pour l'index de recherche : `<br>` devient un saut de ligne, `<sup>6</sup>` devient `⁶`, les autres balises HTML sont supprimées, les entités sont décodées (`&amp;`, `&gt;`, `&RSQUO;`, y compris dans le dictionnaire ANMV), les caractères Windows-1252 mal décodés sont restitués (environ 65 000 apostrophes, puces et tirets dans les avis de la HAS), les `¿` identifiables sont remplacés (apostrophe d'élision, `œ`, puce, `>` des mutations), et les espaces parasites sont normalisés. Les apostrophes sont uniformisées en `'`.
