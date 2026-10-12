@@ -7,6 +7,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.6.1] - 2026-10-12
+
 ### Modifié
 
 - FrozenMiniSearch mis à jour en 1.11.1 (correctifs de rétention mémoire : les index ne gardent plus les callbacks d'ingestion, un build échoué ne retient plus son corpus, le curseur de recherche ne garde plus son dernier préfixe ; recherche, API et format des index inchangés).
@@ -193,7 +195,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.6.0...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.3...v1.6.0
 [1.5.3]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.1...v1.5.2
