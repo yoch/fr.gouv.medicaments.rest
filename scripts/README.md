@@ -20,6 +20,31 @@ npm run audit:ansm-fiches     # → docs/AUDIT_ANSM_FICHE_BOT.md
 npm run audit:ema-monitoring  # → docs/AUDIT_EMA_ADDITIONAL_MONITORING_VS_BDPM.md
 ```
 
+## Audit de rétention mémoire
+
+Le rapport et les résultats de référence sont dans
+[`docs/AUDIT_MEMOIRE.md`](../docs/AUDIT_MEMOIRE.md). Les scripts ci-dessous
+travaillent localement, sans contacter la production ni modifier les corpus :
+
+```bash
+CORPUS_LIGHT_PROFILE=true AUDIT_TRAFFIC_MODE=normal \
+  node --expose-gc --max-semi-space-size=8 scripts/memory/audit-retention.js
+node --expose-gc scripts/memory/audit-resource-errors.js
+CORPUS_LIGHT_PROFILE=true \
+  node --expose-gc --max-semi-space-size=8 scripts/memory/audit-http-disconnects.js
+```
+
+Le premier charge les fichiers locaux, émet du trafic HTTP, mesure le tas et les
+ressources, puis recharge les mêmes données. `AUDIT_FORCE_GC=0` observe le GC
+naturel ; `AUDIT_TRAFFIC_MODE=mixed` inclut les recherches à un caractère. Le
+second injecte des erreurs dans des workers isolés et vérifie le pool avec des
+générations changeantes. Les résultats restent dans `tmp/memory-audit/`.
+
+Le troisième charge la BDPM, interrompt 1 000 réponses HTTP après leurs premiers
+octets, puis crée et ferme 30 applications avec rate limiting. Il mesure le tas,
+les descripteurs et la collecte effective des applications et serveurs via des
+références faibles. `AUDIT_HTTP_OUT` permet de choisir le fichier JSON de sortie.
+
 ## Prérequis
 
 Les scripts mémoire nécessitent `node --expose-gc` (active `global.gc`) :

@@ -26,7 +26,8 @@ const {
 const { miniSearchIndexConfig } = require('../../utils/miniSearchIndexConfig');
 const { MedicamentVet, CompositionVet, PresentationVet } = require('../../models/vet');
 const { TempsAttenteEntry } = require('../../models/tempsAttente');
-const { intern } = require('../../utils/stringPool');
+const { intern, withInternPool } = require('../../utils/stringPool');
+const { singleFlight } = require('../../utils/singleFlight');
 const config = require('../../config');
 const { VET_INDEX_SPECS } = require('../../search/indexSpecs');
 const state = require('./state');
@@ -108,6 +109,9 @@ async function parseDictionaryFromStream(filepath) {
     }
     if (lastEnd > 0) {
       buffer = buffer.slice(lastEnd);
+    }
+    if (buffer.length > 4 * 1024 * 1024) {
+      throw new Error('Dictionnaire ANMV : token incomplet supérieur à 4 Mio');
     }
   }
 
@@ -272,16 +276,18 @@ function parseTempsAttente(product, dict) {
 }
 
 function extractDateJeuFromHeader(filepath) {
+  let fd;
   try {
-    const fd = fs.openSync(filepath, 'r');
+    fd = fs.openSync(filepath, 'r');
     const buffer = Buffer.alloc(8192);
     const bytes = fs.readSync(fd, buffer, 0, buffer.length, 0);
-    fs.closeSync(fd);
     const header = buffer.slice(0, bytes).toString('utf8');
     const match = header.match(/<date-jeu-de-donnees>([^<]+)<\/date-jeu-de-donnees>/);
     return match ? match[1].trim() : null;
   } catch {
     return null;
+  } finally {
+    if (fd !== undefined) fs.closeSync(fd);
   }
 }
 
@@ -304,7 +310,9 @@ function clearLoadedData() {
   clearCorpus(corpus.presentations);
 }
 
-async function loadVetData() {
+const loadVetData = singleFlight(() => withInternPool('vet', loadVetDataGeneration));
+
+async function loadVetDataGeneration() {
   const productsPath = path.join(config.vetDataDir, config.vetProductsFile);
   const dictPath = path.join(config.vetDataDir, config.vetDictFile);
 
@@ -332,13 +340,15 @@ async function loadVetData() {
   const compositionFields = VET_INDEX_SPECS.compositions.fields;
 
   const malformed = [];
+  let malformedCount = 0;
   await streamMedicinalProducts(productsPath, async (blockXml) => {
     let product;
     try {
       product = parseProductBlock(blockXml, defaultProductParser);
     } catch (err) {
       const num = blockXml.match(/<num>([^<]*)<\/num>/)?.[1] ?? '?';
-      malformed.push(`${num} (${err.message})`);
+      malformedCount++;
+      if (malformed.length < 5) malformed.push(`${num} (${err.message})`);
       return;
     }
     if (!product) return;
@@ -353,9 +363,9 @@ async function loadVetData() {
       state.tempsAttente.set(medNum, waiting);
     }
   });
-  if (malformed.length > 0) {
+  if (malformedCount > 0) {
     console.warn(
-      `⚠ ${malformed.length} produit(s) vétérinaire(s) au XML invalide ignoré(s) : ${malformed.slice(0, 5).join(' ; ')}`
+      `⚠ ${malformedCount} produit(s) vétérinaire(s) au XML invalide ignoré(s) : ${malformed.join(' ; ')}`
     );
   }
   loadMemoryMark('vet_stream_done', {

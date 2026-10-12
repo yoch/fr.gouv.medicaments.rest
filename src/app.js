@@ -42,13 +42,21 @@ function healthHandler(req, res) {
 
 function createApp() {
   const app = express();
+  let store = null;
+  // Le MemoryStore du rate limiter garde un timer : à appeler quand l'app est abandonnée.
+  app.locals.dispose = () => {
+    store?.shutdown();
+    store = null;
+  };
 
   app.use(cors());
   app.use(express.json());
   app.use(helmet());
 
   if (config.enableRateLimit) {
+    store = new rateLimit.MemoryStore();
     const limiter = rateLimit({
+      store,
       windowMs: config.rateLimitWindowMs,
       max: config.rateLimitMax,
       standardHeaders: true,

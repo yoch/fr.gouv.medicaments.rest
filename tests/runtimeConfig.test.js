@@ -51,4 +51,14 @@ describe('runtimeConfig', () => {
     expect(config.corpus_light_omit_fields).toBeNull();
     expect(config.presentation_index_fields).toContain('indications');
   });
+
+  it.each(['BDPM_CHECK_INTERVAL_HOURS', 'VET_CHECK_INTERVAL_HOURS'])('refuse %s au-delà de la capacité des timers', variable => {
+    process.env[variable] = '597';
+    expect(loadConfig).toThrow(RangeError);
+  });
+
+  it.each(['VET_LOAD_DELAY_MS', 'RATE_LIMIT_WINDOW_MS'])('refuse %s au-delà de la capacité des timers', variable => {
+    process.env[variable] = '2147483648';
+    expect(loadConfig).toThrow(RangeError);
+  });
 });

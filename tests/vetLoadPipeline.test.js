@@ -67,6 +67,26 @@ describe('pipeline ANMV fixture', () => {
     });
   });
 
+  it('ferme le descripteur de header même si readSync échoue', async () => {
+    const originalOpen = fs.openSync;
+    const originalRead = fs.readSync;
+    let headerFd;
+    jest.spyOn(fs, 'openSync').mockImplementation((file, ...args) => {
+      const fd = originalOpen(file, ...args);
+      if (String(file).endsWith('amm-vet-fixture.xml')) headerFd = fd;
+      return fd;
+    });
+    jest.spyOn(fs, 'readSync').mockImplementation((fd, ...args) => {
+      if (fd === headerFd) throw new Error('header read failed');
+      return originalRead(fd, ...args);
+    });
+    const close = jest.spyOn(fs, 'closeSync');
+    await require('../src/services/vetDataLoader').loadVetData();
+    expect(headerFd).toEqual(expect.any(Number));
+    expect(close).toHaveBeenCalledWith(headerFd);
+    expect(() => fs.fstatSync(headerFd)).toThrow();
+  });
+
   async function withProductsXml(productLines, run) {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'vet-products-'));
     try {
@@ -112,5 +132,35 @@ describe('pipeline ANMV fixture', () => {
       expect(getMedicamentByNum('0999999')).toMatchObject({ nom: 'VALIDE' });
     });
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('1 produit(s) vétérinaire(s) au XML invalide ignoré(s) : 0999998'));
+  });
+
+  it('remplace le pool à chaque génération et partage les appels simultanés', async () => {
+    await withProductsXml([], async ({ loadVetData, getMedicamentByNum }) => {
+      const { internPoolSize } = require('../src/utils/stringPool');
+      for (let cycle = 0; cycle < 3; cycle++) {
+        fs.writeFileSync(path.join(process.env.VET_DATA_DIR, 'products.xml'),
+          `<root><medicinal-product><num>1</num><nom>TEST</nom><maj-rcp>DATE_${cycle}</maj-rcp><modele-destine-vente><mod-vte><lib-mod>LIBELLE_${cycle}</lib-mod></mod-vte></modele-destine-vente></medicinal-product></root>`);
+        const first = loadVetData();
+        expect(loadVetData()).toBe(first);
+        await first;
+        expect(internPoolSize()).toBe(2);
+        expect(getMedicamentByNum('1').maj_rcp).toBe(`DATE_${cycle}`);
+      }
+    });
+  });
+
+  it('rejette un dictionnaire sans tokens qui dépasse la limite et ferme son flux', async () => {
+    await withProductsXml([], async ({ loadVetData }) => {
+      fs.writeFileSync(path.join(process.env.VET_DATA_DIR, 'amm-vet-d-fixture.xml'), 'x'.repeat(4 * 1024 * 1024 + 1));
+      const original = fs.createReadStream;
+      let reader;
+      jest.spyOn(fs, 'createReadStream').mockImplementation((...args) => {
+        reader = original(...args);
+        return reader;
+      });
+      await expect(loadVetData()).rejects.toThrow('token incomplet supérieur');
+      expect(reader.destroyed).toBe(true);
+      expect(require('../src/utils/stringPool').internPoolSize()).toBe(0);
+    });
   });
 });

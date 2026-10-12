@@ -7,6 +7,9 @@ const { loadData } = require('./services/dataLoader');
 const { loadVetData } = require('./services/vetDataLoader');
 const { createApp } = require('./app');
 const { logMemoryUsage } = require('./utils/processMemory');
+const { singleFlight } = require('./utils/singleFlight');
+const { startPeriodicTask } = require('./utils/periodicTask');
+const { setTimeout: delay } = require('node:timers/promises');
 
 const PORT = config.port;
 const BDPM_REFRESH_MS = config.bdpmCheckIntervalHours * 60 * 60 * 1000;
@@ -19,12 +22,17 @@ const MEMORY_PLATEAU_DELAYS_MS = [
   ['+5min', 5 * 60 * 1000]
 ];
 
+const memoryTimers = new Set();
+let runningServer = null;
+
 function scheduleMemoryPlateauLogs(scope) {
   logMemoryUsage(`${scope}:done`);
   for (const [suffix, delayMs] of MEMORY_PLATEAU_DELAYS_MS) {
     const timer = setTimeout(() => {
+      memoryTimers.delete(timer);
       logMemoryUsage(`${scope}:${suffix}`);
     }, delayMs);
+    memoryTimers.add(timer);
     if (typeof timer.unref === 'function') timer.unref();
   }
 }
@@ -66,10 +74,8 @@ async function reloadVetAfterChange() {
   maybeRunPostLoadGc('vet_reload');
 }
 
-async function delayBeforeVetLoad() {
-  if (VET_LOAD_DELAY_MS > 0) {
-    await new Promise((resolve) => setTimeout(resolve, VET_LOAD_DELAY_MS));
-  }
+async function delayBeforeVetLoad(signal) {
+  if (VET_LOAD_DELAY_MS > 0) await delay(VET_LOAD_DELAY_MS, undefined, { signal });
 }
 
 async function loadVetDataSafe() {
@@ -83,20 +89,35 @@ async function loadVetDataSafe() {
   }
 }
 
-function scheduleDeferredVetLoad() {
-  (async () => {
-    await delayBeforeVetLoad();
-    console.log('Chargement des données vétérinaires (différé après listen)...');
-    await loadVetDataSafe();
-  })().catch((err) => {
-    console.warn('⚠ Échec chargement vétérinaire différé:', err.message);
+const startServer = singleFlight(startServerOnce);
+
+async function startServerOnce() {
+  if (runningServer) return runningServer;
+  const app = createApp();
+  const deferredController = new AbortController();
+  const tasks = [];
+  let server;
+  let initialVetLoad = Promise.resolve();
+  let stopped = false;
+  const stop = singleFlight(async () => {
+    if (stopped) return;
+    stopped = true;
+    deferredController.abort();
+    for (const timer of memoryTimers) clearTimeout(timer);
+    memoryTimers.clear();
+    const closing = server?.listening
+      ? new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve()))
+      : Promise.resolve();
+    try {
+      await Promise.all([closing, initialVetLoad, ...tasks.map(task => task.stop())]);
+    } finally {
+      for (const timer of memoryTimers) clearTimeout(timer);
+      memoryTimers.clear();
+      app.locals?.dispose?.();
+      if (runningServer?.server === server) runningServer = null;
+    }
   });
-}
-
-async function startServer() {
   try {
-    const app = createApp();
-
     if (config.enableRateLimit) {
       console.log(
         `Rate limiting enabled: ${config.rateLimitMax} requests per ${config.rateLimitWindowMs}ms`
@@ -111,7 +132,7 @@ async function startServer() {
     scheduleMemoryPlateauLogs('bdpm_load');
 
     if (!VET_LOAD_DEFERRED) {
-      await delayBeforeVetLoad();
+      await delayBeforeVetLoad(deferredController.signal);
       await loadVetDataSafe();
     } else {
       console.log('Chargement vétérinaire différé (VET_LOAD_DEFERRED=true)');
@@ -128,6 +149,8 @@ async function startServer() {
     }
 
     async function refreshVet() {
+      await initialVetLoad;
+      if (stopped) return;
       console.log(`🔄 Rafraîchissement vétérinaire (intervalle ${config.vetCheckIntervalHours}h)...`);
       try {
         const { changed: vetChanged } = await downloadVetDataIfNeeded();
@@ -137,21 +160,35 @@ async function startServer() {
       }
     }
 
-    setInterval(refreshBdpm, BDPM_REFRESH_MS);
-    setInterval(refreshVet, VET_REFRESH_MS);
-
-    app.listen(PORT, () => {
-      console.log(
-        `Planificateur: BDPM toutes les ${config.bdpmCheckIntervalHours}h, vétérinaire toutes les ${config.vetCheckIntervalHours}h`
-      );
-      console.log(`Serveur démarré sur le port ${PORT}`);
-      console.log(`Health check: http://localhost:${PORT}/health`);
-      console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
-      if (VET_LOAD_DEFERRED) {
-        scheduleDeferredVetLoad();
-      }
+    server = app.listen(PORT);
+    await new Promise((resolve, reject) => {
+      const onError = error => { server.off('listening', onListening); reject(error); };
+      const onListening = () => { server.off('error', onError); resolve(); };
+      server.once('listening', onListening);
+      server.once('error', onError);
     });
+    console.log(
+      `Planificateur: BDPM toutes les ${config.bdpmCheckIntervalHours}h, vétérinaire toutes les ${config.vetCheckIntervalHours}h`
+    );
+    console.log(`Serveur démarré sur le port ${PORT}`);
+    console.log(`Health check: http://localhost:${PORT}/health`);
+    console.log(`Swagger Docs: http://localhost:${PORT}/api-docs`);
+    if (VET_LOAD_DEFERRED) {
+      initialVetLoad = (async () => {
+        await delayBeforeVetLoad(deferredController.signal);
+        console.log('Chargement des données vétérinaires (différé après listen)...');
+        await loadVetDataSafe();
+      })().catch(error => {
+        if (error.name !== 'AbortError') console.warn('⚠ Échec chargement vétérinaire différé:', error.message);
+      });
+    }
+    const bdpmTask = startPeriodicTask(refreshBdpm, BDPM_REFRESH_MS);
+    const vetTask = startPeriodicTask(refreshVet, VET_REFRESH_MS);
+    tasks.push(bdpmTask, vetTask);
+    runningServer = { app, server, stop, refreshBdpm: bdpmTask.run, refreshVet: vetTask.run };
+    return runningServer;
   } catch (error) {
+    await stop();
     console.error('Erreur au démarrage:', error);
     process.exit(1);
   }
