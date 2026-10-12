@@ -27,6 +27,7 @@ const { miniSearchIndexConfig } = require('../../utils/miniSearchIndexConfig');
 const { MedicamentVet, CompositionVet, PresentationVet } = require('../../models/vet');
 const { TempsAttenteEntry } = require('../../models/tempsAttente');
 const { intern, withInternPool } = require('../../utils/stringPool');
+const { cleanText } = require('../../utils/textCleanup');
 const { singleFlight } = require('../../utils/singleFlight');
 const config = require('../../config');
 const { VET_INDEX_SPECS } = require('../../search/indexSpecs');
@@ -92,7 +93,8 @@ async function parseDictionaryFromStream(filepath) {
       } else if (match[4] !== undefined) {
         if (inEntry) pendingCode = match[4].trim();
       } else if (match[5] !== undefined) {
-        if (inEntry) pendingDesc = match[5].trim();
+        // Lu par expression régulière, sans parseur XML : les entités restent à décoder.
+        if (inEntry) pendingDesc = cleanText(match[5].trim());
       } else if (full === '</entry>') {
         if (inEntry && currentTerm && pendingCode !== null) {
           dict[currentTerm].set(pendingCode, pendingDesc || '');
@@ -166,7 +168,7 @@ function pushMedicament(medicaments, product, dict) {
     medicaments,
     MedicamentVet.fromObject({
       num: normalizeNum(product.num),
-      nom: product.nom || '',
+      nom: cleanText(product.nom || ''),
       num_amm: product['num-amm'] || '',
       date_amm: product['date-amm'] || '',
       titulaire: resolveTerm(dict, 'term-tit', product['term-tit']),
@@ -185,8 +187,8 @@ function pushCompositionFromSa(compositions, num, sa, dict) {
     CompositionVet.fromObject({
       num,
       substance: resolveTerm(dict, 'term-sa', sa['term-sa']),
-      quantite: sa.quantite != null ? String(sa.quantite) : '',
-      unite: intern(sa.unite || resolveTerm(dict, 'term-unite', sa['term-unite']))
+      quantite: sa.quantite != null ? cleanText(String(sa.quantite)) : '',
+      unite: intern(cleanText(sa.unite || resolveTerm(dict, 'term-unite', sa['term-unite'])))
     })
   );
 }
@@ -212,12 +214,12 @@ function pushCompositionRows(compositions, product, dict) {
 }
 
 function pushPresentation(presentations, num, mod, dict) {
-  const libelle = mod['lib-mod'];
+  const libelle = cleanText(mod['lib-mod']);
   if (!libelle) return false;
 
   const conditions = [];
   if (mod['lib-condp']) {
-    conditions.push(intern(mod['lib-condp']));
+    conditions.push(intern(cleanText(mod['lib-condp'])));
   } else if (mod['term-cd']) {
     const label = resolveTerm(dict, 'term-cd', mod['term-cd']);
     if (label) conditions.push(label);

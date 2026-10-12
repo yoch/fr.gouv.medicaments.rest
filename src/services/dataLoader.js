@@ -41,6 +41,7 @@ const {
 const { FROM_CSV, bdpmExtraitUrl, Substance } = require('../models/bdpm');
 const { BDPM_INDEX_SPECS } = require('../search/indexSpecs');
 const { normalizeAnsmUrl } = require('../utils/ansmUrl');
+const { cleanText } = require('../utils/textCleanup');
 const { buildDisponibiliteAlertId } = require('../utils/disponibiliteQuery');
 const config = require('../config');
 const state = require('./bdpm/state');
@@ -90,6 +91,7 @@ async function loadParseAndIndex(type, filename, fields, boost = null) {
   async function* documents(records) {
     let rowIndex = 0;
     for await (const record of records) {
+      for (const key in record) record[key] = cleanText(record[key]);
       push(rows, fromCsv(record));
       yield buildIndexDocument(rows[rowIndex], rowIndex, fields);
       rowIndex++;

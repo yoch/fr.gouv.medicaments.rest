@@ -7,6 +7,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Corrigé
+
+- Textes BDPM et vétérinaires nettoyés au chargement, pour l'API comme pour l'index de recherche : `<br>` devient un saut de ligne, `<sup>6</sup>` devient `⁶`, les autres balises HTML sont supprimées, les entités sont décodées (`&amp;`, `&gt;`, `&RSQUO;`, y compris dans le dictionnaire ANMV), les caractères Windows-1252 mal décodés sont restitués (environ 65 000 apostrophes, puces et tirets dans les avis de la HAS), les `¿` identifiables sont remplacés (apostrophe d'élision, `œ`, puce, `>` des mutations), et les espaces parasites sont normalisés. Les apostrophes sont uniformisées en `'`.
+
 ## [1.6.1] - 2026-10-12
 
 ### Modifié
