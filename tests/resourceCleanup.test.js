@@ -95,7 +95,7 @@ describe('fermeture des ressources', () => {
     axios.mockResolvedValue({ data: source });
     const timer = setInterval(() => source.write('x'), 5);
     try {
-      await expect(helpers.downloadFile('http://test.invalid', path.join(dir, 'file'), { timeoutMs: 40 }))
+      await expect(helpers.downloadFile('http://test.invalid', path.join(dir, 'file'), { totalTimeoutMs: 40 }))
         .rejects.toMatchObject({ name: 'AbortError' });
       expect(source.destroyed).toBe(true);
       expect(writer.closed).toBe(true);

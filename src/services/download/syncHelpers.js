@@ -47,14 +47,20 @@ async function saveJsonMeta(metaFile, metadata, targetDir) {
 
 /**
  * Télécharge `url` vers `filepath` (stream) et retourne le hash SHA-256 du
- * fichier écrit. `headers` (ex. User-Agent) et `timeoutMs` sont injectés.
+ * fichier écrit. `timeoutMs` borne l'inactivité du socket (un transfert lent mais
+ * actif continue) ; `totalTimeoutMs` borne la durée totale du transfert.
  */
-async function downloadFile(url, filepath, { headers = {}, timeoutMs = 30000 } = {}) {
+async function downloadFile(
+  url,
+  filepath,
+  { headers = {}, timeoutMs = 30000, totalTimeoutMs = 10 * 60 * 1000 } = {}
+) {
   validateTimerDelay(timeoutMs, 'timeoutMs');
+  validateTimerDelay(totalTimeoutMs, 'totalTimeoutMs');
   console.log(`Téléchargement de ${path.basename(filepath)}...`);
   await fs.ensureDir(path.dirname(filepath));
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const timer = setTimeout(() => controller.abort(), totalTimeoutMs);
   timer.unref?.();
   let response;
   try {

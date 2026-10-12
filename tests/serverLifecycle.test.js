@@ -95,60 +95,40 @@ describe('cycle de vie du serveur', () => {
     expect(loadVet).toHaveBeenCalledTimes(1);
   });
 
-  test('ferme le MemoryStore du rate limiter quand le serveur HTTP est fermé', async () => {
-    configure({ enableRateLimit: true });
-    const limiter = require('express-rate-limit');
-    const shutdown = jest.spyOn(limiter.MemoryStore.prototype, 'shutdown');
-    const app = require('../src/app').createApp();
-    const init = jest.spyOn(limiter.MemoryStore.prototype, 'init');
-    const server = app.listen(0, '127.0.0.1');
-    await new Promise(resolve => server.once('listening', resolve));
-    const second = app.listen(0, '127.0.0.1');
-    await new Promise(resolve => second.once('listening', resolve));
-    await new Promise(resolve => server.close(resolve));
-    expect(shutdown).not.toHaveBeenCalled();
-    await new Promise(resolve => second.close(resolve));
-    expect(shutdown).toHaveBeenCalledTimes(1);
-    app.locals.dispose();
-    expect(shutdown).toHaveBeenCalledTimes(1);
-    const restarted = app.listen(0, '127.0.0.1');
-    await new Promise(resolve => restarted.once('listening', resolve));
-    expect(init).toHaveBeenCalledTimes(1);
-    await new Promise(resolve => restarted.close(resolve));
-  });
-
-  test('un port occupé ne retient pas le MemoryStore après un nouvel essai', async () => {
+  test('stop() ferme le MemoryStore du rate limiter', async () => {
     configure({ enableRateLimit: true });
     const { MemoryStore } = require('express-rate-limit');
     const shutdown = jest.spyOn(MemoryStore.prototype, 'shutdown');
+    running = await require('../src/server').startServer();
+    expect(shutdown).not.toHaveBeenCalled();
+    await running.stop();
+    expect(shutdown).toHaveBeenCalledTimes(1);
+  });
+
+  test('un port occupé ferme le MemoryStore avant de quitter', async () => {
     const occupied = require('node:http').createServer();
-    await new Promise(resolve => occupied.listen(0, '127.0.0.1', resolve));
-    const app = require('../src/app').createApp();
+    await new Promise(resolve => occupied.listen(0, resolve));
     try {
-      const failed = app.listen(occupied.address().port, '127.0.0.1');
-      const error = await new Promise(resolve => failed.once('error', resolve));
-      expect(error.code).toBe('EADDRINUSE');
+      configure({ enableRateLimit: true, port: occupied.address().port });
+      const { MemoryStore } = require('express-rate-limit');
+      const shutdown = jest.spyOn(MemoryStore.prototype, 'shutdown');
+      const exit = jest.spyOn(process, 'exit').mockImplementation(() => {});
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+      await require('../src/server').startServer();
+      expect(exit).toHaveBeenCalledWith(1);
       expect(shutdown).toHaveBeenCalledTimes(1);
-      const good = app.listen(0, '127.0.0.1');
-      await new Promise(resolve => good.once('listening', resolve));
-      await new Promise(resolve => good.close(resolve));
-      expect(shutdown).toHaveBeenCalledTimes(2);
     } finally {
-      app.locals.dispose();
       await new Promise(resolve => occupied.close(resolve));
     }
   });
 
-  test('une erreur synchrone de listen libère le MemoryStore', () => {
+  test('dispose() est idempotent', () => {
     configure({ enableRateLimit: true });
     const { MemoryStore } = require('express-rate-limit');
     const shutdown = jest.spyOn(MemoryStore.prototype, 'shutdown');
     const app = require('../src/app').createApp();
-    try {
-      expect(() => app.listen(-1)).toThrow();
-      expect(shutdown).toHaveBeenCalledTimes(1);
-    } finally {
-      app.locals.dispose();
-    }
+    app.locals.dispose();
+    app.locals.dispose();
+    expect(shutdown).toHaveBeenCalledTimes(1);
   });
 });

@@ -6,7 +6,6 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
-const { errorMonitor } = require('node:events');
 
 const config = require('./config');
 const { getMetadata } = require('./services/dataLoader');
@@ -44,12 +43,10 @@ function healthHandler(req, res) {
 function createApp() {
   const app = express();
   let store = null;
-  let servers = 0;
-  let disposed = false;
+  // Le MemoryStore du rate limiter garde un timer : à appeler quand l'app est abandonnée.
   app.locals.dispose = () => {
-    if (disposed) return;
-    disposed = true;
     store?.shutdown();
+    store = null;
   };
 
   app.use(cors());
@@ -73,36 +70,6 @@ function createApp() {
 
     app.use(limiter);
   }
-
-  const listen = app.listen.bind(app);
-  app.listen = (...args) => {
-    if (disposed) {
-      store?.init({ windowMs: config.rateLimitWindowMs });
-      disposed = false;
-    }
-    let server;
-    try {
-      server = listen(...args);
-    } catch (error) {
-      if (servers === 0) app.locals.dispose();
-      throw error;
-    }
-    servers++;
-    const release = () => {
-      server.off('close', release);
-      server.off(errorMonitor, release);
-      server.off('listening', onListening);
-      servers--;
-      if (servers === 0) app.locals.dispose();
-    };
-    const onListening = () => server.off(errorMonitor, release);
-    // Un échec de bind n'émet pas nécessairement `close`. errorMonitor permet
-    // le nettoyage sans absorber l'erreur destinée à l'appelant.
-    server.once(errorMonitor, release);
-    server.once('listening', onListening);
-    server.once('close', release);
-    return server;
-  };
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
   app.get('/api-docs.json', (req, res) => {
