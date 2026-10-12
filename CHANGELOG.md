@@ -7,6 +7,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.7.1] - 2026-10-12
+
 ### Corrigé
 
 - Recherche globale classée par qualité de correspondance avant pagination pour toutes les sources ; les critères dosage/forme/voie ne font plus passer une correspondance faible devant une forte à boost égal.
@@ -213,7 +215,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.0...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.5.3...v1.6.0
