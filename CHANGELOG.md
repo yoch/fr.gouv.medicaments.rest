@@ -7,6 +7,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Modifié
+
+- FrozenMiniSearch mis à jour en 1.11.1 (correctifs de rétention mémoire : les index ne gardent plus les callbacks d'ingestion, un build échoué ne retient plus son corpus, le curseur de recherche ne garde plus son dernier préfixe ; recherche, API et format des index inchangés).
+
 ### Corrigé
 
 - Pools de chaînes renouvelés à chaque génération BDPM et ANMV, sans conserver les valeurs des anciens corpus. Les chargements et téléchargements simultanés d'un même domaine partagent le travail en cours.
