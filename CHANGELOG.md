@@ -7,6 +7,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Modifié
+
+- FrozenMiniSearch 1.12.1 et Knip 6.43.0. Dépendances transitives actualisées dans leurs plages semver, dont `swagger-ui-dist` 5.34.0.
+
+### Sécurité
+
+- `body-parser` 2.4.0 ([GHSA-27r3-jxmh-p828](https://github.com/advisories/GHSA-27r3-jxmh-p828)), `fast-uri` 3.1.9, `ip-address` 10.7.5 ([GHSA-rxp7-6hxx-x8q5](https://github.com/advisories/GHSA-rxp7-6hxx-x8q5)) et `zod` 4.6.7 ([GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5)). `npm audit` ne signale plus de vulnérabilité.
+
 ## [1.7.1] - 2026-10-12
 
 ### Corrigé
