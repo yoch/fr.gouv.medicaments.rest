@@ -7,13 +7,21 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.7.2] - 2026-10-29
+
+### Optimisations
+
+- Recherche : remplacement des expressions régulières dynamiques dans `classifyNormalized` par une vérification par bornes de code caractère (`hasNormalizedWholeWord`) pour identifier les correspondances mot entier, éliminant les désoptimisations JIT (TS100058).
+- Exécution binaire compilée / Bun AOT : possibilité de surcharger `DATA_DIR` et `VET_DATA_DIR` par variables d'environnement pour fonctionner dans des systèmes de fichiers virtuels ou distribués.
+
 ### Modifié
 
-- FrozenMiniSearch 1.12.1 et Knip 6.43.0. Dépendances transitives actualisées dans leurs plages semver, dont `swagger-ui-dist` 5.34.0.
+- Dépendances directes mises à jour : `@yoch/frozenminisearch` 1.12.2, `axios` 1.21.0 et `knip` 6.43.0.
+- Dépendances transitives actualisées dans leurs plages semver (`qs` 6.17.1, `encodeurl` 2.0.1, `@types/node` 26.6.6, `swagger-ui-dist` 5.34.0, etc.).
 
 ### Sécurité
 
-- `body-parser` 2.4.0 ([GHSA-27r3-jxmh-p828](https://github.com/advisories/GHSA-27r3-jxmh-p828)), `fast-uri` 3.1.9, `ip-address` 10.7.5 ([GHSA-rxp7-6hxx-x8q5](https://github.com/advisories/GHSA-rxp7-6hxx-x8q5)) et `zod` 4.6.7 ([GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5)). `npm audit` ne signale plus de vulnérabilité.
+- Correctifs de sécurité des dépendances : `body-parser` 2.4.0 ([GHSA-27r3-jxmh-p828](https://github.com/advisories/GHSA-27r3-jxmh-p828)), `fast-uri` 3.1.9, `ip-address` 10.7.5 ([GHSA-rxp7-6hxx-x8q5](https://github.com/advisories/GHSA-rxp7-6hxx-x8q5)) et `zod` 4.6.7 ([GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5)).
 
 ## [1.7.1] - 2026-10-12
 
@@ -223,7 +231,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.1...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.2...HEAD
+[1.7.2]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.6.0...v1.6.1
