@@ -86,13 +86,21 @@ async function main() {
     results.push(result);
     console.log(JSON.stringify(result));
   }
-  const libraryPackage = path.resolve(path.dirname(require.resolve('@yoch/frozenminisearch')), '../../package.json');
+  let fmsVersion = 'unknown';
+  try {
+    const libraryPackage = path.resolve(path.dirname(require.resolve('@yoch/frozenminisearch')), '../../package.json');
+    if (fs.existsSync(libraryPackage)) {
+      fmsVersion = JSON.parse(fs.readFileSync(libraryPackage, 'utf8')).version;
+    }
+  } catch {
+    // binaire autonome (fichiers hors bunfs)
+  }
   console.log(JSON.stringify({
     node: process.version,
     platform: process.platform,
     arch: process.arch,
     cpu: os.cpus()[0]?.model,
-    frozenMiniSearch: JSON.parse(fs.readFileSync(libraryPackage, 'utf8')).version,
+    frozenMiniSearch: fmsVersion,
     runs: RUNS, warmup: WARMUP, iterations: ITERATIONS, results
   }, null, 2));
 }

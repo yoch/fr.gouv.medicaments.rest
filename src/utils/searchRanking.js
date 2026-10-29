@@ -14,10 +14,6 @@ function tokenizeSearchText(value) {
   return String(value ?? '').split(SPACE_OR_PUNCTUATION).filter(Boolean);
 }
 
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function queryTerms(query) {
   return tokenizeSearchText(query).map((term) => normalizeSearchText(term)).filter(Boolean);
 }
@@ -115,6 +111,17 @@ function containsFolded(text, term, wholeWord) {
   return false;
 }
 
+function hasNormalizedWholeWord(haystack, term) {
+  let idx = 0;
+  while ((idx = haystack.indexOf(term, idx)) !== -1) {
+    const prev = idx > 0 ? haystack.charCodeAt(idx - 1) : -1;
+    const next = idx + term.length < haystack.length ? haystack.charCodeAt(idx + term.length) : -1;
+    if (!isWordCode(prev) && !isWordCode(next)) return true;
+    idx++;
+  }
+  return false;
+}
+
 function codeEqualsQuery(codeValue, normalizedQuery) {
   const code = String(codeValue);
   if (!isFoldable(code)) return normalizeSearchText(code) === normalizedQuery;
@@ -135,11 +142,8 @@ function codeEqualsQuery(codeValue, normalizedQuery) {
 function createMatchPriorityClassifier(query) {
   const normalizedQuery = normalizeSearchText(query);
   const terms = queryTerms(query);
-  let wordMatchers = null;
 
   function classifyNormalized(primaryValue, idValue, codeValues) {
-    wordMatchers ??= terms.map((term) =>
-      new RegExp(`(?:^|[^a-z0-9])${escapeRegExp(term)}(?:[^a-z0-9]|$)`));
     const value = normalizeSearchText(primaryValue);
     const normalizedId = normalizeSearchText(idValue);
 
@@ -155,7 +159,7 @@ function createMatchPriorityClassifier(query) {
     const allTermsPresent = terms.every((term) => haystack.includes(term));
     if (!allTermsPresent) return 0;
 
-    if (wordMatchers.every((matcher) => matcher.test(haystack))) return 1;
+    if (terms.every((term) => hasNormalizedWholeWord(haystack, term))) return 1;
 
     if (haystack.startsWith(terms[0])) return 1;
 

@@ -30,8 +30,8 @@ function parseReloadStrategy(raw) {
   return accepted.has(value) ? value : 'in-process';
 }
 
-const DATA_DIR = path.join(__dirname, '../data');
-const VET_DATA_DIR = path.join(DATA_DIR, 'veterinaires');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../data');
+const VET_DATA_DIR = process.env.VET_DATA_DIR || path.join(DATA_DIR, 'veterinaires');
 
 const config = Object.freeze({
   // Serveur
