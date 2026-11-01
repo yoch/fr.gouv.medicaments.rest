@@ -1,5 +1,5 @@
-const axios = require('axios');
 const { MAX_TIMER_MS } = require('./periodicTask');
+const { HttpStatusError, discardBody } = require('./httpStatusError');
 
 const DEFAULT_USER_AGENT =
   'Mozilla/5.0 (compatible; fr.gouv.medicaments.rest/1.1)';
@@ -26,9 +26,9 @@ function shouldRecheckFile(meta, intervalHours) {
 }
 
 function normalizeFingerprint(headers) {
-  const etag = headers.etag ?? headers.ETag ?? null;
-  const lastModified = headers['last-modified'] ?? headers['Last-Modified'] ?? null;
-  const rawLength = headers['content-length'] ?? headers['Content-Length'] ?? null;
+  const etag = headers.get('etag');
+  const lastModified = headers.get('last-modified');
+  const rawLength = headers.get('content-length');
   const contentLength =
     rawLength != null && rawLength !== '' ? Number(rawLength) : null;
 
@@ -62,33 +62,39 @@ function remoteFingerprintUnchanged(stored, remote) {
   return false;
 }
 
+async function requestHeaders(url, { method, headers, timeout }) {
+  const response = await fetch(url, {
+    method,
+    headers,
+    redirect: 'follow',
+    signal: AbortSignal.timeout(timeout)
+  });
+  if (response.status < 200 || response.status >= 400) {
+    await discardBody(response);
+    throw new HttpStatusError(response.status);
+  }
+  return response;
+}
+
 async function fetchRemoteFingerprint(url, { timeout = 30000, userAgent } = {}) {
   const headers = { 'User-Agent': userAgent ?? DEFAULT_USER_AGENT };
 
   try {
-    const response = await axios.head(url, {
-      headers,
-      timeout,
-      maxRedirects: 5,
-      validateStatus: (status) => status >= 200 && status < 400
-    });
+    const response = await requestHeaders(url, { method: 'HEAD', headers, timeout });
     return normalizeFingerprint(response.headers);
   } catch (headError) {
     try {
-      const response = await axios.get(url, {
+      const response = await requestHeaders(url, {
+        method: 'GET',
         headers: { ...headers, Range: 'bytes=0-0' },
-        timeout,
-        maxRedirects: 5,
-        validateStatus: (status) => status >= 200 && status < 400,
-        responseType: 'stream'
+        timeout
       });
       try {
         return normalizeFingerprint(response.headers);
       } finally {
-        response.data.destroy();
+        await discardBody(response);
       }
-    } catch (rangeError) {
-      rangeError.response?.data?.destroy?.();
+    } catch {
       throw headError;
     }
   }

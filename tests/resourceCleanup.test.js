@@ -7,19 +7,19 @@ const crypto = require('node:crypto');
 const { PassThrough, Readable, Writable } = require('node:stream');
 const { once } = require('node:events');
 
-jest.mock('axios', () => jest.fn());
+const okResponse = (source) => ({ ok: true, status: 200, body: Readable.toWeb(source) });
 
 describe('fermeture des ressources', () => {
   let dir;
   let extra;
-  let axios;
+  let fetchMock;
   let writer;
   let helpers;
 
   beforeEach(() => {
     jest.resetModules();
     dir = fs.mkdtempSync(path.join(os.tmpdir(), 'resource-cleanup-'));
-    axios = require('axios');
+    fetchMock = jest.spyOn(global, 'fetch');
     extra = require('fs-extra');
     const originalWrite = extra.createWriteStream;
     jest.spyOn(extra, 'createWriteStream').mockImplementation((...args) => {
@@ -37,7 +37,7 @@ describe('fermeture des ressources', () => {
 
   test('télécharge et hashe après fermeture du fichier', async () => {
     const source = Readable.from(['bonjour']);
-    axios.mockResolvedValue({ data: source });
+    fetchMock.mockResolvedValue(okResponse(source));
     const file = path.join(dir, 'download');
     expect(await helpers.downloadFile('http://test.invalid', file))
       .toBe(crypto.createHash('sha256').update('bonjour').digest('hex'));
@@ -49,7 +49,7 @@ describe('fermeture des ressources', () => {
 
   test('rejette une erreur source et ferme le writer', async () => {
     const source = new PassThrough();
-    axios.mockResolvedValue({ data: source });
+    fetchMock.mockResolvedValue(okResponse(source));
     const ready = once(source, 'resume');
     const result = expect(helpers.downloadFile('http://test.invalid', path.join(dir, 'file')))
       .rejects.toThrow('socket reset');
@@ -63,7 +63,7 @@ describe('fermeture des ressources', () => {
     const source = new PassThrough();
     const failedWriter = new Writable({ write(chunk, encoding, callback) { callback(new Error('disk full')); } });
     extra.createWriteStream.mockReturnValue(failedWriter);
-    axios.mockResolvedValue({ data: source });
+    fetchMock.mockResolvedValue(okResponse(source));
     const ready = once(source, 'resume');
     const result = expect(helpers.downloadFile('http://test.invalid', path.join(dir, 'file')))
       .rejects.toThrow('disk full');
@@ -78,12 +78,12 @@ describe('fermeture des ressources', () => {
     jest.spyOn(extra, 'ensureDir').mockRejectedValue(new Error('permission denied'));
     await expect(helpers.downloadFile('http://test.invalid', path.join(dir, 'file')))
       .rejects.toThrow('permission denied');
-    expect(axios).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   test('détruit la réponse si la création du writer échoue synchroniquement', async () => {
     const source = new PassThrough();
-    axios.mockResolvedValue({ data: source });
+    fetchMock.mockResolvedValue(okResponse(source));
     extra.createWriteStream.mockImplementation(() => { throw new Error('cannot open'); });
     await expect(helpers.downloadFile('http://test.invalid', path.join(dir, 'file')))
       .rejects.toThrow('cannot open');
@@ -92,7 +92,7 @@ describe('fermeture des ressources', () => {
 
   test('borne la durée totale même si la source envoie continuellement des octets', async () => {
     const source = new PassThrough();
-    axios.mockResolvedValue({ data: source });
+    fetchMock.mockResolvedValue(okResponse(source));
     const timer = setInterval(() => source.write('x'), 5);
     try {
       await expect(helpers.downloadFile('http://test.invalid', path.join(dir, 'file'), { totalTimeoutMs: 40 }))

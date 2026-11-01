@@ -5,7 +5,6 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { gzipSync } = require('node:zlib');
-const axios = require('axios');
 const { fetchRemoteFingerprint } = require('../src/utils/remoteFileProbe');
 const { downloadFile } = require('../src/services/download/syncHelpers');
 
@@ -16,8 +15,6 @@ test.each([
   ['download', 404, true], ['download', 503, true]
 ])('%s ferme une réponse %i sans fin (gzip=%s)', async (operation, status, gzip) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'http-error-cleanup-'));
-  const previousProxy = axios.defaults.proxy;
-  axios.defaults.proxy = false; // Uniquement le serveur loopback de ce test.
   const openResponses = new Set();
   let closed;
   let closeDeadline;
@@ -44,7 +41,6 @@ test.each([
     expect(fs.existsSync(path.join(dir, 'file'))).toBe(false);
   } finally {
     clearTimeout(timer);
-    axios.defaults.proxy = previousProxy;
     server.closeAllConnections();
     await new Promise(resolve => server.close(resolve));
     fs.rmSync(dir, { recursive: true, force: true });

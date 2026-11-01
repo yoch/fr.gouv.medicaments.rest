@@ -1,7 +1,6 @@
 'use strict';
 
 const http = require('node:http');
-const axios = require('axios');
 const { fetchRemoteFingerprint, parseIntervalHours } = require('../src/utils/remoteFileProbe');
 
 afterEach(() => jest.restoreAllMocks());
@@ -16,11 +15,6 @@ test('abandonne le corps lorsque le serveur ignore Range et ne termine jamais sa
     res.write('premiers octets');
     res.on('close', closeResponse);
   });
-  // Garder le proxy externe intact ; seule cette requête de test est sur loopback.
-  const originalGet = axios.get.bind(axios);
-  const originalHead = axios.head.bind(axios);
-  jest.spyOn(axios, 'get').mockImplementation((url, opts) => originalGet(url, { ...opts, proxy: false }));
-  jest.spyOn(axios, 'head').mockImplementation((url, opts) => originalHead(url, { ...opts, proxy: false }));
   server.listen(0, '127.0.0.1');
   await new Promise(resolve => server.once('listening', resolve));
   try {

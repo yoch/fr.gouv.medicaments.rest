@@ -7,6 +7,17 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Modifié
+
+- Spécification OpenAPI pré-générée (`npm run generate:openapi` → `src/openapi.generated.json`) au lieu d'être construite au démarrage par `swagger-jsdoc`, qui devient une dépendance de développement. Un test vérifie que le fichier est à jour : relancer la commande après toute modification des annotations JSDoc de `src/routes`.
+- Téléchargements et sondes distantes : `axios` est remplacé par `fetch` (suivi des redirections, délai d'inactivité et délai total conservés, réponses en erreur abandonnées sans lecture).
+- Les variables d'environnement `HTTP_PROXY` / `HTTPS_PROXY` ne sont plus lues par Node pour ces requêtes : `fetch` ne les applique qu'avec `NODE_USE_ENV_PROXY=1` (Node 24+).
+
+### Optimisations
+
+- Dépendances de production : 134 → 82 paquets, `node_modules` de production 47,6 → 28,7 Mo (`axios`, `swagger-jsdoc`, `ajv`, `yaml`, `json-schema-ref-parser`, etc. retirés).
+- Chargement de l'application : 418 → 207 modules, environ 450–775 ms → 150–290 ms, RSS −21 Mo et tas JS −10 Mo une fois les modules chargés. Débit et latence inchangés ; le RSS au plateau varie de ±30 Mo d'une exécution à l'autre selon le ramasse-miettes (médiane −10 % sur 3 passes).
+
 ## [1.7.2] - 2026-10-29
 
 ### Optimisations

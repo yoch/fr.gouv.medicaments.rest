@@ -12,6 +12,7 @@
     "download-data": "node src/scripts/download-initial-data.js",
     "export-search-indexes": "node src/scripts/export-search-indexes.js",
     "export-corpus-documents": "node src/scripts/export-corpus-documents.js",
+    "generate:openapi": "node scripts/openapi/generate.js",
     "benchmark:csv-loading": "node --expose-gc scripts/benchmark/benchmark-csv-loading.js",
     "benchmark:search-pagination": "node --expose-gc scripts/benchmark/benchmark-search-pagination.js",
     "benchmark:vet-xml": "node --expose-gc scripts/benchmark/vet-xml-parsers.js",
@@ -29,7 +30,6 @@
   "dependencies": {
     "@yoch/frozenminisearch": "^1.12.2",
     "7zip-bin": "^5.2.0",
-    "axios": "^1.21.0",
     "cors": "^2.8.6",
     "csv-parse": "^7.0.3",
     "express": "^5.3.0",
@@ -37,7 +37,6 @@
     "fs-extra": "^11.4.1",
     "helmet": "^8.3.0",
     "saxes": "^6.0.0",
-    "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
@@ -45,6 +44,7 @@
     "jest": "^30.5.2",
     "knip": "^6.43.0",
     "supertest": "^7.3.1",
+    "swagger-jsdoc": "^6.3.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "keywords": [

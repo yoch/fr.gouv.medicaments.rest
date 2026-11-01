@@ -6,7 +6,7 @@
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { PassThrough, Writable } = require('node:stream');
+const { PassThrough, Readable, Writable } = require('node:stream');
 const { spawnSync } = require('node:child_process');
 const { setTimeout: delay } = require('node:timers/promises');
 const root = path.resolve(__dirname, '../..');
@@ -49,11 +49,9 @@ async function runCase(name) {
     } else if (['download-source-error', 'download-writer-error', 'download-directory-error'].includes(name)) {
       source = new PassThrough();
       sink = new Writable({ write(chunk, encoding, callback) { callback(new Error('AUDIT_DISK_FULL')); } });
-      // Remplacer axios uniquement dans ce worker, avant import du helper.
-      const axiosPath = require.resolve('axios');
-      require('axios');
+      // Remplacer fetch uniquement dans ce worker, avant import du helper.
       let requests = 0;
-      require.cache[axiosPath].exports = async () => { requests++; return { data: source }; };
+      global.fetch = async () => { requests++; return { ok: true, status: 200, body: Readable.toWeb(source) }; };
       const extra = require('fs-extra');
       const originalWrite = extra.createWriteStream;
       const originalEnsure = extra.ensureDir;

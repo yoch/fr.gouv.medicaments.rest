@@ -8,12 +8,13 @@
  * (URLs, 7zip, conversion UTF-8) et appellent ces helpers.
  */
 
-const axios = require('axios');
 const crypto = require('crypto');
 const fs = require('fs-extra');
 const path = require('path');
+const { Readable, Transform } = require('node:stream');
 const { pipeline } = require('node:stream/promises');
 const { validateTimerDelay } = require('../../utils/periodicTask');
+const { HttpStatusError, discardBody } = require('../../utils/httpStatusError');
 const {
   fetchRemoteFingerprint,
   remoteFingerprintUnchanged
@@ -47,8 +48,9 @@ async function saveJsonMeta(metaFile, metadata, targetDir) {
 
 /**
  * Télécharge `url` vers `filepath` (stream) et retourne le hash SHA-256 du
- * fichier écrit. `timeoutMs` borne l'inactivité du socket (un transfert lent mais
- * actif continue) ; `totalTimeoutMs` borne la durée totale du transfert.
+ * fichier écrit. `timeoutMs` borne l'inactivité (attente des en-têtes, puis
+ * silence entre deux morceaux : un transfert lent mais actif continue) ;
+ * `totalTimeoutMs` borne la durée totale du transfert.
  */
 async function downloadFile(
   url,
@@ -60,24 +62,38 @@ async function downloadFile(
   console.log(`Téléchargement de ${path.basename(filepath)}...`);
   await fs.ensureDir(path.dirname(filepath));
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), totalTimeoutMs);
-  timer.unref?.();
+  const totalTimer = setTimeout(() => controller.abort(), totalTimeoutMs);
+  totalTimer.unref?.();
+  let idleTimer;
+  const armIdleTimer = () => {
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => controller.abort(), timeoutMs);
+    idleTimer.unref?.();
+  };
   let response;
+  let source;
   try {
-    response = await axios({
-      method: 'GET', url, responseType: 'stream', headers,
-      timeout: timeoutMs, signal: controller.signal
+    armIdleTimer();
+    response = await fetch(url, { headers, redirect: 'follow', signal: controller.signal });
+    if (!response.ok) throw new HttpStatusError(response.status);
+    source = Readable.fromWeb(response.body);
+    const idleWatch = new Transform({
+      transform(chunk, encoding, callback) {
+        armIdleTimer();
+        callback(null, chunk);
+      }
     });
-    await pipeline(response.data, fs.createWriteStream(filepath), { signal: controller.signal });
+    await pipeline(source, idleWatch, fs.createWriteStream(filepath), { signal: controller.signal });
     return await hashFile(filepath);
   } catch (error) {
-    // Axios rejette les statuts HTTP avant d'affecter `response` : le corps
-    // streaming appartient alors à l'erreur et doit lui aussi être fermé.
-    error.response?.data?.destroy?.();
+    // Un statut d'erreur lève avant la création du flux : le corps de la
+    // réponse doit être abandonné ici pour libérer la connexion.
+    if (!source) await discardBody(response ?? {});
     throw error;
   } finally {
-    clearTimeout(timer);
-    response?.data.destroy();
+    clearTimeout(totalTimer);
+    clearTimeout(idleTimer);
+    source?.destroy();
   }
 }
 

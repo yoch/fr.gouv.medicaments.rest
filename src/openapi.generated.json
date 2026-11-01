@@ -1,0 +1,1820 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Base de Données Publique des Médicaments",
+    "version": "1.7.2",
+    "description": "API REST pour accéder aux données officielles des médicaments humains (BDPM) et vétérinaires (ANMV/ANSES).",
+    "contact": {
+      "name": "Yoch Melka",
+      "url": "https://github.com/yoch/fr.gouv.medicaments.rest"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://bdpm.galiensante.fr/api",
+      "description": "Serveur de production"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Medicament": {
+        "type": "object",
+        "properties": {
+          "cis": {
+            "type": "string",
+            "description": "Code Identifiant de Spécialité"
+          },
+          "denomination": {
+            "type": "string",
+            "description": "Nom du médicament"
+          },
+          "forme_pharma": {
+            "type": "string",
+            "description": "Forme pharmaceutique"
+          },
+          "voies_admin": {
+            "type": "string",
+            "description": "Voies d'administration"
+          },
+          "statut_amm": {
+            "type": "string",
+            "description": "Statut de l'AMM"
+          },
+          "type_amm": {
+            "type": "string",
+            "description": "Type de procédure AMM"
+          },
+          "commercialisation": {
+            "type": "string",
+            "description": "État de commercialisation"
+          },
+          "date_amm": {
+            "type": "string",
+            "description": "Date d'AMM"
+          },
+          "titulaire": {
+            "type": "string",
+            "description": "Titulaire de l'AMM"
+          },
+          "surveillance_renforcee": {
+            "type": "string",
+            "description": "Surveillance renforcée"
+          },
+          "url_bdpm": {
+            "type": "string",
+            "format": "uri",
+            "description": "Lien vers la fiche BDPM (extrait RCP, notice, etc.)",
+            "example": "https://base-donnees-publique.medicaments.gouv.fr/medicament/60904643/extrait"
+          }
+        }
+      },
+      "Presentation": {
+        "type": "object",
+        "properties": {
+          "cis": {
+            "type": "string"
+          },
+          "cip7": {
+            "type": "string",
+            "description": "Code CIP7"
+          },
+          "libelle": {
+            "type": "string",
+            "description": "Libellé de la présentation"
+          },
+          "etat_commercialisation": {
+            "type": "string",
+            "description": "État de commercialisation déclaré par le titulaire"
+          },
+          "statut_admin": {
+            "type": "string",
+            "description": "Statut administratif de la présentation (ex. Présentation active)"
+          },
+          "date_declaration": {
+            "type": "string",
+            "description": "Date de la déclaration de commercialisation (JJ/MM/AAAA)"
+          },
+          "cip13": {
+            "type": "string",
+            "description": "Code CIP13"
+          },
+          "agrement_collectivite": {
+            "type": "string",
+            "description": "Agrément aux collectivités (oui, non, inconnu)"
+          },
+          "taux_remboursement": {
+            "type": "string"
+          },
+          "prix_medicament": {
+            "type": "string"
+          },
+          "prix_public": {
+            "type": "string"
+          },
+          "honoraires": {
+            "type": "string"
+          },
+          "indications": {
+            "type": "string"
+          }
+        }
+      },
+      "AvisSMR": {
+        "type": "object",
+        "properties": {
+          "cis": {
+            "type": "string"
+          },
+          "has_dossier": {
+            "type": "string"
+          },
+          "motif_evaluation": {
+            "type": "string"
+          },
+          "date_avis": {
+            "type": "string"
+          },
+          "valeur_smr": {
+            "type": "string"
+          },
+          "libelle_smr": {
+            "type": "string"
+          }
+        }
+      },
+      "AvisASMR": {
+        "type": "object",
+        "properties": {
+          "cis": {
+            "type": "string"
+          },
+          "has_dossier": {
+            "type": "string"
+          },
+          "motif_evaluation": {
+            "type": "string"
+          },
+          "date_avis": {
+            "type": "string"
+          },
+          "valeur_asmr": {
+            "type": "string"
+          },
+          "libelle_asmr": {
+            "type": "string"
+          }
+        }
+      },
+      "GroupeGenerique": {
+        "type": "object",
+        "properties": {
+          "id_groupe": {
+            "type": "string"
+          },
+          "libelle_groupe": {
+            "type": "string"
+          },
+          "cis": {
+            "type": "string"
+          },
+          "type_generique": {
+            "type": "string"
+          },
+          "numero_ordre": {
+            "type": "string"
+          }
+        }
+      },
+      "GroupeGeneriqueDetail": {
+        "type": "object",
+        "properties": {
+          "id_groupe": {
+            "type": "string"
+          },
+          "libelle_groupe": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupeGenerique"
+            }
+          }
+        }
+      },
+      "Condition": {
+        "type": "object",
+        "properties": {
+          "cis": {
+            "type": "string"
+          },
+          "condition": {
+            "type": "string"
+          }
+        }
+      },
+      "Disponibilite": {
+        "type": "object",
+        "description": "Entrée du fichier BDPM CIS_CIP_Dispo_Spec.txt. Champs absents omis s'ils sont vides. Dates au format JJ/MM/AAAA.",
+        "properties": {
+          "cis": {
+            "type": "string",
+            "description": "Code Identifiant de Spécialité"
+          },
+          "cip13": {
+            "type": "string",
+            "description": "Présentation concernée ; absent si toutes les présentations de la spécialité sont concernées"
+          },
+          "code_statut": {
+            "type": "string",
+            "enum": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "description": "1 Rupture, 2 Tension, 3 Arrêt de commercialisation, 4 Remise à disposition"
+          },
+          "libelle_statut": {
+            "type": "string"
+          },
+          "date_debut": {
+            "type": "string",
+            "description": "JJ/MM/AAAA. Pour fiches antérieures au 06/10/2023, la doc BDPM indique que ce n'est pas forcément le vrai début."
+          },
+          "date_mise_a_jour": {
+            "type": "string",
+            "description": "JJ/MM/AAAA — date de mise à jour de la fiche ANSM"
+          },
+          "date_remise_dispo": {
+            "type": "string",
+            "description": "JJ/MM/AAAA — surtout renseigné pour le code statut 4"
+          },
+          "lien_ansm": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL de la fiche ANSM (clé de jointure avec l'export Excel)"
+          }
+        }
+      },
+      "MITM": {
+        "type": "object",
+        "properties": {
+          "cis": {
+            "type": "string"
+          },
+          "code_atc": {
+            "type": "string"
+          },
+          "denomination": {
+            "type": "string"
+          },
+          "lien_fi": {
+            "type": "string"
+          }
+        }
+      },
+      "Substance": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "denomination": {
+            "type": "string"
+          },
+          "medicaments_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "Composition": {
+        "type": "object",
+        "properties": {
+          "cis": {
+            "type": "string"
+          },
+          "element_pharmaceutique": {
+            "type": "string"
+          },
+          "designation_element": {
+            "type": "string"
+          },
+          "code_substance": {
+            "type": "string"
+          },
+          "denomination_substance": {
+            "type": "string"
+          },
+          "dosage": {
+            "type": "string"
+          },
+          "nature_composant": {
+            "type": "string"
+          }
+        }
+      },
+      "MedicamentVeterinaire": {
+        "type": "object",
+        "properties": {
+          "num": {
+            "type": "string",
+            "description": "Identifiant produit ANMV (7 chiffres)"
+          },
+          "nom": {
+            "type": "string"
+          },
+          "titulaire": {
+            "type": "string"
+          },
+          "forme_pharmaceutique": {
+            "type": "string"
+          },
+          "statut_amm": {
+            "type": "string"
+          },
+          "codes_atcvet": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "especes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "lien_rcp": {
+            "type": "string",
+            "format": "uri"
+          },
+          "maj_rcp": {
+            "type": "string"
+          }
+        }
+      },
+      "CompositionVeterinaire": {
+        "type": "object",
+        "properties": {
+          "num": {
+            "type": "string"
+          },
+          "substance": {
+            "type": "string"
+          },
+          "quantite": {
+            "type": "string"
+          },
+          "unite": {
+            "type": "string"
+          }
+        }
+      },
+      "PresentationVeterinaire": {
+        "type": "object",
+        "properties": {
+          "num": {
+            "type": "string"
+          },
+          "libelle": {
+            "type": "string"
+          },
+          "gtin": {
+            "type": "string"
+          },
+          "conditions_delivrance": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "pages": {
+            "type": "integer"
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "last_updated": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "source": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/veterinaires/medicaments": {
+      "get": {
+        "summary": "Liste les médicaments vétérinaires (ANMV)",
+        "tags": [
+          "Vétérinaires"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Terme de recherche (nom ou numéro AMM)"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des médicaments vétérinaires",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/MedicamentVeterinaire"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/veterinaires/medicaments/{num}": {
+      "get": {
+        "summary": "Détail d'un médicament vétérinaire",
+        "description": "Retourne le médicament avec présentations, compositions et temps d'attente liés.\n",
+        "tags": [
+          "Vétérinaires"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "num",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Numéro AMM (7 chiffres, complété par des zéros à gauche si nécessaire)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détail complet du médicament vétérinaire",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/MedicamentVeterinaire"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "presentations": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PresentationVeterinaire"
+                          }
+                        },
+                        "compositions": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/CompositionVeterinaire"
+                          }
+                        },
+                        "temps_attente": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Médicament vétérinaire non trouvé"
+          }
+        }
+      }
+    },
+    "/veterinaires/compositions": {
+      "get": {
+        "summary": "Liste les compositions vétérinaires",
+        "tags": [
+          "Vétérinaires"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des compositions vétérinaires",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/CompositionVeterinaire"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/veterinaires/presentations": {
+      "get": {
+        "summary": "Liste les présentations vétérinaires (scan linéaire sur libellé/GTIN)",
+        "tags": [
+          "Vétérinaires"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Sous-chaîne recherchée dans le libellé ou le GTIN"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des présentations vétérinaires",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/PresentationVeterinaire"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/specialites": {
+      "get": {
+        "summary": "Liste les spécialités pharmaceutiques",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Terme de recherche (recherche par début de mot et approximative)"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Numéro de page"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            },
+            "description": "Nombre d'éléments par page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des spécialités",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Medicament"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/presentations": {
+      "get": {
+        "summary": "Liste les présentations",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des présentations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Presentation"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/compositions": {
+      "get": {
+        "summary": "Liste les compositions",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des compositions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Composition"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/groupes-generiques": {
+      "get": {
+        "summary": "Liste les groupes génériques",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des groupes génériques",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/GroupeGenerique"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/conditions": {
+      "get": {
+        "summary": "Conditions de prescription et de délivrance",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des conditions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Condition"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/disponibilite": {
+      "get": {
+        "summary": "Disponibilité et ruptures de stock (fichier BDPM CIS_CIP_Dispo_Spec)",
+        "description": "Source BDPM structurée (CIS, CIP13, statuts, dates, lien ANSM).\nPour le MVP tools chat, préférer `/medicaments/disponibilite/alerts`.\nLes dates restent au format source `JJ/MM/AAAA`. Voir docs/MVP_BDPM_DISPONIBILITE.md.\n",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Recherche textuelle (libellé de statut)"
+          },
+          {
+            "in": "query",
+            "name": "cis",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtre exact sur le CIS"
+          },
+          {
+            "in": "query",
+            "name": "cip13",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtre exact sur le CIP13 (souvent absent si toute la spécialité est concernée)"
+          },
+          {
+            "in": "query",
+            "name": "code_statut",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1",
+                "2",
+                "3",
+                "4"
+              ]
+            },
+            "description": "1 = Rupture de stock, 2 = Tension d'approvisionnement,\n3 = Arrêt de commercialisation, 4 = Remise à disposition.\nPréférer ce filtre au libellé (typos source possibles).\n"
+          },
+          {
+            "in": "query",
+            "name": "date_mise_a_jour_min",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Garde les entrées dont `date_mise_a_jour` ≥ cette date.\nAccepte `JJ/MM/AAAA` ou `YYYY-MM-DD`. Ne simule pas une date absente.\n"
+          },
+          {
+            "in": "query",
+            "name": "lien_ansm",
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": "Filtre sur l'URL de fiche ANSM (normalisée : sans www, query, hash, slash final).\nUne URL peut correspondre à plusieurs CIS.\n"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des disponibilités",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Disponibilite"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "rupture": {
+                    "summary": "Rupture de stock",
+                    "value": {
+                      "data": [
+                        {
+                          "cis": "64805678",
+                          "code_statut": "1",
+                          "libelle_statut": "Rupture de stock",
+                          "date_debut": "14/02/2024",
+                          "date_mise_a_jour": "10/07/2026",
+                          "lien_ansm": "https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/exemple"
+                        }
+                      ],
+                      "pagination": {
+                        "total": 1,
+                        "page": 1,
+                        "limit": 100,
+                        "pages": 1
+                      }
+                    }
+                  },
+                  "remise": {
+                    "summary": "Remise à disposition",
+                    "value": {
+                      "data": [
+                        {
+                          "cis": "65643371",
+                          "code_statut": "4",
+                          "libelle_statut": "Remise à disposition",
+                          "date_debut": "15/06/2026",
+                          "date_mise_a_jour": "15/06/2026",
+                          "date_remise_dispo": "15/06/2026",
+                          "lien_ansm": "https://ansm.sante.fr/disponibilites-des-produits-de-sante/medicaments/exemple"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/disponibilite/alerts": {
+      "get": {
+        "summary": "Alertes de disponibilité (forme tool MVP BDPM)",
+        "description": "Surface tool-ready pour `get_bdpm_disponibilite_alerts`.\nTri par `date_mise_a_jour` décroissante. Pas de `medical_domain`.\n`q` résout nom/DCI/CIS/CIP13 via les indexes search (comme `/medicaments/search`),\npuis projette les lignes ruptures (`rupturesByCis`). Liste vide = aucune alerte BDPM\npour la requête (pas de 404). Ne confondre pas avec `/disponibilite?q=` qui cherche\ndans le libellé de statut. Voir docs/MVP_BDPM_DISPONIBILITE.md.\n",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Recherche par nom commercial, DCI, CIS ou CIP13 (même esprit que `/medicaments/search`).\nCombinable avec les filtres exacts. Borne interne ~100 CIS résolus.\nPour filtrer par statut, utiliser `code_statut` (pas `q=rupture`).\n"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 30
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "cis",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cip13",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "code_statut",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1",
+                "2",
+                "3",
+                "4"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_mise_a_jour_min",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lien_ansm",
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste d'alertes MVP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "generated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "data_last_updated_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "alerts_count": {
+                      "type": "integer"
+                    },
+                    "alerts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "medicine_name": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "expected_return": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "detail_url": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "cis": {
+                            "type": "string"
+                          },
+                          "cip13": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "code_statut": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/disponibilite/alerts/{alertId}": {
+      "get": {
+        "summary": "Détail d'une alerte de disponibilité (MVP BDPM)",
+        "description": "Surface tool-ready pour `get_bdpm_disponibilite_details`.\n`alertId` = hash opaque 12 hex renvoyé par la liste.\n",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "alertId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détail alerte + spécialité + ruptures CIS"
+          },
+          "404": {
+            "description": "Alerte non trouvée"
+          }
+        }
+      }
+    },
+    "/medicaments/substances": {
+      "get": {
+        "summary": "Liste les substances actives",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des substances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/avis-smr": {
+      "get": {
+        "summary": "Liste les avis SMR (Service Médical Rendu)",
+        "description": "Indisponible si LOAD_HAS_AVIS=false (réponse 410 Gone).\n",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des avis SMR",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/AvisSMR"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Avis HAS non chargés (LOAD_HAS_AVIS=false)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Les avis HAS (SMR/ASMR) ne sont pas chargés sur ce serveur (LOAD_HAS_AVIS=false)."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/avis-asmr": {
+      "get": {
+        "summary": "Liste les avis ASMR (Amélioration du Service Médical Rendu)",
+        "description": "Indisponible si LOAD_HAS_AVIS=false (réponse 410 Gone).\n",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des avis ASMR",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/AvisASMR"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Avis HAS non chargés (LOAD_HAS_AVIS=false)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Les avis HAS (SMR/ASMR) ne sont pas chargés sur ce serveur (LOAD_HAS_AVIS=false)."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/interet-therapeutique-majeur": {
+      "get": {
+        "summary": "Médicaments d'Intérêt Thérapeutique Majeur (MITM)",
+        "description": "Indisponible si LOAD_MITM=false (réponse 410 Gone).",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des MITM",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/MITM"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/medicaments/specialites/{cis}": {
+      "get": {
+        "summary": "Détail d'une spécialité",
+        "description": "Retourne la spécialité avec présentations, compositions, conditions, ruptures\n(disponibilité BDPM) et génériques liés.\nSi le serveur est démarré avec LOAD_HAS_AVIS=false (profil allégé), les champs\navis_smr et avis_asmr sont absents de la réponse. Utiliser les routes\n/medicaments/avis-smr et /medicaments/avis-asmr uniquement lorsque les avis HAS\nsont chargés (LOAD_HAS_AVIS non défini ou true).\n",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "cis",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Code Identifiant de Spécialité"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détail complet du médicament",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Medicament"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "presentations": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Presentation"
+                          }
+                        },
+                        "compositions": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Composition"
+                          }
+                        },
+                        "conditions": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Condition"
+                          }
+                        },
+                        "ruptures": {
+                          "type": "array",
+                          "description": "Lignes CIS_CIP_Dispo_Spec liées à ce CIS",
+                          "items": {
+                            "$ref": "#/components/schemas/Disponibilite"
+                          }
+                        },
+                        "generiques": {
+                          "$ref": "#/components/schemas/GroupeGeneriqueDetail"
+                        },
+                        "avis_smr": {
+                          "type": "array",
+                          "description": "Présent uniquement si LOAD_HAS_AVIS n'est pas false.\n",
+                          "items": {
+                            "$ref": "#/components/schemas/AvisSMR"
+                          }
+                        },
+                        "avis_asmr": {
+                          "type": "array",
+                          "description": "Présent uniquement si LOAD_HAS_AVIS n'est pas false.\n",
+                          "items": {
+                            "$ref": "#/components/schemas/AvisASMR"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Spécialité non trouvée"
+          }
+        }
+      }
+    },
+    "/medicaments/search": {
+      "get": {
+        "summary": "Recherche globale",
+        "tags": [
+          "Médicaments"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "description": "Terme de recherche"
+          },
+          {
+            "in": "query",
+            "name": "source",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "auto",
+                "human",
+                "veterinary",
+                "mixed"
+              ],
+              "default": "auto"
+            },
+            "description": "Référentiel(s) à interroger (auto = BDPM puis fallback ANMV)"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          },
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "markdown"
+              ],
+              "default": "json"
+            },
+            "description": "json (défaut) ou markdown (texte compact pour agents LLM)"
+          },
+          {
+            "in": "query",
+            "name": "detail",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "full",
+                "summary"
+              ],
+              "default": "full"
+            },
+            "description": "full = réponse actuelle ; summary = champs réduits, substances dédupliquées, max 3 présentations"
+          },
+          {
+            "in": "query",
+            "name": "dosage",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Critère de scoring optionnel (non filtrant). Ex. '1 g', '500 mg'. Comparé au dosage présent dans la dénomination ; réordonne à l'intérieur d'un même niveau de pertinence sans écarter de résultats."
+          },
+          {
+            "in": "query",
+            "name": "forme",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Critère de scoring optionnel (non filtrant). Ex. 'comprimé', 'solution injectable'. Comparé à forme_pharma."
+          },
+          {
+            "in": "query",
+            "name": "voie",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Critère de scoring optionnel (non filtrant). Ex. 'orale', 'cutanée'. Comparé à voies_admin."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Résultats de recherche (médicaments humains et/ou vétérinaires agrégés avec présentations et compositions)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "allOf": [
+                              {
+                                "$ref": "#/components/schemas/Medicament"
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "example": "medicament"
+                                  },
+                                  "presentations": {
+                                    "type": "array",
+                                    "items": {
+                                      "$ref": "#/components/schemas/Presentation"
+                                    }
+                                  },
+                                  "compositions": {
+                                    "type": "array",
+                                    "items": {
+                                      "$ref": "#/components/schemas/Composition"
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "text/markdown": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}
