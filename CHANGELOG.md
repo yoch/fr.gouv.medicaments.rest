@@ -7,17 +7,21 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.7.3] - 2026-11-01
+
 ### Modifié
 
 - Spécification OpenAPI pré-générée (`npm run generate:openapi` → `src/openapi.generated.json`) au lieu d'être construite au démarrage par `swagger-jsdoc`, qui devient une dépendance de développement. Un test vérifie que le fichier est à jour : relancer la commande après toute modification des annotations JSDoc de `src/routes`. La version de l'API n'y est pas figée : elle est lue dans `package.json` au démarrage.
 - Téléchargements et sondes distantes : `axios` est remplacé par `fetch` (suivi des redirections, délai d'inactivité et délai total conservés, réponses en erreur abandonnées sans lecture).
 - Les variables d'environnement `HTTP_PROXY` / `HTTPS_PROXY` ne sont plus lues par Node pour ces requêtes : il faut `--use-env-proxy` ou `NODE_USE_ENV_PROXY=1` exporté (sans effet dans `.env`, Node ≥ 22.21 ou ≥ 24). Bun les applique par défaut. Voir le README.
 - Les erreurs de synchronisation indiquent leur cause : délai dépassé (inactivité ou durée totale, avec la valeur), cause réseau masquée par « fetch failed » (DNS, refus de connexion…). Une réponse 2xx sans corps est refusée au lieu de produire un fichier vide.
+- Dépendances directes : `@yoch/frozenminisearch` 1.12.3, `express-rate-limit` 8.7.2 et `knip` 6.44.1. Les autres paquets étaient déjà à leur dernière version compatible.
 
 ### Corrigé
 
 - Sonde distante : quand `HEAD` est refusé, la taille du fichier est lue dans le total de `Content-Range` de la réponse 206 au `Range: bytes=0-0`, et non plus dans son `Content-Length` (toujours 1). Sans `ETag` ni `Last-Modified`, une mise à jour du fichier distant passait inaperçue. Les fichiers concernés seront retéléchargés une fois.
 - Téléchargement : la réception des en-têtes relance le délai d'inactivité, qui n'est plus consommé par l'attente des en-têtes avant le premier octet du corps.
+- FrozenMiniSearch 1.12.3 rétablit l'ordre de visite des termes flous de la 1.12.1, que la 1.12.2 avait modifié. Identifiants, termes et scores inchangés ; l'ordre des résultats à score égal, l'ordre des `terms` et le libellé d'`autoSuggest` peuvent revenir à celui de la 1.12.1.
 
 ### Optimisations
 
@@ -248,7 +252,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.2...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.3...HEAD
+[1.7.3]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.2...v1.7.3
 [1.7.2]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.6.1...v1.7.0

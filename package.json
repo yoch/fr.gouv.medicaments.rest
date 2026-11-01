@@ -1,6 +1,6 @@
 {
   "name": "fr.gouv.medicaments.rest",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "API REST pour la base de données publique des médicaments du gouvernement français",
   "main": "src/index.js",
   "engines": {
@@ -28,12 +28,12 @@
     "test:all": "RUN_SLOW_TESTS=1 jest --runInBand"
   },
   "dependencies": {
-    "@yoch/frozenminisearch": "^1.12.2",
+    "@yoch/frozenminisearch": "^1.12.3",
     "7zip-bin": "^5.2.0",
     "cors": "^2.8.6",
     "csv-parse": "^7.0.3",
     "express": "^5.3.0",
-    "express-rate-limit": "^8.7.1",
+    "express-rate-limit": "^8.7.2",
     "fs-extra": "^11.4.1",
     "helmet": "^8.3.0",
     "saxes": "^6.0.0",
@@ -42,7 +42,7 @@
   "devDependencies": {
     "fast-xml-parser": "^5.11.2",
     "jest": "^30.5.2",
-    "knip": "^6.43.0",
+    "knip": "^6.44.1",
     "supertest": "^7.3.1",
     "swagger-jsdoc": "^6.3.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
