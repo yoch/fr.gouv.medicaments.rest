@@ -47,6 +47,10 @@
     "swagger-jsdoc": "^6.3.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
+  "overrides": {
+    "glob": "^14.0.3",
+    "minimatch": "^11.0.3"
+  },
   "keywords": [
     "medicaments",
     "api",

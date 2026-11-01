@@ -7,6 +7,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Sécurité
+
+- Outils de développement : `overrides` npm forçant `glob` 14.0.3 ([GHSA-3g3m-2fjr-6pw4](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)) et `minimatch` 11.0.3 ([GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249)) sous Jest et `swagger-jsdoc`, qui déclarent encore des versions vulnérables. `npm audit` passe de 20 alertes à 5 alertes faibles sur `deepmerge` ([GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4), sans version corrigée, limité à la lecture de la configuration Jest). Aucune dépendance de production n'était concernée. Retirer ces `overrides` quand Jest et `swagger-jsdoc` auront mis leurs dépendances à jour.
+
 ## [1.7.3] - 2026-11-01
 
 ### Modifié
