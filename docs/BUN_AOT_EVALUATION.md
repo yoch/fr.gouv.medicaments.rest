@@ -15,7 +15,7 @@ charge mixte n'est pas épinglée.
 | `--aot` avec le paquet npm actuel | Plus lent que le JIT sur la recherche (−45 à −55 %), plus rapide ailleurs. |
 | `--aot` avec une bibliothèque FrozenMiniSearch compilée en AOT | Au niveau du JIT ou meilleur partout (jusqu'à +25 % sur la recherche floue), −6 % sur `paracetamol`. |
 | `--aot --trim --trim-locales=fr` | 88 → 64 Mo, réponses identiques à Node, débit inchangé. |
-| Mémoire résidente | AOT ≈ 225–245 Mo, JIT ≈ 265–275 Mo, Node ≈ 220–350 Mo selon le moment du GC. |
+| Mémoire résidente après charge | AOT bibliothèque 208 Mo, JIT 245 Mo, Node 351 Mo (pic sous charge ≈ 395 Mo en AOT et en JIT). |
 
 ## 1. Pourquoi l'analyse `--trim` voit des locales
 
@@ -113,18 +113,35 @@ Notes de lecture :
 - Le tri `localeCompare` n'est donc pas un goulot, et le remplacer par un
   `Intl.Collator` partagé ou par un tri par seaux ne change rien de mesurable.
 
-### Mémoire (RSS après stabilisation)
+### Mémoire
 
-| Exécution | Après chargement vet. | Plateau (+5 min) |
-| --- | ---: | ---: |
-| Node | 343 Mo | 222 Mo (après GC) |
-| JIT | 434 Mo | 272 Mo |
-| AOT npm | 339 Mo | 239 Mo |
-| AOT lib | 342 Mo | 225 Mo |
+Protocole (`scripts/memory/measure-server-rss.py`) : chaque variante est lancée
+seule, RSS lu dans `/proc` toutes les 250 ms. Démarrage, 20 s de repos, 30 s de
+charge mixte (11 chemins, 8 connexions), puis 25 s de repos. Valeurs en Mo.
 
-Le pic au chargement est le même qu'avec Node ; le plateau est le plus bas en
-AOT. Le CPU sous charge est comparable (≈ 85–100 % d'un cœur : le serveur est
-mono-thread).
+| | Node | JIT | AOT npm | AOT lib | AOT lib + trim |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Pic au démarrage | 344 | 364 | 359 | **285** | 297 |
+| Repos après démarrage | 339 | 238 | 230 | **211** | 212 |
+| Pic sous charge | 351 | 394 | 350 | 394 | 382 |
+| **Repos après charge** | 351 | 245 | 231 | **208** | 210 |
+| dont mémoire privée (anonyme) | 298 | 207 | 190 | 167 | 170 |
+| dont fichiers (binaire, bibliothèques) | 23 | 36 | 39 | 38 | 38 |
+| Temps avant `/health` OK (s) | 11,1 | 7,5 | 12,2 | 11,1 | 11,2 |
+
+- **AOT bibliothèque** : plateau −15 % face au JIT (208 contre 245) et −41 % face à
+  Node (351). Le pic au démarrage est 21 % plus bas que celui du JIT.
+- **Pic sous charge** : JIT et AOT bibliothèque montent tous deux à ≈ 395 Mo
+  pendant la charge (le tas JS grossit de 73 à 195 Mo), puis redescendent à ≈ 210 Mo.
+  Pour dimensionner une limite mémoire, il faut compter sur ce pic, pas sur le
+  plateau. Node ne redescend pas dans la fenêtre mesurée (351 Mo constant).
+- **Taille virtuelle** : 38 Go en AOT (réservation d'adresses pour le tas), 6,5 Go
+  en JIT, 1,7 Go pour Node. C'est sans effet sur le RSS ni sur une limite cgroup,
+  mais une limite `ulimit -v` bloquerait le binaire AOT.
+- **`--trim`** ne change pas la mémoire (210 contre 208 Mo) : il réduit le fichier,
+  pas le tas. Débit identique sur trois passes alternées.
+- Le temps de démarrage est dominé par le chargement des données (≈ 11 s) et
+  n'est pas amélioré par l'AOT ; le JIT est ici le plus rapide (7,5 s).
 
 ### `--trim`
 
@@ -174,7 +191,7 @@ Node** (métadonnées exclues), ordre alphabétique français compris. Débit sa
    `bun compile --library`), puis compiler le serveur avec
    `--conditions=aot --trim --trim-locales=fr`.
 3. Gain mesuré face au JIT : +13 % de débit en charge mixte, binaire 137 → 64 Mo,
-   RSS de plateau −17 % ; face à Node : +66 % de débit.
+   RSS après charge −15 % (208 contre 245 Mo) ; face à Node : +66 % de débit.
 4. Avant déploiement : embarquer `public/`, valider la suite `npm run test:integration`
    contre le binaire, et rejouer les mesures sur la machine cible (l'écart
    inter-passes de cette machine, partagée, est de ±10 %).
