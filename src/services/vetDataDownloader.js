@@ -5,6 +5,7 @@ const { execFile } = require('child_process');
 const { promisify } = require('util');
 const sevenBin = require('7zip-bin');
 const { shouldRecheckFile } = require('../utils/remoteFileProbe');
+const { describeError } = require('../utils/httpErrors');
 const config = require('../config');
 const { singleFlight } = require('../utils/singleFlight');
 const {
@@ -124,7 +125,7 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
 
     return { changed: true };
   } catch (error) {
-    console.error(`✗ Échec traitement ${filename} (vétérinaire):`, error.message);
+    console.error(`✗ Échec traitement ${filename} (vétérinaire):`, describeError(error));
     await fs.remove(tempPath).catch(() => {});
     if (!fs.existsSync(finalPath)) {
       console.log(`Le fichier ${filename} n'existe pas localement et le téléchargement a échoué`);

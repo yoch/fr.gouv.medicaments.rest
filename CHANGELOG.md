@@ -9,9 +9,15 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ### Modifié
 
-- Spécification OpenAPI pré-générée (`npm run generate:openapi` → `src/openapi.generated.json`) au lieu d'être construite au démarrage par `swagger-jsdoc`, qui devient une dépendance de développement. Un test vérifie que le fichier est à jour : relancer la commande après toute modification des annotations JSDoc de `src/routes`.
+- Spécification OpenAPI pré-générée (`npm run generate:openapi` → `src/openapi.generated.json`) au lieu d'être construite au démarrage par `swagger-jsdoc`, qui devient une dépendance de développement. Un test vérifie que le fichier est à jour : relancer la commande après toute modification des annotations JSDoc de `src/routes`. La version de l'API n'y est pas figée : elle est lue dans `package.json` au démarrage.
 - Téléchargements et sondes distantes : `axios` est remplacé par `fetch` (suivi des redirections, délai d'inactivité et délai total conservés, réponses en erreur abandonnées sans lecture).
-- Les variables d'environnement `HTTP_PROXY` / `HTTPS_PROXY` ne sont plus lues par Node pour ces requêtes : `fetch` ne les applique qu'avec `NODE_USE_ENV_PROXY=1` (Node 24+).
+- Les variables d'environnement `HTTP_PROXY` / `HTTPS_PROXY` ne sont plus lues par Node pour ces requêtes : il faut `--use-env-proxy` ou `NODE_USE_ENV_PROXY=1` exporté (sans effet dans `.env`, Node ≥ 22.21 ou ≥ 24). Bun les applique par défaut. Voir le README.
+- Les erreurs de synchronisation indiquent leur cause : délai dépassé (inactivité ou durée totale, avec la valeur), cause réseau masquée par « fetch failed » (DNS, refus de connexion…). Une réponse 2xx sans corps est refusée au lieu de produire un fichier vide.
+
+### Corrigé
+
+- Sonde distante : quand `HEAD` est refusé, la taille du fichier est lue dans le total de `Content-Range` de la réponse 206 au `Range: bytes=0-0`, et non plus dans son `Content-Length` (toujours 1). Sans `ETag` ni `Last-Modified`, une mise à jour du fichier distant passait inaperçue. Les fichiers concernés seront retéléchargés une fois.
+- Téléchargement : la réception des en-têtes relance le délai d'inactivité, qui n'est plus consommé par l'attente des en-têtes avant le premier octet du corps.
 
 ### Optimisations
 

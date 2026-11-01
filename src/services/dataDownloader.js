@@ -4,6 +4,7 @@ const os = require('os');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const { shouldRecheckFile } = require('../utils/remoteFileProbe');
+const { describeError } = require('../utils/httpErrors');
 const config = require('../config');
 const { singleFlight } = require('../utils/singleFlight');
 const {
@@ -186,7 +187,7 @@ async function downloadDataCycle() {
         console.log(`✓ ${filename} mis à jour et converti`);
       }
     } catch (error) {
-      console.error(`✗ Échec traitement ${filename}:`, error.message);
+      console.error(`✗ Échec traitement ${filename}:`, describeError(error));
       await fs.remove(tempPath).catch(() => {});
 
       if (!fs.existsSync(finalPath)) {

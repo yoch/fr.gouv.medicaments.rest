@@ -91,6 +91,27 @@ npm install
 npm run dev
 ```
 
+### Proxy sortant
+
+Les téléchargements de données et les sondes distantes utilisent `fetch`. Le respect des variables `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` dépend du moteur :
+
+- **Bun** : appliquées par défaut.
+- **Node** : ignorées sauf activation explicite, au choix :
+  - le flag `--use-env-proxy` (par exemple dans `node_args` de `ecosystem.config.js`) ;
+  - `NODE_USE_ENV_PROXY=1` exporté dans l'environnement du processus (shell, `env` de PM2, unité systemd).
+
+  Placée dans `.env`, `NODE_USE_ENV_PROXY` est **sans effet** : `--env-file` la charge trop tard. Cette prise en charge nécessite Node ≥ 22.21 ou ≥ 24 ; elle n'existe pas sous Node 20.
+
+### Spécification OpenAPI
+
+La spec servie par `/api-docs` est pré-générée dans `src/openapi.generated.json` à partir des annotations JSDoc de `src/routes`. Après toute modification de ces annotations :
+
+```bash
+npm run generate:openapi
+```
+
+Un test échoue si le fichier n'est pas à jour. La version de l'API n'y figure pas : elle est lue dans `package.json` au démarrage, un changement de version ne demande donc pas de régénération.
+
 ## Validation
 
 ```bash

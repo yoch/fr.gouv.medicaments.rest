@@ -1,15 +1,15 @@
 const path = require('node:path');
 const swaggerJsdoc = require('swagger-jsdoc');
-const { version } = require('../../package.json');
 
 const ROOT = path.resolve(__dirname, '..', '..');
 
 const options = {
     definition: {
         openapi: '3.0.0',
+        // `info.version` est injecté au chargement par src/swagger.js depuis
+        // package.json : un changement de version ne rend pas la spec obsolète.
         info: {
             title: 'API Base de Données Publique des Médicaments',
-            version,
             description: 'API REST pour accéder aux données officielles des médicaments humains (BDPM) et vétérinaires (ANMV/ANSES).',
             contact: {
                 name: 'Yoch Melka',

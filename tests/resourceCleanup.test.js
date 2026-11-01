@@ -96,7 +96,7 @@ describe('fermeture des ressources', () => {
     const timer = setInterval(() => source.write('x'), 5);
     try {
       await expect(helpers.downloadFile('http://test.invalid', path.join(dir, 'file'), { totalTimeoutMs: 40 }))
-        .rejects.toMatchObject({ name: 'AbortError' });
+        .rejects.toMatchObject({ name: 'TimeoutError', message: 'durée totale de 40 ms dépassée' });
       expect(source.destroyed).toBe(true);
       expect(writer.closed).toBe(true);
     } finally {
