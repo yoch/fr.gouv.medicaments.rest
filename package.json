@@ -13,6 +13,7 @@
     "export-search-indexes": "node src/scripts/export-search-indexes.js",
     "export-corpus-documents": "node src/scripts/export-corpus-documents.js",
     "generate:openapi": "node scripts/openapi/generate.js",
+    "benchmark:http": "node scripts/benchmark/http-load.js",
     "benchmark:csv-loading": "node --expose-gc scripts/benchmark/benchmark-csv-loading.js",
     "benchmark:search-pagination": "node --expose-gc scripts/benchmark/benchmark-search-pagination.js",
     "benchmark:vet-xml": "node --expose-gc scripts/benchmark/vet-xml-parsers.js",
