@@ -3,11 +3,25 @@ const { AND } = require('@yoch/frozenminisearch');
 const MATCH_QUALITY = ['fuzzy', 'prefix', 'exact'];
 const SPACE_OR_PUNCTUATION = /[\s\p{P}]+/u;
 
-function normalizeSearchText(value) {
-  return String(value ?? '')
+const DIACRITICS_REGEX = /[\u0300-\u036f]/g;
+
+function fullNormalizeSearchText(str) {
+  return str
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(DIACRITICS_REGEX, '')
     .toLowerCase();
+}
+
+function normalizeSearchText(value) {
+  if (value == null) return '';
+  const str = typeof value === 'string' ? value : String(value);
+  let hasUpper = false;
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    if (code > 127) return fullNormalizeSearchText(str);
+    if (code >= 65 && code <= 90) hasUpper = true;
+  }
+  return hasUpper ? str.toLowerCase() : str;
 }
 
 function tokenizeSearchText(value) {

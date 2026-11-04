@@ -28,14 +28,62 @@ function defineCorpusRecord(className, options) {
     typeof omitStoredFields === 'function' ? omitStoredFields() : omitStoredFields;
   const omitStoredSet = new Set(resolvedOmitStoredFields);
 
+  const TYPE_CELL = 0;
+  const TYPE_LOW_CARD = 1;
+  const TYPE_ARRAY = 2;
+  const TYPE_NUMERIC = 3;
+  const TYPE_OMIT = 4;
+
+  const fieldTypes = new Uint8Array(fields.length);
+  for (let i = 0; i < fields.length; i++) {
+    const f = fields[i];
+    if (omitStoredSet.has(f)) {
+      fieldTypes[i] = TYPE_OMIT;
+    } else if (arraySet.has(f)) {
+      fieldTypes[i] = TYPE_ARRAY;
+    } else if (numericSet.has(f)) {
+      fieldTypes[i] = TYPE_NUMERIC;
+    } else if (lowCardSet.has(f)) {
+      fieldTypes[i] = TYPE_LOW_CARD;
+    } else {
+      fieldTypes[i] = TYPE_CELL;
+    }
+  }
+
+  function instantiateFromRecord(record) {
+    const inst = Object.create(CorpusRecord.prototype);
+    for (let i = 0; i < fields.length; i++) {
+      const f = fields[i];
+      const type = fieldTypes[i];
+      if (type === TYPE_OMIT) {
+        inst[f] = '';
+      } else {
+        const v = record ? record[f] : undefined;
+        if (type === TYPE_ARRAY) {
+          inst[f] = v == null || (Array.isArray(v) && v.length === 0) ? EMPTY_ARRAY : v;
+        } else if (type === TYPE_NUMERIC) {
+          inst[f] = v == null || v === '' ? 0 : Number(v);
+        } else if (type === TYPE_LOW_CARD) {
+          inst[f] = intern(v);
+        } else {
+          inst[f] = cell(v);
+        }
+      }
+    }
+    return inst;
+  }
+
   class CorpusRecord {
-    constructor(...values) {
+    constructor(values) {
+      if (!values) return;
+      const vals = Array.isArray(values) ? values : arguments;
       for (let i = 0; i < fields.length; i++) {
         const key = fields[i];
-        const v = values[i];
-        if (arraySet.has(key)) {
+        const v = vals[i];
+        const type = fieldTypes[i];
+        if (type === TYPE_ARRAY) {
           this[key] = v == null || (Array.isArray(v) && v.length === 0) ? EMPTY_ARRAY : v;
-        } else if (numericSet.has(key)) {
+        } else if (type === TYPE_NUMERIC) {
           this[key] = v == null || v === '' ? 0 : Number(v);
         } else {
           this[key] = cell(v);
@@ -44,25 +92,11 @@ function defineCorpusRecord(className, options) {
     }
 
     static fromCsv(record) {
-      const args = new Array(fields.length);
-      for (let i = 0; i < fields.length; i++) {
-        const f = fields[i];
-        let v = record[f];
-        if (omitStoredSet.has(f)) v = '';
-        args[i] = lowCardSet.has(f) ? intern(v) : v;
-      }
-      return new CorpusRecord(...args);
+      return instantiateFromRecord(record);
     }
 
     static fromObject(record) {
-      const args = new Array(fields.length);
-      for (let i = 0; i < fields.length; i++) {
-        const f = fields[i];
-        let v = record ? record[f] : undefined;
-        if (omitStoredSet.has(f)) v = '';
-        args[i] = lowCardSet.has(f) ? intern(v) : v;
-      }
-      return new CorpusRecord(...args);
+      return instantiateFromRecord(record);
     }
 
     toJSON() {
