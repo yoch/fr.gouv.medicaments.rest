@@ -156,18 +156,36 @@ function createMatchPriorityClassifier(query) {
     const haystack = value || normalizedId;
     if (!haystack) return 0;
 
-    const allTermsPresent = terms.every((term) => haystack.includes(term));
-    if (!allTermsPresent) return 0;
+    for (let i = 0; i < terms.length; i++) {
+      if (!haystack.includes(terms[i])) return 0;
+    }
 
-    if (terms.every((term) => hasNormalizedWholeWord(haystack, term))) return 1;
+    let allWholeWords = true;
+    for (let i = 0; i < terms.length; i++) {
+      if (!hasNormalizedWholeWord(haystack, terms[i])) {
+        allWholeWords = false;
+        break;
+      }
+    }
+    if (allWholeWords) return 1;
 
     if (haystack.startsWith(terms[0])) return 1;
 
     return 0;
   }
 
-  return (primaryValue, { idValue = '', codeValues = [] } = {}) => {
+  return (primaryValue, idValueOrOptions, codeValuesParam) => {
     if (!terms.length) return 0;
+
+    let idValue = '';
+    let codeValues = codeValuesParam;
+    if (typeof idValueOrOptions === 'object' && idValueOrOptions !== null) {
+      idValue = idValueOrOptions.idValue || '';
+      codeValues = idValueOrOptions.codeValues || [];
+    } else {
+      idValue = idValueOrOptions || '';
+      if (!codeValues) codeValues = [];
+    }
 
     const value = String(primaryValue ?? '');
     const id = String(idValue ?? '');

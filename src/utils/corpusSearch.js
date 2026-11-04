@@ -19,17 +19,20 @@ function collectCodeValues(row, codeFields) {
 
 /** Correspondances triées par score ; l'application ne lit ni `terms` ni `match`. */
 function scoredSearch(index, query, options) {
-  return index.search(query, { ...options, matchInfo: false });
+  if (!options) return index.search(query, { matchInfo: false });
+  const searchOpts = Object.assign({}, options);
+  searchOpts.matchInfo = false;
+  return index.search(query, searchOpts);
 }
 
-function classifyRow(row, matchPriority, { primaryField, idField = null, codeFields = null }) {
+function classifyRow(row, matchPriority, spec) {
+  const primaryField = spec.primaryField;
+  const idField = spec.idField;
+  const codeFields = spec.codeFields;
   const primaryValue = row[primaryField] != null && row[primaryField] !== '' ? row[primaryField] : '';
   const idValue =
     idField && row[idField] != null && row[idField] !== '' ? row[idField] : '';
-  return matchPriority(primaryValue, {
-    idValue,
-    codeValues: collectCodeValues(row, codeFields)
-  });
+  return matchPriority(primaryValue, idValue, collectCodeValues(row, codeFields));
 }
 
 function rankSearchHit(corpus, res, matchPriority, spec) {
