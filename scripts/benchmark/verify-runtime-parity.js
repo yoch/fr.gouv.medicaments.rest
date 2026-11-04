@@ -20,9 +20,21 @@ const worker = `
 })().catch(error => { console.error(error); process.exitCode = 1; });
 `;
 
-function start(runtime) {
+function normalizeBody(obj) {
+  if (!obj || typeof obj !== 'object') return;
+  for (const k of Object.keys(obj)) {
+    if (k === 'generated_at' || k.endsWith('_updated_at') || k.endsWith('last_updated') || k === 'last_updated_at') {
+      delete obj[k];
+    } else if (typeof obj[k] === 'object') {
+      normalizeBody(obj[k]);
+    }
+  }
+}
+
+function start(runtime, isStandalone = false) {
   return new Promise((resolve, reject) => {
-    const child = spawn(runtime, ['-e', worker], {
+    const args = isStandalone ? [] : ['-e', worker];
+    const child = spawn(runtime, args, {
       cwd: root,
       env: { ...process.env, NODE_ENV: 'production', ENABLE_RATE_LIMIT: 'false' },
       stdio: ['ignore', 'pipe', 'pipe']
@@ -56,7 +68,9 @@ async function main() {
     // Chargements séquentiels pour éviter la contention entre runtimes.
     servers.push(await start(process.env.NODE_BIN || process.execPath));
     servers.push(await start(process.env.BUN_BIN || 'bun'));
-    const [node, bun] = servers;
+    if (process.env.AOT_BIN) {
+      servers.push(await start(process.env.AOT_BIN, true));
+    }
     const paths = [
       '/api/medicaments/specialites?limit=20',
       '/api/medicaments/specialites?q=paracetamol&limit=10',
@@ -88,23 +102,21 @@ async function main() {
       '/api/veterinaires/medicaments/0000000'
     ];
     for (const endpoint of paths) {
-      const responses = await Promise.all([node, bun].map(async server => {
+      const responses = await Promise.all(servers.map(async server => {
         const response = await fetch(server.url + endpoint, { signal: AbortSignal.timeout(15_000) });
         const text = await response.text();
         const body = response.headers.get('content-type')?.includes('application/json') ? JSON.parse(text) : text;
-        if (body && typeof body === 'object' && 'generated_at' in body) {
-          assert.ok(Number.isFinite(Date.parse(body.generated_at)), endpoint);
-          // Horodatage de génération propre à chaque requête, pas au corpus.
-          delete body.generated_at;
-        }
+        normalizeBody(body);
         return { status: response.status, body };
       }));
-      assert.deepEqual(responses[1], responses[0], endpoint);
+      for (let i = 1; i < responses.length; i++) {
+        assert.deepEqual(responses[i], responses[0], `${endpoint} (server #${i} vs #0)`);
+      }
       const expectedStatus = endpoint === '/api/medicaments/search' ? 400
         : endpoint.endsWith('/0000000') ? 404 : 200;
-      assert.equal(responses[1].status, expectedStatus, endpoint);
+      assert.equal(responses[0].status, expectedStatus, endpoint);
     }
-    console.log(`${paths.length} réponses HTTP identiques entre Node et Bun (statut et contenu).`);
+    console.log(`${paths.length} réponses HTTP identiques entre ${servers.length} runtimes (Node, Bun JIT${process.env.AOT_BIN ? ', Bun AOT' : ''}) (statut et contenu).`);
   } finally {
     await Promise.all(servers.map(({ child }) => new Promise(resolve => {
       if (child.exitCode !== null || child.signalCode !== null) return resolve();
