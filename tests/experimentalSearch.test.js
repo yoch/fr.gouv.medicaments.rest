@@ -51,7 +51,15 @@ function seedSyntheticCorpora() {
     makeRow({ cis: '65555555', denomination: 'CERULYSE 5 POUR CENT, solution pour instillation auriculaire', forme_pharma: 'solution pour instillation auriculaire', voies_admin: 'auriculaire', commercialisation: 'Commercialisée', titulaire: 'CHAUVIN' }),
     makeRow({ cis: '66666666', denomination: 'ESOMEPRAZOLE ZENTIVA 40 mg, gélule gastro-résistante', forme_pharma: 'gélule gastro-résistante', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'ZENTIVA' }),
     makeRow({ cis: '67777771', denomination: 'TAGAMET 200 mg, comprimé', forme_pharma: 'comprimé', voies_admin: 'orale', commercialisation: 'Non commercialisée', titulaire: 'GSK' }),
-    makeRow({ cis: '67777772', denomination: 'CIMETIDINE EG 200 mg, comprimé', forme_pharma: 'comprimé', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'EG' })
+    makeRow({ cis: '67777772', denomination: 'CIMETIDINE EG 200 mg, comprimé', forme_pharma: 'comprimé', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'EG' }),
+    makeRow({ cis: '68100001', denomination: 'KETOPROFENE BIOGARAN 2,5 %, gel', forme_pharma: 'gel', voies_admin: 'cutanée', commercialisation: 'Commercialisée', titulaire: 'BIOGARAN' }),
+    makeRow({ cis: '68100002', denomination: 'KETOPROFENE SANDOZ 100 mg, gélule', forme_pharma: 'gélule', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'SANDOZ' }),
+    makeRow({ cis: '68100003', denomination: 'KETOPROFENE TEVA LP 200 mg, comprimé à libération prolongée', forme_pharma: 'comprimé à libération prolongée', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'TEVA' }),
+    makeRow({ cis: '68200001', denomination: 'LIDOCAINE AGUETTANT 10 mg/ml, solution injectable', forme_pharma: 'solution injectable', voies_admin: 'intratumorale', commercialisation: 'Commercialisée', titulaire: 'AGUETTANT' }),
+    makeRow({ cis: '68200002', denomination: 'LIDOCAINE ZENTIVA 2 %, solution buccale', forme_pharma: 'solution buccale', voies_admin: 'cutanée;orale;sublinguale', commercialisation: 'Commercialisée', titulaire: 'ZENTIVA' }),
+    makeRow({ cis: '68200003', denomination: 'LIDOCAINE RENAUDIN 5 mg/ml, solution injectable', forme_pharma: 'solution injectable', voies_admin: 'sous-cutanée', commercialisation: 'Commercialisée', titulaire: 'RENAUDIN' }),
+    makeRow({ cis: '68200004', denomination: 'LIDOCAINE BIOGARAN 5 %, gel', forme_pharma: 'gel', voies_admin: 'cutanée', commercialisation: 'Commercialisée', titulaire: 'BIOGARAN' }),
+    makeRow({ cis: '68200005', denomination: 'LIDOCAINE PATCH ET GEL 5 %, dispositif', forme_pharma: 'patch et gel', voies_admin: 'cutanée', commercialisation: 'Commercialisée', titulaire: 'MEDA' })
   ];
 
   const presentations = [
@@ -76,7 +84,15 @@ function seedSyntheticCorpora() {
     makeRow({ cis: '66666666', designation_element: 'gélule', code_substance: '17407', denomination_substance: 'ÉSOMÉPRAZOLE', dosage: '40 mg', nature_composant: 'FT', numero_ordre: '1' }),
     makeRow({ cis: '66666666', designation_element: 'gélule', code_substance: '61112', denomination_substance: 'ÉSOMÉPRAZOLE MAGNÉSIQUE TRIHYDRATÉ', dosage: '44,5 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '67777771', designation_element: 'comprimé', code_substance: '04444', denomination_substance: 'CIMÉTIDINE', dosage: '200 mg', nature_composant: 'SA', numero_ordre: '1' }),
-    makeRow({ cis: '67777772', designation_element: 'comprimé', code_substance: '04444', denomination_substance: 'CIMÉTIDINE', dosage: '200 mg', nature_composant: 'SA', numero_ordre: '1' })
+    makeRow({ cis: '67777772', designation_element: 'comprimé', code_substance: '04444', denomination_substance: 'CIMÉTIDINE', dosage: '200 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '68100001', designation_element: 'gel', code_substance: '05551', denomination_substance: 'KÉTOPROFÈNE', dosage: '2,5 %', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '68100002', designation_element: 'gélule', code_substance: '05551', denomination_substance: 'KÉTOPROFÈNE', dosage: '100 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '68100003', designation_element: 'comprimé', code_substance: '05551', denomination_substance: 'KÉTOPROFÈNE', dosage: '200 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '68200001', designation_element: 'solution', code_substance: '05552', denomination_substance: 'LIDOCAÏNE', dosage: '10 mg/ml', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '68200002', designation_element: 'solution', code_substance: '05552', denomination_substance: 'LIDOCAÏNE', dosage: '2 %', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '68200003', designation_element: 'solution', code_substance: '05552', denomination_substance: 'LIDOCAÏNE', dosage: '5 mg/ml', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '68200004', designation_element: 'gel', code_substance: '05552', denomination_substance: 'LIDOCAÏNE', dosage: '5 %', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '68200005', designation_element: 'patch', code_substance: '05552', denomination_substance: 'LIDOCAÏNE', dosage: '5 %', nature_composant: 'SA', numero_ordre: '1' })
   ];
 
   const generiques = [
@@ -432,6 +448,146 @@ describe('structuredQueryParser & experimentalSearch (B1/B2)', () => {
       bdpmState.cisIndexes = { ...bdpmState.cisIndexes };
       const store2 = getConceptStore();
       expect(store2).not.toBe(store1);
+    });
+
+    it('P1 unité + HTTP route->parse->ranking->JSON : évite faux positifs sous-chaîne sur forme/voie et gère voies multivaluées', async () => {
+      // 1. Unitaires evaluateEntityCriteria : positif & négatif (useAliases false/true)
+      for (const useAliases of [false, true]) {
+        const pGel = parseStructuredQuery('ketoprofene', { forme: 'gel' }, getTaxonomyVocab(), { useAliases });
+        const evGel = evaluateEntityCriteria(
+          { denomDosages: [], compoDosages: [], normForme: 'gel', normVoie: 'cutanee', normPresText: '', normDenom: 'ketoprofene' },
+          pGel,
+          { useAliases }
+        );
+        expect(evGel.criteria_match.forme).toBe(true);
+        expect(evGel.criteria_status.forme).toBe('matched');
+
+        const evGelule = evaluateEntityCriteria(
+          { denomDosages: [], compoDosages: [], normForme: 'gelule', normVoie: 'orale', normPresText: '', normDenom: 'ketoprofene' },
+          pGel,
+          { useAliases }
+        );
+        expect(evGelule.criteria_match.forme).toBe(false);
+        expect(evGelule.criteria_status.forme).toBe('contradicted');
+
+        const pSolInj = parseStructuredQuery('lidocaine', { forme: 'solution injectable' }, getTaxonomyVocab(), { useAliases });
+        const evSolBuv = evaluateEntityCriteria(
+          { denomDosages: [], compoDosages: [], normForme: 'solution buvable', normVoie: 'orale', normPresText: '', normDenom: 'lidocaine' },
+          pSolInj,
+          { useAliases }
+        );
+        expect(evSolBuv.criteria_match.forme).toBe(false);
+        expect(evSolBuv.criteria_status.forme).toBe('contradicted');
+
+        const pComprime = parseStructuredQuery('doliprane', { forme: 'comprime' }, getTaxonomyVocab(), { useAliases });
+        const evCompresse = evaluateEntityCriteria(
+          { denomDosages: [], compoDosages: [], normForme: 'compresse', normVoie: 'cutanee', normPresText: '', normDenom: 'compresse' },
+          pComprime,
+          { useAliases }
+        );
+        expect(evCompresse.criteria_match.forme).toBe(false);
+        expect(evCompresse.criteria_status.forme).toBe('contradicted');
+
+        // Formes composées ('patch et gel' ; 'comprime a sucer ou a croquer')
+        const evPatchEtGel = evaluateEntityCriteria(
+          { denomDosages: [], compoDosages: [], normForme: 'patch et gel', normVoie: 'cutanee', normPresText: '', normDenom: 'lidocaine' },
+          pGel,
+          { useAliases }
+        );
+        expect(evPatchEtGel.criteria_match.forme).toBe(true);
+        expect(evPatchEtGel.criteria_status.forme).toBe('matched');
+
+        const pSucer = parseStructuredQuery('pastille', { forme: 'comprime a sucer' }, getTaxonomyVocab(), { useAliases });
+        const evSucerOuCroquer = evaluateEntityCriteria(
+          { denomDosages: [], compoDosages: [], normForme: 'comprime a sucer ou a croquer', normVoie: 'orale', normPresText: '', normDenom: 'pastille' },
+          pSucer,
+          { useAliases }
+        );
+        expect(evSucerOuCroquer.criteria_match.forme).toBe(true);
+        expect(evSucerOuCroquer.criteria_status.forme).toBe('matched');
+
+        // Voies : sous-chaîne interdite (orale != intratumorale, cutanee != sous-cutanee), multivalué matched
+        const pOrale = parseStructuredQuery('lidocaine', { voie: 'orale' }, getTaxonomyVocab(), { useAliases });
+        expect(evaluateEntityCriteria(
+          { denomDosages: [], compoDosages: [], normForme: 'solution injectable', normVoie: 'intratumorale', normPresText: '', normDenom: 'lidocaine' },
+          pOrale,
+          { useAliases }
+        )).toMatchObject({ criteria_match: { voie: false }, criteria_status: { voie: 'contradicted' } });
+
+        expect(evaluateEntityCriteria(
+          { denomDosages: [], compoDosages: [], normForme: 'solution buccale', normVoie: 'cutanee;orale;sublinguale', normPresText: '', normDenom: 'lidocaine' },
+          pOrale,
+          { useAliases }
+        )).toMatchObject({ criteria_match: { voie: true }, criteria_status: { voie: 'matched' } });
+
+        const pCutanee = parseStructuredQuery('lidocaine', { voie: 'cutanée' }, getTaxonomyVocab(), { useAliases });
+        expect(evaluateEntityCriteria(
+          { denomDosages: [], compoDosages: [], normForme: 'solution injectable', normVoie: 'sous-cutanee', normPresText: '', normDenom: 'lidocaine' },
+          pCutanee,
+          { useAliases }
+        )).toMatchObject({ criteria_match: { voie: false }, criteria_status: { voie: 'contradicted' } });
+
+        const pSousCutanee = parseStructuredQuery('lidocaine', { voie: 'sous-cutanée' }, getTaxonomyVocab(), { useAliases });
+        expect(evaluateEntityCriteria(
+          { denomDosages: [], compoDosages: [], normForme: 'solution injectable', normVoie: 'sous-cutanee', normPresText: '', normDenom: 'lidocaine' },
+          pSousCutanee,
+          { useAliases }
+        )).toMatchObject({ criteria_match: { voie: true }, criteria_status: { voie: 'matched' } });
+      }
+
+      // Précédence explicite supprime altFormes implicites et tranche en faveur du paramètre explicite
+      const overriddenForme = parseStructuredQuery('ketoprofene gelule', { forme: 'gel' }, getTaxonomyVocab(), { useAliases: true });
+      expect(overriddenForme.conflicts.some((c) => c.field === 'forme')).toBe(true);
+      expect(evaluateEntityCriteria(
+        { denomDosages: [], compoDosages: [], normForme: 'gelule', normVoie: 'orale', normPresText: '', normDenom: 'ketoprofene' },
+        overriddenForme,
+        { useAliases: true }
+      )).toMatchObject({ criteria_match: { forme: false }, criteria_status: { forme: 'contradicted' } });
+
+      // 2. Chaîne complète HTTP route -> parser -> ranking -> JSON (detail=full & detail=summary, B1 & B2)
+      for (const [mode, detail] of [['concepts', 'full'], ['structured', 'summary']]) {
+        const resGel = await request(app).get(`/api/medicaments/search?q=ketoprofene&forme=gel&mode=${mode}&detail=${detail}`);
+        expect(resGel.statusCode).toBe(200);
+        expect(resGel.body.data.length).toBeGreaterThanOrEqual(2);
+        expect(resGel.body.data[0].cis).toBe('68100001');
+        expect(resGel.body.data[0].criteria_match).toEqual({ dosage: false, forme: true, voie: false });
+        expect(resGel.body.data[0].criteria_status.forme).toBe('matched');
+        if (detail === 'full') {
+          expect(Array.isArray(resGel.body.data[0].compositions)).toBe(true);
+        } else {
+          expect(resGel.body.data[0].compositions).toBeUndefined();
+        }
+        const geluleHit = resGel.body.data.find((d) => d.cis === '68100002');
+        expect(geluleHit).toBeDefined();
+        expect(geluleHit.criteria_match.forme).toBe(false);
+        expect(geluleHit.criteria_status.forme).toBe('contradicted');
+
+        const resOrale = await request(app).get(`/api/medicaments/search?q=lidocaine&voie=orale&mode=${mode}&detail=${detail}`);
+        expect(resOrale.statusCode).toBe(200);
+        expect(resOrale.body.data[0].cis).toBe('68200002');
+        expect(resOrale.body.data[0].criteria_match.voie).toBe(true);
+        expect(resOrale.body.data[0].criteria_status.voie).toBe('matched');
+        const intraHit = resOrale.body.data.find((d) => d.cis === '68200001');
+        expect(intraHit).toBeDefined();
+        expect(intraHit.criteria_match.voie).toBe(false);
+        expect(intraHit.criteria_status.voie).toBe('contradicted');
+
+        const resCut = await request(app).get(`/api/medicaments/search?q=lidocaine&voie=cutan%C3%A9e&mode=${mode}&detail=${detail}`);
+        expect(resCut.statusCode).toBe(200);
+        expect(['68200004', '68200005']).toContain(resCut.body.data[0].cis);
+        expect(resCut.body.data[0].criteria_match.voie).toBe(true);
+        expect(resCut.body.data[0].criteria_status.voie).toBe('matched');
+        const scHit = resCut.body.data.find((d) => d.cis === '68200003');
+        expect(scHit).toBeDefined();
+        expect(scHit.criteria_match.voie).toBe(false);
+        expect(scHit.criteria_status.voie).toBe('contradicted');
+      }
+
+      // 3. Non-régression B0 explicite sur la même route sans opt-in mode
+      const b0Gel = await request(app).get('/api/medicaments/search?q=ketoprofene&forme=gel');
+      expect(b0Gel.statusCode).toBe(200);
+      expect(b0Gel.body.search.mode).toBeUndefined();
+      expect(b0Gel.body.data[0].criteria_status).toBeUndefined();
     });
   });
 });

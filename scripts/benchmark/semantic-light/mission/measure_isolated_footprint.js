@@ -19,7 +19,9 @@ const vetState = require('../../../../src/services/vet/state');
 const { BDPM_INDEX_SPECS, VET_INDEX_SPECS } = require('../../../../src/search/indexSpecs');
 const { miniSearchIndexConfig } = require('../../../../src/utils/miniSearchIndexConfig');
 const { buildIndexDocument } = require('../../../../src/utils/corpusStore');
-const { getConceptStore, resetConceptStoreCache } = require('../../../../src/search/conceptStore');
+const { executeHybridSearchPage } = require('../../../../src/services/searchOrchestrator');
+const { executeExperimentalSearchPage } = require('../../../../src/search/experimentalSearch');
+const { getConceptStore, hasConceptStoreCached, resetConceptStoreCache } = require('../../../../src/search/conceptStore');
 const { buildControlledDocuments, loadStaticWordPieceEncoder } = require('./b3_encoders');
 
 const PKG_VERIFY_ROOT =
@@ -87,6 +89,40 @@ function buildHostFromRows(FrozenMiniSearch, rows, spec) {
   return FrozenMiniSearch.fromDocuments(docs, opts);
 }
 
+const SEARCH_SAMPLE_QUERIES = [
+  'paracetamol 1000 mg comprime',
+  'doliprane 500 mg gelule',
+  'amoxicilline acide clavulanique 1 g',
+  'ibuprofene 400 mg',
+  'metacam chien',
+  'ketoprofene gel',
+  'collyre ophtalmique',
+  'lidocaine solution injectable sous cutanee',
+  'generique tagamet',
+  'omeprazole 20 mg',
+  'aspirine sans sucre',
+  'metoject 10 mg'
+];
+
+function measureQueryLatencies(searchFn) {
+  const tFirst0 = process.hrtime.bigint();
+  searchFn(SEARCH_SAMPLE_QUERIES[0]);
+  const firstCallMs = round(Number(process.hrtime.bigint() - tFirst0) / 1e6, 3);
+  for (let i = 0; i < 12; i++) searchFn(SEARCH_SAMPLE_QUERIES[i % SEARCH_SAMPLE_QUERIES.length]);
+  const warmSamples = [];
+  for (let i = 0; i < 120; i++) {
+    const q = SEARCH_SAMPLE_QUERIES[i % SEARCH_SAMPLE_QUERIES.length];
+    const t0 = process.hrtime.bigint();
+    searchFn(q);
+    warmSamples.push(Number(process.hrtime.bigint() - t0) / 1e6);
+  }
+  return {
+    firstCallMs,
+    warmP50Ms: round(percentile(warmSamples, 0.5), 3),
+    warmP95Ms: round(percentile(warmSamples, 0.95), 3)
+  };
+}
+
 async function runVariant(variant) {
   const tStart = process.hrtime.bigint();
   const tLex0 = process.hrtime.bigint();
@@ -96,7 +132,27 @@ async function runVariant(variant) {
   const memAfterB0 = snapshotMem();
 
   if (variant === 'B0') {
-    return { variant, lexicalLoadMs, memAfterB0, peakRssMiB: memAfterB0.peakRssMiB };
+    const queryLatencyMs = measureQueryLatencies((q) => executeHybridSearchPage(q, 'auto', 1, 10, {}));
+    const memAfterQueries = snapshotMem();
+    return { variant, lexicalLoadMs, queryLatencyMs, memAfterB0, memAfterQueries, peakRssMiB: memAfterQueries.peakRssMiB };
+  }
+
+  if (variant === 'B1') {
+    resetConceptStoreCache();
+    const queryLatencyMs = measureQueryLatencies((q) => executeExperimentalSearchPage(q, 'auto', 1, 10, {}, { mode: 'structured' }));
+    if (hasConceptStoreCached()) {
+      throw new Error('B1 structured mode must not materialize ConceptStore');
+    }
+    const memAfterB1 = snapshotMem();
+    return {
+      variant,
+      lexicalLoadMs,
+      conceptStoreMaterialized: hasConceptStoreCached(),
+      queryLatencyMs,
+      memAfterB0,
+      memAfterB1,
+      peakRssMiB: memAfterB1.peakRssMiB
+    };
   }
 
   resetConceptStoreCache();
@@ -106,13 +162,26 @@ async function runVariant(variant) {
   const memAfterB2 = snapshotMem();
 
   if (variant === 'B2') {
+    resetConceptStoreCache();
+    const tFirstCold0 = process.hrtime.bigint();
+    executeExperimentalSearchPage(SEARCH_SAMPLE_QUERIES[0], 'auto', 1, 10, {}, { mode: 'concepts' });
+    const firstCallWithLazyConceptBuildMs = round(Number(process.hrtime.bigint() - tFirstCold0) / 1e6, 2);
+    const warmStats = measureQueryLatencies((q) => executeExperimentalSearchPage(q, 'auto', 1, 10, {}, { mode: 'concepts' }));
+    const memAfterQueries = snapshotMem();
     return {
       variant,
       lexicalLoadMs,
       conceptBuildMs,
+      queryLatencyMs: {
+        firstCallWithLazyConceptBuildMs,
+        firstWarmCallMs: warmStats.firstCallMs,
+        warmP50Ms: warmStats.warmP50Ms,
+        warmP95Ms: warmStats.warmP95Ms
+      },
       memAfterB0,
       memAfterB2,
-      peakRssMiB: memAfterB2.peakRssMiB
+      memAfterQueries,
+      peakRssMiB: memAfterQueries.peakRssMiB
     };
   }
 
@@ -305,7 +374,7 @@ async function runVariant(variant) {
 async function main() {
   const arg = process.argv.find((a) => a.startsWith('--variant='));
   if (!arg) {
-    console.error('Usage: node --expose-gc measure_isolated_footprint.js --variant=B0|B2|FXV1_Float32|FXV1_Int8|FXV1_PQ32|FXV1_PQ16');
+    console.error('Usage: node --expose-gc measure_isolated_footprint.js --variant=B0|B1|B2|FXV1_Float32|FXV1_Int8|FXV1_PQ32|FXV1_PQ16');
     process.exit(1);
   }
   const variant = arg.split('=')[1];

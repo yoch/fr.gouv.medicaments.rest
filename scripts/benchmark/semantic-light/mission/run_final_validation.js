@@ -52,7 +52,9 @@ const { buildControlledDocuments, loadStaticWordPieceEncoder } = require('./b3_e
 const PKG_VERIFY_ROOT =
   process.env.FROZENMINISEARCH_PKG_ROOT ||
   '/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/pkg-verify';
-const PKG_DIR = path.join(PKG_VERIFY_ROOT, 'package');
+const PKG_DIR = fs.existsSync(path.join(PKG_VERIFY_ROOT, 'node_modules/@yoch/frozenminisearch'))
+  ? path.join(PKG_VERIFY_ROOT, 'node_modules/@yoch/frozenminisearch')
+  : path.join(PKG_VERIFY_ROOT, 'package');
 const pkgRequire = createRequire(path.join(PKG_VERIFY_ROOT, 'consumer.js'));
 const MODEL_DIR = path.join(__dirname, '../../../../data/search-indexes/mission-semantic');
 const TARBALL_PATH =
@@ -320,6 +322,7 @@ async function runTarballCrossValidation(bdpmF32, vetF32, enc) {
     corruptionAndMetadataChecksPassed: 8,
     preKFilterBeyondRank85Passed: true,
     pkgBindings: { cjsMain, cjsVec },
+    hosts: { bdpm: bdpmCjs, vet: vetCjs },
     indexes: {
       int8: { bdpm: bdpmInt8, vet: vetInt8 },
       pq32: { bdpm: bdpmPq32, vet: vetPq32 },
@@ -447,7 +450,7 @@ function createHybridSearchFn({
     const withResults = [];
     const candidates = [];
     const seenKeys = new Set();
-    let anyTruncated = false;
+    let anySourceTruncated = false;
 
     const collectFromIndex = (targetSource, vecIndex, refLabel) => {
       if (!vecIndex) return 0;
@@ -457,7 +460,7 @@ function createHybridSearchFn({
         minScore,
         filter: makeFilter(targetSource)
       });
-      if (hits.length > candidateCap) anyTruncated = true;
+      if (hits.length > candidateCap) anySourceTruncated = true;
       const capped = hits.length > candidateCap ? hits.slice(0, candidateCap) : hits;
       if (capped.length > 0) withResults.push(refLabel);
       let added = 0;
@@ -512,12 +515,17 @@ function createHybridSearchFn({
     }
 
     candidates.sort((a, b) => (b.score - a.score) || a.label.localeCompare(b.label, 'fr'));
+    const totalCollectedBeforeMergeCap = candidates.length;
+    const mergedTruncated = anySourceTruncated || totalCollectedBeforeMergeCap > candidateCap;
+    const boundedPool = totalCollectedBeforeMergeCap > candidateCap
+      ? candidates.slice(0, candidateCap)
+      : candidates;
     const { offset, safeLimit } = parseListPaging(page, limit);
-    const sliced = candidates.slice(offset, offset + safeLimit);
+    const sliced = boundedPool.slice(offset, offset + safeLimit);
     const results = sliced.map((c) => hydrateSemanticHit(c.source, c.key, c.score));
 
     const out = {
-      total: candidates.length,
+      total: boundedPool.length,
       results,
       search: {
         ...b2.search,
@@ -525,15 +533,18 @@ function createHybridSearchFn({
         referentiels: { queried, with_results: withResults },
         semantic_fallback_used: true,
         semantic_min_score: minScore,
-        top_cosine: round(candidates[0].score, 4),
+        top_cosine: round(boundedPool[0].score, 4),
         semantic_fallback: {
+          experimental_only: true,
           bounded: true,
           candidate_cap: candidateCap,
-          returned_pool_count: candidates.length,
-          truncated: anyTruncated,
-          total_is_lower_bound: anyTruncated,
-          total_semantics: anyTruncated ? 'bounded_lower_bound' : 'exhaustive_above_min_score',
-          page_out_of_bounded_window: anyTruncated && offset >= candidateCap,
+          candidate_cap_scope: 'global_merged',
+          returned_pool_count: boundedPool.length,
+          total_collected_before_merge_cap: totalCollectedBeforeMergeCap,
+          truncated: mergedTruncated,
+          total_is_lower_bound: mergedTruncated,
+          total_semantics: mergedTruncated ? 'bounded_lower_bound' : 'exhaustive_above_min_score',
+          page_out_of_bounded_window: mergedTruncated && offset >= candidateCap,
           source_policy: sourcePolicy
         }
       }
@@ -625,11 +636,102 @@ function runFallbackContractTests({ tarballCheck, enc, minScore }) {
   });
   assertCondition(synAll60.length === 60 && synAll60.slice(40, 50).length === 10, 'Synthetic exhaustive >= minScore must contain all 60 admissible docs across deep pages');
 
-  // Politique de source
+  // Politique de source + fenêtre bornée globale en source='mixed' (deux sources tronquées > 40 + fusion > 40)
   const vetRes = fnBounded({ q: 'medicament metacam chien', source: 'veterinary' }, 1, 10);
   assertCondition(vetRes.results.every((r) => r.type === 'medicament_veterinaire') && vetRes.search.referentiels.queried.join(',') === 'anmv', 'veterinary policy must query ANMV only');
   const mixRes = fnBounded({ q: qProbe, source: 'mixed' }, 1, 10);
   assertCondition(mixRes.search.semantic_fallback.source_policy === 'mixed_both', 'mixed policy expected');
+
+  const bdpmMixIndices = [];
+  for (let i = 0; i < bdpmState.corpus.specialites.length && bdpmMixIndices.length < 60; i++) {
+    if (bdpmState.corpus.specialites[i].commercialisation === 'Commercialisée') bdpmMixIndices.push(i);
+  }
+  const vetMixIndices = [];
+  for (let i = 0; i < vetState.corpus.medicaments.length && vetMixIndices.length < 60; i++) {
+    if (vetState.corpus.medicaments[i].statut_amm === 'Autorisation active') vetMixIndices.push(i);
+  }
+  assertCondition(bdpmMixIndices.length === 60 && vetMixIndices.length === 60, 'Need 60 commercialized BDPM and 60 active ANMV docs for mixed dual-truncation test');
+
+  const bdpmMixDense = new Float32Array(bdpmState.corpus.specialites.length * 2);
+  for (let i = 0; i < bdpmMixDense.length; i += 2) { bdpmMixDense[i] = 0; bdpmMixDense[i + 1] = 1; }
+  for (let r = 0; r < 60; r++) {
+    const idx = bdpmMixIndices[r];
+    const cos = 0.99 - r * 0.002;
+    bdpmMixDense[idx * 2] = cos;
+    bdpmMixDense[idx * 2 + 1] = Math.sqrt(Math.max(0, 1 - cos * cos));
+  }
+  const vetMixDense = new Float32Array(vetState.corpus.medicaments.length * 2);
+  for (let i = 0; i < vetMixDense.length; i += 2) { vetMixDense[i] = 0; vetMixDense[i + 1] = 1; }
+  for (let r = 0; r < 60; r++) {
+    const idx = vetMixIndices[r];
+    const cos = 0.989 - r * 0.002;
+    vetMixDense[idx * 2] = cos;
+    vetMixDense[idx * 2 + 1] = Math.sqrt(Math.max(0, 1 - cos * cos));
+  }
+  const bdpmMixVec = cjsVec.FrozenVectorIndex.fromDenseFloat32(tarballCheck.hosts.bdpm, bdpmMixDense, {
+    dim: 2, quantization: 'float32', metric: 'cosine', normalize: false,
+    representationVersion: 'mixed-contract:v1', snapshotId: 'sha256:mixed-bdpm'
+  });
+  const vetMixVec = cjsVec.FrozenVectorIndex.fromDenseFloat32(tarballCheck.hosts.vet, vetMixDense, {
+    dim: 2, quantization: 'float32', metric: 'cosine', normalize: false,
+    representationVersion: 'mixed-contract:v1', snapshotId: 'sha256:mixed-vet'
+  });
+  const encMixStub = { encodeQuery: () => ({ vec: new Float32Array([1, 0]) }) };
+  const qMixProbe = 'symptome douleur articulaire';
+
+  const fnMixDual = createHybridSearchFn({
+    bdpmVec: bdpmMixVec, vetVec: vetMixVec, enc: encMixStub, minScore, candidateCap: 40
+  });
+  const mixPages = [1, 2, 3, 4].map((p) => fnMixDual({ q: qMixProbe, source: 'mixed' }, p, 10));
+  const mixP5 = fnMixDual({ q: qMixProbe, source: 'mixed' }, 5, 10);
+  const allMixItems = mixPages.flatMap((res) => res.results);
+  const allMixKeys = allMixItems.map((r) => `${r.type}:${r.cis || r.num}`);
+  assertCondition(
+    mixPages[0].total === 40 &&
+    mixPages[0].search.semantic_fallback.candidate_cap_scope === 'global_merged' &&
+    mixPages[0].search.semantic_fallback.total_collected_before_merge_cap === 80 &&
+    mixPages[0].search.semantic_fallback.truncated === true &&
+    mixPages[0].search.semantic_fallback.total_semantics === 'bounded_lower_bound',
+    'Mixed dual-source >40 truncation must cap merged pool at 40 globally after collecting 40+40=80'
+  );
+  assertCondition(
+    allMixItems.length === 40 &&
+    new Set(allMixKeys).size === 40 &&
+    allMixItems.some((r) => r.type === 'medicament') &&
+    allMixItems.some((r) => r.type === 'medicament_veterinaire'),
+    'Mixed global merged window pages 1..4 must yield 40 unique interleaved human+vet results'
+  );
+  for (let i = 1; i < allMixItems.length; i++) {
+    assertCondition(allMixItems[i - 1].semantic_score >= allMixItems[i].semantic_score, 'Merged mixed scores must remain descending');
+  }
+  assertCondition(
+    mixP5.total === 40 &&
+    mixP5.results.length === 0 &&
+    mixP5.search.semantic_fallback.page_out_of_bounded_window === true,
+    'Mixed page >= 40 must return 0 results and page_out_of_bounded_window=true'
+  );
+
+  // Cas 25 + 25 = 50 > 40 : aucune source individuelle > 40, mais fusion globale > 40
+  const bdpm25 = new Set(bdpmMixIndices.slice(0, 25));
+  const vet25 = new Set(vetMixIndices.slice(0, 25));
+  const fnMix25 = createHybridSearchFn({
+    bdpmVec: bdpmMixVec,
+    vetVec: vetMixVec,
+    enc: encMixStub,
+    minScore,
+    candidateCap: 40,
+    isAdmissible: (source, _rec, sid) => (source === 'bdpm' ? bdpm25.has(sid) : vet25.has(sid))
+  });
+  const mix25P1 = fnMix25({ q: qMixProbe, source: 'mixed' }, 1, 10);
+  const mix25P5 = fnMix25({ q: qMixProbe, source: 'mixed' }, 5, 10);
+  assertCondition(
+    mix25P1.total === 40 &&
+    mix25P1.search.semantic_fallback.total_collected_before_merge_cap === 50 &&
+    mix25P1.search.semantic_fallback.truncated === true &&
+    mix25P5.results.length === 0 &&
+    mix25P5.search.semantic_fallback.page_out_of_bounded_window === true,
+    'Mixed 25+25=50>40 must truncate globally at 40 and flag page_out_of_bounded_window cleanly'
+  );
 
   // Aucun repli sur code inexistant / garde-fou RCP / critere negatifs explicites
   const invCode = fnBounded({ q: '99999999', source: 'auto' }, 1, 10);
@@ -642,6 +744,9 @@ function runFallbackContractTests({ tarballCheck, enc, minScore }) {
   return {
     liveBdpmAdmissiblePoolCount: rawPool.length,
     boundedCap40Verified: true,
+    candidateCapScope: 'global_merged',
+    mixedDualSourceTruncationVerified: true,
+    mixed25Plus25GlobalCapVerified: true,
     deepPage5EmptyAndFlagged: true,
     preKExcludeTop35BdpmRecovered10: true,
     synthetic75PreKExcludeTop45Recovered10: true,
@@ -797,9 +902,10 @@ async function main() {
 
   console.log('=== 1. TARBALL @yoch/frozenminisearch@1.13.0 CROSS-VALIDATION ===');
   const tarballCheck = await runTarballCrossValidation(bdpmF32, vetF32, enc);
-  const { indexes, pkgBindings, ...tarballSummary } = tarballCheck;
+  const { indexes, pkgBindings, hosts, ...tarballSummary } = tarballCheck;
   void indexes;
   void pkgBindings;
+  void hosts;
   console.log(JSON.stringify(tarballSummary, null, 2));
 
   const evalV3 = JSON.parse(fs.readFileSync(path.join(__dirname, 'eval_suite_v3.json'), 'utf8'));
@@ -996,6 +1102,24 @@ async function main() {
   const minisearchRepoPath =
     process.env.FROZENMINISEARCH_REPO_DIR ||
     path.resolve(repoRoot, '../../../minisearch/.worktrees/semantic-aux');
+  const trackedRuntimeFiles = [
+    'src/search/experimentalSearch.js',
+    'src/search/structuredQueryParser.js',
+    'src/search/queryIntentGuard.js',
+    'src/search/conceptStore.js',
+    'src/routes/medicaments/searchHandler.js',
+    'src/utils/searchResponseShape.js',
+    'src/utils/structuredSearchCriteria.js',
+    'scripts/benchmark/semantic-light/mission/run_final_validation.js',
+    'scripts/benchmark/semantic-light/mission/measure_isolated_footprint.js'
+  ];
+  const runtimeFileHashes = Object.fromEntries(
+    trackedRuntimeFiles.map((rel) => [rel, sha256File(path.join(repoRoot, rel))])
+  );
+  const runtimeSourcesHash = crypto.createHash('sha256');
+  for (const rel of trackedRuntimeFiles) {
+    runtimeSourcesHash.update(`${rel}:${runtimeFileHashes[rel] || 'missing'}\n`);
+  }
   const manifest = {
     generatedAt: new Date().toISOString(),
     repos: {
@@ -1008,6 +1132,8 @@ async function main() {
         ...gitInfo(minisearchRepoPath)
       }
     },
+    runtimeSourcesSha256: runtimeSourcesHash.digest('hex'),
+    runtimeFileHashes,
     packageArtifact: {
       name: '@yoch/frozenminisearch',
       version: tarballCheck.version,
@@ -1015,6 +1141,25 @@ async function main() {
       tarballSha256: sha256File(TARBALL_PATH),
       unpackedPkgDir: PKG_DIR
     },
+    configuration: {
+      frozenMinScore: FROZEN_MIN_SCORE,
+      candidateCap: SEMANTIC_CANDIDATE_CAP,
+      candidateCapScope: 'global_merged',
+      experimentalFallbackStatus: 'research_only_not_promoted'
+    },
+    evalFraming: {
+      status: 'regression_suites',
+      note: 'eval_suite_v3 et eval_residual_v1 ont ete iteres conjointement avec le parser, les regles A1 et la taxonomie ; ils servent de suites de non-regression reproductibles et non de mesure de generalisation sur requetes entierement inedites.'
+    },
+    checksExecuted: [
+      'tarball_exports_and_bundle_isolation',
+      'lexical_parity_1_12_3_vs_1_13_0',
+      'fxv1_v2_int8_pq32_pq16_roundtrip_unaligned_and_crc_tamper',
+      'a1_patient_weight_and_verbatim_sans_sucre',
+      'fallback_contract_global_merged_cap40_mixed_dual_truncation',
+      'v3_and_residual_regression_eval_dev_and_heldout',
+      'http_e2e_paired_alternating_abcd_dcba'
+    ],
     runtimePaths: {
       dataDir: process.env.DATA_DIR || path.join(repoRoot, 'data'),
       modelDir: MODEL_DIR

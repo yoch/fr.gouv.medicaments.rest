@@ -37,8 +37,7 @@ const {
 } = require('../utils/searchRanking');
 const {
   parseDosageTokens,
-  matchDosageTokens,
-  textOverlapScore
+  matchDosageTokens
 } = require('../utils/structuredSearchCriteria');
 const { parseStructuredQuery } = require('./structuredQueryParser');
 const { analyzeQuerySafetyAndIntent, inspectCriterionConstraint } = require('./queryIntentGuard');
@@ -417,6 +416,315 @@ function buildStructuredEntityRecord(source, key, parsed) {
   };
 }
 
+const FORME_STOP_WORDS = new Set([
+  'a', 'au', 'aux', 'd', 'dans', 'de', 'des', 'du', 'en', 'et', 'l', 'la', 'le', 'les', 'ou', 'par', 'pour', 'sans', 'sur', 'un', 'une'
+]);
+const GENERIC_GALENIC_CARRIERS = new Set([
+  'solution', 'poudre', 'suspension', 'dispersion', 'emulsion', 'preparation', 'liquide', 'solvant'
+]);
+const FORME_CANONICAL_TOKENS = new Map([
+  ['comprimes', 'comprime'],
+  ['cpr', 'comprime'],
+  ['cp', 'comprime'],
+  ['comp', 'comprime'],
+  ['gelules', 'gelule'],
+  ['gels', 'gel'],
+  ['capsules', 'capsule'],
+  ['sirops', 'sirop'],
+  ['collyres', 'collyre'],
+  ['suppositoires', 'suppositoire'],
+  ['suppos', 'suppositoire'],
+  ['suppo', 'suppositoire'],
+  ['sachets', 'sachet'],
+  ['sach', 'sachet'],
+  ['ampoules', 'ampoule'],
+  ['amp', 'ampoule'],
+  ['flacons', 'flacon'],
+  ['fl', 'flacon'],
+  ['ovules', 'ovule'],
+  ['poudres', 'poudre'],
+  ['pdr', 'poudre'],
+  ['solutions', 'solution'],
+  ['suspensions', 'suspension'],
+  ['emulsions', 'emulsion'],
+  ['pommades', 'pommade'],
+  ['cremes', 'creme'],
+  ['granules', 'granule'],
+  ['granule', 'granule'],
+  ['patchs', 'patch'],
+  ['effervescents', 'effervescent'],
+  ['effervescente', 'effervescent'],
+  ['effervescentes', 'effervescent'],
+  ['eff', 'effervescent'],
+  ['pellicules', 'pellicule'],
+  ['pelliculee', 'pellicule'],
+  ['pelliculees', 'pellicule'],
+  ['secables', 'secable'],
+  ['orodispersibles', 'orodispersible'],
+  ['oro', 'orodispersible'],
+  ['dispersibles', 'dispersible'],
+  ['resistants', 'resistant'],
+  ['resistante', 'resistant'],
+  ['resistantes', 'resistant'],
+  ['prolongee', 'prolonge'],
+  ['prolonges', 'prolonge'],
+  ['prolongees', 'prolonge'],
+  ['buvables', 'buvable'],
+  ['buv', 'buvable'],
+  ['injectables', 'injectable'],
+  ['inj', 'injectable'],
+  ['sublinguales', 'sublingual'],
+  ['sublinguale', 'sublingual'],
+  ['auriculaires', 'auriculaire']
+]);
+
+const VOIE_CANONICAL_ALIASES = new Map([
+  ['voie orale', 'orale'],
+  ['per os', 'orale'],
+  ['po', 'orale'],
+  ['voie per os', 'orale'],
+  ['oral', 'orale'],
+  ['orale', 'orale'],
+  ['iv', 'intraveineuse'],
+  ['voie iv', 'intraveineuse'],
+  ['intraveineux', 'intraveineuse'],
+  ['voie intraveineuse', 'intraveineuse'],
+  ['intraveineuse', 'intraveineuse'],
+  ['im', 'intramusculaire'],
+  ['voie im', 'intramusculaire'],
+  ['voie intramusculaire', 'intramusculaire'],
+  ['intramusculaire', 'intramusculaire'],
+  ['sc', 'sous cutanee'],
+  ['voie sc', 'sous cutanee'],
+  ['sous cutane', 'sous cutanee'],
+  ['sous cutanee', 'sous cutanee'],
+  ['voie sous cutanee', 'sous cutanee'],
+  ['cutane', 'cutanee'],
+  ['cutanee', 'cutanee'],
+  ['voie cutanee', 'cutanee'],
+  ['ophtalmique', 'ophtalmique'],
+  ['voie ophtalmique', 'ophtalmique'],
+  ['auriculaire', 'auriculaire'],
+  ['voie auriculaire', 'auriculaire'],
+  ['nasal', 'nasale'],
+  ['nasale', 'nasale'],
+  ['voie nasale', 'nasale'],
+  ['rectal', 'rectale'],
+  ['rectale', 'rectale'],
+  ['voie rectale', 'rectale'],
+  ['vaginal', 'vaginale'],
+  ['vaginale', 'vaginale'],
+  ['voie vaginale', 'vaginale'],
+  ['sublingual', 'sublinguale'],
+  ['sublinguale', 'sublinguale'],
+  ['voie sublinguale', 'sublinguale'],
+  ['transdermique', 'transdermique'],
+  ['voie transdermique', 'transdermique'],
+  ['inhale', 'inhalee'],
+  ['inhalee', 'inhalee'],
+  ['inhalation', 'inhalee'],
+  ['voie inhalee', 'inhalee'],
+  ['buccale autre', 'voie buccale autre'],
+  ['extracorporelle autre', 'voie extracorporelle autre'],
+  ['parenterale autre', 'voie parenterale autre']
+]);
+
+function normalizeGalenicWord(token) {
+  return FORME_CANONICAL_TOKENS.get(token) || token;
+}
+
+function tokenizeGalenicText(value) {
+  const cleaned = normalizeSearchText(value)
+    .replace(/([a-z0-9])\((?:e|es|s)\)/g, '$1')
+    .replace(/\blp\b/g, 'liberation prolonge')
+    .replace(/\bsol\s+buv(?:able)?\b/g, 'solution buvable')
+    .replace(/\bsol\s+inj(?:ectable)?\b/g, 'solution injectable');
+  if (!cleaned) return [];
+  const raw = cleaned.split(/[\s'’()\-–—,;:/]+/u);
+  const out = [];
+  for (let i = 0; i < raw.length; i++) {
+    const t = raw[i];
+    if (!t) continue;
+    out.push(normalizeGalenicWord(t));
+  }
+  return out;
+}
+
+function splitGalenicClauses(value) {
+  const norm = normalizeSearchText(value)
+    .replace(/([a-z0-9])\((?:e|es|s)\)/g, '$1');
+  if (!norm) return [];
+  const parts = norm.split(/\s*;\s*|\s+\bet\b\s+/);
+  const clauses = [];
+  for (const part of parts) {
+    const allTokens = tokenizeGalenicText(part);
+    if (allTokens.length === 0) continue;
+    const filtered = allTokens.filter((t) => !FORME_STOP_WORDS.has(t));
+    clauses.push({
+      allTokens,
+      tokenSet: new Set(allTokens),
+      sigTokens: filtered.length > 0 ? filtered : allTokens,
+      sigSet: new Set(filtered.length > 0 ? filtered : allTokens)
+    });
+  }
+  return clauses;
+}
+
+function containsTokenSequence(tokens, sequence) {
+  if (sequence.length === 0 || tokens.length < sequence.length) return false;
+  const limit = tokens.length - sequence.length;
+  for (let i = 0; i <= limit; i++) {
+    let ok = true;
+    for (let j = 0; j < sequence.length; j++) {
+      if (tokens[i + j] !== sequence[j]) {
+        ok = false;
+        break;
+      }
+    }
+    if (ok) return true;
+  }
+  return false;
+}
+
+function matchesGalenicPhrase(clauses, phrase) {
+  const phraseTokens = tokenizeGalenicText(phrase);
+  if (phraseTokens.length === 0) return false;
+  for (const clause of clauses) {
+    if (phraseTokens.length === 1) {
+      if (clause.tokenSet.has(phraseTokens[0])) return true;
+    } else if (containsTokenSequence(clause.allTokens, phraseTokens)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Évalue la satisfaction métier d'une forme galénique sur des tokens/expressions
+ * complets (jamais par simple sous-chaîne : `gel` != `gelule`, `comprime` != `compresse`).
+ */
+function matchFormeCriterion(requestedForme, candidateNormForme, { useAliases = false, altFormes = [], normPresText = '' } = {}) {
+  const candClauses = splitGalenicClauses(candidateNormForme);
+  if (candClauses.length === 0) {
+    return { matched: false, status: 'unknown', boost: 0 };
+  }
+
+  const reqAll = tokenizeGalenicText(requestedForme);
+  const reqFiltered = reqAll.filter((t) => !FORME_STOP_WORDS.has(t));
+  const reqSig = [...new Set(reqFiltered.length > 0 ? reqFiltered : reqAll)];
+  if (reqSig.length === 0) {
+    return { matched: false, status: 'unknown', boost: 0 };
+  }
+
+  let bestNonCarrierRatio = 0;
+  for (const clause of candClauses) {
+    let hits = 0;
+    let nonCarrierHits = 0;
+    for (const tok of reqSig) {
+      if (clause.sigSet.has(tok) || clause.tokenSet.has(tok)) {
+        hits++;
+        if (!GENERIC_GALENIC_CARRIERS.has(tok)) nonCarrierHits++;
+      }
+    }
+    if (hits === reqSig.length) {
+      return { matched: true, status: 'matched', boost: 2.5 };
+    }
+    if (nonCarrierHits > 0) {
+      const ratio = hits / reqSig.length;
+      if (ratio > bestNonCarrierRatio) bestNonCarrierRatio = ratio;
+    }
+  }
+
+  if (bestNonCarrierRatio >= 0.5) {
+    return { matched: false, status: 'expanded', boost: 1.25 };
+  }
+
+  if (useAliases && altFormes.length > 0) {
+    const presClauses = normPresText ? splitGalenicClauses(normPresText) : [];
+    const altMatchForme = altFormes.some((alt) => matchesGalenicPhrase(candClauses, alt));
+    const altMatchPres = !altMatchForme && presClauses.length > 0 && altFormes.some((alt) => matchesGalenicPhrase(presClauses, alt));
+    if (altMatchForme) {
+      return { matched: false, status: 'expanded', boost: 1.5 };
+    }
+    if (altMatchPres) {
+      return { matched: false, status: 'expanded', boost: 0.75 };
+    }
+  }
+
+  return { matched: false, status: 'contradicted', boost: -1.5 };
+}
+
+function canonicalizeVoieEntry(raw) {
+  const norm = normalizeSearchText(raw)
+    .replace(/['’]/g, ' ')
+    .replace(/[-–—]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!norm) return '';
+  return VOIE_CANONICAL_ALIASES.get(norm) || norm;
+}
+
+function extractVoieEntries(raw) {
+  const text = String(raw ?? '').trim();
+  if (!text) return [];
+  const entries = [];
+  for (const part of text.split(/[;,]+/)) {
+    const canon = canonicalizeVoieEntry(part);
+    if (canon && !entries.includes(canon)) entries.push(canon);
+  }
+  return entries;
+}
+
+/**
+ * Évalue la satisfaction d'une voie d'administration sur la liste multivaluée
+ * canonique du candidat (`cutanee` != `sous-cutanee`, `orale` != `intratumorale`,
+ * `orale` dans `cutanee;orale;sublinguale` -> `matched`).
+ */
+function matchVoieCriterion(requestedVoies, candidateNormVoie, candidateNormForme, { useAliases = false } = {}) {
+  if (requestedVoies.length === 0) {
+    return { matched: false, status: 'unknown', boost: 0 };
+  }
+  const candEntries = new Set(extractVoieEntries(candidateNormVoie));
+  const formeClauses = candidateNormForme ? splitGalenicClauses(candidateNormForme) : [];
+
+  if (candEntries.size > 0) {
+    let hits = 0;
+    for (const req of requestedVoies) {
+      if (candEntries.has(req)) hits++;
+    }
+    if (hits === requestedVoies.length) {
+      return { matched: true, status: 'matched', boost: 1.5 };
+    }
+    if (hits > 0) {
+      return { matched: false, status: 'expanded', boost: 0.75 };
+    }
+    if (
+      useAliases &&
+      requestedVoies.includes('ophtalmique') &&
+      matchesGalenicPhrase(formeClauses, 'collyre')
+    ) {
+      return { matched: false, status: 'expanded', boost: 1.0 };
+    }
+    return { matched: false, status: 'contradicted', boost: -1.5 };
+  }
+
+  if (
+    useAliases &&
+    requestedVoies.includes('ophtalmique') &&
+    matchesGalenicPhrase(formeClauses, 'collyre')
+  ) {
+    return { matched: false, status: 'expanded', boost: 1.0 };
+  }
+  if (
+    useAliases &&
+    requestedVoies.includes('auriculaire') &&
+    matchesGalenicPhrase(formeClauses, 'auriculaire')
+  ) {
+    return { matched: false, status: 'expanded', boost: 1.0 };
+  }
+  return { matched: false, status: 'unknown', boost: 0 };
+}
+
 function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
   const eff = (parsed && parsed.effectiveCriteria) || {};
   const cm = { dosage: false, forme: false, voie: false };
@@ -471,77 +779,58 @@ function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
     }
   }
 
-  // 2. Forme galénique (expansion alias != correspondance exacte)
+  // 2. Forme galénique (correspondance canonique par tokens/clauses != élargissement du rappel)
   if (eff.forme) {
     if (inspectCriterionConstraint(eff.forme)) {
       cs.forme = 'unsupported';
     } else if (!record || !record.normForme) {
       cs.forme = 'unknown';
     } else {
-      const formeScore = textOverlapScore(eff.forme, record.normForme);
-      if (formeScore >= 0.9) {
-        cm.forme = true;
-        cs.forme = 'matched';
-        boost += 2.5;
-      } else if (formeScore >= 0.5) {
-        cs.forme = 'expanded';
-        boost += 1.25;
-      } else if (useAliases && altFormes.length > 0) {
-        const altMatchForme = altFormes.some((alt) => record.normForme.includes(alt));
-        const altMatchPres = !altMatchForme && altFormes.some((alt) => (record.normPresText || '').includes(alt));
-        if (altMatchForme) {
-          cs.forme = 'expanded';
-          boost += 1.5;
-        } else if (altMatchPres) {
-          cs.forme = 'expanded';
-          boost += 0.75;
-        } else {
-          cs.forme = 'contradicted';
-          boost -= 1.5;
-        }
-      } else {
-        cs.forme = 'contradicted';
-        boost -= 1.5;
-      }
+      const res = matchFormeCriterion(eff.forme, record.normForme, {
+        useAliases,
+        altFormes,
+        normPresText: record.normPresText || ''
+      });
+      cm.forme = res.matched;
+      cs.forme = res.status;
+      boost += res.boost;
     }
   }
 
-  // 3. Voie d'administration (rejette contraintes/négations non supportées ; ophtalmique->collyre reste 'expanded')
+  // 3. Voie d'administration (entrées multivaluées exactes + aliases directionnels contrôlés)
   if (eff.voie) {
     if (inspectCriterionConstraint(eff.voie)) {
       cs.voie = 'unsupported';
     } else if (!record) {
       cs.voie = 'unknown';
-    } else if (record.normVoie) {
-      const voieScore = textOverlapScore(eff.voie, record.normVoie);
-      if (voieScore >= 0.9) {
-        cm.voie = true;
-        cs.voie = 'matched';
-        boost += 1.5;
-      } else if (voieScore >= 0.5) {
-        cs.voie = 'expanded';
-        boost += 0.75;
-      } else if (useAliases && eff.voie === 'ophtalmique' && (record.normForme || '').includes('collyre')) {
-        cs.voie = 'expanded';
-        boost += 1.0;
-      } else {
-        cs.voie = 'contradicted';
-        boost -= 1.5;
-      }
-    } else if (useAliases && eff.voie === 'ophtalmique' && (record.normForme || '').includes('collyre')) {
-      cs.voie = 'expanded';
-      boost += 1.0;
     } else {
-      cs.voie = 'unknown';
+      const requestedVoies =
+        !parsed?.explicitOverrides?.voie &&
+        Array.isArray(parsed?.extracted?.voies) &&
+        parsed.extracted.voies.length > 0
+          ? [...new Set(parsed.extracted.voies.map(canonicalizeVoieEntry).filter(Boolean))]
+          : extractVoieEntries(eff.voie);
+      const res = matchVoieCriterion(
+        requestedVoies,
+        record.normVoie || '',
+        record.normForme || '',
+        { useAliases }
+      );
+      cm.voie = res.matched;
+      cs.voie = res.status;
+      boost += res.boost;
     }
   }
 
   // 4. Qualificatifs galéniques (effervescent, lp, orodispersible, pelliculé, à croquer)
   if (useAliases && eff.qualifiers && eff.qualifiers.length > 0 && record) {
-    const hay = `${record.normDenom || record.normNom || ''} ${record.normForme || ''}`;
+    const qualClauses = splitGalenicClauses(`${record.normDenom || record.normNom || ''} ; ${record.normForme || ''}`);
     let matchedQual = 0;
     for (const q of eff.qualifiers) {
-      if (hay.includes(q) || (q === 'orodispersible' && hay.includes('lyophilisat'))) {
+      if (
+        matchesGalenicPhrase(qualClauses, q) ||
+        (q === 'orodispersible' && matchesGalenicPhrase(qualClauses, 'lyophilisat'))
+      ) {
         matchedQual++;
         boost += 1.5;
       }
