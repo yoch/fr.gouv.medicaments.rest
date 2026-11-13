@@ -27,9 +27,66 @@ const STOP_CLAUSE_FILLERS = new Set(['de', 'du', 'des', 'd', 'le', 'la', 'les', 
 const CLINICAL_RCP_PATTERNS = [
   { re: /\bnon\s+contre[\s-]?indiqu(?:e|ee|es|ees)\b/, kind: 'contraindication_negated' },
   { re: /\bcontre[\s-]?indiqu(?:e|ee|es|ees)\b|\bcontre[\s-]?indications?\b/, kind: 'contraindication' },
-  { re: /\bpendant\s+(?:la\s+)?grossesse\b|\bfemme\s+enceinte\b|\ballaitement\b/, kind: 'pregnancy_lactation' },
+  { re: /\bpendant\s+(?:la\s+)?grossesse\b|\bfemme\s+enceinte\b|\bgrossesse\b|\benceinte[s]?\b|\ballaitement\b|\ballaiter\b|\ballaite(?:nt)?\b/, kind: 'pregnancy_lactation' },
+  { re: /\bcompatibles?\b|\bcompatibilite\b|\bteratogene\b/, kind: 'clinical_compatibility' },
   { re: /\beffets?\s+(?:indesirables?|secondaires?)\b|\binteraction(?:s)?\s+medicamenteuse(?:s)?\b|\bsurdosage\b/, kind: 'clinical_rcp_property' }
 ];
+
+const EXPLICIT_NEGATION_TOKENS = new Set([
+  'non', 'pas', 'ni', 'aucun', 'aucune', 'sauf', 'excepte', 'hors'
+]);
+
+function normalizeCriterionText(value) {
+  return normalizeSearchText(value || '')
+    .replace(/['’/;,+()]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function inspectCriterionConstraint(value) {
+  const norm = normalizeCriterionText(value);
+  if (!norm) return null;
+
+  for (const pat of CLINICAL_RCP_PATTERNS) {
+    if (pat.re.test(norm)) {
+      return { reason: 'clinical_rcp_property_in_criterion', markers: [], excluded: [], cues: [pat.kind] };
+    }
+  }
+
+  const tokens = norm.split(' ').filter(Boolean);
+  const markers = [];
+  const excluded = [];
+
+  for (let i = 0; i < tokens.length; i++) {
+    const tok = tokens[i];
+    if (EXPLICIT_NEGATION_TOKENS.has(tok)) {
+      markers.push(tok);
+      let j = i + 1;
+      while (j < tokens.length && STOP_CLAUSE_FILLERS.has(tokens[j])) j++;
+      const rest = tokens.slice(j).filter((t) => !STOP_CLAUSE_FILLERS.has(t) && !EXPLICIT_NEGATION_TOKENS.has(t));
+      if (rest.length > 0) excluded.push(rest.join(' '));
+    } else if (tok === 'sans') {
+      let j = i + 1;
+      while (j < tokens.length && STOP_CLAUSE_FILLERS.has(tokens[j])) j++;
+      const rest = [];
+      while (j < tokens.length && tokens[j] !== 'ni' && tokens[j] !== 'sans') {
+        if (!STOP_CLAUSE_FILLERS.has(tokens[j])) rest.push(tokens[j]);
+        j++;
+      }
+      const phrase = rest.join(' ');
+      if (!phrase || !VERBATIM_SANS_QUALIFIERS.has(phrase)) {
+        markers.push('sans');
+        if (phrase) excluded.push(phrase);
+      }
+      i = Math.max(i, j - 1);
+    }
+  }
+
+  if (markers.length > 0) {
+    return { reason: 'negation_in_explicit_criterion', markers: [...new Set(markers)], excluded: [...new Set(excluded)], cues: [] };
+  }
+  return null;
+}
 
 function canonicalizeEntityChunk(tokens) {
   const cleaned = tokens.filter((t) => t && !STOP_CLAUSE_FILLERS.has(t));
@@ -40,13 +97,33 @@ function canonicalizeEntityChunk(tokens) {
  * Analyse les négations explicites, contextes cliniques RCP et poids corporel patient (kg)
  * afin d'éviter toute perte silencieuse d'intention ou fausse inférence (A1).
  */
-function analyzeQuerySafetyAndIntent(rawQuery, parsed) {
-  const norm = normalizeSearchText(rawQuery || '')
-    .replace(/['’/;,+()]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+function analyzeQuerySafetyAndIntent(rawQuery, parsed, explicitCriteria = {}) {
+  const norm = normalizeCriterionText(rawQuery);
 
-  if (!norm) {
+  const unsupportedCriteria = [];
+  const clinicalCues = [];
+  let clinicalPolarity = null;
+  const markers = [];
+  const excluded = [];
+
+  const criteriaToCheck = {
+    dosage: explicitCriteria?.dosage ?? parsed?.effectiveCriteria?.dosage ?? null,
+    forme: explicitCriteria?.forme ?? parsed?.effectiveCriteria?.forme ?? null,
+    voie: explicitCriteria?.voie ?? parsed?.effectiveCriteria?.voie ?? null
+  };
+
+  for (const [field, val] of Object.entries(criteriaToCheck)) {
+    if (!val) continue;
+    const issue = inspectCriterionConstraint(val);
+    if (issue) {
+      unsupportedCriteria.push({ field, value: String(val).trim(), reason: issue.reason });
+      for (const m of issue.markers) markers.push(m);
+      for (const ex of issue.excluded) excluded.push(ex);
+      for (const cue of issue.cues) clinicalCues.push(cue);
+    }
+  }
+
+  if (!norm && unsupportedCriteria.length === 0) {
     return {
       supported: true,
       intent: parsed && parsed.kind === 'exact_code' ? 'exact_code' : 'product_or_concept',
@@ -54,6 +131,7 @@ function analyzeQuerySafetyAndIntent(rawQuery, parsed) {
       patientWeight: null,
       pediatricInferred: false,
       verbatimQualifiers: [],
+      unsupportedCriteria: [],
       negation: { detected: false, markers: [], excluded: [] },
       clinicalProperty: { detected: false, polarity: null, cues: [] }
     };
@@ -64,8 +142,6 @@ function analyzeQuerySafetyAndIntent(rawQuery, parsed) {
   const patientWeight = weightMatch ? `${weightMatch[1]} kg` : null;
 
   // Propriétés cliniques / RCP (contre-indications, grossesse, effets indésirables...)
-  const clinicalCues = [];
-  let clinicalPolarity = null;
   for (const pat of CLINICAL_RCP_PATTERNS) {
     if (pat.re.test(norm)) {
       clinicalCues.push(pat.kind);
@@ -76,9 +152,7 @@ function analyzeQuerySafetyAndIntent(rawQuery, parsed) {
   const hasClinicalRcp = clinicalCues.length > 0;
 
   // Analyse séquentielle de négations : « sans X », « sans X ni Y », « pas de X », « ni Y »
-  const tokens = norm.split(' ');
-  const markers = [];
-  const excluded = [];
+  const tokens = norm ? norm.split(' ') : [];
   const verbatimQualifiers = [];
 
   for (let i = 0; i < tokens.length; i++) {
@@ -146,6 +220,10 @@ function analyzeQuerySafetyAndIntent(rawQuery, parsed) {
     supported = false;
     intent = 'clinical_rcp_property_unsupported';
     abstainReason = 'clinical_rcp_property_not_indexed';
+  } else if (unsupportedCriteria.length > 0) {
+    supported = false;
+    intent = 'explicit_criterion_unsupported';
+    abstainReason = 'explicit_criterion_negation_not_supported';
   } else if (hasUnsupportedExclusion) {
     supported = false;
     intent = 'negation_exclusion_unsupported';
@@ -159,6 +237,7 @@ function analyzeQuerySafetyAndIntent(rawQuery, parsed) {
     patientWeight,
     pediatricInferred: false,
     verbatimQualifiers: [...new Set(verbatimQualifiers)],
+    unsupportedCriteria,
     negation: {
       detected: hasUnsupportedExclusion || (clinicalPolarity === 'negated_contraindication'),
       markers: [...new Set(markers)],
@@ -167,12 +246,13 @@ function analyzeQuerySafetyAndIntent(rawQuery, parsed) {
     clinicalProperty: {
       detected: hasClinicalRcp,
       polarity: clinicalPolarity,
-      cues: clinicalCues
+      cues: [...new Set(clinicalCues)]
     }
   };
 }
 
 module.exports = {
   VERBATIM_SANS_QUALIFIERS,
-  analyzeQuerySafetyAndIntent
+  analyzeQuerySafetyAndIntent,
+  inspectCriterionConstraint
 };

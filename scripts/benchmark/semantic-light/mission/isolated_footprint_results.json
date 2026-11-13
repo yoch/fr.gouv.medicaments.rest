@@ -1,41 +1,41 @@
 {
   "B0": {
     "variant": "B0",
-    "lexicalLoadMs": 7557.47,
+    "lexicalLoadMs": 7792,
     "memAfterB0": {
-      "rssMiB": 442.23,
-      "heapUsedMiB": 70.44,
-      "heapTotalMiB": 223.72,
-      "externalMiB": 12.43,
+      "rssMiB": 335.71,
+      "heapUsedMiB": 70.45,
+      "heapTotalMiB": 206.97,
+      "externalMiB": 12.44,
       "arrayBuffersMiB": 10.45,
-      "v8HeapPlusExternalNoDoubleCountMiB": 82.86,
-      "peakRssMiB": 443.8
+      "v8HeapPlusExternalNoDoubleCountMiB": 82.89,
+      "peakRssMiB": 338.61
     },
-    "peakRssMiB": 443.8
+    "peakRssMiB": 338.61
   },
   "B2": {
     "variant": "B2",
-    "lexicalLoadMs": 7454.69,
-    "conceptBuildMs": 884.32,
+    "lexicalLoadMs": 8008.25,
+    "conceptBuildMs": 721.14,
     "memAfterB0": {
-      "rssMiB": 327.14,
-      "heapUsedMiB": 70.44,
-      "heapTotalMiB": 210.47,
-      "externalMiB": 12.43,
+      "rssMiB": 333.24,
+      "heapUsedMiB": 70.45,
+      "heapTotalMiB": 206.47,
+      "externalMiB": 12.44,
       "arrayBuffersMiB": 10.45,
-      "v8HeapPlusExternalNoDoubleCountMiB": 82.86,
-      "peakRssMiB": 330.04
+      "v8HeapPlusExternalNoDoubleCountMiB": 82.89,
+      "peakRssMiB": 336.08
     },
     "memAfterB2": {
-      "rssMiB": 353.97,
-      "heapUsedMiB": 146.94,
-      "heapTotalMiB": 278.13,
-      "externalMiB": 12.43,
+      "rssMiB": 341,
+      "heapUsedMiB": 98.24,
+      "heapTotalMiB": 229.38,
+      "externalMiB": 12.44,
       "arrayBuffersMiB": 10.45,
-      "v8HeapPlusExternalNoDoubleCountMiB": 159.37,
-      "peakRssMiB": 354.23
+      "v8HeapPlusExternalNoDoubleCountMiB": 110.67,
+      "peakRssMiB": 348.24
     },
-    "peakRssMiB": 354.23
+    "peakRssMiB": 348.24
   },
   "FXV1_Float32": {
     "variant": "FXV1_Float32",
@@ -46,77 +46,77 @@
       "dim": 128
     },
     "timingsMs": {
-      "lexicalLoadMs": 7693.14,
-      "conceptBuildMs": 867.91,
-      "host113BuildMs": 365.83,
-      "staticModelLoadMs": 63.2,
-      "docsBuildMs": 217.96,
-      "encodeDocsMs": 1017.39,
-      "fxv1BuildMs": 20.25,
-      "fxv1SaveBinaryMs": 19.31,
-      "fxv1LoadBinaryMs": 30.42,
-      "totalPipelineMs": 13543.35,
-      "scanDual120P50Ms": 5.98,
-      "scanDual120P95Ms": 6.374
+      "lexicalLoadMs": 7747.27,
+      "conceptBuildMs": 719.25,
+      "host113BuildMs": 352.03,
+      "staticModelLoadMs": 59.03,
+      "docsBuildMs": 220.12,
+      "encodeDocsMs": 1092.05,
+      "fxv1BuildMs": 48.93,
+      "fxv1SaveBinaryMs": 23.33,
+      "fxv1LoadBinaryMs": 52.06,
+      "totalPipelineMs": 13977.81,
+      "scanDual120P50Ms": 6.204,
+      "scanDual120P95Ms": 6.614
     },
     "artifactsBytes": {
       "vocabMetaBytes": 1201894,
       "vocabWeightsBytes": 54210064,
       "vocabTotalBytes": 55411958,
       "vocabTotalGzBytes": 50892391,
-      "fxv1BdpmBytes": 8176060,
-      "fxv1VetBytes": 1657948,
-      "fxv1TotalBytes": 9834008,
-      "fxv1TotalGzBytes": 8985147,
-      "estimatedFxv1RuntimeBytes": null,
-      "totalRuntimeAssetsBytes": 65245966,
-      "totalRuntimeAssetsGzBytes": 59877538
+      "fxv1BdpmBytes": 8112740,
+      "fxv1VetBytes": 1645156,
+      "fxv1TotalBytes": 9757896,
+      "fxv1TotalGzBytes": 8984903,
+      "fxv1RuntimeByteLength": 9757896,
+      "totalRuntimeAssetsBytes": 65169854,
+      "totalRuntimeAssetsGzBytes": 59877294
     },
     "memory": {
       "afterB0": {
-        "rssMiB": 347.64,
-        "heapUsedMiB": 70.43,
-        "heapTotalMiB": 205.97,
-        "externalMiB": 12.43,
+        "rssMiB": 305.34,
+        "heapUsedMiB": 70.45,
+        "heapTotalMiB": 210.47,
+        "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 82.86,
-        "peakRssMiB": 348.28
+        "v8HeapPlusExternalNoDoubleCountMiB": 82.89,
+        "peakRssMiB": 307.77
       },
       "afterB2": {
-        "rssMiB": 350.98,
-        "heapUsedMiB": 146.93,
-        "heapTotalMiB": 278.13,
-        "externalMiB": 12.43,
+        "rssMiB": 312.7,
+        "heapUsedMiB": 98.24,
+        "heapTotalMiB": 229.63,
+        "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 159.36,
-        "peakRssMiB": 358.55
+        "v8HeapPlusExternalNoDoubleCountMiB": 110.67,
+        "peakRssMiB": 320.32
       },
       "afterHost113": {
-        "rssMiB": 365.2,
-        "heapUsedMiB": 148.12,
-        "heapTotalMiB": 278.88,
-        "externalMiB": 13.91,
-        "arrayBuffersMiB": 11.94,
-        "v8HeapPlusExternalNoDoubleCountMiB": 162.03,
-        "peakRssMiB": 370.11
+        "rssMiB": 318.91,
+        "heapUsedMiB": 99.48,
+        "heapTotalMiB": 231.04,
+        "externalMiB": 13.94,
+        "arrayBuffersMiB": 11.95,
+        "v8HeapPlusExternalNoDoubleCountMiB": 113.42,
+        "peakRssMiB": 323.41
       },
       "duringBuildBeforeRelease": {
-        "rssMiB": 481.78,
-        "heapUsedMiB": 154.56,
-        "heapTotalMiB": 285.63,
-        "externalMiB": 93.75,
-        "arrayBuffersMiB": 91.78,
-        "v8HeapPlusExternalNoDoubleCountMiB": 248.32,
-        "peakRssMiB": 564.98
+        "rssMiB": 424.93,
+        "heapUsedMiB": 105.92,
+        "heapTotalMiB": 237.79,
+        "externalMiB": 93.56,
+        "arrayBuffersMiB": 91.58,
+        "v8HeapPlusExternalNoDoubleCountMiB": 199.48,
+        "peakRssMiB": 529.74
       },
       "retainedPostGc": {
-        "rssMiB": 481.78,
-        "heapUsedMiB": 154.56,
-        "heapTotalMiB": 285.63,
-        "externalMiB": 75.07,
-        "arrayBuffersMiB": 73.09,
-        "v8HeapPlusExternalNoDoubleCountMiB": 229.63,
-        "peakRssMiB": 564.98
+        "rssMiB": 417.29,
+        "heapUsedMiB": 105.92,
+        "heapTotalMiB": 237.79,
+        "externalMiB": 74.95,
+        "arrayBuffersMiB": 72.96,
+        "v8HeapPlusExternalNoDoubleCountMiB": 180.87,
+        "peakRssMiB": 529.74
       }
     },
     "fxv1Stats": {
@@ -127,12 +127,15 @@
         "documentCount": 15845,
         "nextId": 15845,
         "corpusFingerprint": 3567599445,
+        "mappingFingerprint": 3567599445,
+        "representationVersion": "static-wp-mrl-128d-f32:v1",
+        "snapshotId": "sha256:32da19f0eb0dd4c83fca5612",
         "presentCount": 15845,
         "pqSubspaces": 0,
         "pqCentroidsPerSubspace": 0,
-        "normalized": false,
-        "hasReconstructedNorms": true,
-        "byteLength": 8176060
+        "normalized": true,
+        "hasReconstructedNorms": false,
+        "byteLength": 8112740
       },
       "vet": {
         "quantization": "float32",
@@ -141,12 +144,15 @@
         "documentCount": 3213,
         "nextId": 3213,
         "corpusFingerprint": 42236662,
+        "mappingFingerprint": 42236662,
+        "representationVersion": "static-wp-mrl-128d-f32:v1",
+        "snapshotId": "sha256:3d00c095759b63e4f872b493",
         "presentCount": 3213,
         "pqSubspaces": 0,
         "pqCentroidsPerSubspace": 0,
-        "normalized": false,
-        "hasReconstructedNorms": true,
-        "byteLength": 1657948
+        "normalized": true,
+        "hasReconstructedNorms": false,
+        "byteLength": 1645156
       }
     }
   },
@@ -159,77 +165,77 @@
       "dim": 128
     },
     "timingsMs": {
-      "lexicalLoadMs": 7628.94,
-      "conceptBuildMs": 891.13,
-      "host113BuildMs": 383.21,
-      "staticModelLoadMs": 43.05,
-      "docsBuildMs": 224.56,
-      "encodeDocsMs": 1050.29,
-      "fxv1BuildMs": 59.84,
-      "fxv1SaveBinaryMs": 9.31,
-      "fxv1LoadBinaryMs": 9.89,
-      "totalPipelineMs": 12165.81,
-      "scanDual120P50Ms": 5.422,
-      "scanDual120P95Ms": 5.996
+      "lexicalLoadMs": 7574.13,
+      "conceptBuildMs": 698.65,
+      "host113BuildMs": 371.46,
+      "staticModelLoadMs": 42.82,
+      "docsBuildMs": 227.82,
+      "encodeDocsMs": 1061.82,
+      "fxv1BuildMs": 73.98,
+      "fxv1SaveBinaryMs": 45.2,
+      "fxv1LoadBinaryMs": 25.64,
+      "totalPipelineMs": 12009.3,
+      "scanDual120P50Ms": 5.638,
+      "scanDual120P95Ms": 6.247
     },
     "artifactsBytes": {
       "vocabMetaBytes": 1201894,
       "vocabWeightsBytes": 13976044,
       "vocabTotalBytes": 15177938,
       "vocabTotalGzBytes": 13780669,
-      "fxv1BdpmBytes": 2154960,
-      "fxv1VetBytes": 437008,
-      "fxv1TotalBytes": 2591968,
-      "fxv1TotalGzBytes": 2404403,
-      "estimatedFxv1RuntimeBytes": null,
-      "totalRuntimeAssetsBytes": 17769906,
-      "totalRuntimeAssetsGzBytes": 16185072
+      "fxv1BdpmBytes": 2155021,
+      "fxv1VetBytes": 437069,
+      "fxv1TotalBytes": 2592090,
+      "fxv1TotalGzBytes": 2404518,
+      "fxv1RuntimeByteLength": 2592090,
+      "totalRuntimeAssetsBytes": 17770028,
+      "totalRuntimeAssetsGzBytes": 16185187
     },
     "memory": {
       "afterB0": {
-        "rssMiB": 338.07,
-        "heapUsedMiB": 70.44,
-        "heapTotalMiB": 205.47,
-        "externalMiB": 12.43,
+        "rssMiB": 283.64,
+        "heapUsedMiB": 71.4,
+        "heapTotalMiB": 204.22,
+        "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 82.86,
-        "peakRssMiB": 341.17
+        "v8HeapPlusExternalNoDoubleCountMiB": 83.84,
+        "peakRssMiB": 286.54
       },
       "afterB2": {
-        "rssMiB": 350.14,
-        "heapUsedMiB": 146.93,
-        "heapTotalMiB": 277.63,
-        "externalMiB": 12.43,
+        "rssMiB": 305.83,
+        "heapUsedMiB": 99.19,
+        "heapTotalMiB": 229.13,
+        "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 159.36,
-        "peakRssMiB": 355.07
+        "v8HeapPlusExternalNoDoubleCountMiB": 111.63,
+        "peakRssMiB": 308.64
       },
       "afterHost113": {
-        "rssMiB": 365.91,
-        "heapUsedMiB": 148.12,
-        "heapTotalMiB": 279.13,
-        "externalMiB": 13.91,
-        "arrayBuffersMiB": 11.94,
-        "v8HeapPlusExternalNoDoubleCountMiB": 162.04,
-        "peakRssMiB": 371.14
+        "rssMiB": 317.23,
+        "heapUsedMiB": 100.43,
+        "heapTotalMiB": 230.54,
+        "externalMiB": 13.94,
+        "arrayBuffersMiB": 11.95,
+        "v8HeapPlusExternalNoDoubleCountMiB": 114.37,
+        "peakRssMiB": 321.51
       },
       "duringBuildBeforeRelease": {
-        "rssMiB": 418.77,
-        "heapUsedMiB": 154.56,
-        "heapTotalMiB": 285.38,
-        "externalMiB": 41.57,
-        "arrayBuffersMiB": 39.59,
-        "v8HeapPlusExternalNoDoubleCountMiB": 196.13,
-        "peakRssMiB": 425.91
+        "rssMiB": 391.43,
+        "heapUsedMiB": 105.95,
+        "heapTotalMiB": 236.79,
+        "externalMiB": 41.6,
+        "arrayBuffersMiB": 39.61,
+        "v8HeapPlusExternalNoDoubleCountMiB": 147.55,
+        "peakRssMiB": 391.6
       },
       "retainedPostGc": {
-        "rssMiB": 418.77,
-        "heapUsedMiB": 154.56,
-        "heapTotalMiB": 285.38,
-        "externalMiB": 29.79,
-        "arrayBuffersMiB": 27.82,
-        "v8HeapPlusExternalNoDoubleCountMiB": 184.35,
-        "peakRssMiB": 425.91
+        "rssMiB": 355.56,
+        "heapUsedMiB": 105.95,
+        "heapTotalMiB": 236.79,
+        "externalMiB": 29.82,
+        "arrayBuffersMiB": 27.83,
+        "v8HeapPlusExternalNoDoubleCountMiB": 135.77,
+        "peakRssMiB": 391.6
       }
     },
     "fxv1Stats": {
@@ -240,12 +246,15 @@
         "documentCount": 15845,
         "nextId": 15845,
         "corpusFingerprint": 3567599445,
+        "mappingFingerprint": 3567599445,
+        "representationVersion": "static-wp-mrl-128d-int8:v1",
+        "snapshotId": "sha256:6c2bcfa86225b8d7aad83cc4",
         "presentCount": 15845,
         "pqSubspaces": 0,
         "pqCentroidsPerSubspace": 0,
-        "normalized": false,
+        "normalized": true,
         "hasReconstructedNorms": true,
-        "byteLength": 2154960
+        "byteLength": 2155021
       },
       "vet": {
         "quantization": "int8",
@@ -254,12 +263,15 @@
         "documentCount": 3213,
         "nextId": 3213,
         "corpusFingerprint": 42236662,
+        "mappingFingerprint": 42236662,
+        "representationVersion": "static-wp-mrl-128d-int8:v1",
+        "snapshotId": "sha256:3c609d3b6b1693320c353e52",
         "presentCount": 3213,
         "pqSubspaces": 0,
         "pqCentroidsPerSubspace": 0,
-        "normalized": false,
+        "normalized": true,
         "hasReconstructedNorms": true,
-        "byteLength": 437008
+        "byteLength": 437069
       }
     }
   },
@@ -272,77 +284,77 @@
       "dim": 128
     },
     "timingsMs": {
-      "lexicalLoadMs": 7471.72,
-      "conceptBuildMs": 877.58,
-      "host113BuildMs": 367.56,
-      "staticModelLoadMs": 42.57,
-      "docsBuildMs": 234.85,
-      "encodeDocsMs": 1037.27,
-      "fxv1BuildMs": 12745.73,
-      "fxv1SaveBinaryMs": 3.98,
-      "fxv1LoadBinaryMs": 5.16,
-      "totalPipelineMs": 24123.37,
-      "scanDual120P50Ms": 1.839,
-      "scanDual120P95Ms": 2.063
+      "lexicalLoadMs": 7731.08,
+      "conceptBuildMs": 740.9,
+      "host113BuildMs": 359.6,
+      "staticModelLoadMs": 38.55,
+      "docsBuildMs": 225.31,
+      "encodeDocsMs": 1071.73,
+      "fxv1BuildMs": 13972.59,
+      "fxv1SaveBinaryMs": 0,
+      "fxv1LoadBinaryMs": 45.25,
+      "totalPipelineMs": 25525.24,
+      "scanDual120P50Ms": 1.888,
+      "scanDual120P95Ms": 2.449
     },
     "artifactsBytes": {
       "vocabMetaBytes": 1201894,
       "vocabWeightsBytes": 13976044,
       "vocabTotalBytes": 15177938,
       "vocabTotalGzBytes": 13780669,
-      "fxv1BdpmBytes": 701532,
-      "fxv1VetBytes": 246780,
-      "fxv1TotalBytes": 948312,
-      "fxv1TotalGzBytes": 862497,
-      "estimatedFxv1RuntimeBytes": null,
-      "totalRuntimeAssetsBytes": 16126250,
-      "totalRuntimeAssetsGzBytes": 14643166
+      "fxv1BdpmBytes": 701593,
+      "fxv1VetBytes": 246841,
+      "fxv1TotalBytes": 948434,
+      "fxv1TotalGzBytes": 862949,
+      "fxv1RuntimeByteLength": 948434,
+      "totalRuntimeAssetsBytes": 16126372,
+      "totalRuntimeAssetsGzBytes": 14643618
     },
     "memory": {
       "afterB0": {
-        "rssMiB": 340.25,
-        "heapUsedMiB": 70.43,
-        "heapTotalMiB": 208.22,
-        "externalMiB": 12.43,
+        "rssMiB": 282.65,
+        "heapUsedMiB": 71.4,
+        "heapTotalMiB": 204.97,
+        "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 82.86,
-        "peakRssMiB": 343.68
+        "v8HeapPlusExternalNoDoubleCountMiB": 83.84,
+        "peakRssMiB": 285.35
       },
       "afterB2": {
-        "rssMiB": 351.2,
-        "heapUsedMiB": 146.94,
-        "heapTotalMiB": 277.13,
-        "externalMiB": 12.43,
+        "rssMiB": 306.37,
+        "heapUsedMiB": 99.19,
+        "heapTotalMiB": 229.63,
+        "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 159.37,
-        "peakRssMiB": 358.03
+        "v8HeapPlusExternalNoDoubleCountMiB": 111.63,
+        "peakRssMiB": 309.61
       },
       "afterHost113": {
-        "rssMiB": 367.24,
-        "heapUsedMiB": 148.13,
-        "heapTotalMiB": 278.63,
-        "externalMiB": 13.91,
-        "arrayBuffersMiB": 11.94,
-        "v8HeapPlusExternalNoDoubleCountMiB": 162.04,
-        "peakRssMiB": 371.75
+        "rssMiB": 314.49,
+        "heapUsedMiB": 100.43,
+        "heapTotalMiB": 231.04,
+        "externalMiB": 13.94,
+        "arrayBuffersMiB": 11.95,
+        "v8HeapPlusExternalNoDoubleCountMiB": 114.37,
+        "peakRssMiB": 319.77
       },
       "duringBuildBeforeRelease": {
-        "rssMiB": 418.04,
-        "heapUsedMiB": 154.58,
-        "heapTotalMiB": 284.88,
-        "externalMiB": 38.44,
-        "arrayBuffersMiB": 36.46,
-        "v8HeapPlusExternalNoDoubleCountMiB": 193.02,
-        "peakRssMiB": 425.49
+        "rssMiB": 351.98,
+        "heapUsedMiB": 105.99,
+        "heapTotalMiB": 237.79,
+        "externalMiB": 38.46,
+        "arrayBuffersMiB": 36.48,
+        "v8HeapPlusExternalNoDoubleCountMiB": 144.45,
+        "peakRssMiB": 389.48
       },
       "retainedPostGc": {
-        "rssMiB": 418.04,
-        "heapUsedMiB": 154.58,
-        "heapTotalMiB": 284.63,
-        "externalMiB": 28.23,
-        "arrayBuffersMiB": 26.25,
-        "v8HeapPlusExternalNoDoubleCountMiB": 182.81,
-        "peakRssMiB": 425.49
+        "rssMiB": 351.98,
+        "heapUsedMiB": 105.99,
+        "heapTotalMiB": 237.79,
+        "externalMiB": 28.25,
+        "arrayBuffersMiB": 26.27,
+        "v8HeapPlusExternalNoDoubleCountMiB": 134.24,
+        "peakRssMiB": 389.48
       }
     },
     "fxv1Stats": {
@@ -353,12 +365,15 @@
         "documentCount": 15845,
         "nextId": 15845,
         "corpusFingerprint": 3567599445,
+        "mappingFingerprint": 3567599445,
+        "representationVersion": "static-wp-mrl-128d-int8:v1",
+        "snapshotId": "sha256:6c2bcfa86225b8d7aad83cc4",
         "presentCount": 15845,
         "pqSubspaces": 32,
         "pqCentroidsPerSubspace": 256,
-        "normalized": false,
+        "normalized": true,
         "hasReconstructedNorms": true,
-        "byteLength": 701532
+        "byteLength": 701593
       },
       "vet": {
         "quantization": "pq",
@@ -367,12 +382,15 @@
         "documentCount": 3213,
         "nextId": 3213,
         "corpusFingerprint": 42236662,
+        "mappingFingerprint": 42236662,
+        "representationVersion": "static-wp-mrl-128d-int8:v1",
+        "snapshotId": "sha256:3c609d3b6b1693320c353e52",
         "presentCount": 3213,
         "pqSubspaces": 32,
         "pqCentroidsPerSubspace": 256,
-        "normalized": false,
+        "normalized": true,
         "hasReconstructedNorms": true,
-        "byteLength": 246780
+        "byteLength": 246841
       }
     }
   },
@@ -385,77 +403,77 @@
       "dim": 128
     },
     "timingsMs": {
-      "lexicalLoadMs": 7590.1,
-      "conceptBuildMs": 934.82,
-      "host113BuildMs": 361.33,
-      "staticModelLoadMs": 49.53,
-      "docsBuildMs": 234.75,
-      "encodeDocsMs": 1046.11,
-      "fxv1BuildMs": 11329.84,
-      "fxv1SaveBinaryMs": 3.17,
-      "fxv1LoadBinaryMs": 3.88,
-      "totalPipelineMs": 22782.01,
-      "scanDual120P50Ms": 1.104,
-      "scanDual120P95Ms": 1.507
+      "lexicalLoadMs": 7888.81,
+      "conceptBuildMs": 708.21,
+      "host113BuildMs": 354.07,
+      "staticModelLoadMs": 37.18,
+      "docsBuildMs": 220.27,
+      "encodeDocsMs": 1102.5,
+      "fxv1BuildMs": 12520.14,
+      "fxv1SaveBinaryMs": 0,
+      "fxv1LoadBinaryMs": 44.09,
+      "totalPipelineMs": 24044.29,
+      "scanDual120P50Ms": 1.07,
+      "scanDual120P95Ms": 1.812
     },
     "artifactsBytes": {
       "vocabMetaBytes": 1201894,
       "vocabWeightsBytes": 13976044,
       "vocabTotalBytes": 15177938,
       "vocabTotalGzBytes": 13780669,
-      "fxv1BdpmBytes": 448012,
-      "fxv1VetBytes": 195372,
-      "fxv1TotalBytes": 643384,
-      "fxv1TotalGzBytes": 534934,
-      "estimatedFxv1RuntimeBytes": null,
-      "totalRuntimeAssetsBytes": 15821322,
-      "totalRuntimeAssetsGzBytes": 14315603
+      "fxv1BdpmBytes": 448073,
+      "fxv1VetBytes": 195433,
+      "fxv1TotalBytes": 643506,
+      "fxv1TotalGzBytes": 536895,
+      "fxv1RuntimeByteLength": 643506,
+      "totalRuntimeAssetsBytes": 15821444,
+      "totalRuntimeAssetsGzBytes": 14317564
     },
     "memory": {
       "afterB0": {
-        "rssMiB": 298.51,
-        "heapUsedMiB": 71.39,
-        "heapTotalMiB": 207.47,
-        "externalMiB": 12.43,
+        "rssMiB": 300.09,
+        "heapUsedMiB": 71.4,
+        "heapTotalMiB": 205.97,
+        "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 83.81,
-        "peakRssMiB": 311.99
+        "v8HeapPlusExternalNoDoubleCountMiB": 83.84,
+        "peakRssMiB": 307.33
       },
       "afterB2": {
-        "rssMiB": 357.91,
-        "heapUsedMiB": 147.88,
-        "heapTotalMiB": 278.13,
-        "externalMiB": 12.43,
+        "rssMiB": 309.64,
+        "heapUsedMiB": 99.19,
+        "heapTotalMiB": 229.63,
+        "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 160.31,
-        "peakRssMiB": 359.4
+        "v8HeapPlusExternalNoDoubleCountMiB": 111.63,
+        "peakRssMiB": 312.41
       },
       "afterHost113": {
-        "rssMiB": 370.28,
-        "heapUsedMiB": 149.08,
-        "heapTotalMiB": 279.13,
-        "externalMiB": 13.92,
-        "arrayBuffersMiB": 11.94,
-        "v8HeapPlusExternalNoDoubleCountMiB": 162.99,
-        "peakRssMiB": 374.77
+        "rssMiB": 320.22,
+        "heapUsedMiB": 100.43,
+        "heapTotalMiB": 231.04,
+        "externalMiB": 13.94,
+        "arrayBuffersMiB": 11.95,
+        "v8HeapPlusExternalNoDoubleCountMiB": 114.37,
+        "peakRssMiB": 324.83
       },
       "duringBuildBeforeRelease": {
-        "rssMiB": 417.59,
-        "heapUsedMiB": 155.53,
-        "heapTotalMiB": 285.13,
-        "externalMiB": 37.86,
-        "arrayBuffersMiB": 35.88,
-        "v8HeapPlusExternalNoDoubleCountMiB": 193.38,
-        "peakRssMiB": 427.28
+        "rssMiB": 360.77,
+        "heapUsedMiB": 106.93,
+        "heapTotalMiB": 237.79,
+        "externalMiB": 37.88,
+        "arrayBuffersMiB": 35.89,
+        "v8HeapPlusExternalNoDoubleCountMiB": 144.81,
+        "peakRssMiB": 394.98
       },
       "retainedPostGc": {
-        "rssMiB": 417.59,
-        "heapUsedMiB": 155.53,
-        "heapTotalMiB": 285.13,
-        "externalMiB": 27.94,
-        "arrayBuffersMiB": 25.96,
-        "v8HeapPlusExternalNoDoubleCountMiB": 183.46,
-        "peakRssMiB": 427.28
+        "rssMiB": 360.77,
+        "heapUsedMiB": 106.93,
+        "heapTotalMiB": 237.79,
+        "externalMiB": 27.96,
+        "arrayBuffersMiB": 25.97,
+        "v8HeapPlusExternalNoDoubleCountMiB": 134.89,
+        "peakRssMiB": 394.98
       }
     },
     "fxv1Stats": {
@@ -466,12 +484,15 @@
         "documentCount": 15845,
         "nextId": 15845,
         "corpusFingerprint": 3567599445,
+        "mappingFingerprint": 3567599445,
+        "representationVersion": "static-wp-mrl-128d-int8:v1",
+        "snapshotId": "sha256:6c2bcfa86225b8d7aad83cc4",
         "presentCount": 15845,
         "pqSubspaces": 16,
         "pqCentroidsPerSubspace": 256,
-        "normalized": false,
+        "normalized": true,
         "hasReconstructedNorms": true,
-        "byteLength": 448012
+        "byteLength": 448073
       },
       "vet": {
         "quantization": "pq",
@@ -480,12 +501,15 @@
         "documentCount": 3213,
         "nextId": 3213,
         "corpusFingerprint": 42236662,
+        "mappingFingerprint": 42236662,
+        "representationVersion": "static-wp-mrl-128d-int8:v1",
+        "snapshotId": "sha256:3c609d3b6b1693320c353e52",
         "presentCount": 3213,
         "pqSubspaces": 16,
         "pqCentroidsPerSubspace": 256,
-        "normalized": false,
+        "normalized": true,
         "hasReconstructedNorms": true,
-        "byteLength": 195372
+        "byteLength": 195433
       }
     }
   }

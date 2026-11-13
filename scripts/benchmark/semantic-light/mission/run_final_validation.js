@@ -23,6 +23,9 @@
 const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
+const crypto = require('node:crypto');
+const { execFileSync } = require('node:child_process');
+const { createRequire } = require('node:module');
 const { pathToFileURL } = require('node:url');
 const express = require('express');
 
@@ -38,7 +41,7 @@ const { executeHybridSearchPage } = require('../../../../src/services/searchOrch
 const { executeExperimentalSearchPage } = require('../../../../src/search/experimentalSearch');
 const { parseStructuredQuery } = require('../../../../src/search/structuredQueryParser');
 const { analyzeQuerySafetyAndIntent } = require('../../../../src/search/queryIntentGuard');
-const { getConceptStore } = require('../../../../src/search/conceptStore');
+const { getConceptStore, getTaxonomyVocab } = require('../../../../src/search/conceptStore');
 const { normalizeSearchText } = require('../../../../src/utils/searchRanking');
 const { parseListPaging, buildPagedResponse } = require('../../../../src/utils/corpusPaging');
 const { shapeSearchResults } = require('../../../../src/utils/searchResponseShape');
@@ -46,13 +49,44 @@ const medicamentRoutes = require('../../../../src/routes/medicaments');
 const { evaluateSystem } = require('./eval_harness');
 const { buildControlledDocuments, loadStaticWordPieceEncoder } = require('./b3_encoders');
 
-const PKG_DIR = path.join(
-  __dirname,
-  '../../../../data/search-indexes/mission-semantic/pkg-verify/package'
-);
-const PKG_CJS = path.join(PKG_DIR, 'dist/cjs/index.require.cjs');
-const PKG_ESM = path.join(PKG_DIR, 'dist/es/index.js');
-const PKG_BROWSER = path.join(PKG_DIR, 'dist/browser/index.js');
+const PKG_VERIFY_ROOT =
+  process.env.FROZENMINISEARCH_PKG_ROOT ||
+  '/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/pkg-verify';
+const PKG_DIR = path.join(PKG_VERIFY_ROOT, 'package');
+const pkgRequire = createRequire(path.join(PKG_VERIFY_ROOT, 'consumer.js'));
+const MODEL_DIR = path.join(__dirname, '../../../../data/search-indexes/mission-semantic');
+const TARBALL_PATH =
+  process.env.FROZENMINISEARCH_TGZ ||
+  '/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/yoch-frozenminisearch-1.13.0.tgz';
+const SEMANTIC_CANDIDATE_CAP = 40;
+
+function sha256File(filePath) {
+  if (!fs.existsSync(filePath)) return null;
+  return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
+}
+
+function computeCorpusSnapshotId(prefix, rows, labelField, weightPath, metaPath) {
+  const h = crypto.createHash('sha256');
+  h.update(`${prefix}:${rows.length}:`);
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    h.update(`${r.cis || r.num || ''}|${r[labelField] || ''}\n`);
+  }
+  h.update(fs.readFileSync(metaPath));
+  h.update(fs.readFileSync(weightPath));
+  return `sha256:${h.digest('hex').slice(0, 24)}`;
+}
+
+function gitInfo(repoPath) {
+  try {
+    const head = execFileSync('git', ['-C', repoPath, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+    const branch = execFileSync('git', ['-C', repoPath, 'rev-parse', '--abbrev-ref', 'HEAD'], { encoding: 'utf8' }).trim();
+    const dirty = execFileSync('git', ['-C', repoPath, 'status', '--porcelain'], { encoding: 'utf8' }).trim();
+    return { branch, head, clean: dirty.length === 0 };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
 
 const STOP_WORDS_SEMANTIC = new Set([
   'a', 'au', 'aux', 'avec', 'contre', 'd', 'dans', 'de', 'des', 'du', 'en', 'et',
@@ -118,19 +152,31 @@ function buildSemanticQueryText(rawQuery, parsed) {
 }
 
 async function runTarballCrossValidation(bdpmF32, vetF32, enc) {
-  const cjsPkg = require(PKG_CJS);
-  const esmPkg = await import(pathToFileURL(PKG_ESM).href);
-  const browserPkg = await import(pathToFileURL(PKG_BROWSER).href);
+  // Consommation via exports officiels '.', './vectors', './vectors/train' + browser
+  const cjsMain = pkgRequire('@yoch/frozenminisearch');
+  const cjsVec = pkgRequire('@yoch/frozenminisearch/vectors');
+  const cjsTrain = pkgRequire('@yoch/frozenminisearch/vectors/train');
+  const esmMain = await import(pathToFileURL(path.join(PKG_DIR, 'dist/es/index.js')).href);
+  const esmVec = await import(pathToFileURL(path.join(PKG_DIR, 'dist/es/vectors.js')).href);
+  const browserMain = await import(pathToFileURL(path.join(PKG_DIR, 'dist/browser/index.js')).href);
+  const browserVec = await import(pathToFileURL(path.join(PKG_DIR, 'dist/browser/vectors.js')).href);
   const pkgMeta = JSON.parse(fs.readFileSync(path.join(PKG_DIR, 'package.json'), 'utf8'));
   assertCondition(pkgMeta.version === '1.13.0', `Expected tarball 1.13.0, got ${pkgMeta.version}`);
 
+  // Séparation stricte des bundles principaux vs ./vectors vs ./vectors/train
+  assertCondition(cjsMain.FrozenVectorIndex === undefined, 'Main bundle CJS must not re-export FrozenVectorIndex');
+  assertCondition(esmMain.FrozenVectorIndex === undefined, 'Main bundle ESM must not re-export FrozenVectorIndex');
+  assertCondition(browserMain.FrozenVectorIndex === undefined, 'Main bundle Browser must not re-export FrozenVectorIndex');
+  assertCondition(typeof cjsVec.FrozenVectorIndex === 'function', 'Subpath ./vectors must export FrozenVectorIndex');
+  assertCondition(typeof cjsTrain.encodeDenseVectorPack === 'function', 'Subpath ./vectors/train must export encodeDenseVectorPack');
+
   const bdpmSpec = BDPM_INDEX_SPECS.specialites;
   const vetSpec = VET_INDEX_SPECS.medicaments;
-  const bdpmCjs = buildHostFromRows(cjsPkg.FrozenMiniSearch, bdpmState.corpus.specialites, bdpmSpec);
-  const vetCjs = buildHostFromRows(cjsPkg.FrozenMiniSearch, vetState.corpus.medicaments, vetSpec);
-  const bdpmEsm = buildHostFromRows(esmPkg.FrozenMiniSearch, bdpmState.corpus.specialites, bdpmSpec);
-  const vetEsm = buildHostFromRows(esmPkg.FrozenMiniSearch, vetState.corpus.medicaments, vetSpec);
-  const bdpmBrowser = buildHostFromRows(browserPkg.FrozenMiniSearch, bdpmState.corpus.specialites, bdpmSpec);
+  const bdpmCjs = buildHostFromRows(cjsMain.FrozenMiniSearch, bdpmState.corpus.specialites, bdpmSpec);
+  const vetCjs = buildHostFromRows(cjsMain.FrozenMiniSearch, vetState.corpus.medicaments, vetSpec);
+  const bdpmEsm = buildHostFromRows(esmMain.FrozenMiniSearch, bdpmState.corpus.specialites, bdpmSpec);
+  const vetEsm = buildHostFromRows(esmMain.FrozenMiniSearch, vetState.corpus.medicaments, vetSpec);
+  const bdpmBrowser = buildHostFromRows(browserMain.FrozenMiniSearch, bdpmState.corpus.specialites, bdpmSpec);
 
   // 1. Parité lexicale 100% entre l'index live 1.12.3 et les 3 bundles 1.13.0 (CJS/ESM/Browser)
   const liveBdpm = bdpmState.searchIndexes.specialites;
@@ -159,43 +205,68 @@ async function runTarballCrossValidation(bdpmF32, vetF32, enc) {
   }
   assertCondition(bdpmMismatches === 0 && vetMismatches === 0, 'Lexical parity mismatch 1.12.3 vs 1.13.0');
 
-  // 2. Construction FrozenVectorIndex (Int8, Float32, PQ32, PQ16) + invariants corpusFingerprint & FXV1
-  const bdpmInt8 = cjsPkg.FrozenVectorIndex.fromDenseFloat32(bdpmCjs, bdpmF32, {
-    quantization: 'int8', dim: 128, metric: 'cosine', normalized: true
+  // 2. Identités FXV1 v2 (representationVersion + snapshotId déterministe)
+  const metaPath = path.join(MODEL_DIR, 'static_mrl_128d.meta.json');
+  const int8WeightPath = path.join(MODEL_DIR, 'static_mrl_128d_int8.bin');
+  const bdpmExpected = {
+    representationVersion: 'static-wp-mrl-128d-int8:v1',
+    snapshotId: computeCorpusSnapshotId('bdpm', bdpmState.corpus.specialites, 'denomination', int8WeightPath, metaPath)
+  };
+  const vetExpected = {
+    representationVersion: 'static-wp-mrl-128d-int8:v1',
+    snapshotId: computeCorpusSnapshotId('anmv', vetState.corpus.medicaments, 'nom', int8WeightPath, metaPath)
+  };
+
+  // Construction Int8 via ./vectors et PQ32 / PQ16 via ./vectors/train
+  const bdpmInt8 = cjsVec.FrozenVectorIndex.fromDenseFloat32(bdpmCjs, bdpmF32, {
+    quantization: 'int8', dim: 128, metric: 'cosine', normalize: true, ...bdpmExpected
   });
-  const vetInt8 = cjsPkg.FrozenVectorIndex.fromDenseFloat32(vetCjs, vetF32, {
-    quantization: 'int8', dim: 128, metric: 'cosine', normalized: true
+  const vetInt8 = cjsVec.FrozenVectorIndex.fromDenseFloat32(vetCjs, vetF32, {
+    quantization: 'int8', dim: 128, metric: 'cosine', normalize: true, ...vetExpected
   });
-  const bdpmPq32 = cjsPkg.FrozenVectorIndex.fromDenseFloat32(bdpmCjs, bdpmF32, {
-    quantization: 'pq', dim: 128, metric: 'cosine', normalized: true,
-    pqSubspaces: 32, pqCentroidsPerSubspace: 256, pqMaxIterations: 15
+  assertCondition(bdpmInt8.stats().normalized === true && vetInt8.stats().normalized === true, 'normalize: true must report stats().normalized=true');
+
+  const pq32BdpmBytes = cjsTrain.encodeDenseVectorPack(bdpmCjs, bdpmF32, {
+    quantization: 'pq', dim: 128, metric: 'cosine', normalize: true, pqSubspaces: 32, pqIterations: 15, ...bdpmExpected
   });
-  const vetPq32 = cjsPkg.FrozenVectorIndex.fromDenseFloat32(vetCjs, vetF32, {
-    quantization: 'pq', dim: 128, metric: 'cosine', normalized: true,
-    pqSubspaces: 32, pqCentroidsPerSubspace: 256, pqMaxIterations: 15
+  const pq32VetBytes = cjsTrain.encodeDenseVectorPack(vetCjs, vetF32, {
+    quantization: 'pq', dim: 128, metric: 'cosine', normalize: true, pqSubspaces: 32, pqIterations: 15, ...vetExpected
   });
-  const bdpmPq16 = cjsPkg.FrozenVectorIndex.fromDenseFloat32(bdpmCjs, bdpmF32, {
-    quantization: 'pq', dim: 128, metric: 'cosine', normalized: true,
-    pqSubspaces: 16, pqCentroidsPerSubspace: 256, pqMaxIterations: 15
+  const pq16BdpmBytes = cjsTrain.encodeDenseVectorPack(bdpmCjs, bdpmF32, {
+    quantization: 'pq', dim: 128, metric: 'cosine', normalize: true, pqSubspaces: 16, pqIterations: 15, ...bdpmExpected
   });
-  const vetPq16 = cjsPkg.FrozenVectorIndex.fromDenseFloat32(vetCjs, vetF32, {
-    quantization: 'pq', dim: 128, metric: 'cosine', normalized: true,
-    pqSubspaces: 16, pqCentroidsPerSubspace: 256, pqMaxIterations: 15
+  const pq16VetBytes = cjsTrain.encodeDenseVectorPack(vetCjs, vetF32, {
+    quantization: 'pq', dim: 128, metric: 'cosine', normalize: true, pqSubspaces: 16, pqIterations: 15, ...vetExpected
   });
 
-  // Compatibilité fingerprint & sensibilité à l'ordre
-  bdpmInt8.assertCompatibleWith(bdpmEsm);
-  assertThrows(() => bdpmInt8.assertCompatibleWith(vetCjs), 'Must reject mismatching host (BDPM vs ANMV)');
+  const tLoadInt80 = process.hrtime.bigint();
+  const binCjs = bdpmInt8.saveBinary();
+  const loadedEsm = esmVec.FrozenVectorIndex.loadBinary(makeUnalignedView(binCjs, 3), bdpmEsm, bdpmExpected);
+  const loadInt8EsmMs = round(Number(process.hrtime.bigint() - tLoadInt80) / 1e6, 2);
+
+  const tLoadPq320 = process.hrtime.bigint();
+  const bdpmPq32 = cjsVec.FrozenVectorIndex.loadBinary(pq32BdpmBytes, bdpmCjs, bdpmExpected);
+  const loadPq32BdpmMs = round(Number(process.hrtime.bigint() - tLoadPq320) / 1e6, 2);
+  const vetPq32 = cjsVec.FrozenVectorIndex.loadBinary(pq32VetBytes, vetCjs, vetExpected);
+
+  const tLoadPq160 = process.hrtime.bigint();
+  const bdpmPq16 = cjsVec.FrozenVectorIndex.loadBinary(pq16BdpmBytes, bdpmCjs, bdpmExpected);
+  const loadPq16BdpmMs = round(Number(process.hrtime.bigint() - tLoadPq160) / 1e6, 2);
+  const vetPq16 = cjsVec.FrozenVectorIndex.loadBinary(pq16VetBytes, vetCjs, vetExpected);
+
+  // Compatibilité fingerprint, snapshotId, representationVersion & sensibilité à l'ordre
+  bdpmInt8.assertCompatibleWith(bdpmEsm, bdpmExpected);
+  assertThrows(() => bdpmInt8.assertCompatibleWith(bdpmEsm, { ...bdpmExpected, representationVersion: 'wrong-ver' }), 'Must reject representationVersion mismatch');
+  assertThrows(() => bdpmInt8.assertCompatibleWith(bdpmEsm, { ...bdpmExpected, snapshotId: 'sha256:0000' }), 'Must reject snapshotId mismatch');
+  assertThrows(() => bdpmInt8.assertCompatibleWith(vetCjs, bdpmExpected), 'Must reject mismatching host (BDPM vs ANMV)');
   const swappedRows = [...bdpmState.corpus.specialites];
   [swappedRows[0], swappedRows[1]] = [swappedRows[1], swappedRows[0]];
-  const bdpmSwapped = buildHostFromRows(cjsPkg.FrozenMiniSearch, swappedRows.slice(0, 50), bdpmSpec);
-  assertThrows(() => bdpmInt8.assertCompatibleWith(bdpmSwapped), 'Must reject swapped/partial host');
+  const bdpmSwapped = buildHostFromRows(cjsMain.FrozenMiniSearch, swappedRows.slice(0, 50), bdpmSpec);
+  assertThrows(() => bdpmInt8.assertCompatibleWith(bdpmSwapped, bdpmExpected), 'Must reject swapped/partial host');
 
-  // Round-trip CJS -> ESM (non aligné) -> Browser (non aligné) -> CJS
-  const binCjs = bdpmInt8.saveBinary();
-  const loadedEsm = esmPkg.FrozenVectorIndex.loadBinary(makeUnalignedView(binCjs, 3), bdpmEsm);
+  // Round-trip CJS -> ESM (non aligné) -> Browser (non aligné)
   const binEsm = loadedEsm.saveBinary();
-  const loadedBrowser = browserPkg.FrozenVectorIndex.loadBinary(makeUnalignedView(binEsm, 5), bdpmBrowser);
+  const loadedBrowser = browserVec.FrozenVectorIndex.loadBinary(makeUnalignedView(binEsm, 5), bdpmBrowser, bdpmExpected);
   const qVec = enc.encodeQuery('ibuprofene comprime').vec;
   const topCjs = bdpmInt8.topK(qVec, { k: 10 });
   const topEsm = loadedEsm.topK(qVec, { k: 10 });
@@ -208,16 +279,24 @@ async function runTarballCrossValidation(bdpmF32, vetF32, enc) {
     'CJS / ESM / Browser unaligned FXV1 round-trip topK must match bit-for-bit'
   );
 
-  // Corruption CRC & trailing bytes
+  // Rejet expected mismatch au loadBinary + corruption CRC & trailing bytes
+  assertThrows(
+    () => cjsVec.FrozenVectorIndex.loadBinary(binCjs, bdpmCjs, { ...bdpmExpected, representationVersion: 'wrong' }),
+    'loadBinary must reject representationVersion mismatch'
+  );
+  assertThrows(
+    () => cjsVec.FrozenVectorIndex.loadBinary(binCjs, bdpmCjs, { ...bdpmExpected, snapshotId: 'sha256:stale' }),
+    'loadBinary must reject snapshotId mismatch'
+  );
   const corruptHeader = new Uint8Array(binCjs);
   corruptHeader[16] ^= 0x01;
-  assertThrows(() => cjsPkg.FrozenVectorIndex.loadBinary(corruptHeader, bdpmCjs), 'Must reject header CRC flip');
+  assertThrows(() => cjsVec.FrozenVectorIndex.loadBinary(corruptHeader, bdpmCjs, bdpmExpected), 'Must reject header CRC flip');
   const corruptBody = new Uint8Array(binCjs);
   corruptBody[corruptBody.length - 10] ^= 0x80;
-  assertThrows(() => cjsPkg.FrozenVectorIndex.loadBinary(corruptBody, bdpmCjs), 'Must reject payload CRC flip');
+  assertThrows(() => cjsVec.FrozenVectorIndex.loadBinary(corruptBody, bdpmCjs, bdpmExpected), 'Must reject payload CRC flip');
   const trailing = new Uint8Array(binCjs.length + 1);
   trailing.set(binCjs);
-  assertThrows(() => cjsPkg.FrozenVectorIndex.loadBinary(trailing, bdpmCjs), 'Must reject trailing byte');
+  assertThrows(() => cjsVec.FrozenVectorIndex.loadBinary(trailing, bdpmCjs, bdpmExpected), 'Must reject trailing byte');
 
   // Pre-k filter au-delà du rang 85 sur BDPM live (N = 15 845)
   const top100 = bdpmInt8.topK(qVec, { k: 100 });
@@ -232,12 +311,15 @@ async function runTarballCrossValidation(bdpmF32, vetF32, enc) {
 
   return {
     version: pkgMeta.version,
+    subpathSplitVerified: true,
     lexicalParity: { bdpmProbes: bdpmProbes.length, bdpmMismatches, vetProbes: vetProbes.length, vetMismatches },
-    fxv1FingerprintBdpm: bdpmInt8.corpusFingerprint,
-    fxv1FingerprintVet: vetInt8.corpusFingerprint,
+    fxv1BdpmMeta: { ...bdpmExpected, mappingFingerprint: bdpmInt8.mappingFingerprint, byteLength: bdpmInt8.byteLength },
+    fxv1VetMeta: { ...vetExpected, mappingFingerprint: vetInt8.mappingFingerprint, byteLength: vetInt8.byteLength },
+    loadBinaryBdpmMs: { int8Esm: loadInt8EsmMs, pq32: loadPq32BdpmMs, pq16: loadPq16BdpmMs },
     roundTripCjsEsmBrowserIdentical: true,
-    corruptionChecksPassed: 3,
+    corruptionAndMetadataChecksPassed: 8,
     preKFilterBeyondRank85Passed: true,
+    pkgBindings: { cjsMain, cjsVec },
     indexes: {
       int8: { bdpm: bdpmInt8, vet: vetInt8 },
       pq32: { bdpm: bdpmPq32, vet: vetPq32 },
@@ -270,7 +352,15 @@ function hydrateSemanticHit(source, key, score) {
   };
 }
 
-function createHybridSearchFn({ bdpmVec, vetVec, enc, minScore = 0.55, onTrace = null }) {
+function createHybridSearchFn({
+  bdpmVec,
+  vetVec,
+  enc,
+  minScore = 0.55,
+  candidateCap = SEMANTIC_CANDIDATE_CAP,
+  isAdmissible = null,
+  onTrace = null
+}) {
   return function hybridSearch(tcOrQ, arg2 = 1, arg3 = 10, arg4 = {}) {
     const isCaseObj = typeof tcOrQ === 'object' && tcOrQ !== null;
     const q = isCaseObj ? tcOrQ.q : tcOrQ;
@@ -300,9 +390,9 @@ function createHybridSearchFn({ bdpmVec, vetVec, enc, minScore = 0.55, onTrace =
       return b2;
     }
 
-    const store = getConceptStore();
-    const parsed = parseStructuredQuery(q, explicitCriteria, store.taxonomy, { useAliases: true });
-    const safety = analyzeQuerySafetyAndIntent(q, parsed);
+    const taxonomy = getTaxonomyVocab();
+    const parsed = parseStructuredQuery(q, explicitCriteria, taxonomy, { useAliases: true });
+    const safety = analyzeQuerySafetyAndIntent(q, parsed, explicitCriteria);
     if (!safety.supported) {
       if (onTrace) onTrace('abstained', q, b2);
       return b2;
@@ -326,42 +416,93 @@ function createHybridSearchFn({ bdpmVec, vetVec, enc, minScore = 0.55, onTrace =
       return b2;
     }
 
-    const srcNorm = (source || 'auto').toLowerCase();
+    const rawSrc = (source || 'auto').toLowerCase();
+    const srcNorm = ['auto', 'human', 'veterinary', 'mixed'].includes(rawSrc) ? rawSrc : 'auto';
     const speciesHintVet = parsed.extracted.species.length > 0 && srcNorm === 'auto';
-    const wantBdpm = srcNorm === 'human' || srcNorm === 'mixed' || (srcNorm === 'auto' && !speciesHintVet);
-    const wantVet = srcNorm === 'veterinary' || srcNorm === 'mixed' || srcNorm === 'auto';
+    const store = parsed.extracted.species.length > 0 ? getConceptStore() : null;
+
+    const makeFilter = (targetSource) => {
+      if (!isAdmissible && !(targetSource === 'vet' && parsed.extracted.species.length > 0)) {
+        return undefined;
+      }
+      return (_id, shortId) => {
+        const rec = targetSource === 'bdpm'
+          ? bdpmState.corpus.specialites[shortId]
+          : vetState.corpus.medicaments[shortId];
+        if (!rec) return false;
+        if (targetSource === 'vet' && parsed.extracted.species.length > 0 && store) {
+          const vRec = store.vetByNum.get(rec.num);
+          if (!vRec || !parsed.extracted.species.every((sp) => vRec.speciesTokens.has(sp))) {
+            return false;
+          }
+        }
+        if (isAdmissible && !isAdmissible(targetSource, rec, shortId)) {
+          return false;
+        }
+        return true;
+      };
+    };
 
     const queried = [];
     const withResults = [];
     const candidates = [];
     const seenKeys = new Set();
+    let anyTruncated = false;
 
-    if (wantVet) {
-      queried.push('anmv');
-      const vetHits = vetVec.topK(qVec, { k: 40, minScore });
-      if (vetHits.length > 0) withResults.push('anmv');
-      for (const h of vetHits) {
-        const rec = vetState.corpus.medicaments[h.id];
+    const collectFromIndex = (targetSource, vecIndex, refLabel) => {
+      if (!vecIndex) return 0;
+      queried.push(refLabel);
+      const hits = vecIndex.topK(qVec, {
+        k: candidateCap + 1,
+        minScore,
+        filter: makeFilter(targetSource)
+      });
+      if (hits.length > candidateCap) anyTruncated = true;
+      const capped = hits.length > candidateCap ? hits.slice(0, candidateCap) : hits;
+      if (capped.length > 0) withResults.push(refLabel);
+      let added = 0;
+      for (const h of capped) {
+        const rec = targetSource === 'bdpm'
+          ? bdpmState.corpus.specialites[h.id]
+          : vetState.corpus.medicaments[h.id];
         if (!rec) continue;
-        const dk = `vet:${rec.num}`;
+        const key = targetSource === 'bdpm' ? rec.cis : rec.num;
+        const dk = `${targetSource}:${key}`;
         if (seenKeys.has(dk)) continue;
         seenKeys.add(dk);
-        candidates.push({ source: 'vet', key: rec.num, score: h.score, label: rec.nom || rec.num });
+        candidates.push({
+          source: targetSource,
+          key,
+          score: h.score,
+          label: (targetSource === 'bdpm' ? rec.denomination : rec.nom) || key
+        });
+        added++;
       }
-    }
+      return added;
+    };
 
-    const vetHasHits = candidates.length > 0;
-    if (wantBdpm && !(speciesHintVet && vetHasHits)) {
-      queried.push('bdpm');
-      const bdpmHits = bdpmVec.topK(qVec, { k: 40, minScore });
-      if (bdpmHits.length > 0) withResults.push('bdpm');
-      for (const h of bdpmHits) {
-        const rec = bdpmState.corpus.specialites[h.id];
-        if (!rec) continue;
-        const dk = `bdpm:${rec.cis}`;
-        if (seenKeys.has(dk)) continue;
-        seenKeys.add(dk);
-        candidates.push({ source: 'bdpm', key: rec.cis, score: h.score, label: rec.denomination || rec.cis });
+    let sourcePolicy = 'human_only';
+    if (srcNorm === 'human') {
+      sourcePolicy = 'human_only';
+      collectFromIndex('bdpm', bdpmVec, 'bdpm');
+    } else if (srcNorm === 'veterinary') {
+      sourcePolicy = 'veterinary_only';
+      collectFromIndex('vet', vetVec, 'anmv');
+    } else if (srcNorm === 'mixed') {
+      sourcePolicy = 'mixed_both';
+      collectFromIndex('bdpm', bdpmVec, 'bdpm');
+      collectFromIndex('vet', vetVec, 'anmv');
+    } else if (speciesHintVet) {
+      sourcePolicy = 'auto_vet_species_priority';
+      const vetAdded = collectFromIndex('vet', vetVec, 'anmv');
+      if (vetAdded === 0) {
+        collectFromIndex('bdpm', bdpmVec, 'bdpm');
+      }
+    } else {
+      sourcePolicy = 'auto_human_then_vet';
+      const bdpmAdded = collectFromIndex('bdpm', bdpmVec, 'bdpm');
+      if (bdpmAdded === 0) {
+        collectFromIndex('vet', vetVec, 'anmv');
       }
     }
 
@@ -384,11 +525,128 @@ function createHybridSearchFn({ bdpmVec, vetVec, enc, minScore = 0.55, onTrace =
         referentiels: { queried, with_results: withResults },
         semantic_fallback_used: true,
         semantic_min_score: minScore,
-        top_cosine: round(candidates[0].score, 4)
+        top_cosine: round(candidates[0].score, 4),
+        semantic_fallback: {
+          bounded: true,
+          candidate_cap: candidateCap,
+          returned_pool_count: candidates.length,
+          truncated: anyTruncated,
+          total_is_lower_bound: anyTruncated,
+          total_semantics: anyTruncated ? 'bounded_lower_bound' : 'exhaustive_above_min_score',
+          page_out_of_bounded_window: anyTruncated && offset >= candidateCap,
+          source_policy: sourcePolicy
+        }
       }
     };
     if (onTrace) onTrace('semantic_fallback_hit', q, out);
     return out;
+  };
+}
+
+function runFallbackContractTests({ tarballCheck, enc, minScore }) {
+  const { bdpm: bdpmVec, vet: vetVec } = tarballCheck.indexes.int8;
+  const { cjsMain, cjsVec } = tarballCheck.pkgBindings;
+  const qProbe = 'ibuprofene comprime a avaler';
+  const parsedProbe = parseStructuredQuery(qProbe, {}, getTaxonomyVocab(), { useAliases: true });
+  const qVec = enc.encodeQuery(buildSemanticQueryText(qProbe, parsedProbe)).vec;
+  const rawPool = bdpmVec.topK(qVec, { k: 80, minScore });
+  assertCondition(rawPool.length > 40, `Need >40 docs >=${minScore} on BDPM for bounded cap test, got ${rawPool.length}`);
+
+  const fnBounded = createHybridSearchFn({ bdpmVec, vetVec, enc, minScore, candidateCap: 40 });
+  const p1 = fnBounded({ q: qProbe, source: 'human' }, 1, 10);
+  const p4 = fnBounded({ q: qProbe, source: 'human' }, 4, 10);
+  const p5 = fnBounded({ q: qProbe, source: 'human' }, 5, 10);
+  assertCondition(p1.search.semantic_fallback_used === true, 'Expected semantic fallback trigger');
+  assertCondition(p1.total === 40 && p1.results.length === 10, 'Page 1 bounded pool must expose cap 40 and 10 results');
+  assertCondition(p1.search.semantic_fallback.truncated === true && p1.search.semantic_fallback.total_is_lower_bound === true, 'Must signal truncated lower bound when >40 admissible exist');
+  assertCondition(p1.search.semantic_fallback.total_semantics === 'bounded_lower_bound', 'Must mark bounded_lower_bound');
+  assertCondition(p4.results.length === 10 && new Set([...p1.results, ...p4.results].map((r) => r.cis)).size === 20, 'Pages 1 and 4 must not collide');
+  assertCondition(p5.results.length === 0 && p5.search.semantic_fallback.page_out_of_bounded_window === true, 'Deep page >=40 must stay empty and expose page_out_of_bounded_window');
+
+  // Filtre pre-k sur BDPM réel excluant le top 35 : récupère 10 docs admissibles au-delà du rang 35
+  const excludedLiveIds = new Set(rawPool.slice(0, 35).map((h) => h.id));
+  const fnLiveFiltered = createHybridSearchFn({
+    bdpmVec,
+    vetVec,
+    enc,
+    minScore,
+    candidateCap: 40,
+    isAdmissible: (source, _rec, shortId) => !(source === 'bdpm' && excludedLiveIds.has(shortId))
+  });
+  const liveFilteredRes = fnLiveFiltered({ q: qProbe, source: 'human' }, 1, 10);
+  assertCondition(liveFilteredRes.results.length === 10, 'Pre-k exclusion of top 35 on BDPM must yield 10 admissible docs');
+  assertCondition(liveFilteredRes.results.every((r) => {
+    const shortIdx = bdpmState.corpus.specialites.findIndex((s) => s.cis === r.cis);
+    return !excludedLiveIds.has(shortIdx);
+  }), 'Pre-k exclusion on BDPM must never leak excluded docs');
+
+  // Corpus synthétique contrôlé (75 docs dont 60 admissibles >= minScore) : test >40 admissibles, pages profondes & exclusion top-45
+  const dim = 8;
+  const synDocs = Array.from({ length: 75 }, (_, i) => ({ id: i, text: `synthetique_${i}` }));
+  const synHost = cjsMain.FrozenMiniSearch.fromDocuments(synDocs, { fields: ['text'] });
+  const synDense = new Float32Array(75 * dim);
+  for (let i = 0; i < 75; i++) {
+    // Vecteurs unitaires de similarité strictement décroissante avec [1, 0, ...]
+    const cos = i < 65 ? 0.99 - i * 0.005 : 0.2;
+    const sin = Math.sqrt(Math.max(0, 1 - cos * cos));
+    synDense[i * dim] = cos;
+    synDense[i * dim + 1] = sin;
+  }
+  const synVec = cjsVec.FrozenVectorIndex.fromDenseFloat32(synHost, synDense, {
+    quantization: 'float32',
+    dim,
+    metric: 'cosine',
+    normalize: true,
+    representationVersion: 'syn-test:v1',
+    snapshotId: 'sha256:syn75'
+  });
+  const synQuery = new Float32Array([1, 0, 0, 0, 0, 0, 0, 0]);
+  const synInadmissible = new Set([60, 61, 62, 63, 64]); // laissent exactement 60 admissibles (>=0.55)
+  const synTopCap = synVec.topK(synQuery, {
+    k: 41,
+    minScore,
+    filter: (id) => !synInadmissible.has(id)
+  });
+  assertCondition(synTopCap.length === 41, `Synthetic >40 contract expected 41 hits (cap+1), got ${synTopCap.length}`);
+  const synExcluded45 = new Set(Array.from({ length: 45 }, (_, i) => i));
+  const synNext10 = synVec.topK(synQuery, {
+    k: 10,
+    minScore,
+    filter: (id) => !synInadmissible.has(id) && !synExcluded45.has(id)
+  });
+  assertCondition(
+    JSON.stringify(synNext10.map((h) => h.id)) === JSON.stringify([45, 46, 47, 48, 49, 50, 51, 52, 53, 54]),
+    'Synthetic pre-k filter excluding top 45 (>40) must recover exact ranks 45..54'
+  );
+  const synAll60 = synVec.topK(synQuery, {
+    k: 70,
+    minScore,
+    filter: (id) => !synInadmissible.has(id)
+  });
+  assertCondition(synAll60.length === 60 && synAll60.slice(40, 50).length === 10, 'Synthetic exhaustive >= minScore must contain all 60 admissible docs across deep pages');
+
+  // Politique de source
+  const vetRes = fnBounded({ q: 'medicament metacam chien', source: 'veterinary' }, 1, 10);
+  assertCondition(vetRes.results.every((r) => r.type === 'medicament_veterinaire') && vetRes.search.referentiels.queried.join(',') === 'anmv', 'veterinary policy must query ANMV only');
+  const mixRes = fnBounded({ q: qProbe, source: 'mixed' }, 1, 10);
+  assertCondition(mixRes.search.semantic_fallback.source_policy === 'mixed_both', 'mixed policy expected');
+
+  // Aucun repli sur code inexistant / garde-fou RCP / critere negatifs explicites
+  const invCode = fnBounded({ q: '99999999', source: 'auto' }, 1, 10);
+  const rcGuard = fnBounded({ q: 'ibuprofene compatible grossesse', source: 'auto' }, 1, 10);
+  const negCrit = fnBounded({ q: 'amoxicilline', source: 'auto' }, 1, 10, { voie: 'non orale' });
+  assertCondition(invCode.total === 0 && !invCode.search.semantic_fallback_used, 'Invalid exact code must not trigger fallback');
+  assertCondition(rcGuard.total === 0 && rcGuard.search.abstained && !rcGuard.search.semantic_fallback_used, 'Clinical guard must abstain without fallback');
+  assertCondition(negCrit.total === 0 && negCrit.search.abstained && !negCrit.search.semantic_fallback_used, 'Negative explicit criterion must abstain without fallback');
+
+  return {
+    liveBdpmAdmissiblePoolCount: rawPool.length,
+    boundedCap40Verified: true,
+    deepPage5EmptyAndFlagged: true,
+    preKExcludeTop35BdpmRecovered10: true,
+    synthetic75PreKExcludeTop45Recovered10: true,
+    sourcePolicyVerified: true,
+    guardAndInvalidCodeNoFallback: true
   };
 }
 
@@ -539,15 +797,10 @@ async function main() {
 
   console.log('=== 1. TARBALL @yoch/frozenminisearch@1.13.0 CROSS-VALIDATION ===');
   const tarballCheck = await runTarballCrossValidation(bdpmF32, vetF32, enc);
-  console.log(JSON.stringify({
-    version: tarballCheck.version,
-    lexicalParity: tarballCheck.lexicalParity,
-    fxv1FingerprintBdpm: tarballCheck.fxv1FingerprintBdpm,
-    fxv1FingerprintVet: tarballCheck.fxv1FingerprintVet,
-    roundTripCjsEsmBrowserIdentical: tarballCheck.roundTripCjsEsmBrowserIdentical,
-    corruptionChecksPassed: tarballCheck.corruptionChecksPassed,
-    preKFilterBeyondRank85Passed: tarballCheck.preKFilterBeyondRank85Passed
-  }, null, 2));
+  const { indexes, pkgBindings, ...tarballSummary } = tarballCheck;
+  void indexes;
+  void pkgBindings;
+  console.log(JSON.stringify(tarballSummary, null, 2));
 
   const evalV3 = JSON.parse(fs.readFileSync(path.join(__dirname, 'eval_suite_v3.json'), 'utf8'));
   const evalRes = JSON.parse(fs.readFileSync(path.join(__dirname, 'eval_residual_v1.json'), 'utf8'));
@@ -708,18 +961,92 @@ async function main() {
     devHttpQueries
   );
 
-  const report = {
+  const fallbackContractChecks = runFallbackContractTests({
+    tarballCheck,
+    enc,
+    minScore: FROZEN_MIN_SCORE
+  });
+
+  const deltaMetrics = (a, b) => ({
+    deltaIdentityTop1: round(a.identityTop1 - b.identityTop1, 4),
+    deltaVariantTop1: round(a.variantTop1 - b.variantTop1, 4),
+    deltaHit5Var: round(a.hit5Var - b.hit5Var, 4),
+    deltaMrr10: round(a.mrr10 - b.mrr10, 4),
+    deltaNdcg10: round(a.ndcg10 - b.ndcg10, 4),
+    deltaEmptyRate: round(a.emptyRate - b.emptyRate, 4),
+    deltaOosNonEmptyRate: round(a.oosNonEmptyRate - b.oosNonEmptyRate, 4)
+  });
+
+  const marginalFallbackDelta = {
+    v3_heldout_hybridInt8_minus_B2: deltaMetrics(
+      results.v3.heldout.Hybrid_Int8_Tarball_055.all.summary,
+      results.v3.heldout.B2_concepts.all.summary
+    ),
+    residual_dev_hybridInt8_minus_B2: deltaMetrics(
+      results.residual.dev.Hybrid_Int8_Tarball_055.summary,
+      results.residual.dev.B2_concepts.summary
+    ),
+    residual_heldout_hybridInt8_minus_B2: deltaMetrics(
+      results.residual.heldout.Hybrid_Int8_Tarball_055.summary,
+      results.residual.heldout.B2_concepts.summary
+    )
+  };
+
+  const repoRoot = path.resolve(__dirname, '../../../..');
+  const minisearchRepoPath =
+    process.env.FROZENMINISEARCH_REPO_DIR ||
+    path.resolve(repoRoot, '../../../minisearch/.worktrees/semantic-aux');
+  const manifest = {
     generatedAt: new Date().toISOString(),
-    frozenMinScore: FROZEN_MIN_SCORE,
-    tarballCheck: {
-      version: tarballCheck.version,
-      lexicalParity: tarballCheck.lexicalParity,
-      fxv1FingerprintBdpm: tarballCheck.fxv1FingerprintBdpm,
-      fxv1FingerprintVet: tarballCheck.fxv1FingerprintVet,
-      roundTripCjsEsmBrowserIdentical: tarballCheck.roundTripCjsEsmBrowserIdentical,
-      corruptionChecksPassed: tarballCheck.corruptionChecksPassed,
-      preKFilterBeyondRank85Passed: tarballCheck.preKFilterBeyondRank85Passed
+    repos: {
+      pharmaWorktree: {
+        path: repoRoot,
+        ...gitInfo(repoRoot)
+      },
+      frozenminisearchWorktree: {
+        path: fs.existsSync(minisearchRepoPath) ? minisearchRepoPath : null,
+        ...gitInfo(minisearchRepoPath)
+      }
     },
+    packageArtifact: {
+      name: '@yoch/frozenminisearch',
+      version: tarballCheck.version,
+      tarballPath: fs.existsSync(TARBALL_PATH) ? TARBALL_PATH : null,
+      tarballSha256: sha256File(TARBALL_PATH),
+      unpackedPkgDir: PKG_DIR
+    },
+    runtimePaths: {
+      dataDir: process.env.DATA_DIR || path.join(repoRoot, 'data'),
+      modelDir: MODEL_DIR
+    },
+    dataAndModelRevisions: {
+      corpusMetadata: getMetadata(),
+      bdpmCount: bdpmState.corpus.specialites.length,
+      vetCount: vetState.corpus.medicaments.length,
+      bdpmSnapshotId: tarballSummary.fxv1BdpmMeta.snapshotId,
+      vetSnapshotId: tarballSummary.fxv1VetMeta.snapshotId,
+      modelMetaSha256: sha256File(path.join(MODEL_DIR, 'static_mrl_128d.meta.json')),
+      modelInt8Sha256: sha256File(path.join(MODEL_DIR, 'static_mrl_128d_int8.bin'))
+    },
+    testSuitesSha256: {
+      eval_suite_v3: sha256File(path.join(__dirname, 'eval_suite_v3.json')),
+      eval_residual_v1: sha256File(path.join(__dirname, 'eval_residual_v1.json')),
+      experimentalSearch_test: sha256File(path.join(repoRoot, 'tests/experimentalSearch.test.js'))
+    }
+  };
+
+  fs.writeFileSync(
+    path.join(__dirname, 'reproducibility_manifest.json'),
+    `${JSON.stringify(manifest, null, 2)}\n`
+  );
+
+  const report = {
+    generatedAt: manifest.generatedAt,
+    frozenMinScore: FROZEN_MIN_SCORE,
+    tarballCheck: tarballSummary,
+    fallbackContractChecks,
+    marginalFallbackDelta,
+    manifestSummary: manifest,
     a1SafetyChecks: {
       weightParsedDosage: weightParsed.effectiveCriteria.dosage,
       weightSafety,
@@ -748,8 +1075,8 @@ async function main() {
   console.log(JSON.stringify(compact('residual', 'dev'), null, 2));
   console.log('\n--- RESIDUAL HELDOUT (FROZEN) ---');
   console.log(JSON.stringify(compact('residual', 'heldout'), null, 2));
-  console.log('\n--- TRACE PATHS & HTTP E2E ---');
-  console.log(JSON.stringify({ traceDev, traceHeldout, pagInvariance, httpE2E }, null, 2));
+  console.log('\n--- MARGINAL FALLBACK DELTA & CONTRACT CHECKS ---');
+  console.log(JSON.stringify({ marginalFallbackDelta, fallbackContractChecks, traceDev, traceHeldout, pagInvariance, httpE2E }, null, 2));
 }
 
 main().catch((err) => {

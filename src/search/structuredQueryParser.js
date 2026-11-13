@@ -211,7 +211,17 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
         intents: [],
         altFormeTokens: []
       },
-      effectiveCriteria: explicit,
+      effectiveCriteria: {
+        ...explicit,
+        qualifiers: [],
+        species: [],
+        altFormeTokens: []
+      },
+      explicitOverrides: {
+        dosage: Boolean(explicit.dosage),
+        forme: Boolean(explicit.forme),
+        voie: Boolean(explicit.voie)
+      },
       conflicts: [],
       provenance: [{ span: raw, role: codeMatch.kind, source: 'exact_pattern' }]
     };
@@ -224,7 +234,9 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
   const extractedQualifiers = [];
   const extractedSpecies = [];
   const intents = [];
-  const altFormeTokens = [];
+  const altFormeFromForme = [];
+  const altFormeFromVoie = [];
+  const altFormeFromQualifier = [];
 
   let working = normalizeGluedUnits(raw);
 
@@ -271,13 +283,13 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
       normWork = nextWork;
       if (rule.kind === 'voie') {
         extractedVoies.push(rule.value);
-        if (rule.expandForme) altFormeTokens.push(...rule.expandForme);
+        if (rule.expandForme) altFormeFromVoie.push(...rule.expandForme);
       } else if (rule.kind === 'forme') {
         extractedFormes.push(rule.value);
-        if (rule.altTokens) altFormeTokens.push(...rule.altTokens);
+        if (rule.altTokens) altFormeFromForme.push(...rule.altTokens);
       } else if (rule.kind === 'qualifier') {
         extractedQualifiers.push(rule.value);
-        if (rule.altTokens) altFormeTokens.push(...rule.altTokens);
+        if (rule.altTokens) altFormeFromQualifier.push(...rule.altTokens);
       } else if (rule.kind === 'intent') {
         intents.push(rule.value);
       }
@@ -369,12 +381,31 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
     conflicts.push({ field: 'voie', explicit: explicit.voie, parsed: extractedVoies.join(' ') });
   }
 
+  const rawAltFormeTokens = [...new Set([
+    ...altFormeFromForme,
+    ...altFormeFromVoie,
+    ...altFormeFromQualifier
+  ])];
+  // Precedence stricte : un param explicite `forme` annule toute expansion derivee du texte.
+  const effectiveAltFormeTokens = explicit.forme
+    ? []
+    : [...new Set([
+      ...altFormeFromForme,
+      ...(explicit.voie ? [] : altFormeFromVoie),
+      ...altFormeFromQualifier
+    ])];
+
   return {
     raw,
     kind: 'structured',
     code: null,
     nameTokens: finalNameTokens,
     nameQuery: finalNameTokens.join(' '),
+    explicitOverrides: {
+      dosage: Boolean(explicit.dosage),
+      forme: Boolean(explicit.forme),
+      voie: Boolean(explicit.voie)
+    },
     extracted: {
       dosages: extractedDosages,
       formes: extractedFormes,
@@ -382,7 +413,7 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
       qualifiers: extractedQualifiers,
       species: extractedSpecies,
       intents,
-      altFormeTokens: [...new Set(altFormeTokens)]
+      altFormeTokens: rawAltFormeTokens
     },
     effectiveCriteria: {
       dosage: effDosage,
@@ -390,7 +421,7 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
       voie: effVoie,
       qualifiers: extractedQualifiers,
       species: extractedSpecies,
-      altFormeTokens: [...new Set(altFormeTokens)]
+      altFormeTokens: effectiveAltFormeTokens
     },
     conflicts,
     provenance

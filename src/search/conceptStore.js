@@ -29,6 +29,7 @@ const SALT_WORDS = new Set([
 ]);
 
 let cachedEntry = null;
+let cachedTaxonomy = null;
 
 function extractTokens(text, minLen = 2) {
   const norm = normalizeSearchText(text);
@@ -62,50 +63,8 @@ function pushUniqueCisList(map, key, id) {
   }
 }
 
-function addPhraseAlias(aliasMap, phraseA, phraseB) {
-  if (!phraseA || !phraseB || phraseA === phraseB) return;
-  let setA = aliasMap.get(phraseA);
-  if (!setA) {
-    setA = new Set();
-    aliasMap.set(phraseA, setA);
-  }
-  setA.add(phraseB);
-}
-
-function indexSaFtPairsForRows(compRows, saFtAliases) {
-  const byOrder = new Map();
-  let allHaveOrder = true;
-  for (let i = 0; i < compRows.length; i++) {
-    const row = compRows[i];
-    if (row.numero_ordre == null || row.numero_ordre === '') {
-      allHaveOrder = false;
-      break;
-    }
-    const k = String(row.numero_ordre);
-    if (!byOrder.has(k)) byOrder.set(k, { sa: [], ft: [] });
-    if (row.nature_composant === 'SA') byOrder.get(k).sa.push(row);
-    else if (row.nature_composant === 'FT') byOrder.get(k).ft.push(row);
-  }
-
-  const groups = allHaveOrder
-    ? [...byOrder.values()]
-    : [{
-      sa: compRows.filter((r) => r.nature_composant === 'SA'),
-      ft: compRows.filter((r) => r.nature_composant === 'FT')
-    }];
-
-  for (const grp of groups) {
-    if (grp.sa.length !== 1 || grp.ft.length !== 1) continue;
-    const normSa = normalizeSearchText(grp.sa[0].denomination_substance).replace(/\s+/g, ' ').trim();
-    const normFt = normalizeSearchText(grp.ft[0].denomination_substance).replace(/\s+/g, ' ').trim();
-    if (!normSa || !normFt || normSa === normFt) continue;
-    addPhraseAlias(saFtAliases, normSa, normFt);
-    addPhraseAlias(saFtAliases, normFt, normSa);
-  }
-}
-
 function buildIngredientGroups(compRows) {
-  const byKey = new Map();
+  const seenKeys = new Set();
   const distinctSaCodes = new Set();
   const distinctFtCodes = new Set();
   const allTokens = new Set();
@@ -115,11 +74,11 @@ function buildIngredientGroups(compRows) {
     const row = compRows[i];
     const normSub = normalizeSearchText(row.denomination_substance);
     const subTokens = extractTokens(normSub, 2);
-    for (const t of subTokens) allTokens.add(t);
+    for (let k = 0; k < subTokens.length; k++) allTokens.add(subTokens[k]);
 
     if (row.dosage) {
       const parsed = parseDosageTokens(row.dosage);
-      for (const p of parsed) compoDosages.push(p);
+      for (let k = 0; k < parsed.length; k++) compoDosages.push(parsed[k]);
     }
 
     if (row.nature_composant === 'SA' && row.code_substance) {
@@ -129,29 +88,15 @@ function buildIngredientGroups(compRows) {
     }
 
     const hasOrder = row.numero_ordre != null && row.numero_ordre !== '';
-    const groupKey = hasOrder
-      ? `ord:${row.numero_ordre}`
-      : `code:${row.code_substance || normSub}`;
-
-    let grp = byKey.get(groupKey);
-    if (!grp) {
-      grp = { coreTokens: new Set(), allTokens: new Set(), phrases: [] };
-      byKey.set(groupKey, grp);
-    }
-    if (normSub) grp.phrases.push(normSub.replace(/\s+/g, ' ').trim());
-    for (const t of subTokens) {
-      grp.allTokens.add(t);
-      if (!SALT_WORDS.has(t) && t.length >= 3) grp.coreTokens.add(t);
-    }
+    seenKeys.add(hasOrder ? `ord:${row.numero_ordre}` : `code:${row.code_substance || normSub}`);
   }
 
   const distinctActiveCount = distinctSaCodes.size > 0
     ? distinctSaCodes.size
-    : (distinctFtCodes.size > 0 ? distinctFtCodes.size : byKey.size);
+    : (distinctFtCodes.size > 0 ? distinctFtCodes.size : seenKeys.size);
 
   return {
-    allSubstanceTokens: allTokens,
-    substanceGroups: [...byKey.values()],
+    allTokens,
     distinctActiveCount,
     compoDosages
   };
@@ -171,11 +116,7 @@ function buildGenericsStructures(generiquesRows) {
     let grp = generiquesByGroup.get(gid);
     if (!grp) {
       grp = {
-        id_groupe: gid,
-        libelle_groupe: row.libelle_groupe || '',
         normLibelle: normalizeSearchText(row.libelle_groupe || ''),
-        princepsCis: [],
-        genericCis: [],
         allCis: []
       };
       generiquesByGroup.set(gid, grp);
@@ -183,11 +124,9 @@ function buildGenericsStructures(generiquesRows) {
     grp.allCis.push(cis);
     const typeGen = String(row.type_generique ?? '');
     if (typeGen === '0') {
-      grp.princepsCis.push(cis);
       roleByCis.set(cis, 'princeps');
-    } else {
-      grp.genericCis.push(cis);
-      if (!roleByCis.has(cis)) roleByCis.set(cis, 'generic');
+    } else if (!roleByCis.has(cis)) {
+      roleByCis.set(cis, 'generic');
     }
 
     let cGroups = groupIdsByCis.get(cis);
@@ -201,22 +140,14 @@ function buildGenericsStructures(generiquesRows) {
   return { generiquesByGroup, roleByCis, groupIdsByCis };
 }
 
-function buildMitmAtcByCis(mitmRows, bdpmAtcToCis) {
-  const atcByCis = new Map();
+function populateBdpmAtcIndex(mitmRows, bdpmAtcToCis) {
   for (let i = 0; i < mitmRows.length; i++) {
     const row = mitmRows[i];
     const cis = row.cis;
     const code = normalizeSearchText(row.code_atc).toUpperCase();
     if (!cis || !code) continue;
-    let list = atcByCis.get(cis);
-    if (!list) {
-      list = [];
-      atcByCis.set(cis, list);
-    }
-    if (!list.includes(code)) list.push(code);
     pushUniqueCisList(bdpmAtcToCis, code, cis);
   }
-  return atcByCis;
 }
 
 function buildBdpmConceptIndexes() {
@@ -228,7 +159,6 @@ function buildBdpmConceptIndexes() {
   const bdpmDenomTokenToCis = new Map();
   const bdpmAtcToCis = new Map();
   const brandRootToGroupIds = new Map();
-  const saFtAliases = new Map();
 
   if (!corpus.specialites || corpus.specialites.length === 0 || !cisIndexes) {
     return {
@@ -237,13 +167,12 @@ function buildBdpmConceptIndexes() {
       bdpmDenomTokenToCis,
       bdpmAtcToCis,
       generiquesByGroup: new Map(),
-      brandRootToGroupIds,
-      saFtAliases
+      brandRootToGroupIds
     };
   }
 
   const { generiquesByGroup, roleByCis, groupIdsByCis } = buildGenericsStructures(corpus.generiques || []);
-  const atcByCis = buildMitmAtcByCis(corpus.mitm || [], bdpmAtcToCis);
+  populateBdpmAtcIndex(corpus.mitm || [], bdpmAtcToCis);
   const compByCis = cisIndexes.compositionsByCis;
   const presByCis = cisIndexes.presentationsByCis;
 
@@ -261,15 +190,13 @@ function buildBdpmConceptIndexes() {
     for (let j = 0; j < compIndices.length; j++) {
       compRows[j] = corpus.compositions[compIndices[j]];
     }
-    if (compRows.length > 0) indexSaFtPairsForRows(compRows, saFtAliases);
     const {
-      allSubstanceTokens,
-      substanceGroups,
+      allTokens,
       distinctActiveCount,
       compoDosages
     } = buildIngredientGroups(compRows);
 
-    for (const tok of allSubstanceTokens) {
+    for (const tok of allTokens) {
       pushUniqueCisList(bdpmSubTokenToCis, tok, cis);
     }
 
@@ -280,7 +207,7 @@ function buildBdpmConceptIndexes() {
       if (p.libelle) presParts.push(p.libelle);
       if (p.indications) presParts.push(p.indications);
     }
-    const normPresText = normalizeSearchText(presParts.join(' '));
+    const normPresText = presParts.length > 0 ? normalizeSearchText(presParts.join(' ')) : '';
 
     const gids = groupIdsByCis.get(cis) || [];
     const brandRoot = denomTokens[0] || '';
@@ -303,20 +230,14 @@ function buildBdpmConceptIndexes() {
       denomination: spec.denomination || '',
       normDenom,
       brandRoot,
-      denomTokenSet: new Set(denomTokens),
       denomDosages: parseDosageTokens(spec.denomination || ''),
       compoDosages,
       normForme,
-      formeTokenSet: new Set(extractTokens(normForme, 2)),
       normVoie,
-      voieTokenSet: new Set(extractTokens(normVoie, 2)),
       normPresText,
-      allSubstanceTokens,
-      substanceGroups,
       distinctActiveCount,
       genericGroupIds: gids,
       genericRole: roleByCis.get(cis) || null,
-      atcCodes: atcByCis.get(cis) || [],
       isCommercialised: spec.commercialisation === 'Commercialisée'
     });
   }
@@ -327,8 +248,7 @@ function buildBdpmConceptIndexes() {
     bdpmDenomTokenToCis,
     bdpmAtcToCis,
     generiquesByGroup,
-    brandRootToGroupIds,
-    saFtAliases
+    brandRootToGroupIds
   };
 }
 
@@ -358,35 +278,21 @@ function buildVetConceptIndexes() {
     }
 
     const compIndices = compByNum ? (compByNum.get(num) || []) : [];
-    const allSubstanceTokens = new Set();
-    const substanceGroups = [];
+    const subTokensSeen = new Set();
     const compoDosages = [];
 
     for (let j = 0; j < compIndices.length; j++) {
       const comp = corpus.compositions[compIndices[j]];
       const normSub = normalizeSearchText(comp.substance);
       const subTokens = extractTokens(normSub, 2);
-      const grpCore = new Set();
-      const grpAll = new Set();
-      for (const t of subTokens) {
-        allSubstanceTokens.add(t);
-        grpAll.add(t);
-        if (!SALT_WORDS.has(t) && t.length >= 3) grpCore.add(t);
-      }
-      if (subTokens.length > 0) {
-        substanceGroups.push({
-          coreTokens: grpCore,
-          allTokens: grpAll,
-          phrases: normSub ? [normSub] : []
-        });
-      }
+      for (let k = 0; k < subTokens.length; k++) subTokensSeen.add(subTokens[k]);
       if (comp.quantite != null && comp.quantite !== '' && comp.unite) {
         const parsed = parseDosageTokens(`${comp.quantite} ${comp.unite}`);
-        for (const p of parsed) compoDosages.push(p);
+        for (let k = 0; k < parsed.length; k++) compoDosages.push(parsed[k]);
       }
     }
 
-    for (const tok of allSubstanceTokens) {
+    for (const tok of subTokensSeen) {
       pushUniqueCisList(vetSubTokenToNum, tok, num);
     }
 
@@ -406,11 +312,9 @@ function buildVetConceptIndexes() {
       }
     }
 
-    const atcVetCodes = [];
     for (const code of med.codes_atcvet || []) {
       const clean = normalizeSearchText(code).toUpperCase();
       if (!clean) continue;
-      atcVetCodes.push(clean);
       pushUniqueCisList(vetAtcToNum, clean, num);
     }
 
@@ -420,19 +324,14 @@ function buildVetConceptIndexes() {
       num,
       nom: med.nom || '',
       normNom,
-      denomTokenSet: new Set(nomTokens),
+      normDenom: normNom,
       denomDosages: parseDosageTokens(med.nom || ''),
       compoDosages,
       normForme,
-      formeTokenSet: new Set(extractTokens(normForme, 2)),
       normVoie: '',
-      voieTokenSet: new Set(),
-      normPresText: normalizeSearchText(presParts.join(' ')),
-      allSubstanceTokens,
-      substanceGroups,
-      distinctActiveCount: Math.max(1, substanceGroups.length),
+      normPresText: presParts.length > 0 ? normalizeSearchText(presParts.join(' ')) : '',
+      distinctActiveCount: Math.max(1, compIndices.length),
       speciesTokens,
-      atcCodes: atcVetCodes,
       isActive: !/abrog|retir/i.test(med.statut_amm || '')
     });
   }
@@ -440,8 +339,28 @@ function buildVetConceptIndexes() {
   return { vetByNum, vetSubTokenToNum, vetNomTokenToNum, vetAtcToNum };
 }
 
-function buildConceptStore() {
+/**
+ * Retourne le vocabulaire taxonomique (formes/voies/especes) léger,
+ * utilisable dès B1 sans matérialiser le ConceptStore complet.
+ */
+function getTaxonomyVocab({ force = false } = {}) {
+  const bdpmRef = bdpmState.cisIndexes || null;
+  const vetRef = vetState.numIndexes || null;
+  if (
+    !force &&
+    cachedTaxonomy &&
+    cachedTaxonomy.bdpmRef === bdpmRef &&
+    cachedTaxonomy.vetRef === vetRef
+  ) {
+    return cachedTaxonomy.taxonomy;
+  }
   const taxonomy = buildTaxonomyVocab(bdpmState.corpus, vetState.corpus);
+  cachedTaxonomy = { bdpmRef, vetRef, taxonomy };
+  return taxonomy;
+}
+
+function buildConceptStore() {
+  const taxonomy = getTaxonomyVocab();
   const bdpm = buildBdpmConceptIndexes();
   const vet = buildVetConceptIndexes();
 
@@ -452,7 +371,6 @@ function buildConceptStore() {
     stats: {
       bdpmCount: bdpm.bdpmByCis.size,
       vetCount: vet.vetByNum.size,
-      saFtAliasCount: bdpm.saFtAliases.size,
       generiquesGroupCount: bdpm.generiquesByGroup.size
     }
   };
@@ -478,8 +396,19 @@ function getConceptStore({ force = false } = {}) {
   return store;
 }
 
+function hasConceptStoreCached() {
+  const bdpmRef = bdpmState.cisIndexes || null;
+  const vetRef = vetState.numIndexes || null;
+  return Boolean(
+    cachedEntry &&
+    cachedEntry.bdpmRef === bdpmRef &&
+    cachedEntry.vetRef === vetRef
+  );
+}
+
 function resetConceptStoreCache() {
   cachedEntry = null;
+  cachedTaxonomy = null;
 }
 
 module.exports = {
@@ -487,6 +416,8 @@ module.exports = {
   extractTokens,
   canonicalizeSpeciesWord,
   buildConceptStore,
+  getTaxonomyVocab,
   getConceptStore,
+  hasConceptStoreCached,
   resetConceptStoreCache
 };

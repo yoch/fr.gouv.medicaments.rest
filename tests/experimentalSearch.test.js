@@ -7,9 +7,14 @@ const bdpmState = require('../src/services/bdpm/state');
 const vetState = require('../src/services/vet/state');
 const medicamentRoutes = require('../src/routes/medicaments');
 const { executeHybridSearchPage } = require('../src/services/searchOrchestrator');
-const { executeExperimentalSearchPage } = require('../src/search/experimentalSearch');
+const { executeExperimentalSearchPage, evaluateEntityCriteria } = require('../src/search/experimentalSearch');
 const { parseStructuredQuery } = require('../src/search/structuredQueryParser');
-const { getConceptStore, resetConceptStoreCache } = require('../src/search/conceptStore');
+const {
+  getTaxonomyVocab,
+  getConceptStore,
+  hasConceptStoreCached,
+  resetConceptStoreCache
+} = require('../src/search/conceptStore');
 const { BDPM_INDEX_SPECS, VET_INDEX_SPECS } = require('../src/search/indexSpecs');
 const { miniSearchIndexConfig } = require('../src/utils/miniSearchIndexConfig');
 const { buildFrozenIndexFromRows } = require('../src/utils/frozenMiniSearch');
@@ -37,6 +42,8 @@ function seedSyntheticCorpora() {
     makeRow({ cis: '60904643', denomination: 'CODOLIPRANE 500 mg/30 mg, comprimé', forme_pharma: 'comprimé', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'OPELLA' }),
     makeRow({ cis: '66053338', denomination: 'AUGMENTIN 1 g/125 mg ADULTES, poudre pour suspension buvable en sachet-dose', forme_pharma: 'poudre pour suspension buvable', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'GSK' }),
     makeRow({ cis: '61111111', denomination: 'AMOXICILLINE BIOGARAN 1 g, comprimé dispersible', forme_pharma: 'comprimé dispersible', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'BIOGARAN' }),
+    makeRow({ cis: '61111112', denomination: 'AMOXICILLINE SANDOZ 500 mg/5 ml, poudre pour suspension buvable', forme_pharma: 'poudre pour suspension buvable', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'SANDOZ' }),
+    makeRow({ cis: '69999999', denomination: 'IBUPROFENE ARROW 400 mg, comprimé pelliculé', forme_pharma: 'comprimé pelliculé', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'ARROW' }),
     makeRow({ cis: '62222222', denomination: 'MAG 2 100 mg, comprimé', forme_pharma: 'comprimé', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'COOPER' }),
     makeRow({ cis: '63333333', denomination: 'HEXAMIDINE 0,1 POUR CENT, collyre en solution', forme_pharma: 'collyre en solution', voies_admin: 'ophtalmique', commercialisation: 'Commercialisée', titulaire: 'BIOCODEX' }),
     makeRow({ cis: '64444444', denomination: 'METHOTREXATE BELLON 2,5 mg, comprimé', forme_pharma: 'comprimé', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'SANOFI' }),
@@ -63,6 +70,8 @@ function seedSyntheticCorpora() {
     makeRow({ cis: '66053338', designation_element: 'poudre', code_substance: '93286', denomination_substance: 'ACIDE CLAVULANIQUE', dosage: '125,00 mg', nature_composant: 'FT', numero_ordre: '2' }),
     makeRow({ cis: '61111111', designation_element: 'comprimé', code_substance: '05248', denomination_substance: 'AMOXICILLINE ANHYDRE', dosage: '1000 mg', nature_composant: 'FT', numero_ordre: '1' }),
     makeRow({ cis: '61111111', designation_element: 'comprimé', code_substance: '28165', denomination_substance: 'AMOXICILLINE TRIHYDRATÉE', dosage: '', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '61111112', designation_element: 'poudre', code_substance: '28165', denomination_substance: 'AMOXICILLINE TRIHYDRATÉE', dosage: '500 mg/5 ml', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '69999999', designation_element: 'comprimé', code_substance: '01234', denomination_substance: 'IBUPROFÈNE', dosage: '400 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '64444444', designation_element: 'comprimé', code_substance: '03333', denomination_substance: 'MÉTHOTREXATE', dosage: '2,5 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '66666666', designation_element: 'gélule', code_substance: '17407', denomination_substance: 'ÉSOMÉPRAZOLE', dosage: '40 mg', nature_composant: 'FT', numero_ordre: '1' }),
     makeRow({ cis: '66666666', designation_element: 'gélule', code_substance: '61112', denomination_substance: 'ÉSOMÉPRAZOLE MAGNÉSIQUE TRIHYDRATÉ', dosage: '44,5 mg', nature_composant: 'SA', numero_ordre: '1' }),
@@ -327,6 +336,102 @@ describe('structuredQueryParser & experimentalSearch (B1/B2)', () => {
 
       const badMode = await request(app).get('/api/medicaments/search?q=doliprane&mode=unknown');
       expect(badMode.statusCode).toBe(400);
+    });
+
+    it('§1 : applique la précédence stricte de forme=comprimé sur "amoxicilline sirop" sans fuite d’altFormeTokens', async () => {
+      const parsed = parseStructuredQuery('amoxicilline sirop', { forme: 'comprimé' }, getTaxonomyVocab(), { useAliases: true });
+      expect(parsed.effectiveCriteria.forme).toBe('comprimé');
+      expect(parsed.effectiveCriteria.altFormeTokens).toEqual([]);
+      expect(parsed.conflicts).toEqual([{ field: 'forme', explicit: 'comprimé', parsed: 'sirop' }]);
+
+      const resp = await request(app).get('/api/medicaments/search?q=amoxicilline%20sirop&forme=comprim%C3%A9&mode=concepts');
+      expect(resp.statusCode).toBe(200);
+      expect(resp.body.data[0].cis).toBe('61111111');
+      expect(resp.body.data[0].criteria_match).toEqual({ dosage: false, forme: true, voie: false });
+      expect(resp.body.data[0].criteria_status).toEqual({
+        dosage: 'not_requested',
+        forme: 'matched',
+        voie: 'not_requested'
+      });
+
+      const susp = resp.body.data.find((d) => d.cis === '61111112');
+      expect(susp).toBeDefined();
+      expect(susp.criteria_match.forme).toBe(false);
+      expect(susp.criteria_status.forme).toBe('contradicted');
+    });
+
+    it('§1 : distingue correspondance exacte vs expansion de rappel (spray/collyre/partial) et vérifie evaluateEntityCriteria', async () => {
+      const resp = await request(app).get('/api/medicaments/search?q=Cerulyse%20spray&mode=concepts&detail=summary');
+      expect(resp.statusCode).toBe(200);
+      expect(resp.body.data[0].cis).toBe('65555555');
+      expect(resp.body.data[0].criteria_match.forme).toBe(false);
+      expect(resp.body.data[0].criteria_status.forme).toBe('expanded');
+
+      const ophtParsed = parseStructuredQuery('collyre yeux', {}, getTaxonomyVocab(), { useAliases: true });
+      const ophtNoVoie = evaluateEntityCriteria(
+        { denomDosages: [], compoDosages: [], normForme: 'collyre en solution', normVoie: '', normPresText: '', normDenom: 'collyre' },
+        ophtParsed,
+        { useAliases: true }
+      );
+      expect(ophtNoVoie.criteria_match.voie).toBe(false);
+      expect(ophtNoVoie.criteria_status.voie).toBe('expanded');
+    });
+
+    it('§1 : rejette/marque unsupported sur voie="non orale" et étend le garde-fou grossesse/compatibilité via HTTP', async () => {
+      const parsedNeg = parseStructuredQuery('amoxicilline', { voie: 'non orale' }, getTaxonomyVocab(), { useAliases: true });
+      const directEval = evaluateEntityCriteria(
+        { denomDosages: [], compoDosages: [], normForme: 'comprime', normVoie: 'orale', normPresText: '', normDenom: 'amoxicilline' },
+        parsedNeg,
+        { useAliases: true }
+      );
+      expect(directEval.criteria_match.voie).toBe(false);
+      expect(directEval.criteria_status.voie).toBe('unsupported');
+
+      for (const m of ['structured', 'concepts']) {
+        const resNegVoie = await request(app).get(`/api/medicaments/search?q=amoxicilline&voie=non%20orale&mode=${m}`);
+        expect(resNegVoie.statusCode).toBe(200);
+        expect(resNegVoie.body.pagination.total).toBe(0);
+        expect(resNegVoie.body.data).toEqual([]);
+        expect(resNegVoie.body.search.abstained).toBe(true);
+        expect(resNegVoie.body.search.safety.supported).toBe(false);
+        expect(resNegVoie.body.search.safety.unsupported_criteria).toHaveLength(1);
+        expect(resNegVoie.body.search.safety.unsupported_criteria[0].field).toBe('voie');
+      }
+
+      for (const query of ['ibuprofene compatible grossesse', 'ibuprofene enceinte', 'paracetamol allaitement']) {
+        const resClin = await request(app).get(`/api/medicaments/search?q=${encodeURIComponent(query)}&mode=concepts`);
+        expect(resClin.statusCode).toBe(200);
+        expect(resClin.body.pagination.total).toBe(0);
+        expect(resClin.body.search.abstained).toBe(true);
+        expect(resClin.body.search.safety.clinical_property.detected).toBe(true);
+      }
+    });
+
+    it('§5 : ne matérialise pas ConceptStore sur mode=structured ni sur requêtes rejetées / codes numériques, mais invalide après rechargement', () => {
+      resetConceptStoreCache();
+      expect(hasConceptStoreCached()).toBe(false);
+
+      const b1 = executeExperimentalSearchPage('Doliprane 1 g comprimé', 'auto', 1, 5, {}, { mode: 'structured' });
+      expect(b1.results[0].cis).toBe('60234100');
+      expect(b1.results[0].criteria_status.dosage).toBe('matched');
+      expect(hasConceptStoreCached()).toBe(false);
+
+      const rejected = executeExperimentalSearchPage('ibuprofene enceinte', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(rejected.search.abstained).toBe(true);
+      expect(hasConceptStoreCached()).toBe(false);
+
+      const numCode = executeExperimentalSearchPage('60234100', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(numCode.results[0].cis).toBe('60234100');
+      expect(hasConceptStoreCached()).toBe(false);
+
+      const gen = executeExperimentalSearchPage('générique tagamet', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(gen.results[0].cis).toBe('67777772');
+      expect(hasConceptStoreCached()).toBe(true);
+
+      const store1 = getConceptStore();
+      bdpmState.cisIndexes = { ...bdpmState.cisIndexes };
+      const store2 = getConceptStore();
+      expect(store2).not.toBe(store1);
     });
   });
 });

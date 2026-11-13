@@ -1,19 +1,118 @@
 {
-  "generatedAt": "2026-11-13T08:10:02.616Z",
+  "generatedAt": "2026-11-13T09:44:09.377Z",
   "frozenMinScore": 0.55,
   "tarballCheck": {
     "version": "1.13.0",
+    "subpathSplitVerified": true,
     "lexicalParity": {
       "bdpmProbes": 15,
       "bdpmMismatches": 0,
       "vetProbes": 6,
       "vetMismatches": 0
     },
-    "fxv1FingerprintBdpm": 3567599445,
-    "fxv1FingerprintVet": 42236662,
+    "fxv1BdpmMeta": {
+      "representationVersion": "static-wp-mrl-128d-int8:v1",
+      "snapshotId": "sha256:6c2bcfa86225b8d7aad83cc4",
+      "mappingFingerprint": 3567599445,
+      "byteLength": 2155021
+    },
+    "fxv1VetMeta": {
+      "representationVersion": "static-wp-mrl-128d-int8:v1",
+      "snapshotId": "sha256:3c609d3b6b1693320c353e52",
+      "mappingFingerprint": 42236662,
+      "byteLength": 437069
+    },
+    "loadBinaryBdpmMs": {
+      "int8Esm": 35.7,
+      "pq32": 9.87,
+      "pq16": 2.93
+    },
     "roundTripCjsEsmBrowserIdentical": true,
-    "corruptionChecksPassed": 3,
+    "corruptionAndMetadataChecksPassed": 8,
     "preKFilterBeyondRank85Passed": true
+  },
+  "fallbackContractChecks": {
+    "liveBdpmAdmissiblePoolCount": 49,
+    "boundedCap40Verified": true,
+    "deepPage5EmptyAndFlagged": true,
+    "preKExcludeTop35BdpmRecovered10": true,
+    "synthetic75PreKExcludeTop45Recovered10": true,
+    "sourcePolicyVerified": true,
+    "guardAndInvalidCodeNoFallback": true
+  },
+  "marginalFallbackDelta": {
+    "v3_heldout_hybridInt8_minus_B2": {
+      "deltaIdentityTop1": 0,
+      "deltaVariantTop1": 0,
+      "deltaHit5Var": 0,
+      "deltaMrr10": 0,
+      "deltaNdcg10": 0,
+      "deltaEmptyRate": 0,
+      "deltaOosNonEmptyRate": 0
+    },
+    "residual_dev_hybridInt8_minus_B2": {
+      "deltaIdentityTop1": 0.091,
+      "deltaVariantTop1": 0.091,
+      "deltaHit5Var": 0.091,
+      "deltaMrr10": 0.091,
+      "deltaNdcg10": 0.059,
+      "deltaEmptyRate": -0.091,
+      "deltaOosNonEmptyRate": 0
+    },
+    "residual_heldout_hybridInt8_minus_B2": {
+      "deltaIdentityTop1": 0.033,
+      "deltaVariantTop1": 0.034,
+      "deltaHit5Var": 0.033,
+      "deltaMrr10": 0.033,
+      "deltaNdcg10": 0.031,
+      "deltaEmptyRate": -0.066,
+      "deltaOosNonEmptyRate": 0
+    }
+  },
+  "manifestSummary": {
+    "generatedAt": "2026-11-13T09:44:09.377Z",
+    "repos": {
+      "pharmaWorktree": {
+        "path": "/home/yoch/fr.gouv.medicaments.rest/.worktrees/semantic-light",
+        "branch": "experiment/semantic-light-search",
+        "head": "948d974b07b4642e17fd5b89cd3076be1aafae79",
+        "clean": false
+      },
+      "frozenminisearchWorktree": {
+        "path": "/home/yoch/minisearch/.worktrees/semantic-aux",
+        "branch": "feat/semantic-light-aux",
+        "head": "70ccae5cbc756c6b1a2fadc94bbd1df8c651db6f",
+        "clean": true
+      }
+    },
+    "packageArtifact": {
+      "name": "@yoch/frozenminisearch",
+      "version": "1.13.0",
+      "tarballPath": "/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/yoch-frozenminisearch-1.13.0.tgz",
+      "tarballSha256": "5f9e4351fa668e54780da7413c264364c94acb8a4b1eb4d4c06072ac8147eb61",
+      "unpackedPkgDir": "/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/pkg-verify/package"
+    },
+    "runtimePaths": {
+      "dataDir": "/home/yoch/fr.gouv.medicaments.rest/data",
+      "modelDir": "/home/yoch/fr.gouv.medicaments.rest/.worktrees/semantic-light/data/search-indexes/mission-semantic"
+    },
+    "dataAndModelRevisions": {
+      "corpusMetadata": {
+        "last_updated": "2026-11-04T21:40:37.661Z",
+        "source": "base de données publique des médicaments - gouv.fr"
+      },
+      "bdpmCount": 15845,
+      "vetCount": 3213,
+      "bdpmSnapshotId": "sha256:6c2bcfa86225b8d7aad83cc4",
+      "vetSnapshotId": "sha256:3c609d3b6b1693320c353e52",
+      "modelMetaSha256": "3d3d1a8cca4ec8f7d6dfdb534076e2fedd583beb93f1ce54d657f91eda557c1b",
+      "modelInt8Sha256": "a86ea7e41d43f14f0d7aebb6b7d9ece3541685c2784d930fc065688091b225ea"
+    },
+    "testSuitesSha256": {
+      "eval_suite_v3": "ed66b42fe5a967a4ec16d94e69a0c221e4c90eee864b25506d8bf02003eb2216",
+      "eval_residual_v1": "a0b28d940fb3b1370f136ec63a8a1286ab8289efee2acedcdd1e6c843b5b75fc",
+      "experimentalSearch_test": "12a56a992c603265bb84d8e6df5c91929c42c835e33e6833083eef8c79c961cd"
+    }
   },
   "a1SafetyChecks": {
     "weightParsedDosage": null,
@@ -24,6 +123,7 @@
       "patientWeight": "70 kg",
       "pediatricInferred": false,
       "verbatimQualifiers": [],
+      "unsupportedCriteria": [],
       "negation": {
         "detected": false,
         "markers": [],
@@ -44,6 +144,7 @@
       "verbatimQualifiers": [
         "sans sucre"
       ],
+      "unsupportedCriteria": [],
       "negation": {
         "detected": false,
         "markers": [],
@@ -159,36 +260,36 @@
     "modes": {
       "legacy": {
         "requests": 280,
-        "p50Ms": 2.36,
-        "iqrMs": 0.75,
-        "p95Ms": 3.92,
-        "meanMs": 2.48
+        "p50Ms": 2.42,
+        "iqrMs": 0.87,
+        "p95Ms": 4.84,
+        "meanMs": 2.76
       },
       "structured": {
         "requests": 280,
-        "p50Ms": 2.7,
-        "iqrMs": 1.14,
-        "p95Ms": 5,
-        "meanMs": 3.07
+        "p50Ms": 2.87,
+        "iqrMs": 1.97,
+        "p95Ms": 7.2,
+        "meanMs": 3.82
       },
       "concepts": {
         "requests": 280,
-        "p50Ms": 2.81,
-        "iqrMs": 1.32,
-        "p95Ms": 5.56,
-        "meanMs": 3.28
+        "p50Ms": 2.9,
+        "iqrMs": 1.64,
+        "p95Ms": 6.8,
+        "meanMs": 3.54
       },
       "hybrid_int8": {
         "requests": 280,
-        "p50Ms": 3.37,
-        "iqrMs": 3.18,
-        "p95Ms": 10.49,
-        "meanMs": 4.68
+        "p50Ms": 3.66,
+        "iqrMs": 3.71,
+        "p95Ms": 12.79,
+        "meanMs": 5.14
       }
     },
     "pairedDeltaMedianMs": {
-      "hybridMinusB2": 0.139,
-      "hybridMinusB0": 0.785
+      "hybridMinusB2": 0.1,
+      "hybridMinusB0": 0.853
     }
   },
   "results": {
@@ -219,9 +320,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.49,
-                "p95": 1.38,
-                "max": 2.74
+                "p50": 0.51,
+                "p95": 1.35,
+                "max": 2.7
               },
               "httpStats": null
             },
@@ -335,9 +436,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.45,
-              "p95": 1.04,
-              "max": 1.2
+              "p50": 0.47,
+              "p95": 1.13,
+              "max": 1.19
             },
             "httpStats": null
           },
@@ -364,9 +465,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.28,
+              "p50": 0.2,
               "p95": 0.63,
-              "max": 4.46
+              "max": 2.66
             },
             "httpStats": null
           }
@@ -380,9 +481,9 @@
               "hit5Var": 0.886,
               "hit10Var": 0.886,
               "mrr10": 0.886,
-              "ndcg10": 0.866,
-              "recall10": 0.775,
-              "recall10Capped": 0.858,
+              "ndcg10": 0.861,
+              "recall10": 0.771,
+              "recall10Capped": 0.854,
               "trapTop1": 0,
               "trapBeforeVar": 0,
               "emptyRate": 0.068,
@@ -396,9 +497,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.62,
-                "p95": 2.16,
-                "max": 12.87
+                "p50": 0.86,
+                "p95": 3.56,
+                "max": 29.79
               },
               "httpStats": null
             },
@@ -421,8 +522,8 @@
                 "identityTop1": 0.933,
                 "variantTop1": 0.933,
                 "mrr10": 0.933,
-                "ndcg10": 0.924,
-                "recall10Capped": 0.933,
+                "ndcg10": 0.909,
+                "recall10Capped": 0.92,
                 "trapTop1": 0,
                 "empty": 0.067,
                 "guardFailures": 0
@@ -433,7 +534,7 @@
                 "identityTop1": 1,
                 "variantTop1": 1,
                 "mrr10": 1,
-                "ndcg10": 0.951,
+                "ndcg10": 0.954,
                 "recall10Capped": 0.933,
                 "trapTop1": 0,
                 "empty": 0,
@@ -496,7 +597,7 @@
             "hit5Var": 0.737,
             "hit10Var": 0.737,
             "mrr10": 0.737,
-            "ndcg10": 0.698,
+            "ndcg10": 0.7,
             "recall10": 0.513,
             "recall10Capped": 0.671,
             "trapTop1": 0,
@@ -512,9 +613,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.75,
-              "p95": 4.24,
-              "max": 14.59
+              "p50": 0.96,
+              "p95": 3.85,
+              "max": 29.59
             },
             "httpStats": null
           },
@@ -525,9 +626,9 @@
             "hit5Var": 1,
             "hit10Var": 1,
             "mrr10": 1,
-            "ndcg10": 0.993,
-            "recall10": 0.974,
-            "recall10Capped": 1,
+            "ndcg10": 0.984,
+            "recall10": 0.968,
+            "recall10Capped": 0.992,
             "trapTop1": 0,
             "trapBeforeVar": 0,
             "emptyRate": 0,
@@ -541,9 +642,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.45,
-              "p95": 1.49,
-              "max": 3.06
+              "p50": 0.59,
+              "p95": 2.74,
+              "max": 3.21
             },
             "httpStats": null
           }
@@ -573,9 +674,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.71,
-                "p95": 2.34,
-                "max": 12.13
+                "p50": 0.75,
+                "p95": 2.79,
+                "max": 16.05
               },
               "httpStats": null
             },
@@ -689,9 +790,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.12,
-              "p95": 2.61,
-              "max": 11.75
+              "p50": 1.38,
+              "p95": 4.96,
+              "max": 15.33
             },
             "httpStats": null
           },
@@ -718,9 +819,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.58,
-              "p95": 1.56,
-              "max": 2.91
+              "p50": 0.69,
+              "p95": 1.92,
+              "max": 4.78
             },
             "httpStats": null
           }
@@ -750,9 +851,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.73,
-                "p95": 2.92,
-                "max": 12.12
+                "p50": 0.86,
+                "p95": 3.83,
+                "max": 13.91
               },
               "httpStats": null
             },
@@ -866,9 +967,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1,
-              "p95": 6.39,
-              "max": 10.77
+              "p50": 1.41,
+              "p95": 6.67,
+              "max": 14.18
             },
             "httpStats": null
           },
@@ -895,9 +996,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.59,
-              "p95": 1.96,
-              "max": 3.19
+              "p50": 0.5,
+              "p95": 1.76,
+              "max": 2.97
             },
             "httpStats": null
           }
@@ -927,9 +1028,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.85,
-                "p95": 2.56,
-                "max": 11.1
+                "p50": 0.96,
+                "p95": 2.84,
+                "max": 14.68
               },
               "httpStats": null
             },
@@ -1043,9 +1144,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.96,
-              "p95": 2.8,
-              "max": 10.43
+              "p50": 1.09,
+              "p95": 3.71,
+              "max": 13.2
             },
             "httpStats": null
           },
@@ -1072,9 +1173,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.46,
-              "p95": 1.42,
-              "max": 2.9
+              "p50": 0.49,
+              "p95": 1.69,
+              "max": 2.97
             },
             "httpStats": null
           }
@@ -1104,9 +1205,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.64,
-                "p95": 2.95,
-                "max": 10.38
+                "p50": 0.79,
+                "p95": 2.84,
+                "max": 16.23
               },
               "httpStats": null
             },
@@ -1220,9 +1321,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.63,
-              "p95": 4.07,
-              "max": 13.98
+              "p50": 1.17,
+              "p95": 2.89,
+              "max": 14.02
             },
             "httpStats": null
           },
@@ -1249,9 +1350,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.62,
-              "p95": 1.56,
-              "max": 3.22
+              "p50": 0.5,
+              "p95": 1.62,
+              "max": 2.94
             },
             "httpStats": null
           }
@@ -1283,9 +1384,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.52,
-                "p95": 1.12,
-                "max": 1.53
+                "p50": 0.48,
+                "p95": 1.18,
+                "max": 1.84
               },
               "httpStats": null
             },
@@ -1399,9 +1500,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.7,
-              "p95": 1.82,
-              "max": 2.77
+              "p50": 0.51,
+              "p95": 0.97,
+              "max": 1.26
             },
             "httpStats": null
           },
@@ -1428,9 +1529,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.49,
-              "p95": 0.69,
-              "max": 0.71
+              "p50": 0.43,
+              "p95": 0.66,
+              "max": 0.69
             },
             "httpStats": null
           }
@@ -1439,14 +1540,14 @@
           "all": {
             "summary": {
               "validN": 55,
-              "identityTop1": 0.873,
-              "variantTop1": 0.855,
+              "identityTop1": 0.855,
+              "variantTop1": 0.836,
               "hit5Var": 0.873,
               "hit10Var": 0.891,
-              "mrr10": 0.867,
-              "ndcg10": 0.858,
-              "recall10": 0.811,
-              "recall10Capped": 0.859,
+              "mrr10": 0.855,
+              "ndcg10": 0.843,
+              "recall10": 0.803,
+              "recall10Capped": 0.851,
               "trapTop1": 0,
               "trapBeforeVar": 0,
               "emptyRate": 0.109,
@@ -1460,9 +1561,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.84,
-                "p95": 2.43,
-                "max": 3.23
+                "p50": 0.83,
+                "p95": 3.1,
+                "max": 5.52
               },
               "httpStats": null
             },
@@ -1482,11 +1583,11 @@
               "F2_typos_glued_accents_abbrev": {
                 "n": 13,
                 "validN": 13,
-                "identityTop1": 0.846,
-                "variantTop1": 0.846,
-                "mrr10": 0.885,
-                "ndcg10": 0.89,
-                "recall10Capped": 0.923,
+                "identityTop1": 0.769,
+                "variantTop1": 0.769,
+                "mrr10": 0.833,
+                "ndcg10": 0.846,
+                "recall10Capped": 0.889,
                 "trapTop1": 0,
                 "empty": 0.077,
                 "guardFailures": 0
@@ -1497,7 +1598,7 @@
                 "identityTop1": 0.95,
                 "variantTop1": 0.9,
                 "mrr10": 0.908,
-                "ndcg10": 0.909,
+                "ndcg10": 0.898,
                 "recall10Capped": 0.925,
                 "trapTop1": 0,
                 "empty": 0.05,
@@ -1576,22 +1677,22 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.95,
-              "p95": 2.61,
-              "max": 4.97
+              "p50": 1.31,
+              "p95": 4.43,
+              "max": 5.36
             },
             "httpStats": null
           },
           "corpus_generated": {
             "validN": 25,
-            "identityTop1": 0.96,
-            "variantTop1": 0.92,
+            "identityTop1": 0.92,
+            "variantTop1": 0.88,
             "hit5Var": 0.96,
             "hit10Var": 1,
-            "mrr10": 0.947,
-            "ndcg10": 0.966,
-            "recall10": 1,
-            "recall10Capped": 1,
+            "mrr10": 0.92,
+            "ndcg10": 0.934,
+            "recall10": 0.982,
+            "recall10Capped": 0.982,
             "trapTop1": 0,
             "trapBeforeVar": 0,
             "emptyRate": 0,
@@ -1605,9 +1706,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.64,
-              "p95": 1.03,
-              "max": 1.28
+              "p50": 0.74,
+              "p95": 1.56,
+              "max": 2.24
             },
             "httpStats": null
           }
@@ -1637,9 +1738,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.91,
-                "p95": 2.31,
-                "max": 3.64
+                "p50": 0.99,
+                "p95": 2.99,
+                "max": 4.68
               },
               "httpStats": null
             },
@@ -1753,9 +1854,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.17,
-              "p95": 2.99,
-              "max": 3.68
+              "p50": 1.38,
+              "p95": 3.33,
+              "max": 4.79
             },
             "httpStats": null
           },
@@ -1782,9 +1883,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.98,
-              "p95": 1.32,
-              "max": 1.82
+              "p50": 0.88,
+              "p95": 1.35,
+              "max": 1.78
             },
             "httpStats": null
           }
@@ -1814,9 +1915,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.79,
-                "p95": 2.58,
-                "max": 7.2
+                "p50": 1.02,
+                "p95": 3.69,
+                "max": 7.46
               },
               "httpStats": null
             },
@@ -1930,9 +2031,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.04,
-              "p95": 6.64,
-              "max": 8.07
+              "p50": 1.16,
+              "p95": 7.3,
+              "max": 13.1
             },
             "httpStats": null
           },
@@ -1959,9 +2060,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.72,
-              "p95": 1.16,
-              "max": 1.44
+              "p50": 1.37,
+              "p95": 2.25,
+              "max": 3.24
             },
             "httpStats": null
           }
@@ -1991,9 +2092,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.77,
-                "p95": 3.04,
-                "max": 5.95
+                "p50": 0.98,
+                "p95": 3.55,
+                "max": 6.45
               },
               "httpStats": null
             },
@@ -2107,9 +2208,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.01,
-              "p95": 3.01,
-              "max": 3.58
+              "p50": 1.14,
+              "p95": 4.85,
+              "max": 6.07
             },
             "httpStats": null
           },
@@ -2136,9 +2237,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.68,
-              "p95": 1.23,
-              "max": 1.53
+              "p50": 0.67,
+              "p95": 1.25,
+              "max": 1.66
             },
             "httpStats": null
           }
@@ -2168,9 +2269,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.81,
-                "p95": 2.53,
-                "max": 3.83
+                "p50": 0.83,
+                "p95": 2.74,
+                "max": 3.34
               },
               "httpStats": null
             },
@@ -2284,9 +2385,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.98,
-              "p95": 2.54,
-              "max": 2.97
+              "p50": 1.11,
+              "p95": 3.37,
+              "max": 3.5
             },
             "httpStats": null
           },
@@ -2313,9 +2414,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.65,
-              "p95": 1.11,
-              "max": 1.3
+              "p50": 0.84,
+              "p95": 1.26,
+              "max": 1.58
             },
             "httpStats": null
           }
@@ -2348,9 +2449,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.44,
-              "p95": 0.98,
-              "max": 1.37
+              "p50": 0.31,
+              "p95": 0.79,
+              "max": 1.26
             },
             "httpStats": null
           },
@@ -2429,9 +2530,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.98,
-              "p95": 2.63,
-              "max": 4.24
+              "p50": 0.63,
+              "p95": 4.06,
+              "max": 6.68
             },
             "httpStats": null
           },
@@ -2510,9 +2611,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.64,
-              "p95": 2.14,
-              "max": 3.28
+              "p50": 0.67,
+              "p95": 2.53,
+              "max": 4.03
             },
             "httpStats": null
           },
@@ -2591,9 +2692,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 5.9,
-              "p95": 6.43,
-              "max": 6.84
+              "p50": 5.69,
+              "p95": 6.31,
+              "max": 6.68
             },
             "httpStats": null
           },
@@ -2672,9 +2773,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 2.72,
-              "p95": 6.08,
-              "max": 6.49
+              "p50": 3.38,
+              "p95": 4.16,
+              "max": 4.6
             },
             "httpStats": null
           },
@@ -2753,9 +2854,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.76,
-              "p95": 2.17,
-              "max": 3.04
+              "p50": 1.61,
+              "p95": 2.66,
+              "max": 3.7
             },
             "httpStats": null
           },
@@ -2837,8 +2938,8 @@
             "oosStrongFpRate": 0,
             "latencyMs": {
               "p50": 0.46,
-              "p95": 0.96,
-              "max": 1.22
+              "p95": 0.92,
+              "max": 1.19
             },
             "httpStats": null
           },
@@ -2917,9 +3018,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.98,
-              "p95": 2.65,
-              "max": 3.81
+              "p50": 0.79,
+              "p95": 3.27,
+              "max": 5.77
             },
             "httpStats": null
           },
@@ -2998,9 +3099,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.84,
-              "p95": 2.42,
-              "max": 3.12
+              "p50": 0.91,
+              "p95": 2.2,
+              "max": 3.69
             },
             "httpStats": null
           },
@@ -3079,9 +3180,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 3.29,
-              "p95": 7.21,
-              "max": 8.1
+              "p50": 4.08,
+              "p95": 7.48,
+              "max": 8.3
             },
             "httpStats": null
           },
@@ -3160,9 +3261,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 2.38,
-              "p95": 3.57,
-              "max": 4.89
+              "p50": 2.22,
+              "p95": 3.65,
+              "max": 4.02
             },
             "httpStats": null
           },
@@ -3185,7 +3286,7 @@
               "identityTop1": 0.714,
               "variantTop1": 0.429,
               "mrr10": 0.481,
-              "ndcg10": 0.584,
+              "ndcg10": 0.585,
               "recall10Capped": 0.557,
               "trapTop1": 0.143,
               "empty": 0.143,
@@ -3225,9 +3326,9 @@
             "hit5Var": 0.4,
             "hit10Var": 0.433,
             "mrr10": 0.379,
-            "ndcg10": 0.403,
-            "recall10": 0.257,
-            "recall10Capped": 0.4,
+            "ndcg10": 0.377,
+            "recall10": 0.242,
+            "recall10Capped": 0.37,
             "trapTop1": 0.033,
             "trapBeforeVar": 0.033,
             "emptyRate": 0.5,
@@ -3241,9 +3342,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.48,
-              "p95": 2.33,
-              "max": 3.56
+              "p50": 1.56,
+              "p95": 2.49,
+              "max": 3.48
             },
             "httpStats": null
           },
@@ -3266,8 +3367,8 @@
               "identityTop1": 0.714,
               "variantTop1": 0.429,
               "mrr10": 0.481,
-              "ndcg10": 0.592,
-              "recall10Capped": 0.571,
+              "ndcg10": 0.48,
+              "recall10Capped": 0.443,
               "trapTop1": 0.143,
               "empty": 0.286,
               "guardFailures": 0

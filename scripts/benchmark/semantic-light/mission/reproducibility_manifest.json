@@ -1,0 +1,45 @@
+{
+  "generatedAt": "2026-11-13T09:44:09.377Z",
+  "repos": {
+    "pharmaWorktree": {
+      "path": "/home/yoch/fr.gouv.medicaments.rest/.worktrees/semantic-light",
+      "branch": "experiment/semantic-light-search",
+      "head": "948d974b07b4642e17fd5b89cd3076be1aafae79",
+      "clean": false
+    },
+    "frozenminisearchWorktree": {
+      "path": "/home/yoch/minisearch/.worktrees/semantic-aux",
+      "branch": "feat/semantic-light-aux",
+      "head": "70ccae5cbc756c6b1a2fadc94bbd1df8c651db6f",
+      "clean": true
+    }
+  },
+  "packageArtifact": {
+    "name": "@yoch/frozenminisearch",
+    "version": "1.13.0",
+    "tarballPath": "/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/yoch-frozenminisearch-1.13.0.tgz",
+    "tarballSha256": "5f9e4351fa668e54780da7413c264364c94acb8a4b1eb4d4c06072ac8147eb61",
+    "unpackedPkgDir": "/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/pkg-verify/package"
+  },
+  "runtimePaths": {
+    "dataDir": "/home/yoch/fr.gouv.medicaments.rest/data",
+    "modelDir": "/home/yoch/fr.gouv.medicaments.rest/.worktrees/semantic-light/data/search-indexes/mission-semantic"
+  },
+  "dataAndModelRevisions": {
+    "corpusMetadata": {
+      "last_updated": "2026-11-04T21:40:37.661Z",
+      "source": "base de données publique des médicaments - gouv.fr"
+    },
+    "bdpmCount": 15845,
+    "vetCount": 3213,
+    "bdpmSnapshotId": "sha256:6c2bcfa86225b8d7aad83cc4",
+    "vetSnapshotId": "sha256:3c609d3b6b1693320c353e52",
+    "modelMetaSha256": "3d3d1a8cca4ec8f7d6dfdb534076e2fedd583beb93f1ce54d657f91eda557c1b",
+    "modelInt8Sha256": "a86ea7e41d43f14f0d7aebb6b7d9ece3541685c2784d930fc065688091b225ea"
+  },
+  "testSuitesSha256": {
+    "eval_suite_v3": "ed66b42fe5a967a4ec16d94e69a0c221e4c90eee864b25506d8bf02003eb2216",
+    "eval_residual_v1": "a0b28d940fb3b1370f136ec63a8a1286ab8289efee2acedcdd1e6c843b5b75fc",
+    "experimentalSearch_test": "12a56a992c603265bb84d8e6df5c91929c42c835e33e6833083eef8c79c961cd"
+  }
+}

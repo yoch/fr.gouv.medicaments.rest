@@ -41,8 +41,14 @@ const {
   textOverlapScore
 } = require('../utils/structuredSearchCriteria');
 const { parseStructuredQuery } = require('./structuredQueryParser');
-const { analyzeQuerySafetyAndIntent } = require('./queryIntentGuard');
-const { SALT_WORDS, getConceptStore } = require('./conceptStore');
+const { analyzeQuerySafetyAndIntent, inspectCriterionConstraint } = require('./queryIntentGuard');
+const {
+  SALT_WORDS,
+  extractTokens,
+  canonicalizeSpeciesWord,
+  getTaxonomyVocab,
+  getConceptStore
+} = require('./conceptStore');
 
 const VALID_EXPERIMENTAL_MODES = new Set(['structured', 'concepts']);
 const VIA_BONUS = {
@@ -87,6 +93,7 @@ function hydrateExperimentalHit(ref, matchesBySource) {
     if (via) result.match_via = via;
   }
   if (ref.criteria_match) result.criteria_match = ref.criteria_match;
+  if (ref.criteria_status) result.criteria_status = ref.criteria_status;
   return result;
 }
 
@@ -342,83 +349,196 @@ function mergeMatchMaps(primary, secondary) {
   return { qualityByKey, metaByKey };
 }
 
+function buildStructuredEntityRecord(source, key, parsed) {
+  const needCompoDosage = Boolean(parsed?.effectiveCriteria?.dosage);
+  const needSpecies = Boolean(parsed?.effectiveCriteria?.species?.length);
+
+  if (source === 'bdpm') {
+    const spec = getSpecialiteByCis(key);
+    if (!spec) return null;
+    const denom = spec.denomination || '';
+    const denomDosages = parseDosageTokens(denom);
+    let compoDosages = [];
+    if (needCompoDosage && denomDosages.length === 0) {
+      const comps = getRelatedByCis('compositions', key, 50) || [];
+      for (let i = 0; i < comps.length; i++) {
+        if (comps[i].dosage) {
+          for (const p of parseDosageTokens(comps[i].dosage)) compoDosages.push(p);
+        }
+      }
+    }
+    return {
+      cis: key,
+      denomination: denom,
+      normDenom: normalizeSearchText(denom),
+      denomDosages,
+      compoDosages,
+      normForme: normalizeSearchText(spec.forme_pharma),
+      normVoie: normalizeSearchText(spec.voies_admin),
+      normPresText: ''
+    };
+  }
+
+  const med = getMedicamentByNum(key);
+  if (!med) return null;
+  const nom = med.nom || '';
+  const denomDosages = parseDosageTokens(nom);
+  let compoDosages = [];
+  if (needCompoDosage && denomDosages.length === 0) {
+    const comps = getRelatedByNum('compositions', key) || [];
+    for (let i = 0; i < comps.length; i++) {
+      const c = comps[i];
+      if (c.quantite != null && c.quantite !== '' && c.unite) {
+        for (const p of parseDosageTokens(`${c.quantite} ${c.unite}`)) compoDosages.push(p);
+      }
+    }
+  }
+  const speciesTokens = new Set();
+  if (needSpecies) {
+    for (const esp of med.especes || []) {
+      const canonical = canonicalizeSpeciesWord(esp);
+      if (canonical) speciesTokens.add(canonical);
+      for (const w of extractTokens(esp, 3)) {
+        speciesTokens.add(canonicalizeSpeciesWord(w));
+      }
+    }
+  }
+  return {
+    num: key,
+    nom,
+    normNom: normalizeSearchText(nom),
+    normDenom: normalizeSearchText(nom),
+    denomDosages,
+    compoDosages,
+    normForme: normalizeSearchText(med.forme_pharmaceutique),
+    normVoie: '',
+    normPresText: '',
+    speciesTokens
+  };
+}
+
 function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
-  const eff = parsed.effectiveCriteria;
+  const eff = (parsed && parsed.effectiveCriteria) || {};
   const cm = { dosage: false, forme: false, voie: false };
+  const cs = { dosage: 'not_requested', forme: 'not_requested', voie: 'not_requested' };
   let boost = 0;
   let dosageExtra = null;
 
+  const formeOverridden =
+    Boolean(parsed?.explicitOverrides?.forme) ||
+    Boolean(parsed?.conflicts?.some((c) => c.field === 'forme'));
+  const altFormes = !formeOverridden && Array.isArray(eff.altFormeTokens)
+    ? eff.altFormeTokens
+    : [];
+
   // 1. Dosage (dénomination prioritaire ; composition uniquement si dénomination muette)
   if (eff.dosage) {
-    const requested = parseDosageTokens(eff.dosage);
-    if (requested.length > 0) {
-      const denomTokens = record ? record.denomDosages : [];
-      const compoTokens = record ? record.compoDosages : [];
-      if (denomTokens.length > 0) {
-        const { matched, extra } = matchDosageTokens(requested, denomTokens);
-        cm.dosage = matched === requested.length;
-        if (matched > 0) {
-          boost += (3 * matched) / requested.length;
-          dosageExtra = extra;
-        } else {
-          boost -= 2.5; // contredit explicitement
-        }
-      } else if (compoTokens.length > 0) {
-        const { matched, extra } = matchDosageTokens(requested, compoTokens);
-        cm.dosage = matched === requested.length;
-        if (matched > 0) {
-          boost += (2 * matched) / requested.length;
-          dosageExtra = extra;
-        } else {
-          boost -= 2.0;
-        }
-      }
-      // Si ni denomDosages ni compoDosages : état 'unknown', cm.dosage reste false
-    }
-  }
-
-  // 2. Forme galénique
-  if (eff.forme && record) {
-    const formeScore = textOverlapScore(eff.forme, record.normForme);
-    if (formeScore >= 0.5) {
-      cm.forme = formeScore >= 0.9 || eff.forme.split(/\s+/).length === 1;
-      boost += formeScore >= 1 ? 2.5 : 1.25;
-    } else if (useAliases && eff.altFormeTokens && eff.altFormeTokens.length > 0) {
-      const altMatchForme = eff.altFormeTokens.some((alt) => record.normForme.includes(alt));
-      const altMatchPres = !altMatchForme && eff.altFormeTokens.some((alt) => record.normPresText.includes(alt));
-      if (altMatchForme) {
-        cm.forme = true;
-        boost += 2.0;
-      } else if (altMatchPres) {
-        boost += 1.0;
-      } else if (record.normForme) {
-        boost -= 1.5;
-      }
-    } else if (record.normForme) {
-      boost -= 1.5;
-    }
-  }
-
-  // 3. Voie d'administration
-  if (eff.voie && record) {
-    if (record.normVoie) {
-      const voieScore = textOverlapScore(eff.voie, record.normVoie);
-      if (voieScore >= 0.5) {
-        cm.voie = true;
-        boost += voieScore >= 1 ? 1.5 : 0.75;
-      } else if (useAliases && eff.voie === 'ophtalmique' && record.normForme.includes('collyre')) {
-        cm.voie = true;
-        boost += 1.25;
+    if (inspectCriterionConstraint(eff.dosage)) {
+      cs.dosage = 'unsupported';
+    } else {
+      const requested = parseDosageTokens(eff.dosage);
+      if (requested.length === 0) {
+        cs.dosage = 'unsupported';
+      } else if (!record) {
+        cs.dosage = 'unknown';
       } else {
+        const denomTokens = record.denomDosages || [];
+        const compoTokens = record.compoDosages || [];
+        if (denomTokens.length > 0) {
+          const { matched, extra } = matchDosageTokens(requested, denomTokens);
+          cm.dosage = matched === requested.length;
+          cs.dosage = cm.dosage ? 'matched' : 'contradicted';
+          if (matched > 0) {
+            boost += (3 * matched) / requested.length;
+            dosageExtra = extra;
+          } else {
+            boost -= 2.5; // contredit explicitement
+          }
+        } else if (compoTokens.length > 0) {
+          const { matched, extra } = matchDosageTokens(requested, compoTokens);
+          cm.dosage = matched === requested.length;
+          cs.dosage = cm.dosage ? 'matched' : 'contradicted';
+          if (matched > 0) {
+            boost += (2 * matched) / requested.length;
+            dosageExtra = extra;
+          } else {
+            boost -= 2.0;
+          }
+        } else {
+          cs.dosage = 'unknown';
+        }
+      }
+    }
+  }
+
+  // 2. Forme galénique (expansion alias != correspondance exacte)
+  if (eff.forme) {
+    if (inspectCriterionConstraint(eff.forme)) {
+      cs.forme = 'unsupported';
+    } else if (!record || !record.normForme) {
+      cs.forme = 'unknown';
+    } else {
+      const formeScore = textOverlapScore(eff.forme, record.normForme);
+      if (formeScore >= 0.9) {
+        cm.forme = true;
+        cs.forme = 'matched';
+        boost += 2.5;
+      } else if (formeScore >= 0.5) {
+        cs.forme = 'expanded';
+        boost += 1.25;
+      } else if (useAliases && altFormes.length > 0) {
+        const altMatchForme = altFormes.some((alt) => record.normForme.includes(alt));
+        const altMatchPres = !altMatchForme && altFormes.some((alt) => (record.normPresText || '').includes(alt));
+        if (altMatchForme) {
+          cs.forme = 'expanded';
+          boost += 1.5;
+        } else if (altMatchPres) {
+          cs.forme = 'expanded';
+          boost += 0.75;
+        } else {
+          cs.forme = 'contradicted';
+          boost -= 1.5;
+        }
+      } else {
+        cs.forme = 'contradicted';
         boost -= 1.5;
       }
     }
-    // Si normVoie est vide (ex: ANMV), état 'unknown', jamais faux positif
+  }
+
+  // 3. Voie d'administration (rejette contraintes/négations non supportées ; ophtalmique->collyre reste 'expanded')
+  if (eff.voie) {
+    if (inspectCriterionConstraint(eff.voie)) {
+      cs.voie = 'unsupported';
+    } else if (!record) {
+      cs.voie = 'unknown';
+    } else if (record.normVoie) {
+      const voieScore = textOverlapScore(eff.voie, record.normVoie);
+      if (voieScore >= 0.9) {
+        cm.voie = true;
+        cs.voie = 'matched';
+        boost += 1.5;
+      } else if (voieScore >= 0.5) {
+        cs.voie = 'expanded';
+        boost += 0.75;
+      } else if (useAliases && eff.voie === 'ophtalmique' && (record.normForme || '').includes('collyre')) {
+        cs.voie = 'expanded';
+        boost += 1.0;
+      } else {
+        cs.voie = 'contradicted';
+        boost -= 1.5;
+      }
+    } else if (useAliases && eff.voie === 'ophtalmique' && (record.normForme || '').includes('collyre')) {
+      cs.voie = 'expanded';
+      boost += 1.0;
+    } else {
+      cs.voie = 'unknown';
+    }
   }
 
   // 4. Qualificatifs galéniques (effervescent, lp, orodispersible, pelliculé, à croquer)
   if (useAliases && eff.qualifiers && eff.qualifiers.length > 0 && record) {
-    const hay = `${record.normDenom} ${record.normForme}`;
+    const hay = `${record.normDenom || record.normNom || ''} ${record.normForme || ''}`;
     let matchedQual = 0;
     for (const q of eff.qualifiers) {
       if (hay.includes(q) || (q === 'orodispersible' && hay.includes('lyophilisat'))) {
@@ -436,21 +556,24 @@ function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
       speciesMatched = eff.species.every((sp) => record.speciesTokens.has(sp));
       if (speciesMatched) {
         cm.species = true;
+        cs.species = 'matched';
         boost += 3.5;
       } else {
+        cs.species = 'contradicted';
         boost -= 3.0;
       }
     } else {
       // Médicament humain sur une requête avec espèce animale explicite
+      cs.species = 'contradicted';
       boost -= 3.0;
     }
   }
 
-  return { boost, criteria_match: cm, dosage_extra: dosageExtra, speciesMatched };
+  return { boost, criteria_match: cm, criteria_status: cs, dosage_extra: dosageExtra, speciesMatched };
 }
 
 function buildEntitySignals(ref, record, meta, parsed, { mode, store }) {
-  const { boost, criteria_match, dosage_extra, speciesMatched } = evaluateEntityCriteria(
+  const { boost, criteria_match, criteria_status, dosage_extra, speciesMatched } = evaluateEntityCriteria(
     record,
     parsed,
     { useAliases: mode === 'concepts' }
@@ -489,6 +612,7 @@ function buildEntitySignals(ref, record, meta, parsed, { mode, store }) {
   return {
     ...ref,
     criteria_match,
+    criteria_status,
     _score: boost + conceptBonus,
     _dosageExtra: dosage_extra,
     _speciesMatched: speciesMatched,
@@ -578,12 +702,11 @@ function executeExperimentalSearchPage(
   }
 
   const sourceMode = normalizeSource(source);
-  const explicitSource = source != null && String(source).trim() !== '';
-  const store = getConceptStore();
-  const parsed = parseStructuredQuery(q, explicitCriteria, store.taxonomy, {
+  const taxonomy = getTaxonomyVocab();
+  const parsed = parseStructuredQuery(q, explicitCriteria, taxonomy, {
     useAliases: mode === 'concepts'
   });
-  const safety = analyzeQuerySafetyAndIntent(q, parsed);
+  const safety = analyzeQuerySafetyAndIntent(q, parsed, explicitCriteria);
 
   const buildParsedMeta = () => ({
     kind: parsed.kind,
@@ -597,7 +720,8 @@ function executeExperimentalSearchPage(
     conflicts: parsed.conflicts,
     patient_weight: safety.patientWeight,
     pediatric_inferred: safety.pediatricInferred,
-    verbatim_qualifiers: safety.verbatimQualifiers
+    verbatim_qualifiers: safety.verbatimQualifiers,
+    unsupported_criteria: safety.unsupportedCriteria
   });
 
   if (!safety.supported) {
@@ -616,11 +740,17 @@ function executeExperimentalSearchPage(
           supported: false,
           intent: safety.intent,
           negation: safety.negation,
-          clinical_property: safety.clinicalProperty
+          clinical_property: safety.clinicalProperty,
+          unsupported_criteria: safety.unsupportedCriteria
         }
       }
     };
   }
+
+  const needsConceptStore =
+    mode === 'concepts' &&
+    !(parsed.kind === 'exact_code' && parsed.code && parsed.code.kind === 'numeric_code');
+  const store = needsConceptStore ? getConceptStore() : null;
 
   const queried = [];
   const withResults = [];
@@ -684,7 +814,9 @@ function executeExperimentalSearchPage(
 
   const scored = [];
   for (const ref of dedup.values()) {
-    const record = ref.source === 'bdpm' ? store.bdpmByCis.get(ref.key) : store.vetByNum.get(ref.key);
+    const record = store
+      ? (ref.source === 'bdpm' ? store.bdpmByCis.get(ref.key) : store.vetByNum.get(ref.key))
+      : buildStructuredEntityRecord(ref.source, ref.key, parsed);
     const meta = matchesBySource[ref.source] && matchesBySource[ref.source].metaByKey[ref.key];
     scored.push(buildEntitySignals(ref, record, meta, parsed, { mode, store }));
   }
@@ -706,7 +838,8 @@ function executeExperimentalSearchPage(
       supported: true,
       intent: safety.intent,
       negation: safety.negation,
-      clinical_property: safety.clinicalProperty
+      clinical_property: safety.clinicalProperty,
+      unsupported_criteria: safety.unsupportedCriteria
     }
   };
 

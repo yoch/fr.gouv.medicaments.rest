@@ -9,6 +9,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const zlib = require('node:zlib');
+const crypto = require('node:crypto');
+const { createRequire } = require('node:module');
 
 const { loadData } = require('../../../../src/services/dataLoader');
 const { loadVetData } = require('../../../../src/services/vetDataLoader');
@@ -20,14 +22,26 @@ const { buildIndexDocument } = require('../../../../src/utils/corpusStore');
 const { getConceptStore, resetConceptStoreCache } = require('../../../../src/search/conceptStore');
 const { buildControlledDocuments, loadStaticWordPieceEncoder } = require('./b3_encoders');
 
-const PKG_CJS = path.join(
-  __dirname,
-  '../../../../data/search-indexes/mission-semantic/pkg-verify/package/dist/cjs/index.require.cjs'
-);
+const PKG_VERIFY_ROOT =
+  process.env.FROZENMINISEARCH_PKG_ROOT ||
+  '/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/pkg-verify';
+const pkgRequire = createRequire(path.join(PKG_VERIFY_ROOT, 'consumer.js'));
 const MODEL_DIR = path.join(
   __dirname,
   '../../../../data/search-indexes/mission-semantic'
 );
+
+function computeCorpusSnapshotId(prefix, rows, labelField, weightPath, metaPath) {
+  const h = crypto.createHash('sha256');
+  h.update(`${prefix}:${rows.length}:`);
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    h.update(`${r.cis || r.num || ''}|${r[labelField] || ''}\n`);
+  }
+  h.update(fs.readFileSync(metaPath));
+  h.update(fs.readFileSync(weightPath));
+  return `sha256:${h.digest('hex').slice(0, 24)}`;
+}
 
 function round(v, digits = 2) {
   const f = Math.pow(10, digits);
@@ -102,7 +116,9 @@ async function runVariant(variant) {
     };
   }
 
-  const { FrozenMiniSearch, FrozenVectorIndex } = require(PKG_CJS);
+  const { FrozenMiniSearch } = pkgRequire('@yoch/frozenminisearch');
+  const { FrozenVectorIndex } = pkgRequire('@yoch/frozenminisearch/vectors');
+  const { encodeDenseVectorPack } = pkgRequire('@yoch/frozenminisearch/vectors/train');
   const tHost0 = process.hrtime.bigint();
   const bdpmHost = buildHostFromRows(
     FrozenMiniSearch,
@@ -119,18 +135,15 @@ async function runVariant(variant) {
 
   const useF32Encoder = variant === 'FXV1_Float32';
   const enc = loadStaticWordPieceEncoder(128, { useF32: useF32Encoder });
-  const vocabMetaBytes = fs.statSync(path.join(MODEL_DIR, 'static_mrl_128d.meta.json')).size;
-  const vocabWeightsBytes = fs.statSync(
-    path.join(MODEL_DIR, useF32Encoder ? 'static_mrl_128d_f32.bin' : 'static_mrl_128d_int8.bin')
-  ).size;
-  const vocabGzBytes = zlib.gzipSync(
-    fs.readFileSync(
-      path.join(MODEL_DIR, useF32Encoder ? 'static_mrl_128d_f32.bin' : 'static_mrl_128d_int8.bin')
-    )
-  ).length;
-  const metaGzBytes = zlib.gzipSync(
-    fs.readFileSync(path.join(MODEL_DIR, 'static_mrl_128d.meta.json'))
-  ).length;
+  const metaPath = path.join(MODEL_DIR, 'static_mrl_128d.meta.json');
+  const weightPath = path.join(
+    MODEL_DIR,
+    useF32Encoder ? 'static_mrl_128d_f32.bin' : 'static_mrl_128d_int8.bin'
+  );
+  const vocabMetaBytes = fs.statSync(metaPath).size;
+  const vocabWeightsBytes = fs.statSync(weightPath).size;
+  const vocabGzBytes = zlib.gzipSync(fs.readFileSync(weightPath)).length;
+  const metaGzBytes = zlib.gzipSync(fs.readFileSync(metaPath)).length;
 
   const tDocs0 = process.hrtime.bigint();
   let builtDocs = buildControlledDocuments(
@@ -149,48 +162,70 @@ async function runVariant(variant) {
   const encodeDocsMs = round(Number(process.hrtime.bigint() - tEnc0) / 1e6, 2);
   builtDocs = null;
 
-  const vecOptsByVariant = {
-    FXV1_Float32: { quantization: 'float32', dim: 128, metric: 'cosine', normalized: true },
-    FXV1_Int8: { quantization: 'int8', dim: 128, metric: 'cosine', normalized: true },
+  const repVersion = useF32Encoder ? 'static-wp-mrl-128d-f32:v1' : 'static-wp-mrl-128d-int8:v1';
+  const bdpmExpected = {
+    representationVersion: repVersion,
+    snapshotId: computeCorpusSnapshotId('bdpm', bdpmState.corpus.specialites, 'denomination', weightPath, metaPath)
+  };
+  const vetExpected = {
+    representationVersion: repVersion,
+    snapshotId: computeCorpusSnapshotId('anmv', vetState.corpus.medicaments, 'nom', weightPath, metaPath)
+  };
+
+  const baseOptsByVariant = {
+    FXV1_Float32: { quantization: 'float32', dim: 128, metric: 'cosine', normalize: true },
+    FXV1_Int8: { quantization: 'int8', dim: 128, metric: 'cosine', normalize: true },
     FXV1_PQ32: {
       quantization: 'pq',
       dim: 128,
       metric: 'cosine',
-      normalized: true,
+      normalize: true,
       pqSubspaces: 32,
-      pqCentroidsPerSubspace: 256,
-      pqMaxIterations: 15
+      pqIterations: 15
     },
     FXV1_PQ16: {
       quantization: 'pq',
       dim: 128,
       metric: 'cosine',
-      normalized: true,
+      normalize: true,
       pqSubspaces: 16,
-      pqCentroidsPerSubspace: 256,
-      pqMaxIterations: 15
+      pqIterations: 15
     }
   };
-  const opts = vecOptsByVariant[variant];
-  if (!opts) throw new Error(`Variante inconnue: ${variant}`);
+  const baseOpts = baseOptsByVariant[variant];
+  if (!baseOpts) throw new Error(`Variante inconnue: ${variant}`);
+  const bdpmOpts = { ...baseOpts, ...bdpmExpected };
+  const vetOpts = { ...baseOpts, ...vetExpected };
 
   const tBuildVec0 = process.hrtime.bigint();
-  let bdpmVec = FrozenVectorIndex.fromDenseFloat32(bdpmHost, bdpmF32, opts);
-  let vetVec = FrozenVectorIndex.fromDenseFloat32(vetHost, vetF32, opts);
+  let bdpmBin;
+  let vetBin;
+  let bdpmVec;
+  let vetVec;
+  let fxv1SaveBinaryMs = 0;
+  if (baseOpts.quantization === 'pq') {
+    bdpmBin = encodeDenseVectorPack(bdpmHost, bdpmF32, bdpmOpts);
+    vetBin = encodeDenseVectorPack(vetHost, vetF32, vetOpts);
+  } else {
+    bdpmVec = FrozenVectorIndex.fromDenseFloat32(bdpmHost, bdpmF32, bdpmOpts);
+    vetVec = FrozenVectorIndex.fromDenseFloat32(vetHost, vetF32, vetOpts);
+  }
   const fxv1BuildMs = round(Number(process.hrtime.bigint() - tBuildVec0) / 1e6, 2);
 
-  const tSave0 = process.hrtime.bigint();
-  let bdpmBin = bdpmVec.saveBinary();
-  let vetBin = vetVec.saveBinary();
-  const fxv1SaveBinaryMs = round(Number(process.hrtime.bigint() - tSave0) / 1e6, 2);
+  if (baseOpts.quantization !== 'pq') {
+    const tSave0 = process.hrtime.bigint();
+    bdpmBin = bdpmVec.saveBinary();
+    vetBin = vetVec.saveBinary();
+    fxv1SaveBinaryMs = round(Number(process.hrtime.bigint() - tSave0) / 1e6, 2);
+  }
   const bdpmBinBytes = bdpmBin.length;
   const vetBinBytes = vetBin.length;
   const bdpmGz = zlib.gzipSync(bdpmBin).length;
   const vetGz = zlib.gzipSync(vetBin).length;
 
   const tLoad0 = process.hrtime.bigint();
-  bdpmVec = FrozenVectorIndex.loadBinary(bdpmBin, bdpmHost);
-  vetVec = FrozenVectorIndex.loadBinary(vetBin, vetHost);
+  bdpmVec = FrozenVectorIndex.loadBinary(bdpmBin, bdpmHost, bdpmExpected);
+  vetVec = FrozenVectorIndex.loadBinary(vetBin, vetHost, vetExpected);
   const fxv1LoadBinaryMs = round(Number(process.hrtime.bigint() - tLoad0) / 1e6, 2);
 
   // Latence de scan top-20 sur 120 requêtes
@@ -217,8 +252,8 @@ async function runVariant(variant) {
   vetF32 = null;
   bdpmBin = null;
   vetBin = null;
-  const estimatedBdpmMem = bdpmVec.stats().estimatedByteLength;
-  const estimatedVetMem = vetVec.stats().estimatedByteLength;
+  const byteLengthBdpm = bdpmVec.stats().byteLength;
+  const byteLengthVet = vetVec.stats().byteLength;
   const keepAlive = [bdpmHost, vetHost, bdpmVec, vetVec, enc];
   const memRetained = snapshotMem();
   void keepAlive.length;
@@ -249,7 +284,7 @@ async function runVariant(variant) {
       fxv1VetBytes: vetBinBytes,
       fxv1TotalBytes: bdpmBinBytes + vetBinBytes,
       fxv1TotalGzBytes: bdpmGz + vetGz,
-      estimatedFxv1RuntimeBytes: estimatedBdpmMem + estimatedVetMem,
+      fxv1RuntimeByteLength: byteLengthBdpm + byteLengthVet,
       totalRuntimeAssetsBytes: vocabMetaBytes + vocabWeightsBytes + bdpmBinBytes + vetBinBytes,
       totalRuntimeAssetsGzBytes: metaGzBytes + vocabGzBytes + bdpmGz + vetGz
     },
