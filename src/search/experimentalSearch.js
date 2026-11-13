@@ -1,0 +1,724 @@
+'use strict';
+
+/**
+ * Pipeline expérimental opt-in (étapes B1 / B2).
+ *
+ * - mode='structured' (B1) : interpréteur de requête strict (sans alias externes)
+ *   + recherche MiniSearch existante + scoring tri-état (matched/contradicted/unknown)
+ *   + résolution explicite sans perte silencieuse.
+ * - mode='concepts' (B2) : B1 + alias pharmaceutiques traçables (galénique, voies)
+ *   + ConceptStore par entité (jointures CIS_COMPO SA<->FT, CIS_GENER princeps/génériques,
+ *   ANMV substances x espèces, préférence mono-principe actif sur requête simple).
+ *
+ * Aucun impact sur le chemin par défaut (`executeHybridSearchPage` dans searchOrchestrator.js).
+ */
+
+const {
+  searchKeyMatches,
+  getSpecialiteByCis,
+  getSpecialiteLabelByCis,
+  getRelatedByCis,
+  bdpmExtraitUrl,
+  HYDRATE_RELATED_LIMIT
+} = require('../services/dataLoader');
+const {
+  searchVetKeyMatches,
+  getMedicamentByNum,
+  getMedicamentLabelByNum,
+  getRelatedByNum
+} = require('../services/vetDataLoader');
+const { collectBdpmMatches } = require('../services/searchOrchestrator');
+const { parseListPaging } = require('../utils/corpusPaging');
+const {
+  normalizeSearchText,
+  createMatchPriorityClassifier,
+  isStrongMatchQuality,
+  MATCH_QUALITY_RANK
+} = require('../utils/searchRanking');
+const {
+  parseDosageTokens,
+  matchDosageTokens,
+  textOverlapScore
+} = require('../utils/structuredSearchCriteria');
+const { parseStructuredQuery } = require('./structuredQueryParser');
+const { analyzeQuerySafetyAndIntent } = require('./queryIntentGuard');
+const { SALT_WORDS, getConceptStore } = require('./conceptStore');
+
+const VALID_EXPERIMENTAL_MODES = new Set(['structured', 'concepts']);
+const VIA_BONUS = {
+  cis: 5,
+  num: 5,
+  atc: 4,
+  denomination: 3,
+  generique: 2.5,
+  presentation: 2,
+  composition: 1,
+  concept: 1
+};
+
+function normalizeSource(source) {
+  const value = (source || 'auto').toLowerCase();
+  return ['auto', 'human', 'veterinary', 'mixed'].includes(value) ? value : 'auto';
+}
+
+function hydrateExperimentalHit(ref, matchesBySource) {
+  let result;
+  if (ref.source === 'bdpm') {
+    const m = matchesBySource.bdpm;
+    result = {
+      type: 'medicament',
+      match_quality: ref.match_quality,
+      ...(getSpecialiteByCis(ref.key) || { cis: ref.key, url_bdpm: bdpmExtraitUrl(ref.key) }),
+      presentations: getRelatedByCis('presentations', ref.key, HYDRATE_RELATED_LIMIT),
+      compositions: getRelatedByCis('compositions', ref.key, HYDRATE_RELATED_LIMIT)
+    };
+    const via = ref.match_via || (m && m.metaByKey[ref.key] && m.metaByKey[ref.key].via);
+    if (via) result.match_via = via;
+  } else {
+    const m = matchesBySource.vet;
+    result = {
+      type: 'medicament_veterinaire',
+      match_quality: ref.match_quality,
+      ...(getMedicamentByNum(ref.key) || { num: ref.key }),
+      presentations: getRelatedByNum('presentations', ref.key),
+      compositions: getRelatedByNum('compositions', ref.key)
+    };
+    const via = ref.match_via || (m && m.metaByKey[ref.key] && m.metaByKey[ref.key].via);
+    if (via) result.match_via = via;
+  }
+  if (ref.criteria_match) result.criteria_match = ref.criteria_match;
+  return result;
+}
+
+function collectLegacyVetMatches(q) {
+  const qualityByKey = {};
+  const metaByKey = {};
+  const searches = [
+    { items: searchVetKeyMatches('medicaments', q), via: 'denomination' },
+    { items: searchVetKeyMatches('compositions', q), via: 'composition' }
+  ];
+  for (const { items, via } of searches) {
+    for (const item of items) {
+      const key = item.num;
+      if (!key) continue;
+      const prevMeta = metaByKey[key];
+      if (
+        !prevMeta ||
+        MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[prevMeta.quality] ||
+        (item.match_quality === prevMeta.quality && (VIA_BONUS[via] || 0) > (VIA_BONUS[prevMeta.via] || 0))
+      ) {
+        metaByKey[key] = { quality: item.match_quality, via };
+      }
+      if (!qualityByKey[key] || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[qualityByKey[key]]) {
+        qualityByKey[key] = item.match_quality;
+      }
+    }
+  }
+  const trimmed = String(q || '').trim();
+  if (/^\d+$/.test(trimmed)) {
+    const num = trimmed.padStart(7, '0');
+    if (qualityByKey[num] === 'exact') metaByKey[num] = { quality: 'exact', via: 'num' };
+  }
+  return { qualityByKey, metaByKey };
+}
+
+/**
+ * Recherche BDPM par entités via ConceptStore (résout les multi-substances
+ * sur lignes CIS_COMPO distinctes, SA<->FT, et fallback dénomination).
+ */
+function collectBdpmConceptMatches(parsed, store) {
+  const qualityByKey = {};
+  const metaByKey = {};
+  const tokens = (parsed.nameTokens || []).filter((t) => t.length >= 2);
+  if (tokens.length === 0) return { qualityByKey, metaByKey };
+
+  // Codes ATC exacts via MITM
+  if (parsed.kind === 'exact_code' && parsed.code && parsed.code.kind === 'atc_code') {
+    const list = store.bdpmAtcToCis.get(parsed.code.code) || [];
+    for (const cis of list) {
+      qualityByKey[cis] = 'exact';
+      metaByKey[cis] = { quality: 'exact', via: 'atc', coveredTokens: 1, totalTokens: 1 };
+    }
+    return { qualityByKey, metaByKey };
+  }
+
+  const substantiveTokens = tokens.filter((t) => t.length >= 3 && !SALT_WORDS.has(t));
+  const queryToks = substantiveTokens.length > 0 ? substantiveTokens : tokens;
+  if (queryToks.length === 0) return { qualityByKey, metaByKey };
+
+  // Compter pour chaque CIS combien de tokens de la requête trouvent un appui
+  // (dénomination OU substance active / fraction thérapeutique)
+  const hitCountByCis = new Map();
+  const denomHitByCis = new Map();
+
+  for (const tok of queryToks) {
+    const cisVisitedThisToken = new Set();
+
+    const denomHits = store.bdpmDenomTokenToCis.get(tok) || [];
+    for (let i = 0; i < denomHits.length; i++) {
+      const cis = denomHits[i];
+      denomHitByCis.set(cis, (denomHitByCis.get(cis) || 0) + 1);
+      if (!cisVisitedThisToken.has(cis)) {
+        cisVisitedThisToken.add(cis);
+        hitCountByCis.set(cis, (hitCountByCis.get(cis) || 0) + 1);
+      }
+    }
+
+    const subHits = store.bdpmSubTokenToCis.get(tok) || [];
+    for (let i = 0; i < subHits.length; i++) {
+      const cis = subHits[i];
+      if (!cisVisitedThisToken.has(cis)) {
+        cisVisitedThisToken.add(cis);
+        hitCountByCis.set(cis, (hitCountByCis.get(cis) || 0) + 1);
+      }
+    }
+  }
+
+  // Exiger couverture complète des tokens substantifs pour éviter les faux positifs
+  const requiredHits = queryToks.length;
+  const normQuery = normalizeSearchText(parsed.nameQuery);
+  const classifier = createMatchPriorityClassifier(normQuery);
+
+  for (const [cis, count] of hitCountByCis.entries()) {
+    if (count < requiredHits) continue;
+    const rec = store.bdpmByCis.get(cis);
+    if (!rec) continue;
+
+    const denomHits = denomHitByCis.get(cis) || 0;
+    const allInDenom = denomHits >= requiredHits;
+    const cls = classifier(rec.denomination, { idValue: cis });
+    let quality = 'prefix';
+    if (cls === 2) quality = 'exact';
+    else if (!allInDenom && requiredHits >= 2) quality = 'prefix';
+
+    const via = allInDenom ? 'denomination' : 'composition';
+    qualityByKey[cis] = quality;
+    metaByKey[cis] = {
+      quality,
+      via,
+      coveredTokens: count,
+      totalTokens: requiredHits,
+      allSubstancesMatched: requiredHits >= 2 && rec.distinctActiveCount >= 2
+    };
+  }
+
+  return { qualityByKey, metaByKey };
+}
+
+/**
+ * Résout l'intention explicite « générique de X » / « équivalent X » via CIS_GENER.
+ */
+function expandGenericGroupMatches(parsed, baseMatches, store) {
+  if (!parsed.extracted.intents.includes('generic_equivalent')) return null;
+
+  const anchorKeys = Object.keys(baseMatches.qualityByKey);
+  const groupIds = new Set();
+
+  for (const cis of anchorKeys) {
+    const rec = store.bdpmByCis.get(cis);
+    if (!rec) continue;
+    for (const gid of rec.genericGroupIds) groupIds.add(gid);
+  }
+
+  // Fallback si l'ancre exacte n'était pas directement dans CIS_GENER mais partage brandRoot
+  if (groupIds.size === 0) {
+    for (const cis of anchorKeys) {
+      const rec = store.bdpmByCis.get(cis);
+      if (!rec || !rec.brandRoot) continue;
+      const gSet = store.brandRootToGroupIds.get(rec.brandRoot);
+      if (gSet) {
+        for (const gid of gSet) groupIds.add(gid);
+      }
+    }
+  }
+
+  // Dernier repli : chercher le nom de marque dans libelle_groupe
+  if (groupIds.size === 0 && parsed.nameTokens.length > 0) {
+    const core = parsed.nameTokens.filter((t) => t.length >= 3);
+    if (core.length > 0) {
+      for (const [gid, grp] of store.generiquesByGroup.entries()) {
+        if (core.every((t) => grp.normLibelle.includes(t))) {
+          groupIds.add(gid);
+        }
+      }
+    }
+  }
+
+  if (groupIds.size === 0) return null;
+
+  const qualityByKey = { ...baseMatches.qualityByKey };
+  const metaByKey = { ...baseMatches.metaByKey };
+
+  for (const gid of groupIds) {
+    const grp = store.generiquesByGroup.get(gid);
+    if (!grp) continue;
+    for (const cis of grp.allCis) {
+      if (!qualityByKey[cis]) {
+        qualityByKey[cis] = 'prefix';
+        metaByKey[cis] = { quality: 'prefix', via: 'generique', genericExpanded: true };
+      } else {
+        metaByKey[cis] = { ...metaByKey[cis], genericExpanded: true };
+      }
+    }
+  }
+
+  return { qualityByKey, metaByKey };
+}
+
+/**
+ * Recherche vétérinaire par entités (substances x espèces x dosage).
+ */
+function collectVetConceptMatches(parsed, store) {
+  const qualityByKey = {};
+  const metaByKey = {};
+
+  if (parsed.kind === 'exact_code' && parsed.code && parsed.code.kind === 'atc_code') {
+    const list = store.vetAtcToNum.get(parsed.code.code) || [];
+    for (const num of list) {
+      qualityByKey[num] = 'exact';
+      metaByKey[num] = { quality: 'exact', via: 'atc' };
+    }
+    return { qualityByKey, metaByKey };
+  }
+
+  const tokens = (parsed.nameTokens || []).filter((t) => t.length >= 2);
+  const substantiveTokens = tokens.filter((t) => t.length >= 3 && !SALT_WORDS.has(t));
+  const queryToks = substantiveTokens.length > 0 ? substantiveTokens : tokens;
+  if (queryToks.length === 0) return { qualityByKey, metaByKey };
+
+  const hitCountByNum = new Map();
+  const nomHitByNum = new Map();
+
+  for (const tok of queryToks) {
+    const visited = new Set();
+    for (const num of store.vetNomTokenToNum.get(tok) || []) {
+      nomHitByNum.set(num, (nomHitByNum.get(num) || 0) + 1);
+      if (!visited.has(num)) {
+        visited.add(num);
+        hitCountByNum.set(num, (hitCountByNum.get(num) || 0) + 1);
+      }
+    }
+    for (const num of store.vetSubTokenToNum.get(tok) || []) {
+      if (!visited.has(num)) {
+        visited.add(num);
+        hitCountByNum.set(num, (hitCountByNum.get(num) || 0) + 1);
+      }
+    }
+  }
+
+  const reqHits = queryToks.length;
+  for (const [num, count] of hitCountByNum.entries()) {
+    if (count < reqHits) continue;
+    const rec = store.vetByNum.get(num);
+    if (!rec) continue;
+    const allInNom = (nomHitByNum.get(num) || 0) >= reqHits;
+    qualityByKey[num] = 'prefix';
+    metaByKey[num] = {
+      quality: 'prefix',
+      via: allInNom ? 'denomination' : 'composition'
+    };
+  }
+
+  return { qualityByKey, metaByKey };
+}
+
+function mergeMatchMaps(primary, secondary) {
+  const qualityByKey = { ...primary.qualityByKey };
+  const metaByKey = { ...primary.metaByKey };
+  for (const [k, q] of Object.entries(secondary.qualityByKey)) {
+    const secMeta = secondary.metaByKey[k] || { quality: q, via: 'concept' };
+    const prevQ = qualityByKey[k];
+    if (!prevQ || MATCH_QUALITY_RANK[q] > MATCH_QUALITY_RANK[prevQ]) {
+      qualityByKey[k] = q;
+      metaByKey[k] = secMeta;
+    } else if (prevQ === q && metaByKey[k]) {
+      metaByKey[k] = {
+        ...metaByKey[k],
+        ...(secMeta.allSubstancesMatched ? { allSubstancesMatched: true } : {}),
+        ...(secMeta.genericExpanded ? { genericExpanded: true } : {})
+      };
+    }
+  }
+  return { qualityByKey, metaByKey };
+}
+
+function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
+  const eff = parsed.effectiveCriteria;
+  const cm = { dosage: false, forme: false, voie: false };
+  let boost = 0;
+  let dosageExtra = null;
+
+  // 1. Dosage (dénomination prioritaire ; composition uniquement si dénomination muette)
+  if (eff.dosage) {
+    const requested = parseDosageTokens(eff.dosage);
+    if (requested.length > 0) {
+      const denomTokens = record ? record.denomDosages : [];
+      const compoTokens = record ? record.compoDosages : [];
+      if (denomTokens.length > 0) {
+        const { matched, extra } = matchDosageTokens(requested, denomTokens);
+        cm.dosage = matched === requested.length;
+        if (matched > 0) {
+          boost += (3 * matched) / requested.length;
+          dosageExtra = extra;
+        } else {
+          boost -= 2.5; // contredit explicitement
+        }
+      } else if (compoTokens.length > 0) {
+        const { matched, extra } = matchDosageTokens(requested, compoTokens);
+        cm.dosage = matched === requested.length;
+        if (matched > 0) {
+          boost += (2 * matched) / requested.length;
+          dosageExtra = extra;
+        } else {
+          boost -= 2.0;
+        }
+      }
+      // Si ni denomDosages ni compoDosages : état 'unknown', cm.dosage reste false
+    }
+  }
+
+  // 2. Forme galénique
+  if (eff.forme && record) {
+    const formeScore = textOverlapScore(eff.forme, record.normForme);
+    if (formeScore >= 0.5) {
+      cm.forme = formeScore >= 0.9 || eff.forme.split(/\s+/).length === 1;
+      boost += formeScore >= 1 ? 2.5 : 1.25;
+    } else if (useAliases && eff.altFormeTokens && eff.altFormeTokens.length > 0) {
+      const altMatchForme = eff.altFormeTokens.some((alt) => record.normForme.includes(alt));
+      const altMatchPres = !altMatchForme && eff.altFormeTokens.some((alt) => record.normPresText.includes(alt));
+      if (altMatchForme) {
+        cm.forme = true;
+        boost += 2.0;
+      } else if (altMatchPres) {
+        boost += 1.0;
+      } else if (record.normForme) {
+        boost -= 1.5;
+      }
+    } else if (record.normForme) {
+      boost -= 1.5;
+    }
+  }
+
+  // 3. Voie d'administration
+  if (eff.voie && record) {
+    if (record.normVoie) {
+      const voieScore = textOverlapScore(eff.voie, record.normVoie);
+      if (voieScore >= 0.5) {
+        cm.voie = true;
+        boost += voieScore >= 1 ? 1.5 : 0.75;
+      } else if (useAliases && eff.voie === 'ophtalmique' && record.normForme.includes('collyre')) {
+        cm.voie = true;
+        boost += 1.25;
+      } else {
+        boost -= 1.5;
+      }
+    }
+    // Si normVoie est vide (ex: ANMV), état 'unknown', jamais faux positif
+  }
+
+  // 4. Qualificatifs galéniques (effervescent, lp, orodispersible, pelliculé, à croquer)
+  if (useAliases && eff.qualifiers && eff.qualifiers.length > 0 && record) {
+    const hay = `${record.normDenom} ${record.normForme}`;
+    let matchedQual = 0;
+    for (const q of eff.qualifiers) {
+      if (hay.includes(q) || (q === 'orodispersible' && hay.includes('lyophilisat'))) {
+        matchedQual++;
+        boost += 1.5;
+      }
+    }
+    if (matchedQual === 0) boost -= 1.0;
+  }
+
+  // 5. Espèces animales (ANMV)
+  let speciesMatched = false;
+  if (eff.species && eff.species.length > 0 && record) {
+    if (record.speciesTokens && record.speciesTokens.size > 0) {
+      speciesMatched = eff.species.every((sp) => record.speciesTokens.has(sp));
+      if (speciesMatched) {
+        cm.species = true;
+        boost += 3.5;
+      } else {
+        boost -= 3.0;
+      }
+    } else {
+      // Médicament humain sur une requête avec espèce animale explicite
+      boost -= 3.0;
+    }
+  }
+
+  return { boost, criteria_match: cm, dosage_extra: dosageExtra, speciesMatched };
+}
+
+function buildEntitySignals(ref, record, meta, parsed, { mode, store }) {
+  const { boost, criteria_match, dosage_extra, speciesMatched } = evaluateEntityCriteria(
+    record,
+    parsed,
+    { useAliases: mode === 'concepts' }
+  );
+
+  let conceptBonus = 0;
+  if (mode === 'concepts' && record) {
+    const nameTokens = parsed.nameTokens || [];
+    const substantiveTokens = nameTokens.filter((t) => t.length >= 3 && !SALT_WORDS.has(t));
+
+    // Préférer mono-substance sur requête mono-molécule sans dosage d'association
+    const singleRequested = substantiveTokens.length === 1 &&
+      !(parsed.effectiveCriteria.dosage && parsed.effectiveCriteria.dosage.includes('/'));
+    if (singleRequested && record.distinctActiveCount === 1) {
+      conceptBonus += 1.2;
+    } else if (singleRequested && record.distinctActiveCount > 1) {
+      conceptBonus -= 0.4;
+    }
+
+    // Sur requête générique, mettre en avant les génériques ('generic') avant princeps ('0')
+    if (parsed.extracted.intents.includes('generic_equivalent')) {
+      if (record.genericRole === 'generic') conceptBonus += 1.5;
+      else if (record.genericRole === 'princeps') conceptBonus -= 0.3;
+    }
+
+    if (meta && meta.allSubstancesMatched) {
+      conceptBonus += 1.0;
+    }
+
+    // Tie-breaker doux sur statut de commercialisation actif
+    const active = ref.source === 'bdpm' ? record.isCommercialised : record.isActive;
+    if (active) conceptBonus += 0.25;
+  }
+
+  const viaRank = VIA_BONUS[ref.match_via] || 0;
+  return {
+    ...ref,
+    criteria_match,
+    _score: boost + conceptBonus,
+    _dosageExtra: dosage_extra,
+    _speciesMatched: speciesMatched,
+    _viaRank: viaRank,
+    _activePriority: record ? (ref.source === 'bdpm' ? (record.isCommercialised ? 1 : 0) : (record.isActive ? 1 : 0)) : 0
+  };
+}
+
+function compareExperimentalRefs(a, b) {
+  const qA = MATCH_QUALITY_RANK[a.match_quality] || 0;
+  const qB = MATCH_QUALITY_RANK[b.match_quality] || 0;
+  if (qB !== qA) return qB - qA;
+  if (b._score !== a._score) return b._score - a._score;
+  const exA = a._dosageExtra ?? Infinity;
+  const exB = b._dosageExtra ?? Infinity;
+  if (exA !== exB) return exA < exB ? -1 : 1;
+  if (b._viaRank !== a._viaRank) return b._viaRank - a._viaRank;
+  if (b._activePriority !== a._activePriority) return b._activePriority - a._activePriority;
+  return a.label.localeCompare(b.label, 'fr');
+}
+
+function buildRefsFromMatches(matches, source, labelFn, metaFn) {
+  return Object.keys(matches.qualityByKey).map((key) => ({
+    source,
+    key,
+    match_quality: matches.qualityByKey[key],
+    match_via: (matches.metaByKey[key] && matches.metaByKey[key].via) || metaFn,
+    label: labelFn(key)
+  }));
+}
+
+function runBdpmStage(parsed, { mode, store }) {
+  if (parsed.kind === 'exact_code') {
+    const lexical = collectBdpmMatches(parsed.raw);
+    if (mode === 'concepts' && parsed.code.kind === 'atc_code') {
+      return mergeMatchMaps(lexical, collectBdpmConceptMatches(parsed, store));
+    }
+    return lexical;
+  }
+
+  const queryText = parsed.nameQuery || parsed.raw;
+  let matches = collectBdpmMatches(queryText);
+
+  if (mode === 'concepts') {
+    const conceptMatches = collectBdpmConceptMatches(parsed, store);
+    matches = mergeMatchMaps(matches, conceptMatches);
+    const expanded = expandGenericGroupMatches(parsed, matches, store);
+    if (expanded) matches = expanded;
+  }
+  return matches;
+}
+
+function runVetStage(parsed, { mode, store }) {
+  if (parsed.kind === 'exact_code') {
+    const lexical = collectLegacyVetMatches(parsed.raw);
+    if (mode === 'concepts' && parsed.code.kind === 'atc_code') {
+      return mergeMatchMaps(lexical, collectVetConceptMatches(parsed, store));
+    }
+    return lexical;
+  }
+
+  const queryText = parsed.nameQuery || parsed.raw;
+  let matches = collectLegacyVetMatches(queryText);
+  if (mode === 'concepts') {
+    matches = mergeMatchMaps(matches, collectVetConceptMatches(parsed, store));
+  }
+  return matches;
+}
+
+/**
+ * Point d'entrée paginé expérimental (B1/B2). Respecte les invariants :
+ * - source = auto | human | veterinary | mixed
+ * - dédoublonnage strict par CIS/num avant pagination
+ * - aucun filtrage destructif sur dosage/forme/voie
+ * - précédence stricte des paramètres explicites + conflits exposés en métadonnées
+ */
+function executeExperimentalSearchPage(
+  q,
+  source,
+  page = 1,
+  limit = 50,
+  explicitCriteria = {},
+  { mode = 'concepts' } = {}
+) {
+  if (!VALID_EXPERIMENTAL_MODES.has(mode)) {
+    throw new Error(`Mode de recherche expérimental inconnu : ${mode}`);
+  }
+
+  const sourceMode = normalizeSource(source);
+  const explicitSource = source != null && String(source).trim() !== '';
+  const store = getConceptStore();
+  const parsed = parseStructuredQuery(q, explicitCriteria, store.taxonomy, {
+    useAliases: mode === 'concepts'
+  });
+  const safety = analyzeQuerySafetyAndIntent(q, parsed);
+
+  const buildParsedMeta = () => ({
+    kind: parsed.kind,
+    name_query: parsed.nameQuery,
+    dosage: parsed.effectiveCriteria.dosage,
+    forme: parsed.effectiveCriteria.forme,
+    voie: parsed.effectiveCriteria.voie,
+    species: parsed.extracted.species,
+    qualifiers: parsed.extracted.qualifiers,
+    intents: parsed.extracted.intents,
+    conflicts: parsed.conflicts,
+    patient_weight: safety.patientWeight,
+    pediatric_inferred: safety.pediatricInferred,
+    verbatim_qualifiers: safety.verbatimQualifiers
+  });
+
+  if (!safety.supported) {
+    return {
+      total: 0,
+      results: [],
+      search: {
+        query: q,
+        mode,
+        source: sourceMode,
+        referentiels: { queried: [], with_results: [] },
+        abstained: true,
+        abstain_reason: safety.abstainReason,
+        parsed: buildParsedMeta(),
+        safety: {
+          supported: false,
+          intent: safety.intent,
+          negation: safety.negation,
+          clinical_property: safety.clinicalProperty
+        }
+      }
+    };
+  }
+
+  const queried = [];
+  const withResults = [];
+  const matchesBySource = {};
+  let bdpmRefs = [];
+  let vetRefs = [];
+
+  const speciesHintVet = mode === 'concepts' && sourceMode === 'auto' && parsed.extracted.species.length > 0;
+
+  // 1. Cas espèce explicite en mode auto : interroger ANMV en priorité
+  if (speciesHintVet) {
+    queried.push('anmv');
+    matchesBySource.vet = runVetStage(parsed, { mode, store });
+    vetRefs = buildRefsFromMatches(matchesBySource.vet, 'vet', getMedicamentLabelByNum, 'denomination');
+    if (vetRefs.length > 0) withResults.push('anmv');
+  }
+
+  const needBdpm = sourceMode === 'human' || sourceMode === 'mixed' ||
+    (sourceMode === 'auto' && vetRefs.length === 0);
+
+  if (needBdpm) {
+    queried.push('bdpm');
+    matchesBySource.bdpm = runBdpmStage(parsed, { mode, store });
+    bdpmRefs = buildRefsFromMatches(matchesBySource.bdpm, 'bdpm', getSpecialiteLabelByCis, 'denomination');
+    if (bdpmRefs.length > 0) withResults.push('bdpm');
+  }
+
+  const bdpmStrong = bdpmRefs.some((r) => isStrongMatchQuality(r.match_quality));
+  const needVet = !speciesHintVet && (
+    sourceMode === 'veterinary' ||
+    sourceMode === 'mixed' ||
+    (sourceMode === 'auto' && !bdpmStrong)
+  );
+
+  if (needVet) {
+    queried.push('anmv');
+    matchesBySource.vet = runVetStage(parsed, { mode, store });
+    vetRefs = buildRefsFromMatches(matchesBySource.vet, 'vet', getMedicamentLabelByNum, 'denomination');
+    if (vetRefs.length > 0) withResults.push('anmv');
+  }
+
+  const vetStrong = vetRefs.some((r) => isStrongMatchQuality(r.match_quality));
+  let rawRefs;
+  if (sourceMode === 'human') rawRefs = bdpmRefs;
+  else if (sourceMode === 'veterinary') rawRefs = vetRefs;
+  else if (sourceMode === 'mixed') rawRefs = [...bdpmRefs, ...vetRefs];
+  else if (speciesHintVet && vetRefs.length > 0) rawRefs = vetRefs;
+  else if (bdpmStrong) rawRefs = bdpmRefs;
+  else if (vetStrong || bdpmRefs.length === 0) rawRefs = vetRefs;
+  else rawRefs = vetRefs.length > 0 ? [...bdpmRefs, ...vetRefs] : bdpmRefs;
+
+  // Dédoublonnage strict (par source + clé) et scoring tri-état
+  const dedup = new Map();
+  for (const ref of rawRefs) {
+    const dk = `${ref.source}:${ref.key}`;
+    const existing = dedup.get(dk);
+    if (!existing || MATCH_QUALITY_RANK[ref.match_quality] > MATCH_QUALITY_RANK[existing.match_quality]) {
+      dedup.set(dk, ref);
+    }
+  }
+
+  const scored = [];
+  for (const ref of dedup.values()) {
+    const record = ref.source === 'bdpm' ? store.bdpmByCis.get(ref.key) : store.vetByNum.get(ref.key);
+    const meta = matchesBySource[ref.source] && matchesBySource[ref.source].metaByKey[ref.key];
+    scored.push(buildEntitySignals(ref, record, meta, parsed, { mode, store }));
+  }
+
+  scored.sort(compareExperimentalRefs);
+
+  const { offset, safeLimit } = parseListPaging(page, limit);
+  const pageRefs = scored.slice(offset, offset + safeLimit);
+  const results = pageRefs.map((ref) => hydrateExperimentalHit(ref, matchesBySource));
+
+  const searchMeta = {
+    query: q,
+    mode,
+    source: sourceMode,
+    referentiels: { queried, with_results: withResults },
+    abstained: false,
+    parsed: buildParsedMeta(),
+    safety: {
+      supported: true,
+      intent: safety.intent,
+      negation: safety.negation,
+      clinical_property: safety.clinicalProperty
+    }
+  };
+
+  return {
+    total: scored.length,
+    results,
+    search: searchMeta
+  };
+}
+
+module.exports = {
+  VALID_EXPERIMENTAL_MODES,
+  executeExperimentalSearchPage,
+  evaluateEntityCriteria
+};

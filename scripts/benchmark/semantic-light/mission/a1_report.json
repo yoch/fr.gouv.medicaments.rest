@@ -1,0 +1,916 @@
+{
+  "environment": {
+    "node": "v24.18.0",
+    "platform": "linux/x64",
+    "dataDir": "/home/yoch/fr.gouv.medicaments.rest/data",
+    "vetDataDir": "/home/yoch/fr.gouv.medicaments.rest/data/veterinaires",
+    "configFlags": {
+      "loadHasAvis": true,
+      "loadMitm": true,
+      "corpusLightProfile": false,
+      "searchHydrateRelatedLimit": 50
+    }
+  },
+  "snapshot": {
+    "bdpmMeta": {
+      "CIS_bdpm.txt": {
+        "downloadedAt": "2026-11-04T21:40:37.666Z",
+        "checkedAt": "2026-11-04T21:40:37.666Z",
+        "hash": "97dcd8fc406e1c0bfb969cad6f66bda489eeede1c9910e2813dd65e1ab71d752",
+        "source": "remote",
+        "encoding": "utf-8",
+        "remote": {
+          "etag": null,
+          "lastModified": null,
+          "contentLength": null
+        }
+      },
+      "CIS_CIP_bdpm.txt": {
+        "downloadedAt": "2026-05-24T22:20:40.079Z",
+        "checkedAt": "2026-11-04T21:40:37.735Z",
+        "hash": "e1abee0b1f44e663b8c6a69936aeb08f2edb87778c202f8a52acab7000cce3aa",
+        "source": "remote",
+        "encoding": "utf-8"
+      },
+      "CIS_COMPO_bdpm.txt": {
+        "downloadedAt": "2026-11-04T21:40:38.798Z",
+        "checkedAt": "2026-11-04T21:40:38.798Z",
+        "hash": "18c2eb506602946b8a5010fd56a5339e6571ba8f76480b62dc751dd26c150716",
+        "source": "remote",
+        "encoding": "utf-8",
+        "remote": {
+          "etag": null,
+          "lastModified": null,
+          "contentLength": null
+        }
+      },
+      "CIS_HAS_SMR_bdpm.txt": {
+        "downloadedAt": "2026-11-04T21:40:42.625Z",
+        "checkedAt": "2026-11-04T21:40:42.625Z",
+        "hash": "78e59667a1ff8ba899838e6498426a9dea537b99b88c74afbe6b29a8d4d7118d",
+        "source": "remote",
+        "encoding": "utf-8",
+        "remote": {
+          "etag": null,
+          "lastModified": null,
+          "contentLength": null
+        }
+      },
+      "CIS_HAS_ASMR_bdpm.txt": {
+        "downloadedAt": "2026-11-04T21:40:43.649Z",
+        "checkedAt": "2026-11-04T21:40:43.649Z",
+        "hash": "c5f651561dedb325317a559b5f5934407c62776adb429e318fa7494954cce1bc",
+        "source": "remote",
+        "encoding": "utf-8",
+        "remote": {
+          "etag": null,
+          "lastModified": null,
+          "contentLength": null
+        }
+      },
+      "CIS_GENER_bdpm.txt": {
+        "downloadedAt": "2026-11-04T21:40:39.547Z",
+        "checkedAt": "2026-11-04T21:40:39.547Z",
+        "hash": "bdcc5d710279f56d6a28af86168e583387f4bd42462a1a706354a455422d1aa7",
+        "source": "remote",
+        "encoding": "utf-8",
+        "remote": {
+          "etag": null,
+          "lastModified": null,
+          "contentLength": null
+        }
+      },
+      "CIS_CPD_bdpm.txt": {
+        "downloadedAt": "2026-11-04T21:40:40.306Z",
+        "checkedAt": "2026-11-04T21:40:40.306Z",
+        "hash": "80fbf7298bc42681e32129980fc31b95f508d6f10b023f930836ecadb42ac8d0",
+        "source": "remote",
+        "encoding": "utf-8",
+        "remote": {
+          "etag": null,
+          "lastModified": null,
+          "contentLength": null
+        }
+      },
+      "CIS_CIP_Dispo_Spec.txt": {
+        "downloadedAt": "2026-11-04T21:40:40.870Z",
+        "checkedAt": "2026-11-04T21:40:40.870Z",
+        "hash": "94872ccb74e05c24f14c801bfc6598ac801d71fd85ea11bdd68719e554348ecf",
+        "source": "remote",
+        "encoding": "utf-8",
+        "remote": {
+          "etag": null,
+          "lastModified": null,
+          "contentLength": null
+        }
+      },
+      "CIS_MITM.txt": {
+        "downloadedAt": "2026-10-29T13:06:28.394Z",
+        "checkedAt": "2026-11-04T21:40:41.654Z",
+        "hash": "300f24c39e84466c617eedce9edfd491870259fd5abd2092b3f8296a3b6245fa",
+        "source": "remote",
+        "encoding": "utf-8",
+        "remote": {
+          "etag": null,
+          "lastModified": null,
+          "contentLength": null
+        }
+      },
+      "CIS_InfoImportantes.txt": {
+        "downloadedAt": "2026-01-28T00:21:42.013Z",
+        "checkedAt": "2026-01-28T00:24:38.106Z",
+        "hash": "903e5847ee22c7bf7b30db1e4915baf67cb2a9ff5c54b3aa7097b9a4b30d3728",
+        "source": "remote",
+        "encoding": "utf-8"
+      }
+    },
+    "vetMeta": {
+      "amm-vet-fr-v2-v.7z": {
+        "downloadedAt": "2026-05-31T21:21:14.858Z",
+        "checkedAt": "2026-11-04T21:40:53.948Z",
+        "hash": "29bd0dbff8dbe9885ec79c4bbbbbbe8dc32e78b76d70ed0611f2354ff68e81a5",
+        "source": "remote",
+        "remote": {
+          "etag": "\"369a8b-6524e2458f3c0\"",
+          "lastModified": "Thu, 21 May 2026 06:37:11 GMT",
+          "contentLength": 3578507
+        }
+      },
+      "amm-vet-fr-v2-d.xml": {
+        "downloadedAt": "2026-05-31T21:21:16.107Z",
+        "checkedAt": "2026-11-04T21:40:53.952Z",
+        "hash": "5ee17fcbc9afcd9faf853de9f32c4919c6acb928bc7bf1b8d2df48dcc137baef",
+        "source": "remote",
+        "remote": {
+          "etag": "\"e0001-62bbf2f628e80-gzip\"",
+          "lastModified": "Wed, 15 Jan 2025 14:06:34 GMT",
+          "contentLength": null
+        }
+      }
+    },
+    "cisBdpmSha256": "0381012edec9848d8c88355299d386c422efbcafd050a06ef38aa55ea5db7a4e",
+    "vetXmlSha256": "4c56916c203bc65791407fcb9f7622c52656dd601a2d7335ee34a5446da62312"
+  },
+  "loadTimingMs": {
+    "bdpmMs": 6752,
+    "vetMs": 1547,
+    "totalMs": 8298
+  },
+  "memoryMb": {
+    "start": {
+      "rss": 73.1,
+      "heapUsed": 12.8,
+      "external": 2.8,
+      "arrayBuffers": 0.3
+    },
+    "afterLoad": {
+      "rss": 449.6,
+      "heapUsed": 263.8,
+      "external": 14.9,
+      "arrayBuffers": 12.4
+    }
+  },
+  "bdpmInventory": {
+    "counts": {
+      "specialites": 15845,
+      "presentations": 20905,
+      "compositions": 32297,
+      "avis_smr": 15595,
+      "avis_asmr": 10146,
+      "generiques": 10745,
+      "conditions": 28513,
+      "ruptures": 725,
+      "substances": 3902,
+      "mitm": 7855
+    },
+    "fieldProfiles": {
+      "specialites_denomination": {
+        "total": 15845,
+        "nonEmpty": 15845,
+        "pctNonEmpty": 100,
+        "chars": {
+          "p50": 49,
+          "p95": 92,
+          "max": 255
+        },
+        "tokens": {
+          "p50": 7,
+          "p95": 16,
+          "max": 34
+        }
+      },
+      "specialites_forme_pharma": {
+        "total": 15845,
+        "nonEmpty": 15845,
+        "pctNonEmpty": 100,
+        "chars": {
+          "p50": 19,
+          "p95": 56,
+          "max": 92
+        },
+        "tokens": {
+          "p50": 2,
+          "p95": 9,
+          "max": 13
+        }
+      },
+      "specialites_voies_admin": {
+        "total": 15845,
+        "nonEmpty": 15845,
+        "pctNonEmpty": 100,
+        "chars": {
+          "p50": 5,
+          "p95": 26,
+          "max": 134
+        },
+        "tokens": {
+          "p50": 1,
+          "p95": 1,
+          "max": 3
+        }
+      },
+      "presentations_libelle": {
+        "total": 20905,
+        "nonEmpty": 20905,
+        "pctNonEmpty": 100,
+        "chars": {
+          "p50": 58,
+          "p95": 118,
+          "max": 255
+        },
+        "tokens": {
+          "p50": 7,
+          "p95": 17,
+          "max": 59
+        }
+      },
+      "compositions_substance": {
+        "total": 32297,
+        "nonEmpty": 32297,
+        "pctNonEmpty": 100,
+        "chars": {
+          "p50": 21,
+          "p95": 53,
+          "max": 205
+        },
+        "tokens": {
+          "p50": 2,
+          "p95": 5,
+          "max": 26
+        }
+      },
+      "generiques_libelle_groupe": {
+        "total": 10745,
+        "nonEmpty": 10745,
+        "pctNonEmpty": 100,
+        "chars": {
+          "p50": 85,
+          "p95": 174,
+          "max": 430
+        },
+        "tokens": {
+          "p50": 13,
+          "p95": 26,
+          "max": 64
+        }
+      }
+    },
+    "coverageAndRelations": {
+      "specialitesCommercialised": 13599,
+      "specialitesWithCompositions": 15843,
+      "specialitesWithoutForme": 0,
+      "specialitesWithoutVoie": 0,
+      "uniqueFormesNormalized": 366,
+      "uniqueVoiesNormalized": 68,
+      "uniqueSubstanceCodes": 3902,
+      "uniqueSubstanceNamesNormalized": 4474,
+      "saToFtLinksCount": 890,
+      "monoSubstanceCis": 13458,
+      "multiSubstanceCis": 2385,
+      "activeSubstancesPerCisDist": {
+        "0": 2,
+        "1": 13458,
+        "2": 1736,
+        "3": 296,
+        "4": 95,
+        "5": 70,
+        "6": 52,
+        "7": 19,
+        "8": 26,
+        "9": 19,
+        "10": 16,
+        "11": 4,
+        "12": 2,
+        "13": 1,
+        "15": 1,
+        "16": 2,
+        "18": 4,
+        "19": 3,
+        "20": 7,
+        "21": 4,
+        "22": 1,
+        "23": 1,
+        "24": 2,
+        "25": 8,
+        "27": 5,
+        "28": 5,
+        "29": 1,
+        "32": 1,
+        "35": 3,
+        "58": 1
+      },
+      "compositionsWithDosage": 29454,
+      "compositionsWithParseableDosage": 22927,
+      "cisInGeneriques": 8127,
+      "cisInMitm": 7854,
+      "cisInConditions": 12550,
+      "cisInRuptures": 659,
+      "presentationsPerCis": {
+        "p50": 1,
+        "p95": 3,
+        "max": 37
+      }
+    }
+  },
+  "anmvInventory": {
+    "counts": {
+      "medicaments": 3213,
+      "compositions": 4842,
+      "presentations": 19878
+    },
+    "uniqueFormesNormalized": 132,
+    "uniqueEspecesNormalized": 82,
+    "uniqueAtcvetCodes": 630,
+    "uniqueSubstanceNamesNormalized": 1094,
+    "fieldProfiles": {
+      "vet_nom": {
+        "total": 3213,
+        "nonEmpty": 3213,
+        "pctNonEmpty": 100,
+        "chars": {
+          "p50": 52,
+          "p95": 90,
+          "max": 154
+        },
+        "tokens": {
+          "p50": 8,
+          "p95": 15,
+          "max": 25
+        }
+      },
+      "vet_forme": {
+        "total": 3213,
+        "nonEmpty": 3213,
+        "pctNonEmpty": 100,
+        "chars": {
+          "p50": 19,
+          "p95": 49,
+          "max": 76
+        },
+        "tokens": {
+          "p50": 2,
+          "p95": 6,
+          "max": 10
+        }
+      },
+      "vet_especes": {
+        "total": 3213,
+        "nonEmpty": 3213,
+        "pctNonEmpty": 100,
+        "chars": {
+          "p50": 6,
+          "p95": 44,
+          "max": 175
+        },
+        "tokens": {
+          "p50": 1,
+          "p95": 7,
+          "max": 27
+        }
+      },
+      "vet_presentations": {
+        "total": 19878,
+        "nonEmpty": 19878,
+        "pctNonEmpty": 100,
+        "chars": {
+          "p50": 40,
+          "p95": 80,
+          "max": 239
+        },
+        "tokens": {
+          "p50": 8,
+          "p95": 16,
+          "max": 47
+        }
+      }
+    }
+  },
+  "b0Traces": [
+    {
+      "label": "exact_name",
+      "q": "doliprane",
+      "criteria": null,
+      "orchMs": 20.508162,
+      "httpMs": 40.365086,
+      "httpStatus": 200,
+      "total": 31,
+      "searchMeta": {
+        "query": "doliprane",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm"
+          ],
+          "with_results": [
+            "bdpm"
+          ]
+        }
+      },
+      "top3": [
+        {
+          "type": "medicament",
+          "id": "64793681",
+          "name": "DOLIPRANE 100 mg, poudre pour solution buvable en sachet-dose",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        },
+        {
+          "type": "medicament",
+          "id": "66057393",
+          "name": "DOLIPRANE 100 mg, suppositoire sécable",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        },
+        {
+          "type": "medicament",
+          "id": "60234100",
+          "name": "DOLIPRANE 1000 mg, comprimé",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        }
+      ]
+    },
+    {
+      "label": "name_plus_dose_space",
+      "q": "doliprane 1000 mg",
+      "criteria": null,
+      "orchMs": 4.986969,
+      "httpMs": 7.136596,
+      "httpStatus": 200,
+      "total": 8,
+      "searchMeta": {
+        "query": "doliprane 1000 mg",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm"
+          ],
+          "with_results": [
+            "bdpm"
+          ]
+        }
+      },
+      "top3": [
+        {
+          "type": "medicament",
+          "id": "60234100",
+          "name": "DOLIPRANE 1000 mg, comprimé",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        },
+        {
+          "type": "medicament",
+          "id": "66567738",
+          "name": "DOLIPRANE 1000 mg, comprimé effervescent sécable",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        },
+        {
+          "type": "medicament",
+          "id": "69309629",
+          "name": "DOLIPRANE 1000 mg, gélule",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        }
+      ]
+    },
+    {
+      "label": "natural_mixed_unit_conv",
+      "q": "Doliprane 1 g comprimé",
+      "criteria": null,
+      "orchMs": 4.476505,
+      "httpMs": 4.517386,
+      "httpStatus": 200,
+      "total": 0,
+      "searchMeta": {
+        "query": "Doliprane 1 g comprimé",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm",
+            "anmv"
+          ],
+          "with_results": []
+        }
+      },
+      "top3": []
+    },
+    {
+      "label": "natural_glued_accent",
+      "q": "esoméprazole 40mg",
+      "criteria": null,
+      "orchMs": 0.855496,
+      "httpMs": 3.629044,
+      "httpStatus": 200,
+      "total": 1,
+      "searchMeta": {
+        "query": "esoméprazole 40mg",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm"
+          ],
+          "with_results": [
+            "bdpm"
+          ]
+        }
+      },
+      "top3": [
+        {
+          "type": "medicament",
+          "id": "67717735",
+          "name": "ESOMEPRAZOLE BENTA 40mg, gélule gastro-résistante",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        }
+      ]
+    },
+    {
+      "label": "natural_name_forme",
+      "q": "Hexamidine collyre",
+      "criteria": null,
+      "orchMs": 1.074392,
+      "httpMs": 3.942989,
+      "httpStatus": 200,
+      "total": 0,
+      "searchMeta": {
+        "query": "Hexamidine collyre",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm",
+            "anmv"
+          ],
+          "with_results": []
+        }
+      },
+      "top3": []
+    },
+    {
+      "label": "natural_dci_voie",
+      "q": "méthotrexate per os",
+      "criteria": null,
+      "orchMs": 1.782501,
+      "httpMs": 4.300189,
+      "httpStatus": 200,
+      "total": 0,
+      "searchMeta": {
+        "query": "méthotrexate per os",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm",
+            "anmv"
+          ],
+          "with_results": []
+        }
+      },
+      "top3": []
+    },
+    {
+      "label": "natural_brand_forme",
+      "q": "Cerulyse spray",
+      "criteria": null,
+      "orchMs": 0.878919,
+      "httpMs": 2.83685,
+      "httpStatus": 200,
+      "total": 0,
+      "searchMeta": {
+        "query": "Cerulyse spray",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm",
+            "anmv"
+          ],
+          "with_results": []
+        }
+      },
+      "top3": []
+    },
+    {
+      "label": "brand_with_digit",
+      "q": "MAG 2 100 mg",
+      "criteria": null,
+      "orchMs": 1.184613,
+      "httpMs": 3.017971,
+      "httpStatus": 200,
+      "total": 15,
+      "searchMeta": {
+        "query": "MAG 2 100 mg",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm"
+          ],
+          "with_results": [
+            "bdpm"
+          ]
+        }
+      },
+      "top3": [
+        {
+          "type": "medicament",
+          "id": "68633852",
+          "name": "MAG 2 100 mg, comprimé",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        },
+        {
+          "type": "medicament",
+          "id": "66303368",
+          "name": "BEVITINE 100 mg/2 ml, solution injectable en ampoule",
+          "match_quality": "fuzzy",
+          "match_via": "denomination",
+          "criteria_match": null
+        },
+        {
+          "type": "medicament",
+          "id": "61426630",
+          "name": "CARBOXYMALTOSE FERRIQUE TEVA 50 mg/mL, dispersion injectable/pour perfusion",
+          "match_quality": "fuzzy",
+          "match_via": "presentation",
+          "criteria_match": null
+        }
+      ]
+    },
+    {
+      "label": "multi_sub_mixed",
+      "q": "amoxicilline acide clavulanique 1 g",
+      "criteria": null,
+      "orchMs": 1.989837,
+      "httpMs": 5.82755,
+      "httpStatus": 200,
+      "total": 31,
+      "searchMeta": {
+        "query": "amoxicilline acide clavulanique 1 g",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm"
+          ],
+          "with_results": [
+            "bdpm"
+          ]
+        }
+      },
+      "top3": [
+        {
+          "type": "medicament",
+          "id": "69776892",
+          "name": "AMOXICILLINE ACIDE CLAVULANIQUE ARROW 100 mg/12,5 mg par mL ENFANTS, poudre pour suspension buvable en flacon (rapport amoxicilline/acide clavulanique : 8/1)",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        },
+        {
+          "type": "medicament",
+          "id": "69033903",
+          "name": "AMOXICILLINE ACIDE CLAVULANIQUE ARROW 100 mg/12,5 mg par mL NOURRISSONS, poudre pour suspension buvable en flacon (rapport amoxicilline/acide clavulanique : 8/1)",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        },
+        {
+          "type": "medicament",
+          "id": "60685523",
+          "name": "AMOXICILLINE/ACIDE CLAVULANIQUE ALMUS 1 g/125 mg ADULTES, poudre pour suspension buvable en sachet-dose (rapport amoxicilline/acide clavulanique : 8/1)",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        }
+      ]
+    },
+    {
+      "label": "microgram_symbol",
+      "q": "levothyroxine 25 µg",
+      "criteria": null,
+      "orchMs": 2.649637,
+      "httpMs": 5.001426,
+      "httpStatus": 200,
+      "total": 0,
+      "searchMeta": {
+        "query": "levothyroxine 25 µg",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm",
+            "anmv"
+          ],
+          "with_results": []
+        }
+      },
+      "top3": []
+    },
+    {
+      "label": "vet_auto_species",
+      "q": "meloxicam chien",
+      "criteria": null,
+      "orchMs": 2.096074,
+      "httpMs": 4.194106,
+      "httpStatus": 200,
+      "total": 2,
+      "searchMeta": {
+        "query": "meloxicam chien",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm",
+            "anmv"
+          ],
+          "with_results": [
+            "anmv"
+          ]
+        }
+      },
+      "top3": [
+        {
+          "type": "medicament_veterinaire",
+          "id": "0066709",
+          "name": "MELOXICAM CEVA 1,5 MG/ML SUSPENSION BUVABLE POUR CHIENS",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        },
+        {
+          "type": "medicament_veterinaire",
+          "id": "0095709",
+          "name": "MELOXICAM CEVA 5 MG/ML SOLUTION INJECTABLE POUR CHIENS ET CHATS",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": null
+        }
+      ]
+    },
+    {
+      "label": "vet_brand",
+      "q": "SULTRIAN 100",
+      "criteria": null,
+      "orchMs": 0.873634,
+      "httpMs": 2.765604,
+      "httpStatus": 200,
+      "total": 1,
+      "searchMeta": {
+        "query": "SULTRIAN 100",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm",
+            "anmv"
+          ],
+          "with_results": [
+            "anmv"
+          ]
+        }
+      },
+      "top3": [
+        {
+          "type": "medicament_veterinaire",
+          "id": "0452300",
+          "name": "SULTRIAN 100",
+          "match_quality": "exact",
+          "match_via": "denomination",
+          "criteria_match": null
+        }
+      ]
+    },
+    {
+      "label": "typo",
+      "q": "dolipranr",
+      "criteria": null,
+      "orchMs": 0.946324,
+      "httpMs": 2.628352,
+      "httpStatus": 200,
+      "total": 18,
+      "searchMeta": {
+        "query": "dolipranr",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm",
+            "anmv"
+          ],
+          "with_results": [
+            "bdpm"
+          ]
+        }
+      },
+      "top3": [
+        {
+          "type": "medicament",
+          "id": "64793681",
+          "name": "DOLIPRANE 100 mg, poudre pour solution buvable en sachet-dose",
+          "match_quality": "fuzzy",
+          "match_via": "denomination",
+          "criteria_match": null
+        },
+        {
+          "type": "medicament",
+          "id": "66057393",
+          "name": "DOLIPRANE 100 mg, suppositoire sécable",
+          "match_quality": "fuzzy",
+          "match_via": "denomination",
+          "criteria_match": null
+        },
+        {
+          "type": "medicament",
+          "id": "60234100",
+          "name": "DOLIPRANE 1000 mg, comprimé",
+          "match_quality": "fuzzy",
+          "match_via": "denomination",
+          "criteria_match": null
+        }
+      ]
+    },
+    {
+      "label": "structured_baseline",
+      "q": "doliprane",
+      "criteria": {
+        "dosage": "1 g",
+        "forme": "comprimé"
+      },
+      "orchMs": 2.377471,
+      "httpMs": 3.743691,
+      "httpStatus": 200,
+      "total": 31,
+      "searchMeta": {
+        "query": "doliprane",
+        "source": "auto",
+        "referentiels": {
+          "queried": [
+            "bdpm"
+          ],
+          "with_results": [
+            "bdpm"
+          ]
+        }
+      },
+      "top3": [
+        {
+          "type": "medicament",
+          "id": "60234100",
+          "name": "DOLIPRANE 1000 mg, comprimé",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": {
+            "dosage": true,
+            "forme": true,
+            "voie": false
+          }
+        },
+        {
+          "type": "medicament",
+          "id": "66567738",
+          "name": "DOLIPRANE 1000 mg, comprimé effervescent sécable",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": {
+            "dosage": true,
+            "forme": true,
+            "voie": false
+          }
+        },
+        {
+          "type": "medicament",
+          "id": "60641854",
+          "name": "DOLIPRANETABS 1000 mg, comprimé pelliculé",
+          "match_quality": "prefix",
+          "match_via": "denomination",
+          "criteria_match": {
+            "dosage": true,
+            "forme": true,
+            "voie": false
+          }
+        }
+      ]
+    }
+  ]
+}

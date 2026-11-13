@@ -1,0 +1,492 @@
+{
+  "B0": {
+    "variant": "B0",
+    "lexicalLoadMs": 7557.47,
+    "memAfterB0": {
+      "rssMiB": 442.23,
+      "heapUsedMiB": 70.44,
+      "heapTotalMiB": 223.72,
+      "externalMiB": 12.43,
+      "arrayBuffersMiB": 10.45,
+      "v8HeapPlusExternalNoDoubleCountMiB": 82.86,
+      "peakRssMiB": 443.8
+    },
+    "peakRssMiB": 443.8
+  },
+  "B2": {
+    "variant": "B2",
+    "lexicalLoadMs": 7454.69,
+    "conceptBuildMs": 884.32,
+    "memAfterB0": {
+      "rssMiB": 327.14,
+      "heapUsedMiB": 70.44,
+      "heapTotalMiB": 210.47,
+      "externalMiB": 12.43,
+      "arrayBuffersMiB": 10.45,
+      "v8HeapPlusExternalNoDoubleCountMiB": 82.86,
+      "peakRssMiB": 330.04
+    },
+    "memAfterB2": {
+      "rssMiB": 353.97,
+      "heapUsedMiB": 146.94,
+      "heapTotalMiB": 278.13,
+      "externalMiB": 12.43,
+      "arrayBuffersMiB": 10.45,
+      "v8HeapPlusExternalNoDoubleCountMiB": 159.37,
+      "peakRssMiB": 354.23
+    },
+    "peakRssMiB": 354.23
+  },
+  "FXV1_Float32": {
+    "variant": "FXV1_Float32",
+    "counts": {
+      "bdpmN": 15845,
+      "vetN": 3213,
+      "totalDocs": 19058,
+      "dim": 128
+    },
+    "timingsMs": {
+      "lexicalLoadMs": 7693.14,
+      "conceptBuildMs": 867.91,
+      "host113BuildMs": 365.83,
+      "staticModelLoadMs": 63.2,
+      "docsBuildMs": 217.96,
+      "encodeDocsMs": 1017.39,
+      "fxv1BuildMs": 20.25,
+      "fxv1SaveBinaryMs": 19.31,
+      "fxv1LoadBinaryMs": 30.42,
+      "totalPipelineMs": 13543.35,
+      "scanDual120P50Ms": 5.98,
+      "scanDual120P95Ms": 6.374
+    },
+    "artifactsBytes": {
+      "vocabMetaBytes": 1201894,
+      "vocabWeightsBytes": 54210064,
+      "vocabTotalBytes": 55411958,
+      "vocabTotalGzBytes": 50892391,
+      "fxv1BdpmBytes": 8176060,
+      "fxv1VetBytes": 1657948,
+      "fxv1TotalBytes": 9834008,
+      "fxv1TotalGzBytes": 8985147,
+      "estimatedFxv1RuntimeBytes": null,
+      "totalRuntimeAssetsBytes": 65245966,
+      "totalRuntimeAssetsGzBytes": 59877538
+    },
+    "memory": {
+      "afterB0": {
+        "rssMiB": 347.64,
+        "heapUsedMiB": 70.43,
+        "heapTotalMiB": 205.97,
+        "externalMiB": 12.43,
+        "arrayBuffersMiB": 10.45,
+        "v8HeapPlusExternalNoDoubleCountMiB": 82.86,
+        "peakRssMiB": 348.28
+      },
+      "afterB2": {
+        "rssMiB": 350.98,
+        "heapUsedMiB": 146.93,
+        "heapTotalMiB": 278.13,
+        "externalMiB": 12.43,
+        "arrayBuffersMiB": 10.45,
+        "v8HeapPlusExternalNoDoubleCountMiB": 159.36,
+        "peakRssMiB": 358.55
+      },
+      "afterHost113": {
+        "rssMiB": 365.2,
+        "heapUsedMiB": 148.12,
+        "heapTotalMiB": 278.88,
+        "externalMiB": 13.91,
+        "arrayBuffersMiB": 11.94,
+        "v8HeapPlusExternalNoDoubleCountMiB": 162.03,
+        "peakRssMiB": 370.11
+      },
+      "duringBuildBeforeRelease": {
+        "rssMiB": 481.78,
+        "heapUsedMiB": 154.56,
+        "heapTotalMiB": 285.63,
+        "externalMiB": 93.75,
+        "arrayBuffersMiB": 91.78,
+        "v8HeapPlusExternalNoDoubleCountMiB": 248.32,
+        "peakRssMiB": 564.98
+      },
+      "retainedPostGc": {
+        "rssMiB": 481.78,
+        "heapUsedMiB": 154.56,
+        "heapTotalMiB": 285.63,
+        "externalMiB": 75.07,
+        "arrayBuffersMiB": 73.09,
+        "v8HeapPlusExternalNoDoubleCountMiB": 229.63,
+        "peakRssMiB": 564.98
+      }
+    },
+    "fxv1Stats": {
+      "bdpm": {
+        "quantization": "float32",
+        "metric": "cosine",
+        "dim": 128,
+        "documentCount": 15845,
+        "nextId": 15845,
+        "corpusFingerprint": 3567599445,
+        "presentCount": 15845,
+        "pqSubspaces": 0,
+        "pqCentroidsPerSubspace": 0,
+        "normalized": false,
+        "hasReconstructedNorms": true,
+        "byteLength": 8176060
+      },
+      "vet": {
+        "quantization": "float32",
+        "metric": "cosine",
+        "dim": 128,
+        "documentCount": 3213,
+        "nextId": 3213,
+        "corpusFingerprint": 42236662,
+        "presentCount": 3213,
+        "pqSubspaces": 0,
+        "pqCentroidsPerSubspace": 0,
+        "normalized": false,
+        "hasReconstructedNorms": true,
+        "byteLength": 1657948
+      }
+    }
+  },
+  "FXV1_Int8": {
+    "variant": "FXV1_Int8",
+    "counts": {
+      "bdpmN": 15845,
+      "vetN": 3213,
+      "totalDocs": 19058,
+      "dim": 128
+    },
+    "timingsMs": {
+      "lexicalLoadMs": 7628.94,
+      "conceptBuildMs": 891.13,
+      "host113BuildMs": 383.21,
+      "staticModelLoadMs": 43.05,
+      "docsBuildMs": 224.56,
+      "encodeDocsMs": 1050.29,
+      "fxv1BuildMs": 59.84,
+      "fxv1SaveBinaryMs": 9.31,
+      "fxv1LoadBinaryMs": 9.89,
+      "totalPipelineMs": 12165.81,
+      "scanDual120P50Ms": 5.422,
+      "scanDual120P95Ms": 5.996
+    },
+    "artifactsBytes": {
+      "vocabMetaBytes": 1201894,
+      "vocabWeightsBytes": 13976044,
+      "vocabTotalBytes": 15177938,
+      "vocabTotalGzBytes": 13780669,
+      "fxv1BdpmBytes": 2154960,
+      "fxv1VetBytes": 437008,
+      "fxv1TotalBytes": 2591968,
+      "fxv1TotalGzBytes": 2404403,
+      "estimatedFxv1RuntimeBytes": null,
+      "totalRuntimeAssetsBytes": 17769906,
+      "totalRuntimeAssetsGzBytes": 16185072
+    },
+    "memory": {
+      "afterB0": {
+        "rssMiB": 338.07,
+        "heapUsedMiB": 70.44,
+        "heapTotalMiB": 205.47,
+        "externalMiB": 12.43,
+        "arrayBuffersMiB": 10.45,
+        "v8HeapPlusExternalNoDoubleCountMiB": 82.86,
+        "peakRssMiB": 341.17
+      },
+      "afterB2": {
+        "rssMiB": 350.14,
+        "heapUsedMiB": 146.93,
+        "heapTotalMiB": 277.63,
+        "externalMiB": 12.43,
+        "arrayBuffersMiB": 10.45,
+        "v8HeapPlusExternalNoDoubleCountMiB": 159.36,
+        "peakRssMiB": 355.07
+      },
+      "afterHost113": {
+        "rssMiB": 365.91,
+        "heapUsedMiB": 148.12,
+        "heapTotalMiB": 279.13,
+        "externalMiB": 13.91,
+        "arrayBuffersMiB": 11.94,
+        "v8HeapPlusExternalNoDoubleCountMiB": 162.04,
+        "peakRssMiB": 371.14
+      },
+      "duringBuildBeforeRelease": {
+        "rssMiB": 418.77,
+        "heapUsedMiB": 154.56,
+        "heapTotalMiB": 285.38,
+        "externalMiB": 41.57,
+        "arrayBuffersMiB": 39.59,
+        "v8HeapPlusExternalNoDoubleCountMiB": 196.13,
+        "peakRssMiB": 425.91
+      },
+      "retainedPostGc": {
+        "rssMiB": 418.77,
+        "heapUsedMiB": 154.56,
+        "heapTotalMiB": 285.38,
+        "externalMiB": 29.79,
+        "arrayBuffersMiB": 27.82,
+        "v8HeapPlusExternalNoDoubleCountMiB": 184.35,
+        "peakRssMiB": 425.91
+      }
+    },
+    "fxv1Stats": {
+      "bdpm": {
+        "quantization": "int8",
+        "metric": "cosine",
+        "dim": 128,
+        "documentCount": 15845,
+        "nextId": 15845,
+        "corpusFingerprint": 3567599445,
+        "presentCount": 15845,
+        "pqSubspaces": 0,
+        "pqCentroidsPerSubspace": 0,
+        "normalized": false,
+        "hasReconstructedNorms": true,
+        "byteLength": 2154960
+      },
+      "vet": {
+        "quantization": "int8",
+        "metric": "cosine",
+        "dim": 128,
+        "documentCount": 3213,
+        "nextId": 3213,
+        "corpusFingerprint": 42236662,
+        "presentCount": 3213,
+        "pqSubspaces": 0,
+        "pqCentroidsPerSubspace": 0,
+        "normalized": false,
+        "hasReconstructedNorms": true,
+        "byteLength": 437008
+      }
+    }
+  },
+  "FXV1_PQ32": {
+    "variant": "FXV1_PQ32",
+    "counts": {
+      "bdpmN": 15845,
+      "vetN": 3213,
+      "totalDocs": 19058,
+      "dim": 128
+    },
+    "timingsMs": {
+      "lexicalLoadMs": 7471.72,
+      "conceptBuildMs": 877.58,
+      "host113BuildMs": 367.56,
+      "staticModelLoadMs": 42.57,
+      "docsBuildMs": 234.85,
+      "encodeDocsMs": 1037.27,
+      "fxv1BuildMs": 12745.73,
+      "fxv1SaveBinaryMs": 3.98,
+      "fxv1LoadBinaryMs": 5.16,
+      "totalPipelineMs": 24123.37,
+      "scanDual120P50Ms": 1.839,
+      "scanDual120P95Ms": 2.063
+    },
+    "artifactsBytes": {
+      "vocabMetaBytes": 1201894,
+      "vocabWeightsBytes": 13976044,
+      "vocabTotalBytes": 15177938,
+      "vocabTotalGzBytes": 13780669,
+      "fxv1BdpmBytes": 701532,
+      "fxv1VetBytes": 246780,
+      "fxv1TotalBytes": 948312,
+      "fxv1TotalGzBytes": 862497,
+      "estimatedFxv1RuntimeBytes": null,
+      "totalRuntimeAssetsBytes": 16126250,
+      "totalRuntimeAssetsGzBytes": 14643166
+    },
+    "memory": {
+      "afterB0": {
+        "rssMiB": 340.25,
+        "heapUsedMiB": 70.43,
+        "heapTotalMiB": 208.22,
+        "externalMiB": 12.43,
+        "arrayBuffersMiB": 10.45,
+        "v8HeapPlusExternalNoDoubleCountMiB": 82.86,
+        "peakRssMiB": 343.68
+      },
+      "afterB2": {
+        "rssMiB": 351.2,
+        "heapUsedMiB": 146.94,
+        "heapTotalMiB": 277.13,
+        "externalMiB": 12.43,
+        "arrayBuffersMiB": 10.45,
+        "v8HeapPlusExternalNoDoubleCountMiB": 159.37,
+        "peakRssMiB": 358.03
+      },
+      "afterHost113": {
+        "rssMiB": 367.24,
+        "heapUsedMiB": 148.13,
+        "heapTotalMiB": 278.63,
+        "externalMiB": 13.91,
+        "arrayBuffersMiB": 11.94,
+        "v8HeapPlusExternalNoDoubleCountMiB": 162.04,
+        "peakRssMiB": 371.75
+      },
+      "duringBuildBeforeRelease": {
+        "rssMiB": 418.04,
+        "heapUsedMiB": 154.58,
+        "heapTotalMiB": 284.88,
+        "externalMiB": 38.44,
+        "arrayBuffersMiB": 36.46,
+        "v8HeapPlusExternalNoDoubleCountMiB": 193.02,
+        "peakRssMiB": 425.49
+      },
+      "retainedPostGc": {
+        "rssMiB": 418.04,
+        "heapUsedMiB": 154.58,
+        "heapTotalMiB": 284.63,
+        "externalMiB": 28.23,
+        "arrayBuffersMiB": 26.25,
+        "v8HeapPlusExternalNoDoubleCountMiB": 182.81,
+        "peakRssMiB": 425.49
+      }
+    },
+    "fxv1Stats": {
+      "bdpm": {
+        "quantization": "pq",
+        "metric": "cosine",
+        "dim": 128,
+        "documentCount": 15845,
+        "nextId": 15845,
+        "corpusFingerprint": 3567599445,
+        "presentCount": 15845,
+        "pqSubspaces": 32,
+        "pqCentroidsPerSubspace": 256,
+        "normalized": false,
+        "hasReconstructedNorms": true,
+        "byteLength": 701532
+      },
+      "vet": {
+        "quantization": "pq",
+        "metric": "cosine",
+        "dim": 128,
+        "documentCount": 3213,
+        "nextId": 3213,
+        "corpusFingerprint": 42236662,
+        "presentCount": 3213,
+        "pqSubspaces": 32,
+        "pqCentroidsPerSubspace": 256,
+        "normalized": false,
+        "hasReconstructedNorms": true,
+        "byteLength": 246780
+      }
+    }
+  },
+  "FXV1_PQ16": {
+    "variant": "FXV1_PQ16",
+    "counts": {
+      "bdpmN": 15845,
+      "vetN": 3213,
+      "totalDocs": 19058,
+      "dim": 128
+    },
+    "timingsMs": {
+      "lexicalLoadMs": 7590.1,
+      "conceptBuildMs": 934.82,
+      "host113BuildMs": 361.33,
+      "staticModelLoadMs": 49.53,
+      "docsBuildMs": 234.75,
+      "encodeDocsMs": 1046.11,
+      "fxv1BuildMs": 11329.84,
+      "fxv1SaveBinaryMs": 3.17,
+      "fxv1LoadBinaryMs": 3.88,
+      "totalPipelineMs": 22782.01,
+      "scanDual120P50Ms": 1.104,
+      "scanDual120P95Ms": 1.507
+    },
+    "artifactsBytes": {
+      "vocabMetaBytes": 1201894,
+      "vocabWeightsBytes": 13976044,
+      "vocabTotalBytes": 15177938,
+      "vocabTotalGzBytes": 13780669,
+      "fxv1BdpmBytes": 448012,
+      "fxv1VetBytes": 195372,
+      "fxv1TotalBytes": 643384,
+      "fxv1TotalGzBytes": 534934,
+      "estimatedFxv1RuntimeBytes": null,
+      "totalRuntimeAssetsBytes": 15821322,
+      "totalRuntimeAssetsGzBytes": 14315603
+    },
+    "memory": {
+      "afterB0": {
+        "rssMiB": 298.51,
+        "heapUsedMiB": 71.39,
+        "heapTotalMiB": 207.47,
+        "externalMiB": 12.43,
+        "arrayBuffersMiB": 10.45,
+        "v8HeapPlusExternalNoDoubleCountMiB": 83.81,
+        "peakRssMiB": 311.99
+      },
+      "afterB2": {
+        "rssMiB": 357.91,
+        "heapUsedMiB": 147.88,
+        "heapTotalMiB": 278.13,
+        "externalMiB": 12.43,
+        "arrayBuffersMiB": 10.45,
+        "v8HeapPlusExternalNoDoubleCountMiB": 160.31,
+        "peakRssMiB": 359.4
+      },
+      "afterHost113": {
+        "rssMiB": 370.28,
+        "heapUsedMiB": 149.08,
+        "heapTotalMiB": 279.13,
+        "externalMiB": 13.92,
+        "arrayBuffersMiB": 11.94,
+        "v8HeapPlusExternalNoDoubleCountMiB": 162.99,
+        "peakRssMiB": 374.77
+      },
+      "duringBuildBeforeRelease": {
+        "rssMiB": 417.59,
+        "heapUsedMiB": 155.53,
+        "heapTotalMiB": 285.13,
+        "externalMiB": 37.86,
+        "arrayBuffersMiB": 35.88,
+        "v8HeapPlusExternalNoDoubleCountMiB": 193.38,
+        "peakRssMiB": 427.28
+      },
+      "retainedPostGc": {
+        "rssMiB": 417.59,
+        "heapUsedMiB": 155.53,
+        "heapTotalMiB": 285.13,
+        "externalMiB": 27.94,
+        "arrayBuffersMiB": 25.96,
+        "v8HeapPlusExternalNoDoubleCountMiB": 183.46,
+        "peakRssMiB": 427.28
+      }
+    },
+    "fxv1Stats": {
+      "bdpm": {
+        "quantization": "pq",
+        "metric": "cosine",
+        "dim": 128,
+        "documentCount": 15845,
+        "nextId": 15845,
+        "corpusFingerprint": 3567599445,
+        "presentCount": 15845,
+        "pqSubspaces": 16,
+        "pqCentroidsPerSubspace": 256,
+        "normalized": false,
+        "hasReconstructedNorms": true,
+        "byteLength": 448012
+      },
+      "vet": {
+        "quantization": "pq",
+        "metric": "cosine",
+        "dim": 128,
+        "documentCount": 3213,
+        "nextId": 3213,
+        "corpusFingerprint": 42236662,
+        "presentCount": 3213,
+        "pqSubspaces": 16,
+        "pqCentroidsPerSubspace": 256,
+        "normalized": false,
+        "hasReconstructedNorms": true,
+        "byteLength": 195372
+      }
+    }
+  }
+}
