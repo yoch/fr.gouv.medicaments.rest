@@ -89,4 +89,41 @@ node scripts/benchmark/semantic-light/run_rigorous_bench.js
 - [`lib/lsa_engine.js`](lib/lsa_engine.js) — SVD randomisée de Halko en pur JS + index vectoriel `Int8Array` (0 dépendance externe).
 - [`lib/query_processor.js`](lib/query_processor.js) — analyse d'intention, négations, contraintes statutaires/âge, lexique v1 figé pour test de fuite.
 - [`lib/eval_suite.js`](lib/eval_suite.js) — suite de 226 requêtes (`F1..F8`).
+
+---
+
+## 6. Mise à jour de mission (novembre 2026) — pipeline `B0→B4`, garde-fous A1 et `FrozenVectorIndex` (`@yoch/frozenminisearch@1.13.0`)
+
+> **Avertissement :** les sections 1–5 ci-dessus documentent l'exploration historique v2 (corpus enrichi RCP + prototype `lib/lsa_engine.js`). Le code courant de la branche `experiment/semantic-light-search` sépare strictement le runtime applicatif (`src/search/`), l'évaluation corrigée sans RCP (`scripts/benchmark/semantic-light/mission/`), et l'extension générique dans `yoch/frozenminisearch` (branche `feat/semantic-light-aux`).
+
+### Architecture retenue
+
+| Composant | Rôle | Emplacement |
+| :--- | :--- | :--- |
+| Mode historique inchangé (`B0`, `legacy`) | Par défaut sur `/api/medicaments/search` | [`src/services/searchOrchestrator.js`](../../../src/services/searchOrchestrator.js) |
+| Interpréteur structuré & alias BDPM (`B1` / `B2`, opt-in `mode=structured\|concepts`) | Extraction dosage (`kg` poids patient exclu des doses autonomes), galénique, voies, espèces ANMV, `ConceptStore` SA↔FT & `CIS_GENER` | [`src/search/structuredQueryParser.js`](../../../src/search/structuredQueryParser.js), [`src/search/conceptStore.js`](../../../src/search/conceptStore.js), [`src/search/experimentalSearch.js`](../../../src/search/experimentalSearch.js) |
+| Garde-fou A1 intentions & négations | Détection négations/exclusions multi-entités (`pas de X`, `sans X ni Y`), propriétés RCP cliniques (`contre-indiqu*`, `non contre-indiqu*`, `grossesse`, `effets indésirables`), poids patient (`kg`), préservation explicite des qualificatifs littéraux BDPM (`sans sucre`, `sans conservateur`, `sans alcool`) | [`src/search/queryIntentGuard.js`](../../../src/search/queryIntentGuard.js) |
+| Extension générique zéro-dépendance | `FrozenVectorIndex` (`FXV1` Float32 / Int8 / PQ8 avec normes reconstruites, `corpusFingerprint`, filtre pré-k, 0 octet/dépendance si inutilisé) | Dépôt `yoch/frozenminisearch` (`feat/semantic-light-aux`) |
+| Protocoles DEV/HELDOUT gelé, B3/B4, empreinte isolée et HTTP E2E | Suites `eval_suite_v3.json` (46 dev / 62 heldout) & `eval_residual_v1.json` (24 dev / 34 heldout), repli strict `b2.total === 0 && safety.supported && cos >= 0.55`, comparaison `Float32 / Int8 / PQ32 / PQ16` | [`mission/`](mission/) |
+
+### Chiffres mesurés sur la version courante (`heldout` exécuté une fois après gel de `minScore = 0.55`)
+
+- **`V3 HELDOUT` (55 requêtes valides + 4 impossibles + 3 OOS)** :
+  - `B0_legacy` : `Id@1 = 0.636`, `Var@1 = 0.618`, `MRR@10 = 0.624`, `nDCG@10 = 0.517`, `Empty = 0.345`, `OOS non-vide = 0.000`.
+  - `B1_structured` : `Id@1 = 0.873`, `Var@1 = 0.855`, `MRR@10 = 0.867`, `nDCG@10 = 0.858`, `Empty = 0.109`, `OOS non-vide = 0.000`.
+  - `B2_concepts` : `Id@1 = 0.982`, `Var@1 = 0.945`, `MRR@10 = 0.967`, `nDCG@10 = 0.964`, `Empty = 0.000`, `OOS non-vide = 0.000` (curated `Var@1 = 0.967`, corpus-generated `Var@1 = 0.920`).
+  - `Hybrid_Int8_Tarball_055` (`FrozenVectorIndex@1.13.0 Int8`, seuil gelé `0.55`) : identique à `B2_concepts` sur V3 (0 régression).
+- **`RESIDUAL HELDOUT` (30 requêtes résiduelles dures + 2 impossibles + 2 OOS)** :
+  - `B2_concepts` : `Id@1 = 0.400`, `Var@1 = 0.333`, `nDCG@10 = 0.370`, `Empty = 0.533` (`R2 = 0.571 Id@1 / 0.286 Var@1 / 0.449 nDCG@10`).
+  - `Hybrid_Int8_Tarball_055` : `Id@1 = 0.433`, `Var@1 = 0.367`, `nDCG@10 = 0.401`, `Empty = 0.467`, `OOS non-vide = 0.000` (`R2 = 0.714 Id@1 / 0.429 Var@1 / 0.584 nDCG@10`, gain ciblé sur formulations patient sans alias, nul sur fautes d'orthographe sévères `R1` et DCI cross-lingues `R3`).
+- **Coût isolé (`--expose-gc`, N = 15 845 BDPM + 3 213 ANMV)** & **HTTP E2E apparié (4 rondes alternées, 280 req/mode)** :
+  - `B0` retenu : `82.86 MiB` (`heap+external`, peak RSS `443.8 MiB`) ; `B2` : `159.37 MiB` (+`884 ms` build ConceptStore) ; `FXV1_Int8` + encodeur WordPiece `static_mrl_128d_int8` : `184.35 MiB` retenus (`2.59 MB` binaires `FXV1` + `15.18 MB` vocab/poids WordPiece, `59.8 ms` build `FXV1`).
+  - HTTP Express p50 / p95 (`/api/medicaments/search` pour `legacy/structured/concepts`, route compagnon de bench pour `hybrid_int8`) : `legacy` `2.36 / 3.92 ms`, `structured` `2.70 / 5.00 ms`, `concepts` `2.81 / 5.56 ms`, `hybrid_int8` `3.37 / 10.49 ms` (delta médian apparié `hybrid_int8 - concepts = +0.139 ms`).
+
+Reproduction :
+
+```bash
+DATA_DIR=/chemin/vers/data node --expose-gc scripts/benchmark/semantic-light/mission/measure_isolated_footprint.js --variant=FXV1_Int8
+DATA_DIR=/chemin/vers/data node scripts/benchmark/semantic-light/mission/run_final_validation.js
+```
 - [`run_rigorous_bench.js`](run_rigorous_bench.js) — orchestration complète et comparaison des 11 modèles.
