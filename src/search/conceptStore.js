@@ -20,12 +20,18 @@ const { buildTaxonomyVocab } = require('./structuredQueryParser');
 const TOKEN_SPLIT_RE = /[\s/;,+()'"’\-:.]+/u;
 const SALT_WORDS = new Set([
   'de', 'du', 'des', 'd', 'l', 'sodium', 'sodique', 'potassium', 'potassique',
-  'calcium', 'calcique', 'magnesium', 'magnesique', 'chlorhydrate', 'bromhydrate',
+  'calcium', 'calcique', 'magnesium', 'magnesique', 'chlorure', 'chlorhydrate', 'bromhydrate',
   'sulfate', 'phosphate', 'citrate', 'maleate', 'tartrate', 'fumarate', 'succinate',
   'mesilate', 'besilate', 'tosylate', 'valerate', 'propionate', 'acetate', 'benzoate',
   'gluconate', 'lactate', 'hydrate', 'monohydrate', 'dihydrate', 'trihydrate',
   'hemihydrate', 'sesquihydrate', 'anhydre', 'lysine', 'arginine', 'trometamol',
   'ester', 'sels', 'base'
+]);
+const CONCEPT_IGNORED_TOKENS = new Set([
+  'de', 'du', 'des', 'd', 'l', 'le', 'la', 'les', 'a', 'au', 'aux', 'en', 'et',
+  'hydrate', 'monohydrate', 'dihydrate', 'trihydrate', 'tetrahydrate',
+  'pentahydrate', 'heptahydrate', 'hemihydrate', 'sesquihydrate', 'anhydre',
+  'sels', 'base', 'ester'
 ]);
 
 let cachedEntry = null;
@@ -413,6 +419,7 @@ function resetConceptStoreCache() {
 
 module.exports = {
   SALT_WORDS,
+  CONCEPT_IGNORED_TOKENS,
   extractTokens,
   canonicalizeSpeciesWord,
   buildConceptStore,

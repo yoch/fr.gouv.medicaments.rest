@@ -12,7 +12,12 @@ const VERBATIM_SANS_QUALIFIERS = new Set([
   'sucres',
   'conservateur',
   'conservateurs',
-  'alcool'
+  'alcool',
+  'arome',
+  'aromes',
+  'sulfite',
+  'sulfites',
+  'anis'
 ]);
 
 const NEGATION_CLAUSE_BOUNDARY = new Set([

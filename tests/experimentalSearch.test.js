@@ -9,6 +9,8 @@ const medicamentRoutes = require('../src/routes/medicaments');
 const { executeHybridSearchPage } = require('../src/services/searchOrchestrator');
 const { executeExperimentalSearchPage, evaluateEntityCriteria } = require('../src/search/experimentalSearch');
 const { parseStructuredQuery } = require('../src/search/structuredQueryParser');
+const { analyzeQuerySafetyAndIntent } = require('../src/search/queryIntentGuard');
+const { parseDosageTokens } = require('../src/utils/structuredSearchCriteria');
 const {
   getTaxonomyVocab,
   getConceptStore,
@@ -588,6 +590,71 @@ describe('structuredQueryParser & experimentalSearch (B1/B2)', () => {
       expect(b0Gel.statusCode).toBe(200);
       expect(b0Gel.body.search.mode).toBeUndefined();
       expect(b0Gel.body.data[0].criteria_status).toBeUndefined();
+    });
+
+    it('Calibration B2 : qualifiants "sans arome/sulfites/anis", conversion concentration (g/ml <-> mg/ml <-> %) et forme+voie combinées', () => {
+      for (const q of ['movicol sans arome', 'xylocaine sans conservateur', 'lidocaine sans sulfites', 'granules sans anis']) {
+        const parsed = parseStructuredQuery(q, {}, getTaxonomyVocab(), { useAliases: true });
+        const safety = analyzeQuerySafetyAndIntent(q, parsed, {});
+        expect(safety.supported).toBe(true);
+        expect(safety.negation.detected).toBe(false);
+        expect(safety.verbatimQualifiers.length).toBeGreaterThanOrEqual(1);
+      }
+
+      // Forme 'émulsion cutanée' satisfaite par forme='émulsion pour application' + voie='cutanée' en mode concepts
+      const pEmul = parseStructuredQuery('econazole', { forme: 'émulsion cutanée' }, getTaxonomyVocab(), { useAliases: true });
+      const evEmul = evaluateEntityCriteria(
+        { denomDosages: [], compoDosages: [], normForme: 'emulsion pour application', normVoie: 'cutanee', normPresText: '', normDenom: 'econazole' },
+        pEmul,
+        { useAliases: true }
+      );
+      expect(evEmul.criteria_match.forme).toBe(true);
+      expect(evEmul.criteria_status.forme).toBe('matched');
+
+      // Conversion de concentration en mode concepts : 1.5g/10ml <-> 150 mg/ml et 15 % ; 0.2 % <-> 2 mg/ml
+      const pMag = parseStructuredQuery('magnesium sulfate', { dosage: '1.5g/10ml', forme: 'solution injectable' }, getTaxonomyVocab(), { useAliases: true });
+      const evMag150 = evaluateEntityCriteria(
+        {
+          denomDosages: parseDosageTokens('SULFATE DE MAGNESIUM 150 mg/ml'),
+          compoDosages: [],
+          normForme: 'solution injectable',
+          normVoie: 'intraveineuse',
+          normPresText: '',
+          normDenom: 'sulfate de magnesium 150 mg ml'
+        },
+        pMag,
+        { useAliases: true }
+      );
+      expect(evMag150.criteria_status.dosage).toBe('expanded');
+
+      const evMag15Pct = evaluateEntityCriteria(
+        {
+          denomDosages: parseDosageTokens('SULFATE DE MAGNESIUM 15 % (0,15 g/ml)'),
+          compoDosages: [],
+          normForme: 'solution injectable',
+          normVoie: 'intraveineuse',
+          normPresText: '',
+          normDenom: 'sulfate de magnesium 15 pour cent'
+        },
+        pMag,
+        { useAliases: true }
+      );
+      expect(evMag15Pct.criteria_status.dosage).toBe('expanded');
+
+      const pChx = parseStructuredQuery('chlorhexidine', { dosage: '0.2 %' }, getTaxonomyVocab(), { useAliases: true });
+      const evChx = evaluateEntityCriteria(
+        {
+          denomDosages: parseDosageTokens('CHLORHEXIDINE 2 mg/ml'),
+          compoDosages: [],
+          normForme: 'solution pour bain de bouche',
+          normVoie: 'buccale',
+          normPresText: '',
+          normDenom: 'chlorhexidine 2 mg ml'
+        },
+        pChx,
+        { useAliases: true }
+      );
+      expect(evChx.criteria_status.dosage).toBe('expanded');
     });
   });
 });

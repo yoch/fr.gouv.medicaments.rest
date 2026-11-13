@@ -43,6 +43,7 @@ const { parseStructuredQuery } = require('./structuredQueryParser');
 const { analyzeQuerySafetyAndIntent, inspectCriterionConstraint } = require('./queryIntentGuard');
 const {
   SALT_WORDS,
+  CONCEPT_IGNORED_TOKENS,
   extractTokens,
   canonicalizeSpeciesWord,
   getTaxonomyVocab,
@@ -148,9 +149,13 @@ function collectBdpmConceptMatches(parsed, store) {
     return { qualityByKey, metaByKey };
   }
 
-  const substantiveTokens = tokens.filter((t) => t.length >= 3 && !SALT_WORDS.has(t));
+  const alphaTokens = tokens.filter((t) => t.length >= 3 && !/^\d+$/.test(t) && !CONCEPT_IGNORED_TOKENS.has(t));
+  const substantiveTokens = alphaTokens.length > 0
+    ? tokens.filter((t) => t.length >= 3 && !CONCEPT_IGNORED_TOKENS.has(t))
+    : tokens;
   const queryToks = substantiveTokens.length > 0 ? substantiveTokens : tokens;
   if (queryToks.length === 0) return { qualityByKey, metaByKey };
+  const nonSaltTokens = queryToks.filter((t) => !/^\d+$/.test(t) && !SALT_WORDS.has(t));
 
   // Compter pour chaque CIS combien de tokens de la requête trouvent un appui
   // (dénomination OU substance active / fraction thérapeutique)
@@ -191,7 +196,13 @@ function collectBdpmConceptMatches(parsed, store) {
     if (!rec) continue;
 
     const denomHits = denomHitByCis.get(cis) || 0;
-    const allInDenom = denomHits >= requiredHits;
+    let allInDenom = denomHits >= requiredHits;
+    if (!allInDenom && rec.normDenom) {
+      const dToks = extractTokens(rec.normDenom, 2);
+      allInDenom = queryToks.every((qt) =>
+        dToks.some((dt) => dt === qt || (qt.length >= 4 && dt.startsWith(qt)))
+      );
+    }
     const cls = classifier(rec.denomination, { idValue: cis });
     let quality = 'prefix';
     if (cls === 2) quality = 'exact';
@@ -204,7 +215,10 @@ function collectBdpmConceptMatches(parsed, store) {
       via,
       coveredTokens: count,
       totalTokens: requiredHits,
-      allSubstancesMatched: requiredHits >= 2 && rec.distinctActiveCount >= 2
+      allSubstancesMatched:
+        nonSaltTokens.length >= 2 &&
+        rec.distinctActiveCount >= 2 &&
+        rec.distinctActiveCount <= nonSaltTokens.length
     };
   }
 
@@ -288,7 +302,10 @@ function collectVetConceptMatches(parsed, store) {
   }
 
   const tokens = (parsed.nameTokens || []).filter((t) => t.length >= 2);
-  const substantiveTokens = tokens.filter((t) => t.length >= 3 && !SALT_WORDS.has(t));
+  const alphaTokens = tokens.filter((t) => t.length >= 3 && !/^\d+$/.test(t) && !CONCEPT_IGNORED_TOKENS.has(t));
+  const substantiveTokens = alphaTokens.length > 0
+    ? tokens.filter((t) => t.length >= 3 && !CONCEPT_IGNORED_TOKENS.has(t))
+    : tokens;
   const queryToks = substantiveTokens.length > 0 ? substantiveTokens : tokens;
   if (queryToks.length === 0) return { qualityByKey, metaByKey };
 
@@ -321,7 +338,9 @@ function collectVetConceptMatches(parsed, store) {
     qualityByKey[num] = 'prefix';
     metaByKey[num] = {
       quality: 'prefix',
-      via: allInNom ? 'denomination' : 'composition'
+      via: allInNom ? 'denomination' : 'composition',
+      coveredTokens: count,
+      totalTokens: reqHits
     };
   }
 
@@ -337,11 +356,12 @@ function mergeMatchMaps(primary, secondary) {
     if (!prevQ || MATCH_QUALITY_RANK[q] > MATCH_QUALITY_RANK[prevQ]) {
       qualityByKey[k] = q;
       metaByKey[k] = secMeta;
-    } else if (prevQ === q && metaByKey[k]) {
+    } else if (metaByKey[k]) {
       metaByKey[k] = {
         ...metaByKey[k],
-        ...(secMeta.allSubstancesMatched ? { allSubstancesMatched: true } : {}),
-        ...(secMeta.genericExpanded ? { genericExpanded: true } : {})
+        ...(secMeta.coveredTokens ? { coveredTokens: secMeta.coveredTokens, totalTokens: secMeta.totalTokens } : {}),
+        ...(prevQ === q && secMeta.allSubstancesMatched ? { allSubstancesMatched: true } : {}),
+        ...(prevQ === q && secMeta.genericExpanded ? { genericExpanded: true } : {})
       };
     }
   }
@@ -603,7 +623,7 @@ function matchesGalenicPhrase(clauses, phrase) {
  * Évalue la satisfaction métier d'une forme galénique sur des tokens/expressions
  * complets (jamais par simple sous-chaîne : `gel` != `gelule`, `comprime` != `compresse`).
  */
-function matchFormeCriterion(requestedForme, candidateNormForme, { useAliases = false, altFormes = [], normPresText = '' } = {}) {
+function matchFormeCriterion(requestedForme, candidateNormForme, { useAliases = false, altFormes = [], normPresText = '', normVoie = '' } = {}) {
   const candClauses = splitGalenicClauses(candidateNormForme);
   if (candClauses.length === 0) {
     return { matched: false, status: 'unknown', boost: 0 };
@@ -616,17 +636,21 @@ function matchFormeCriterion(requestedForme, candidateNormForme, { useAliases = 
     return { matched: false, status: 'unknown', boost: 0 };
   }
 
+  const voieTokenSet = new Set(tokenizeGalenicText(normVoie));
   let bestNonCarrierRatio = 0;
   for (const clause of candClauses) {
     let hits = 0;
     let nonCarrierHits = 0;
+    let voieAssistHits = 0;
     for (const tok of reqSig) {
       if (clause.sigSet.has(tok) || clause.tokenSet.has(tok)) {
         hits++;
         if (!GENERIC_GALENIC_CARRIERS.has(tok)) nonCarrierHits++;
+      } else if (voieTokenSet.has(tok)) {
+        voieAssistHits++;
       }
     }
-    if (hits === reqSig.length) {
+    if (hits === reqSig.length || (hits > 0 && hits + voieAssistHits === reqSig.length)) {
       return { matched: true, status: 'matched', boost: 2.5 };
     }
     if (nonCarrierHits > 0) {
@@ -725,6 +749,34 @@ function matchVoieCriterion(requestedVoies, candidateNormVoie, candidateNormForm
   return { matched: false, status: 'unknown', boost: 0 };
 }
 
+function hasConvertedConcentrationMatch(requested, candidate, toleranceRatio = 0.02) {
+  if (!Array.isArray(requested) || !Array.isArray(candidate) || candidate.length === 0) return false;
+  const close = (a, b) => Math.abs(a - b) <= Math.max(a, b) * toleranceRatio;
+  if (requested.length === 2) {
+    const mg = requested.find((t) => t.unit === 'mg');
+    const ml = requested.find((t) => t.unit === 'ml');
+    if (mg && ml && ml.amount > 0) {
+      const concMgMl = mg.amount / ml.amount;
+      const pct = concMgMl / 10;
+      return candidate.some((c) =>
+        (c.unit === 'mg/ml' && close(c.amount, concMgMl)) ||
+        (c.unit === '%' && close(c.amount, pct))
+      );
+    }
+  } else if (requested.length === 1) {
+    const req = requested[0];
+    if (req.unit === '%') {
+      const concMgMl = req.amount * 10;
+      return candidate.some((c) => c.unit === 'mg/ml' && close(c.amount, concMgMl));
+    }
+    if (req.unit === 'mg/ml') {
+      const pct = req.amount / 10;
+      return candidate.some((c) => c.unit === '%' && close(c.amount, pct));
+    }
+  }
+  return false;
+}
+
 function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
   const eff = (parsed && parsed.effectiveCriteria) || {};
   const cm = { dosage: false, forme: false, voie: false };
@@ -759,6 +811,9 @@ function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
           if (matched > 0) {
             boost += (3 * matched) / requested.length;
             dosageExtra = extra;
+          } else if (useAliases && hasConvertedConcentrationMatch(requested, denomTokens)) {
+            cs.dosage = 'expanded';
+            boost += 1.0;
           } else {
             boost -= 2.5; // contredit explicitement
           }
@@ -769,8 +824,11 @@ function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
           if (matched > 0) {
             boost += (2 * matched) / requested.length;
             dosageExtra = extra;
+          } else if (useAliases && hasConvertedConcentrationMatch(requested, compoTokens)) {
+            cs.dosage = 'expanded';
+            boost += 1.0;
           } else {
-            boost -= 2.0;
+            boost -= 2.5;
           }
         } else {
           cs.dosage = 'unknown';
@@ -789,7 +847,8 @@ function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
       const res = matchFormeCriterion(eff.forme, record.normForme, {
         useAliases,
         altFormes,
-        normPresText: record.normPresText || ''
+        normPresText: record.normPresText || '',
+        normVoie: record.normVoie || ''
       });
       cm.forme = res.matched;
       cs.forme = res.status;
@@ -869,13 +928,15 @@ function buildEntitySignals(ref, record, meta, parsed, { mode, store }) {
   );
 
   let conceptBonus = 0;
+  const isGenericIntent = Boolean(parsed?.extracted?.intents?.includes('generic_equivalent'));
   if (mode === 'concepts' && record) {
-    const nameTokens = parsed.nameTokens || [];
-    const substantiveTokens = nameTokens.filter((t) => t.length >= 3 && !SALT_WORDS.has(t));
+    const nameTokens = (parsed.nameTokens || []).filter((t) => t.length >= 2);
+    const nonSaltTokens = nameTokens.filter((t) => t.length >= 3 && !/^\d+$/.test(t) && !SALT_WORDS.has(t));
+    const reqDosages = parsed.effectiveCriteria.dosage ? parseDosageTokens(parsed.effectiveCriteria.dosage) : [];
+    const multiDoseRequested = reqDosages.filter((d) => d.unit === 'mg' || d.unit === 'ui').length >= 2;
 
     // Préférer mono-substance sur requête mono-molécule sans dosage d'association
-    const singleRequested = substantiveTokens.length === 1 &&
-      !(parsed.effectiveCriteria.dosage && parsed.effectiveCriteria.dosage.includes('/'));
+    const singleRequested = nameTokens.length >= 1 && nonSaltTokens.length <= 1 && !multiDoseRequested;
     if (singleRequested && record.distinctActiveCount === 1) {
       conceptBonus += 1.2;
     } else if (singleRequested && record.distinctActiveCount > 1) {
@@ -883,18 +944,45 @@ function buildEntitySignals(ref, record, meta, parsed, { mode, store }) {
     }
 
     // Sur requête générique, mettre en avant les génériques ('generic') avant princeps ('0')
-    if (parsed.extracted.intents.includes('generic_equivalent')) {
+    if (isGenericIntent) {
       if (record.genericRole === 'generic') conceptBonus += 1.5;
       else if (record.genericRole === 'princeps') conceptBonus -= 0.3;
     }
 
+    const active = ref.source === 'bdpm' ? record.isCommercialised : record.isActive;
+    if (active) conceptBonus += 0.25;
+
     if (meta && meta.allSubstancesMatched) {
       conceptBonus += 1.0;
     }
+  }
 
-    // Tie-breaker doux sur statut de commercialisation actif
-    const active = ref.source === 'bdpm' ? record.isCommercialised : record.isActive;
-    if (active) conceptBonus += 0.25;
+  const hasContradictedCriterion =
+    criteria_status.dosage === 'contradicted' ||
+    criteria_status.forme === 'contradicted' ||
+    criteria_status.voie === 'contradicted' ||
+    criteria_status.species === 'contradicted';
+  const hasSatisfiedCriterion =
+    criteria_status.dosage === 'matched' ||
+    criteria_status.dosage === 'expanded' ||
+    criteria_status.forme === 'matched' ||
+    criteria_status.forme === 'expanded' ||
+    criteria_status.voie === 'matched' ||
+    criteria_status.voie === 'expanded' ||
+    criteria_status.species === 'matched' ||
+    criteria_status.species === 'expanded';
+  let qualityRank = MATCH_QUALITY_RANK[ref.match_quality] || 0;
+  if (mode === 'concepts') {
+    if (
+      ref.match_quality === 'prefix' &&
+      Boolean(meta && meta.coveredTokens) &&
+      hasSatisfiedCriterion &&
+      !hasContradictedCriterion
+    ) {
+      qualityRank = 2.5;
+    } else if (ref.match_quality === 'exact' && ref.match_via === 'composition' && hasContradictedCriterion) {
+      qualityRank = 2.2;
+    }
   }
 
   const viaRank = VIA_BONUS[ref.match_via] || 0;
@@ -902,6 +990,7 @@ function buildEntitySignals(ref, record, meta, parsed, { mode, store }) {
     ...ref,
     criteria_match,
     criteria_status,
+    _qualityRank: qualityRank,
     _score: boost + conceptBonus,
     _dosageExtra: dosage_extra,
     _speciesMatched: speciesMatched,
@@ -911,8 +1000,8 @@ function buildEntitySignals(ref, record, meta, parsed, { mode, store }) {
 }
 
 function compareExperimentalRefs(a, b) {
-  const qA = MATCH_QUALITY_RANK[a.match_quality] || 0;
-  const qB = MATCH_QUALITY_RANK[b.match_quality] || 0;
+  const qA = a._qualityRank ?? (MATCH_QUALITY_RANK[a.match_quality] || 0);
+  const qB = b._qualityRank ?? (MATCH_QUALITY_RANK[b.match_quality] || 0);
   if (qB !== qA) return qB - qA;
   if (b._score !== a._score) return b._score - a._score;
   const exA = a._dosageExtra ?? Infinity;
