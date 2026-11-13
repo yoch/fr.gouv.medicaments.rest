@@ -648,7 +648,8 @@ function runFallbackContractTests({ tarballCheck, enc, minScore }) {
   }
   const vetMixIndices = [];
   for (let i = 0; i < vetState.corpus.medicaments.length && vetMixIndices.length < 60; i++) {
-    if (vetState.corpus.medicaments[i].statut_amm === 'Autorisation active') vetMixIndices.push(i);
+    const st = vetState.corpus.medicaments[i].statut_amm || '';
+    if (st && !/abrog|retir|suspend/i.test(st)) vetMixIndices.push(i);
   }
   assertCondition(bdpmMixIndices.length === 60 && vetMixIndices.length === 60, 'Need 60 commercialized BDPM and 60 active ANMV docs for mixed dual-truncation test');
 
@@ -676,7 +677,7 @@ function runFallbackContractTests({ tarballCheck, enc, minScore }) {
     dim: 2, quantization: 'float32', metric: 'cosine', normalize: false,
     representationVersion: 'mixed-contract:v1', snapshotId: 'sha256:mixed-vet'
   });
-  const encMixStub = { encodeQuery: () => ({ vec: new Float32Array([1, 0]) }) };
+  const encMixStub = { encodeQuery: () => ({ vec: new Float32Array([1, 0]), matchedTerms: 2 }) };
   const qMixProbe = 'symptome douleur articulaire';
 
   const fnMixDual = createHybridSearchFn({
