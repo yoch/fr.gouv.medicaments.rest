@@ -1,41 +1,99 @@
 {
   "B0": {
     "variant": "B0",
-    "lexicalLoadMs": 7792,
+    "lexicalLoadMs": 7733.46,
+    "queryLatencyMs": {
+      "firstCallMs": 24.898,
+      "warmP50Ms": 0.603,
+      "warmP95Ms": 1.443
+    },
     "memAfterB0": {
-      "rssMiB": 335.71,
-      "heapUsedMiB": 70.45,
+      "rssMiB": 333.69,
+      "heapUsedMiB": 70.61,
+      "heapTotalMiB": 208.22,
+      "externalMiB": 12.44,
+      "arrayBuffersMiB": 10.45,
+      "v8HeapPlusExternalNoDoubleCountMiB": 83.05,
+      "peakRssMiB": 336.69
+    },
+    "memAfterQueries": {
+      "rssMiB": 335.94,
+      "heapUsedMiB": 71.16,
+      "heapTotalMiB": 208.47,
+      "externalMiB": 12.44,
+      "arrayBuffersMiB": 10.45,
+      "v8HeapPlusExternalNoDoubleCountMiB": 83.6,
+      "peakRssMiB": 336.69
+    },
+    "peakRssMiB": 336.69
+  },
+  "B1": {
+    "variant": "B1",
+    "lexicalLoadMs": 7863.66,
+    "conceptStoreMaterialized": false,
+    "queryLatencyMs": {
+      "firstCallMs": 166.509,
+      "warmP50Ms": 2.044,
+      "warmP95Ms": 8.59
+    },
+    "memAfterB0": {
+      "rssMiB": 296.46,
+      "heapUsedMiB": 70.6,
       "heapTotalMiB": 206.97,
       "externalMiB": 12.44,
       "arrayBuffersMiB": 10.45,
-      "v8HeapPlusExternalNoDoubleCountMiB": 82.89,
-      "peakRssMiB": 338.61
+      "v8HeapPlusExternalNoDoubleCountMiB": 83.04,
+      "peakRssMiB": 299.55
     },
-    "peakRssMiB": 338.61
+    "memAfterB1": {
+      "rssMiB": 306.09,
+      "heapUsedMiB": 71.72,
+      "heapTotalMiB": 208.47,
+      "externalMiB": 12.44,
+      "arrayBuffersMiB": 10.45,
+      "v8HeapPlusExternalNoDoubleCountMiB": 84.16,
+      "peakRssMiB": 306.09
+    },
+    "peakRssMiB": 306.09
   },
   "B2": {
     "variant": "B2",
-    "lexicalLoadMs": 8008.25,
-    "conceptBuildMs": 721.14,
+    "lexicalLoadMs": 8302.67,
+    "conceptBuildMs": 725.32,
+    "queryLatencyMs": {
+      "firstCallWithLazyConceptBuildMs": 704.69,
+      "firstWarmCallMs": 15.632,
+      "warmP50Ms": 2.239,
+      "warmP95Ms": 7.35
+    },
     "memAfterB0": {
-      "rssMiB": 333.24,
-      "heapUsedMiB": 70.45,
-      "heapTotalMiB": 206.47,
+      "rssMiB": 440.96,
+      "heapUsedMiB": 70.61,
+      "heapTotalMiB": 222.22,
       "externalMiB": 12.44,
       "arrayBuffersMiB": 10.45,
-      "v8HeapPlusExternalNoDoubleCountMiB": 82.89,
-      "peakRssMiB": 336.08
+      "v8HeapPlusExternalNoDoubleCountMiB": 83.05,
+      "peakRssMiB": 442.21
     },
     "memAfterB2": {
-      "rssMiB": 341,
-      "heapUsedMiB": 98.24,
-      "heapTotalMiB": 229.38,
+      "rssMiB": 442.27,
+      "heapUsedMiB": 98.4,
+      "heapTotalMiB": 230.13,
       "externalMiB": 12.44,
       "arrayBuffersMiB": 10.45,
-      "v8HeapPlusExternalNoDoubleCountMiB": 110.67,
-      "peakRssMiB": 348.24
+      "v8HeapPlusExternalNoDoubleCountMiB": 110.84,
+      "peakRssMiB": 447.84
     },
-    "peakRssMiB": 348.24
+    "memAfterQueries": {
+      "rssMiB": 447.64,
+      "heapUsedMiB": 99.74,
+      "heapTotalMiB": 244.38,
+      "externalMiB": 12.44,
+      "arrayBuffersMiB": 10.45,
+      "v8HeapPlusExternalNoDoubleCountMiB": 112.18,
+      "peakRssMiB": 449.59
+    },
+    "peakRssMiB": 449.59
   },
   "FXV1_Float32": {
     "variant": "FXV1_Float32",
@@ -46,18 +104,18 @@
       "dim": 128
     },
     "timingsMs": {
-      "lexicalLoadMs": 7747.27,
-      "conceptBuildMs": 719.25,
-      "host113BuildMs": 352.03,
-      "staticModelLoadMs": 59.03,
-      "docsBuildMs": 220.12,
-      "encodeDocsMs": 1092.05,
-      "fxv1BuildMs": 48.93,
-      "fxv1SaveBinaryMs": 23.33,
-      "fxv1LoadBinaryMs": 52.06,
-      "totalPipelineMs": 13977.81,
-      "scanDual120P50Ms": 6.204,
-      "scanDual120P95Ms": 6.614
+      "lexicalLoadMs": 7867.04,
+      "conceptBuildMs": 715.2,
+      "host113BuildMs": 370.93,
+      "staticModelLoadMs": 71.3,
+      "docsBuildMs": 230.98,
+      "encodeDocsMs": 1120.49,
+      "fxv1BuildMs": 54.07,
+      "fxv1SaveBinaryMs": 23.76,
+      "fxv1LoadBinaryMs": 54.52,
+      "totalPipelineMs": 14195.79,
+      "scanDual120P50Ms": 6.176,
+      "scanDual120P95Ms": 6.86
     },
     "artifactsBytes": {
       "vocabMetaBytes": 1201894,
@@ -74,49 +132,49 @@
     },
     "memory": {
       "afterB0": {
-        "rssMiB": 305.34,
-        "heapUsedMiB": 70.45,
-        "heapTotalMiB": 210.47,
+        "rssMiB": 301.78,
+        "heapUsedMiB": 70.61,
+        "heapTotalMiB": 213.97,
         "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 82.89,
-        "peakRssMiB": 307.77
+        "v8HeapPlusExternalNoDoubleCountMiB": 83.05,
+        "peakRssMiB": 305.49
       },
       "afterB2": {
-        "rssMiB": 312.7,
-        "heapUsedMiB": 98.24,
-        "heapTotalMiB": 229.63,
+        "rssMiB": 313.81,
+        "heapUsedMiB": 98.4,
+        "heapTotalMiB": 230.13,
         "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 110.67,
-        "peakRssMiB": 320.32
+        "v8HeapPlusExternalNoDoubleCountMiB": 110.83,
+        "peakRssMiB": 320.27
       },
       "afterHost113": {
-        "rssMiB": 318.91,
-        "heapUsedMiB": 99.48,
-        "heapTotalMiB": 231.04,
+        "rssMiB": 320.82,
+        "heapUsedMiB": 99.65,
+        "heapTotalMiB": 231.29,
         "externalMiB": 13.94,
         "arrayBuffersMiB": 11.95,
-        "v8HeapPlusExternalNoDoubleCountMiB": 113.42,
-        "peakRssMiB": 323.41
+        "v8HeapPlusExternalNoDoubleCountMiB": 113.59,
+        "peakRssMiB": 325.3
       },
       "duringBuildBeforeRelease": {
-        "rssMiB": 424.93,
-        "heapUsedMiB": 105.92,
+        "rssMiB": 424.46,
+        "heapUsedMiB": 106.07,
         "heapTotalMiB": 237.79,
         "externalMiB": 93.56,
         "arrayBuffersMiB": 91.58,
-        "v8HeapPlusExternalNoDoubleCountMiB": 199.48,
-        "peakRssMiB": 529.74
+        "v8HeapPlusExternalNoDoubleCountMiB": 199.63,
+        "peakRssMiB": 529.43
       },
       "retainedPostGc": {
-        "rssMiB": 417.29,
-        "heapUsedMiB": 105.92,
+        "rssMiB": 416.72,
+        "heapUsedMiB": 106.07,
         "heapTotalMiB": 237.79,
         "externalMiB": 74.95,
         "arrayBuffersMiB": 72.96,
-        "v8HeapPlusExternalNoDoubleCountMiB": 180.87,
-        "peakRssMiB": 529.74
+        "v8HeapPlusExternalNoDoubleCountMiB": 181.02,
+        "peakRssMiB": 529.43
       }
     },
     "fxv1Stats": {
@@ -165,18 +223,18 @@
       "dim": 128
     },
     "timingsMs": {
-      "lexicalLoadMs": 7574.13,
-      "conceptBuildMs": 698.65,
-      "host113BuildMs": 371.46,
-      "staticModelLoadMs": 42.82,
-      "docsBuildMs": 227.82,
-      "encodeDocsMs": 1061.82,
-      "fxv1BuildMs": 73.98,
-      "fxv1SaveBinaryMs": 45.2,
-      "fxv1LoadBinaryMs": 25.64,
-      "totalPipelineMs": 12009.3,
-      "scanDual120P50Ms": 5.638,
-      "scanDual120P95Ms": 6.247
+      "lexicalLoadMs": 8150.23,
+      "conceptBuildMs": 741.46,
+      "host113BuildMs": 370.19,
+      "staticModelLoadMs": 42.5,
+      "docsBuildMs": 231.67,
+      "encodeDocsMs": 1066.27,
+      "fxv1BuildMs": 76.16,
+      "fxv1SaveBinaryMs": 36.14,
+      "fxv1LoadBinaryMs": 28.41,
+      "totalPipelineMs": 12745.18,
+      "scanDual120P50Ms": 5.597,
+      "scanDual120P95Ms": 7.7
     },
     "artifactsBytes": {
       "vocabMetaBytes": 1201894,
@@ -193,49 +251,49 @@
     },
     "memory": {
       "afterB0": {
-        "rssMiB": 283.64,
-        "heapUsedMiB": 71.4,
-        "heapTotalMiB": 204.22,
+        "rssMiB": 443.43,
+        "heapUsedMiB": 70.61,
+        "heapTotalMiB": 226.97,
         "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 83.84,
-        "peakRssMiB": 286.54
+        "v8HeapPlusExternalNoDoubleCountMiB": 83.05,
+        "peakRssMiB": 444.14
       },
       "afterB2": {
-        "rssMiB": 305.83,
-        "heapUsedMiB": 99.19,
-        "heapTotalMiB": 229.13,
+        "rssMiB": 445.2,
+        "heapUsedMiB": 98.4,
+        "heapTotalMiB": 231.38,
         "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 111.63,
-        "peakRssMiB": 308.64
+        "v8HeapPlusExternalNoDoubleCountMiB": 110.84,
+        "peakRssMiB": 450.96
       },
       "afterHost113": {
-        "rssMiB": 317.23,
-        "heapUsedMiB": 100.43,
-        "heapTotalMiB": 230.54,
+        "rssMiB": 447.42,
+        "heapUsedMiB": 99.65,
+        "heapTotalMiB": 232.79,
         "externalMiB": 13.94,
         "arrayBuffersMiB": 11.95,
-        "v8HeapPlusExternalNoDoubleCountMiB": 114.37,
-        "peakRssMiB": 321.51
+        "v8HeapPlusExternalNoDoubleCountMiB": 113.59,
+        "peakRssMiB": 451.8
       },
       "duringBuildBeforeRelease": {
-        "rssMiB": 391.43,
-        "heapUsedMiB": 105.95,
-        "heapTotalMiB": 236.79,
-        "externalMiB": 41.6,
-        "arrayBuffersMiB": 39.61,
-        "v8HeapPlusExternalNoDoubleCountMiB": 147.55,
-        "peakRssMiB": 391.6
+        "rssMiB": 517.09,
+        "heapUsedMiB": 106.09,
+        "heapTotalMiB": 238.54,
+        "externalMiB": 41.67,
+        "arrayBuffersMiB": 39.68,
+        "v8HeapPlusExternalNoDoubleCountMiB": 147.76,
+        "peakRssMiB": 517.23
       },
       "retainedPostGc": {
-        "rssMiB": 355.56,
-        "heapUsedMiB": 105.95,
-        "heapTotalMiB": 236.79,
-        "externalMiB": 29.82,
-        "arrayBuffersMiB": 27.83,
-        "v8HeapPlusExternalNoDoubleCountMiB": 135.77,
-        "peakRssMiB": 391.6
+        "rssMiB": 479.96,
+        "heapUsedMiB": 106.09,
+        "heapTotalMiB": 238.54,
+        "externalMiB": 29.89,
+        "arrayBuffersMiB": 27.91,
+        "v8HeapPlusExternalNoDoubleCountMiB": 135.99,
+        "peakRssMiB": 517.23
       }
     },
     "fxv1Stats": {
@@ -284,18 +342,18 @@
       "dim": 128
     },
     "timingsMs": {
-      "lexicalLoadMs": 7731.08,
-      "conceptBuildMs": 740.9,
-      "host113BuildMs": 359.6,
-      "staticModelLoadMs": 38.55,
-      "docsBuildMs": 225.31,
-      "encodeDocsMs": 1071.73,
-      "fxv1BuildMs": 13972.59,
+      "lexicalLoadMs": 8051.71,
+      "conceptBuildMs": 705.92,
+      "host113BuildMs": 356.65,
+      "staticModelLoadMs": 40.32,
+      "docsBuildMs": 243.11,
+      "encodeDocsMs": 1168.09,
+      "fxv1BuildMs": 14742.57,
       "fxv1SaveBinaryMs": 0,
-      "fxv1LoadBinaryMs": 45.25,
-      "totalPipelineMs": 25525.24,
-      "scanDual120P50Ms": 1.888,
-      "scanDual120P95Ms": 2.449
+      "fxv1LoadBinaryMs": 48.3,
+      "totalPipelineMs": 26710.31,
+      "scanDual120P50Ms": 1.824,
+      "scanDual120P95Ms": 2.176
     },
     "artifactsBytes": {
       "vocabMetaBytes": 1201894,
@@ -312,49 +370,49 @@
     },
     "memory": {
       "afterB0": {
-        "rssMiB": 282.65,
-        "heapUsedMiB": 71.4,
-        "heapTotalMiB": 204.97,
+        "rssMiB": 336.73,
+        "heapUsedMiB": 70.61,
+        "heapTotalMiB": 207.72,
         "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 83.84,
-        "peakRssMiB": 285.35
+        "v8HeapPlusExternalNoDoubleCountMiB": 83.04,
+        "peakRssMiB": 338.29
       },
       "afterB2": {
-        "rssMiB": 306.37,
-        "heapUsedMiB": 99.19,
-        "heapTotalMiB": 229.63,
+        "rssMiB": 343.18,
+        "heapUsedMiB": 98.39,
+        "heapTotalMiB": 229.13,
         "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 111.63,
-        "peakRssMiB": 309.61
+        "v8HeapPlusExternalNoDoubleCountMiB": 110.83,
+        "peakRssMiB": 349.8
       },
       "afterHost113": {
-        "rssMiB": 314.49,
-        "heapUsedMiB": 100.43,
-        "heapTotalMiB": 231.04,
+        "rssMiB": 344.73,
+        "heapUsedMiB": 99.64,
+        "heapTotalMiB": 230.54,
         "externalMiB": 13.94,
         "arrayBuffersMiB": 11.95,
-        "v8HeapPlusExternalNoDoubleCountMiB": 114.37,
-        "peakRssMiB": 319.77
+        "v8HeapPlusExternalNoDoubleCountMiB": 113.58,
+        "peakRssMiB": 349.8
       },
       "duringBuildBeforeRelease": {
-        "rssMiB": 351.98,
-        "heapUsedMiB": 105.99,
-        "heapTotalMiB": 237.79,
-        "externalMiB": 38.46,
-        "arrayBuffersMiB": 36.48,
-        "v8HeapPlusExternalNoDoubleCountMiB": 144.45,
-        "peakRssMiB": 389.48
+        "rssMiB": 411.61,
+        "heapUsedMiB": 106.13,
+        "heapTotalMiB": 236.79,
+        "externalMiB": 38.54,
+        "arrayBuffersMiB": 36.55,
+        "v8HeapPlusExternalNoDoubleCountMiB": 144.66,
+        "peakRssMiB": 411.78
       },
       "retainedPostGc": {
-        "rssMiB": 351.98,
-        "heapUsedMiB": 105.99,
-        "heapTotalMiB": 237.79,
-        "externalMiB": 28.25,
-        "arrayBuffersMiB": 26.27,
-        "v8HeapPlusExternalNoDoubleCountMiB": 134.24,
-        "peakRssMiB": 389.48
+        "rssMiB": 411.27,
+        "heapUsedMiB": 106.12,
+        "heapTotalMiB": 236.54,
+        "externalMiB": 28.33,
+        "arrayBuffersMiB": 26.34,
+        "v8HeapPlusExternalNoDoubleCountMiB": 134.45,
+        "peakRssMiB": 411.78
       }
     },
     "fxv1Stats": {
@@ -403,18 +461,18 @@
       "dim": 128
     },
     "timingsMs": {
-      "lexicalLoadMs": 7888.81,
-      "conceptBuildMs": 708.21,
-      "host113BuildMs": 354.07,
-      "staticModelLoadMs": 37.18,
-      "docsBuildMs": 220.27,
-      "encodeDocsMs": 1102.5,
-      "fxv1BuildMs": 12520.14,
+      "lexicalLoadMs": 9327.27,
+      "conceptBuildMs": 900.82,
+      "host113BuildMs": 374.37,
+      "staticModelLoadMs": 44.41,
+      "docsBuildMs": 242.75,
+      "encodeDocsMs": 1168.25,
+      "fxv1BuildMs": 13067.97,
       "fxv1SaveBinaryMs": 0,
-      "fxv1LoadBinaryMs": 44.09,
-      "totalPipelineMs": 24044.29,
-      "scanDual120P50Ms": 1.07,
-      "scanDual120P95Ms": 1.812
+      "fxv1LoadBinaryMs": 47.65,
+      "totalPipelineMs": 26506.32,
+      "scanDual120P50Ms": 1.158,
+      "scanDual120P95Ms": 1.853
     },
     "artifactsBytes": {
       "vocabMetaBytes": 1201894,
@@ -431,49 +489,49 @@
     },
     "memory": {
       "afterB0": {
-        "rssMiB": 300.09,
-        "heapUsedMiB": 71.4,
-        "heapTotalMiB": 205.97,
+        "rssMiB": 347.36,
+        "heapUsedMiB": 70.6,
+        "heapTotalMiB": 212.97,
         "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 83.84,
-        "peakRssMiB": 307.33
+        "v8HeapPlusExternalNoDoubleCountMiB": 83.04,
+        "peakRssMiB": 350.67
       },
       "afterB2": {
-        "rssMiB": 309.64,
-        "heapUsedMiB": 99.19,
+        "rssMiB": 351.24,
+        "heapUsedMiB": 98.39,
         "heapTotalMiB": 229.63,
         "externalMiB": 12.44,
         "arrayBuffersMiB": 10.45,
-        "v8HeapPlusExternalNoDoubleCountMiB": 111.63,
-        "peakRssMiB": 312.41
+        "v8HeapPlusExternalNoDoubleCountMiB": 110.83,
+        "peakRssMiB": 358.8
       },
       "afterHost113": {
-        "rssMiB": 320.22,
-        "heapUsedMiB": 100.43,
-        "heapTotalMiB": 231.04,
+        "rssMiB": 353.28,
+        "heapUsedMiB": 99.64,
+        "heapTotalMiB": 230.54,
         "externalMiB": 13.94,
         "arrayBuffersMiB": 11.95,
-        "v8HeapPlusExternalNoDoubleCountMiB": 114.37,
-        "peakRssMiB": 324.83
+        "v8HeapPlusExternalNoDoubleCountMiB": 113.59,
+        "peakRssMiB": 358.8
       },
       "duringBuildBeforeRelease": {
-        "rssMiB": 360.77,
-        "heapUsedMiB": 106.93,
-        "heapTotalMiB": 237.79,
-        "externalMiB": 37.88,
-        "arrayBuffersMiB": 35.89,
-        "v8HeapPlusExternalNoDoubleCountMiB": 144.81,
-        "peakRssMiB": 394.98
+        "rssMiB": 387.07,
+        "heapUsedMiB": 106.13,
+        "heapTotalMiB": 236.54,
+        "externalMiB": 37.95,
+        "arrayBuffersMiB": 35.97,
+        "v8HeapPlusExternalNoDoubleCountMiB": 144.09,
+        "peakRssMiB": 421.85
       },
       "retainedPostGc": {
-        "rssMiB": 360.77,
-        "heapUsedMiB": 106.93,
-        "heapTotalMiB": 237.79,
-        "externalMiB": 27.96,
-        "arrayBuffersMiB": 25.97,
-        "v8HeapPlusExternalNoDoubleCountMiB": 134.89,
-        "peakRssMiB": 394.98
+        "rssMiB": 387.07,
+        "heapUsedMiB": 106.13,
+        "heapTotalMiB": 236.79,
+        "externalMiB": 28.03,
+        "arrayBuffersMiB": 26.05,
+        "v8HeapPlusExternalNoDoubleCountMiB": 134.17,
+        "peakRssMiB": 421.85
       }
     },
     "fxv1Stats": {

@@ -1,26 +1,57 @@
 {
-  "generatedAt": "2026-11-13T09:44:09.377Z",
+  "generatedAt": "2026-11-13T10:43:59.960Z",
   "repos": {
     "pharmaWorktree": {
       "path": "/home/yoch/fr.gouv.medicaments.rest/.worktrees/semantic-light",
       "branch": "experiment/semantic-light-search",
-      "head": "948d974b07b4642e17fd5b89cd3076be1aafae79",
-      "clean": false
+      "head": "788c06058dfce508cef65a946e9a9d83e576ed5e",
+      "clean": true
     },
     "frozenminisearchWorktree": {
       "path": "/home/yoch/minisearch/.worktrees/semantic-aux",
       "branch": "feat/semantic-light-aux",
-      "head": "70ccae5cbc756c6b1a2fadc94bbd1df8c651db6f",
+      "head": "10d7456a8eb636c1ae2784f41f394c6cb5819b05",
       "clean": true
     }
+  },
+  "runtimeSourcesSha256": "b1acd69edde64e1e56f46ec161dcabd4496109cce80d81a68232ef8a73aeb957",
+  "runtimeFileHashes": {
+    "src/search/experimentalSearch.js": "9c56baad6dc26c39b1c1568852829912a73896e1c52a984ad2595bd3d7468ce4",
+    "src/search/structuredQueryParser.js": "2dd94aa3637c1d2f2bb1acd3b1340d4058dc24c161a8dacd494e74980cd3c177",
+    "src/search/queryIntentGuard.js": "61d99323bfa93e9afb7c76adc796b4b4dd73a36097f2946c50d3bee68c197b21",
+    "src/search/conceptStore.js": "d507ae0d92001c0844408f655214b270ae8d02e286821f10f202749fe795130f",
+    "src/routes/medicaments/searchHandler.js": "fc6dbe11a92fc12c5125e37e4a10bf508c935b16053994127000d17bde83d8a5",
+    "src/utils/searchResponseShape.js": "fbcefd11fee0b38d9faf59932c24cedff57ad90a003baaf2f28233e584081d30",
+    "src/utils/structuredSearchCriteria.js": "209bbe2fccf1d3b7b1c39fa4d933c082bc58e1aa6ef8e0f1ee491c0b03804981",
+    "scripts/benchmark/semantic-light/mission/run_final_validation.js": "2e79d8ab54ab29d672cdf77d7fb2fa91621cf8e2f6ada8a3f3c00ef8deaeed6d",
+    "scripts/benchmark/semantic-light/mission/measure_isolated_footprint.js": "b5ec5b1194c15d2dca95347b14ef18cc5a35badc75d01779d68ea11a3be04d94"
   },
   "packageArtifact": {
     "name": "@yoch/frozenminisearch",
     "version": "1.13.0",
     "tarballPath": "/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/yoch-frozenminisearch-1.13.0.tgz",
-    "tarballSha256": "5f9e4351fa668e54780da7413c264364c94acb8a4b1eb4d4c06072ac8147eb61",
-    "unpackedPkgDir": "/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/pkg-verify/package"
+    "tarballSha256": "a8d54a0b06390acadc918a830e4fc47b7b8ff47d64995f5a6d9679598b047d4d",
+    "unpackedPkgDir": "/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/pkg-verify/node_modules/@yoch/frozenminisearch"
   },
+  "configuration": {
+    "frozenMinScore": 0.55,
+    "candidateCap": 40,
+    "candidateCapScope": "global_merged",
+    "experimentalFallbackStatus": "research_only_not_promoted"
+  },
+  "evalFraming": {
+    "status": "regression_suites",
+    "note": "eval_suite_v3 et eval_residual_v1 ont ete iteres conjointement avec le parser, les regles A1 et la taxonomie ; ils servent de suites de non-regression reproductibles et non de mesure de generalisation sur requetes entierement inedites."
+  },
+  "checksExecuted": [
+    "tarball_exports_and_bundle_isolation",
+    "lexical_parity_1_12_3_vs_1_13_0",
+    "fxv1_v2_int8_pq32_pq16_roundtrip_unaligned_and_crc_tamper",
+    "a1_patient_weight_and_verbatim_sans_sucre",
+    "fallback_contract_global_merged_cap40_mixed_dual_truncation",
+    "v3_and_residual_regression_eval_dev_and_heldout",
+    "http_e2e_paired_alternating_abcd_dcba"
+  ],
   "runtimePaths": {
     "dataDir": "/home/yoch/fr.gouv.medicaments.rest/data",
     "modelDir": "/home/yoch/fr.gouv.medicaments.rest/.worktrees/semantic-light/data/search-indexes/mission-semantic"
@@ -40,6 +71,6 @@
   "testSuitesSha256": {
     "eval_suite_v3": "ed66b42fe5a967a4ec16d94e69a0c221e4c90eee864b25506d8bf02003eb2216",
     "eval_residual_v1": "a0b28d940fb3b1370f136ec63a8a1286ab8289efee2acedcdd1e6c843b5b75fc",
-    "experimentalSearch_test": "12a56a992c603265bb84d8e6df5c91929c42c835e33e6833083eef8c79c961cd"
+    "experimentalSearch_test": "85da97873089d1e225deb5771eda780aabd0a7711b229898d1e5b2584531648a"
   }
 }

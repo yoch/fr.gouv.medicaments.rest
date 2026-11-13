@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-13T09:44:09.377Z",
+  "generatedAt": "2026-11-13T10:43:59.960Z",
   "frozenMinScore": 0.55,
   "tarballCheck": {
     "version": "1.13.0",
@@ -23,9 +23,9 @@
       "byteLength": 437069
     },
     "loadBinaryBdpmMs": {
-      "int8Esm": 35.7,
-      "pq32": 9.87,
-      "pq16": 2.93
+      "int8Esm": 38.73,
+      "pq32": 12.93,
+      "pq16": 2.48
     },
     "roundTripCjsEsmBrowserIdentical": true,
     "corruptionAndMetadataChecksPassed": 8,
@@ -34,6 +34,9 @@
   "fallbackContractChecks": {
     "liveBdpmAdmissiblePoolCount": 49,
     "boundedCap40Verified": true,
+    "candidateCapScope": "global_merged",
+    "mixedDualSourceTruncationVerified": true,
+    "mixed25Plus25GlobalCapVerified": true,
     "deepPage5EmptyAndFlagged": true,
     "preKExcludeTop35BdpmRecovered10": true,
     "synthetic75PreKExcludeTop45Recovered10": true,
@@ -70,28 +73,59 @@
     }
   },
   "manifestSummary": {
-    "generatedAt": "2026-11-13T09:44:09.377Z",
+    "generatedAt": "2026-11-13T10:43:59.960Z",
     "repos": {
       "pharmaWorktree": {
         "path": "/home/yoch/fr.gouv.medicaments.rest/.worktrees/semantic-light",
         "branch": "experiment/semantic-light-search",
-        "head": "948d974b07b4642e17fd5b89cd3076be1aafae79",
-        "clean": false
+        "head": "788c06058dfce508cef65a946e9a9d83e576ed5e",
+        "clean": true
       },
       "frozenminisearchWorktree": {
         "path": "/home/yoch/minisearch/.worktrees/semantic-aux",
         "branch": "feat/semantic-light-aux",
-        "head": "70ccae5cbc756c6b1a2fadc94bbd1df8c651db6f",
+        "head": "10d7456a8eb636c1ae2784f41f394c6cb5819b05",
         "clean": true
       }
+    },
+    "runtimeSourcesSha256": "b1acd69edde64e1e56f46ec161dcabd4496109cce80d81a68232ef8a73aeb957",
+    "runtimeFileHashes": {
+      "src/search/experimentalSearch.js": "9c56baad6dc26c39b1c1568852829912a73896e1c52a984ad2595bd3d7468ce4",
+      "src/search/structuredQueryParser.js": "2dd94aa3637c1d2f2bb1acd3b1340d4058dc24c161a8dacd494e74980cd3c177",
+      "src/search/queryIntentGuard.js": "61d99323bfa93e9afb7c76adc796b4b4dd73a36097f2946c50d3bee68c197b21",
+      "src/search/conceptStore.js": "d507ae0d92001c0844408f655214b270ae8d02e286821f10f202749fe795130f",
+      "src/routes/medicaments/searchHandler.js": "fc6dbe11a92fc12c5125e37e4a10bf508c935b16053994127000d17bde83d8a5",
+      "src/utils/searchResponseShape.js": "fbcefd11fee0b38d9faf59932c24cedff57ad90a003baaf2f28233e584081d30",
+      "src/utils/structuredSearchCriteria.js": "209bbe2fccf1d3b7b1c39fa4d933c082bc58e1aa6ef8e0f1ee491c0b03804981",
+      "scripts/benchmark/semantic-light/mission/run_final_validation.js": "2e79d8ab54ab29d672cdf77d7fb2fa91621cf8e2f6ada8a3f3c00ef8deaeed6d",
+      "scripts/benchmark/semantic-light/mission/measure_isolated_footprint.js": "b5ec5b1194c15d2dca95347b14ef18cc5a35badc75d01779d68ea11a3be04d94"
     },
     "packageArtifact": {
       "name": "@yoch/frozenminisearch",
       "version": "1.13.0",
       "tarballPath": "/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/yoch-frozenminisearch-1.13.0.tgz",
-      "tarballSha256": "5f9e4351fa668e54780da7413c264364c94acb8a4b1eb4d4c06072ac8147eb61",
-      "unpackedPkgDir": "/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/pkg-verify/package"
+      "tarballSha256": "a8d54a0b06390acadc918a830e4fc47b7b8ff47d64995f5a6d9679598b047d4d",
+      "unpackedPkgDir": "/home/yoch/.gemini/antigravity-cli/brain/94228641-cb35-4e73-bd50-3e5b84af2042/scratch/pkg-verify/node_modules/@yoch/frozenminisearch"
     },
+    "configuration": {
+      "frozenMinScore": 0.55,
+      "candidateCap": 40,
+      "candidateCapScope": "global_merged",
+      "experimentalFallbackStatus": "research_only_not_promoted"
+    },
+    "evalFraming": {
+      "status": "regression_suites",
+      "note": "eval_suite_v3 et eval_residual_v1 ont ete iteres conjointement avec le parser, les regles A1 et la taxonomie ; ils servent de suites de non-regression reproductibles et non de mesure de generalisation sur requetes entierement inedites."
+    },
+    "checksExecuted": [
+      "tarball_exports_and_bundle_isolation",
+      "lexical_parity_1_12_3_vs_1_13_0",
+      "fxv1_v2_int8_pq32_pq16_roundtrip_unaligned_and_crc_tamper",
+      "a1_patient_weight_and_verbatim_sans_sucre",
+      "fallback_contract_global_merged_cap40_mixed_dual_truncation",
+      "v3_and_residual_regression_eval_dev_and_heldout",
+      "http_e2e_paired_alternating_abcd_dcba"
+    ],
     "runtimePaths": {
       "dataDir": "/home/yoch/fr.gouv.medicaments.rest/data",
       "modelDir": "/home/yoch/fr.gouv.medicaments.rest/.worktrees/semantic-light/data/search-indexes/mission-semantic"
@@ -111,7 +145,7 @@
     "testSuitesSha256": {
       "eval_suite_v3": "ed66b42fe5a967a4ec16d94e69a0c221e4c90eee864b25506d8bf02003eb2216",
       "eval_residual_v1": "a0b28d940fb3b1370f136ec63a8a1286ab8289efee2acedcdd1e6c843b5b75fc",
-      "experimentalSearch_test": "12a56a992c603265bb84d8e6df5c91929c42c835e33e6833083eef8c79c961cd"
+      "experimentalSearch_test": "85da97873089d1e225deb5771eda780aabd0a7711b229898d1e5b2584531648a"
     }
   },
   "a1SafetyChecks": {
@@ -260,36 +294,36 @@
     "modes": {
       "legacy": {
         "requests": 280,
-        "p50Ms": 2.42,
-        "iqrMs": 0.87,
-        "p95Ms": 4.84,
-        "meanMs": 2.76
+        "p50Ms": 2.48,
+        "iqrMs": 0.82,
+        "p95Ms": 3.98,
+        "meanMs": 2.6
       },
       "structured": {
         "requests": 280,
-        "p50Ms": 2.87,
-        "iqrMs": 1.97,
-        "p95Ms": 7.2,
-        "meanMs": 3.82
+        "p50Ms": 2.77,
+        "iqrMs": 1.62,
+        "p95Ms": 6.96,
+        "meanMs": 3.73
       },
       "concepts": {
         "requests": 280,
-        "p50Ms": 2.9,
-        "iqrMs": 1.64,
-        "p95Ms": 6.8,
-        "meanMs": 3.54
+        "p50Ms": 2.88,
+        "iqrMs": 1.4,
+        "p95Ms": 5.94,
+        "meanMs": 3.45
       },
       "hybrid_int8": {
         "requests": 280,
-        "p50Ms": 3.66,
-        "iqrMs": 3.71,
-        "p95Ms": 12.79,
-        "meanMs": 5.14
+        "p50Ms": 3.7,
+        "iqrMs": 3.68,
+        "p95Ms": 10.08,
+        "meanMs": 4.92
       }
     },
     "pairedDeltaMedianMs": {
-      "hybridMinusB2": 0.1,
-      "hybridMinusB0": 0.853
+      "hybridMinusB2": 0.162,
+      "hybridMinusB0": 0.988
     }
   },
   "results": {
@@ -320,9 +354,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.51,
-                "p95": 1.35,
-                "max": 2.7
+                "p50": 0.48,
+                "p95": 1.3,
+                "max": 2.63
               },
               "httpStats": null
             },
@@ -436,9 +470,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.47,
+              "p50": 0.46,
               "p95": 1.13,
-              "max": 1.19
+              "max": 1.14
             },
             "httpStats": null
           },
@@ -466,8 +500,8 @@
             "oosStrongFpRate": 0,
             "latencyMs": {
               "p50": 0.2,
-              "p95": 0.63,
-              "max": 2.66
+              "p95": 0.65,
+              "max": 2.63
             },
             "httpStats": null
           }
@@ -497,9 +531,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.86,
-                "p95": 3.56,
-                "max": 29.79
+                "p50": 0.72,
+                "p95": 4.01,
+                "max": 31.7
               },
               "httpStats": null
             },
@@ -613,9 +647,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.96,
-              "p95": 3.85,
-              "max": 29.59
+              "p50": 0.92,
+              "p95": 3.93,
+              "max": 28.06
             },
             "httpStats": null
           },
@@ -642,9 +676,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.59,
-              "p95": 2.74,
-              "max": 3.21
+              "p50": 0.6,
+              "p95": 3.22,
+              "max": 3.95
             },
             "httpStats": null
           }
@@ -674,9 +708,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.75,
-                "p95": 2.79,
-                "max": 16.05
+                "p50": 0.76,
+                "p95": 3.37,
+                "max": 17.27
               },
               "httpStats": null
             },
@@ -790,9 +824,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.38,
-              "p95": 4.96,
-              "max": 15.33
+              "p50": 1.44,
+              "p95": 3.73,
+              "max": 16.17
             },
             "httpStats": null
           },
@@ -819,9 +853,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.69,
-              "p95": 1.92,
-              "max": 4.78
+              "p50": 0.61,
+              "p95": 2.82,
+              "max": 4.02
             },
             "httpStats": null
           }
@@ -851,9 +885,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.86,
-                "p95": 3.83,
-                "max": 13.91
+                "p50": 0.76,
+                "p95": 3.08,
+                "max": 15.53
               },
               "httpStats": null
             },
@@ -967,9 +1001,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.41,
-              "p95": 6.67,
-              "max": 14.18
+              "p50": 1.33,
+              "p95": 6.35,
+              "max": 13.91
             },
             "httpStats": null
           },
@@ -996,9 +1030,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.5,
-              "p95": 1.76,
-              "max": 2.97
+              "p50": 0.58,
+              "p95": 2.25,
+              "max": 3.84
             },
             "httpStats": null
           }
@@ -1028,9 +1062,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.96,
-                "p95": 2.84,
-                "max": 14.68
+                "p50": 0.77,
+                "p95": 3.19,
+                "max": 16.31
               },
               "httpStats": null
             },
@@ -1144,9 +1178,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.09,
-              "p95": 3.71,
-              "max": 13.2
+              "p50": 1.22,
+              "p95": 3.73,
+              "max": 13.27
             },
             "httpStats": null
           },
@@ -1174,8 +1208,8 @@
             "oosStrongFpRate": 0,
             "latencyMs": {
               "p50": 0.49,
-              "p95": 1.69,
-              "max": 2.97
+              "p95": 1.88,
+              "max": 3.14
             },
             "httpStats": null
           }
@@ -1205,9 +1239,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.79,
-                "p95": 2.84,
-                "max": 16.23
+                "p50": 0.7,
+                "p95": 2.9,
+                "max": 14.18
               },
               "httpStats": null
             },
@@ -1321,9 +1355,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.17,
-              "p95": 2.89,
-              "max": 14.02
+              "p50": 1.22,
+              "p95": 3.57,
+              "max": 13.7
             },
             "httpStats": null
           },
@@ -1350,9 +1384,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.5,
-              "p95": 1.62,
-              "max": 2.94
+              "p50": 0.51,
+              "p95": 2.07,
+              "max": 3.06
             },
             "httpStats": null
           }
@@ -1385,8 +1419,8 @@
               "oosStrongFpRate": 0,
               "latencyMs": {
                 "p50": 0.48,
-                "p95": 1.18,
-                "max": 1.84
+                "p95": 0.89,
+                "max": 1.7
               },
               "httpStats": null
             },
@@ -1500,9 +1534,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.51,
-              "p95": 0.97,
-              "max": 1.26
+              "p50": 0.5,
+              "p95": 0.99,
+              "max": 1.24
             },
             "httpStats": null
           },
@@ -1529,9 +1563,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.43,
-              "p95": 0.66,
-              "max": 0.69
+              "p50": 0.46,
+              "p95": 0.64,
+              "max": 0.71
             },
             "httpStats": null
           }
@@ -1561,9 +1595,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.83,
-                "p95": 3.1,
-                "max": 5.52
+                "p50": 0.94,
+                "p95": 3.24,
+                "max": 7.64
               },
               "httpStats": null
             },
@@ -1677,9 +1711,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.31,
-              "p95": 4.43,
-              "max": 5.36
+              "p50": 0.77,
+              "p95": 5.46,
+              "max": 6.61
             },
             "httpStats": null
           },
@@ -1706,9 +1740,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.74,
-              "p95": 1.56,
-              "max": 2.24
+              "p50": 0.82,
+              "p95": 1.95,
+              "max": 2.7
             },
             "httpStats": null
           }
@@ -1738,9 +1772,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.99,
-                "p95": 2.99,
-                "max": 4.68
+                "p50": 0.98,
+                "p95": 3.1,
+                "max": 6.09
               },
               "httpStats": null
             },
@@ -1854,9 +1888,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.38,
-              "p95": 3.33,
-              "max": 4.79
+              "p50": 1.27,
+              "p95": 4.26,
+              "max": 4.42
             },
             "httpStats": null
           },
@@ -1883,9 +1917,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.88,
-              "p95": 1.35,
-              "max": 1.78
+              "p50": 0.99,
+              "p95": 1.85,
+              "max": 3.27
             },
             "httpStats": null
           }
@@ -1915,8 +1949,8 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 1.02,
-                "p95": 3.69,
+                "p50": 1.21,
+                "p95": 4.86,
                 "max": 7.46
               },
               "httpStats": null
@@ -2031,9 +2065,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.16,
-              "p95": 7.3,
-              "max": 13.1
+              "p50": 1.24,
+              "p95": 7.16,
+              "max": 7.41
             },
             "httpStats": null
           },
@@ -2060,9 +2094,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.37,
-              "p95": 2.25,
-              "max": 3.24
+              "p50": 0.95,
+              "p95": 2.03,
+              "max": 2.64
             },
             "httpStats": null
           }
@@ -2092,9 +2126,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.98,
-                "p95": 3.55,
-                "max": 6.45
+                "p50": 1.09,
+                "p95": 3.98,
+                "max": 5.34
               },
               "httpStats": null
             },
@@ -2208,9 +2242,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.14,
-              "p95": 4.85,
-              "max": 6.07
+              "p50": 1.23,
+              "p95": 4.26,
+              "max": 5.19
             },
             "httpStats": null
           },
@@ -2237,9 +2271,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.67,
-              "p95": 1.25,
-              "max": 1.66
+              "p50": 0.69,
+              "p95": 1.44,
+              "max": 1.99
             },
             "httpStats": null
           }
@@ -2269,9 +2303,9 @@
               "oosNonEmptyRate": 0,
               "oosStrongFpRate": 0,
               "latencyMs": {
-                "p50": 0.83,
-                "p95": 2.74,
-                "max": 3.34
+                "p50": 0.93,
+                "p95": 3.69,
+                "max": 4.46
               },
               "httpStats": null
             },
@@ -2385,9 +2419,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.11,
-              "p95": 3.37,
-              "max": 3.5
+              "p50": 1.18,
+              "p95": 3.84,
+              "max": 4.71
             },
             "httpStats": null
           },
@@ -2414,9 +2448,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.84,
-              "p95": 1.26,
-              "max": 1.58
+              "p50": 0.66,
+              "p95": 1.42,
+              "max": 1.94
             },
             "httpStats": null
           }
@@ -2449,9 +2483,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.31,
-              "p95": 0.79,
-              "max": 1.26
+              "p50": 0.33,
+              "p95": 0.89,
+              "max": 1.36
             },
             "httpStats": null
           },
@@ -2530,9 +2564,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.63,
-              "p95": 4.06,
-              "max": 6.68
+              "p50": 0.64,
+              "p95": 4.23,
+              "max": 6.34
             },
             "httpStats": null
           },
@@ -2611,9 +2645,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.67,
-              "p95": 2.53,
-              "max": 4.03
+              "p50": 0.73,
+              "p95": 2.81,
+              "max": 5.07
             },
             "httpStats": null
           },
@@ -2692,9 +2726,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 5.69,
-              "p95": 6.31,
-              "max": 6.68
+              "p50": 5.66,
+              "p95": 6.4,
+              "max": 7.17
             },
             "httpStats": null
           },
@@ -2773,9 +2807,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 3.38,
-              "p95": 4.16,
-              "max": 4.6
+              "p50": 2.82,
+              "p95": 4.04,
+              "max": 4.98
             },
             "httpStats": null
           },
@@ -2854,9 +2888,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.61,
-              "p95": 2.66,
-              "max": 3.7
+              "p50": 1.64,
+              "p95": 2.71,
+              "max": 3.59
             },
             "httpStats": null
           },
@@ -2938,8 +2972,8 @@
             "oosStrongFpRate": 0,
             "latencyMs": {
               "p50": 0.46,
-              "p95": 0.92,
-              "max": 1.19
+              "p95": 0.91,
+              "max": 1.24
             },
             "httpStats": null
           },
@@ -3018,9 +3052,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.79,
-              "p95": 3.27,
-              "max": 5.77
+              "p50": 0.68,
+              "p95": 2.9,
+              "max": 5.63
             },
             "httpStats": null
           },
@@ -3099,9 +3133,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 0.91,
-              "p95": 2.2,
-              "max": 3.69
+              "p50": 0.76,
+              "p95": 2.57,
+              "max": 4.21
             },
             "httpStats": null
           },
@@ -3180,9 +3214,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 4.08,
-              "p95": 7.48,
-              "max": 8.3
+              "p50": 4.46,
+              "p95": 7.11,
+              "max": 7.23
             },
             "httpStats": null
           },
@@ -3261,9 +3295,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 2.22,
-              "p95": 3.65,
-              "max": 4.02
+              "p50": 2.21,
+              "p95": 3.56,
+              "max": 3.73
             },
             "httpStats": null
           },
@@ -3342,9 +3376,9 @@
             "oosNonEmptyRate": 0,
             "oosStrongFpRate": 0,
             "latencyMs": {
-              "p50": 1.56,
-              "p95": 2.49,
-              "max": 3.48
+              "p50": 1.65,
+              "p95": 2.63,
+              "max": 3.67
             },
             "httpStats": null
           },
