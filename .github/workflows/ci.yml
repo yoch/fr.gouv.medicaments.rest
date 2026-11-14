@@ -11,17 +11,22 @@ on:
   workflow_dispatch:
     inputs:
       run_external_corpus:
-        description: 'Exécuter les suites dépendant de DATA_DIR / VET_RCP_EQUIVALENCE_XML (auto-hébergé ou runners équipés)'
+        description: 'Exécuter les suites dépendant du corpus externe BDPM/ANMV (requiert un runner self-hosted équipé ; non disponible sur ubuntu-latest standard)'
         type: boolean
         required: false
         default: false
       data_dir:
-        description: 'Chemin local vers DATA_DIR contenant CIS_bdpm.txt et les fichiers BDPM/ANMV'
+        description: 'Chemin local sur le runner self-hosted vers DATA_DIR contenant CIS_bdpm.txt et les fichiers BDPM/ANMV'
+        type: string
+        required: false
+        default: ''
+      vet_data_dir:
+        description: 'Chemin optionnel vers VET_DATA_DIR (défaut : <data_dir>/veterinaires s’il existe)'
         type: string
         required: false
         default: ''
       vet_rcp_equivalence_xml:
-        description: 'Chemin optionnel vers VET_RCP_EQUIVALENCE_XML pour les tests XML complets'
+        description: 'Chemin optionnel sur le runner self-hosted vers VET_RCP_EQUIVALENCE_XML pour les tests XML complets'
         type: string
         required: false
         default: ''
@@ -88,10 +93,13 @@ jobs:
           npm run generate:openapi
           git diff --exit-code src/openapi.generated.json
 
+  # Job manuel hors CI standard (ubuntu-latest ne contient pas les fichiers bruts BDPM/ANMV
+  # non versionnés). À lancer sur un runner self-hosted équipé du corpus, ou localement via :
+  #   DATA_DIR=... VET_DATA_DIR=... VET_RCP_EQUIVALENCE_XML=... npm run test:all
   integration-external-corpus:
-    name: Manual External Corpus Integration (RUN_SLOW_TESTS=1)
+    name: Manual External Corpus Integration (RUN_SLOW_TESTS=1, self-hosted)
     if: github.event_name == 'workflow_dispatch' && inputs.run_external_corpus == true
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       RUN_SLOW_TESTS: '1'
       DATA_DIR: ${{ inputs.data_dir }}
@@ -107,9 +115,27 @@ jobs:
           cache: 'npm'
 
       - name: Check external corpus prerequisites
+        env:
+          INPUT_VET_DATA_DIR: ${{ inputs.vet_data_dir }}
         run: |
           if [ -z "$DATA_DIR" ] || [ ! -f "$DATA_DIR/CIS_bdpm.txt" ]; then
-            echo "Prerequisite missing: DATA_DIR must point to a local directory containing CIS_bdpm.txt (and BDPM/ANMV raw files)." >&2
+            echo "Prerequisite missing: DATA_DIR must point to a local directory on the self-hosted runner containing CIS_bdpm.txt (and BDPM/ANMV raw files)." >&2
+            echo "Otherwise run locally: DATA_DIR=/path/to/data VET_DATA_DIR=/path/to/data/veterinaires VET_RCP_EQUIVALENCE_XML=/path/to/amm-vet-fr-v2-v.xml npm run test:all" >&2
+            exit 1
+          fi
+          RESOLVED_VET_DATA_DIR="$INPUT_VET_DATA_DIR"
+          if [ -z "$RESOLVED_VET_DATA_DIR" ] && [ -d "$DATA_DIR/veterinaires" ]; then
+            RESOLVED_VET_DATA_DIR="$DATA_DIR/veterinaires"
+          fi
+          if [ -n "$RESOLVED_VET_DATA_DIR" ]; then
+            if [ ! -d "$RESOLVED_VET_DATA_DIR" ]; then
+              echo "Prerequisite invalid: VET_DATA_DIR ($RESOLVED_VET_DATA_DIR) does not exist." >&2
+              exit 1
+            fi
+            echo "VET_DATA_DIR=$RESOLVED_VET_DATA_DIR" >> "$GITHUB_ENV"
+          fi
+          if [ -n "$VET_RCP_EQUIVALENCE_XML" ] && [ ! -f "$VET_RCP_EQUIVALENCE_XML" ]; then
+            echo "Prerequisite invalid: VET_RCP_EQUIVALENCE_XML ($VET_RCP_EQUIVALENCE_XML) does not exist." >&2
             exit 1
           fi
 
