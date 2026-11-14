@@ -45,6 +45,7 @@ const {
   SALT_WORDS,
   CONCEPT_IGNORED_TOKENS,
   extractTokens,
+  extractConceptTokens,
   canonicalizeSpeciesWord,
   getTaxonomyVocab,
   getConceptStore
@@ -129,6 +130,20 @@ function collectLegacyVetMatches(q) {
   return { qualityByKey, metaByKey };
 }
 
+function countRequestedSubstanceEntities(tokens) {
+  const nonSalt = tokens.filter((t) => !/^\d+$/.test(t) && !SALT_WORDS.has(t));
+  if (nonSalt.length <= 1) return nonSalt.length;
+  let count = 0;
+  for (let i = 0; i < nonSalt.length; i++) {
+    const t = nonSalt[i];
+    if (t === 'acide' || t === 'acides' || t === 'vitamine' || t === 'vitamines') {
+      continue;
+    }
+    count++;
+  }
+  return Math.max(1, count);
+}
+
 /**
  * Recherche BDPM par entités via ConceptStore (résout les multi-substances
  * sur lignes CIS_COMPO distinctes, SA<->FT, et fallback dénomination).
@@ -136,8 +151,8 @@ function collectLegacyVetMatches(q) {
 function collectBdpmConceptMatches(parsed, store) {
   const qualityByKey = {};
   const metaByKey = {};
-  const tokens = (parsed.nameTokens || []).filter((t) => t.length >= 2);
-  if (tokens.length === 0) return { qualityByKey, metaByKey };
+  const rawTokens = (parsed.nameTokens || []).filter((t) => t.length >= 1 && !CONCEPT_IGNORED_TOKENS.has(t));
+  if (rawTokens.length === 0) return { qualityByKey, metaByKey };
 
   // Codes ATC exacts via MITM
   if (parsed.kind === 'exact_code' && parsed.code && parsed.code.kind === 'atc_code') {
@@ -149,13 +164,9 @@ function collectBdpmConceptMatches(parsed, store) {
     return { qualityByKey, metaByKey };
   }
 
-  const alphaTokens = tokens.filter((t) => t.length >= 3 && !/^\d+$/.test(t) && !CONCEPT_IGNORED_TOKENS.has(t));
-  const substantiveTokens = alphaTokens.length > 0
-    ? tokens.filter((t) => t.length >= 3 && !CONCEPT_IGNORED_TOKENS.has(t))
-    : tokens;
-  const queryToks = substantiveTokens.length > 0 ? substantiveTokens : tokens;
+  const queryToks = [...new Set(rawTokens)];
   if (queryToks.length === 0) return { qualityByKey, metaByKey };
-  const nonSaltTokens = queryToks.filter((t) => !/^\d+$/.test(t) && !SALT_WORDS.has(t));
+  const requestedSubstanceCount = countRequestedSubstanceEntities(queryToks);
 
   // Compter pour chaque CIS combien de tokens de la requête trouvent un appui
   // (dénomination OU substance active / fraction thérapeutique)
@@ -168,8 +179,8 @@ function collectBdpmConceptMatches(parsed, store) {
     const denomHits = store.bdpmDenomTokenToCis.get(tok) || [];
     for (let i = 0; i < denomHits.length; i++) {
       const cis = denomHits[i];
-      denomHitByCis.set(cis, (denomHitByCis.get(cis) || 0) + 1);
       if (!cisVisitedThisToken.has(cis)) {
+        denomHitByCis.set(cis, (denomHitByCis.get(cis) || 0) + 1);
         cisVisitedThisToken.add(cis);
         hitCountByCis.set(cis, (hitCountByCis.get(cis) || 0) + 1);
       }
@@ -185,7 +196,7 @@ function collectBdpmConceptMatches(parsed, store) {
     }
   }
 
-  // Exiger couverture complète des tokens substantifs pour éviter les faux positifs
+  // Exiger couverture complète de tous les tokens distinctifs (y compris codes courts B1/B6/D3/9/5/40)
   const requiredHits = queryToks.length;
   const normQuery = normalizeSearchText(parsed.nameQuery);
   const classifier = createMatchPriorityClassifier(normQuery);
@@ -197,8 +208,8 @@ function collectBdpmConceptMatches(parsed, store) {
 
     const denomHits = denomHitByCis.get(cis) || 0;
     let allInDenom = denomHits >= requiredHits;
-    if (!allInDenom && rec.normDenom) {
-      const dToks = extractTokens(rec.normDenom, 2);
+    if (!allInDenom && rec.denomination) {
+      const dToks = extractConceptTokens(rec.denomination);
       allInDenom = queryToks.every((qt) =>
         dToks.some((dt) => dt === qt || (qt.length >= 4 && dt.startsWith(qt)))
       );
@@ -216,9 +227,9 @@ function collectBdpmConceptMatches(parsed, store) {
       coveredTokens: count,
       totalTokens: requiredHits,
       allSubstancesMatched:
-        nonSaltTokens.length >= 2 &&
+        requestedSubstanceCount >= 2 &&
         rec.distinctActiveCount >= 2 &&
-        rec.distinctActiveCount <= nonSaltTokens.length
+        rec.distinctActiveCount <= requestedSubstanceCount
     };
   }
 
@@ -301,12 +312,8 @@ function collectVetConceptMatches(parsed, store) {
     return { qualityByKey, metaByKey };
   }
 
-  const tokens = (parsed.nameTokens || []).filter((t) => t.length >= 2);
-  const alphaTokens = tokens.filter((t) => t.length >= 3 && !/^\d+$/.test(t) && !CONCEPT_IGNORED_TOKENS.has(t));
-  const substantiveTokens = alphaTokens.length > 0
-    ? tokens.filter((t) => t.length >= 3 && !CONCEPT_IGNORED_TOKENS.has(t))
-    : tokens;
-  const queryToks = substantiveTokens.length > 0 ? substantiveTokens : tokens;
+  const rawTokens = (parsed.nameTokens || []).filter((t) => t.length >= 1 && !CONCEPT_IGNORED_TOKENS.has(t));
+  const queryToks = [...new Set(rawTokens)];
   if (queryToks.length === 0) return { qualityByKey, metaByKey };
 
   const hitCountByNum = new Map();
@@ -315,8 +322,8 @@ function collectVetConceptMatches(parsed, store) {
   for (const tok of queryToks) {
     const visited = new Set();
     for (const num of store.vetNomTokenToNum.get(tok) || []) {
-      nomHitByNum.set(num, (nomHitByNum.get(num) || 0) + 1);
       if (!visited.has(num)) {
+        nomHitByNum.set(num, (nomHitByNum.get(num) || 0) + 1);
         visited.add(num);
         hitCountByNum.set(num, (hitCountByNum.get(num) || 0) + 1);
       }
@@ -749,10 +756,57 @@ function matchVoieCriterion(requestedVoies, candidateNormVoie, candidateNormForm
   return { matched: false, status: 'unknown', boost: 0 };
 }
 
-function hasConvertedConcentrationMatch(requested, candidate, toleranceRatio = 0.02) {
+const NON_COMPARABLE_DOSAGE_RATIO_RE =
+  /\b\d+(?:[.,]\d+)?\s*(?:mg|g|grammes?|ug|µg|μg|mcg|microgrammes?|ui|iu|u|unites?|ml|l)\s*\/\s*(?:\d+(?:[.,]\d+)?\s*)?(?:kg|mg|ug|µg|μg|mcg|microgrammes?)\b/i;
+const MASS_PER_GRAM_RATIO_RE =
+  /\b(\d+(?:[.,]\d+)?)\s*(mg|g|grammes?|ug|µg|μg|mcg|microgrammes?)\s*\/\s*(\d+(?:[.,]\d+)?)?\s*(?:g|grammes?)(?![\p{L}])/iu;
+const CONTIGUOUS_MASS_PER_VOL_RE =
+  /\b(\d+(?:[.,]\d+)?)\s*(mg|g|grammes?|ug|µg|μg|mcg|microgrammes?)\s*\/\s*(\d+(?:[.,]\d+)?)\s*(ml|l)\b/i;
+const LIQUID_MV_FORME_RE =
+  /\b(?:solutions?|collyres?|sirops?|suspensions?|emulsions?|liquides?|injectables?|perfusions?|instillations?|irrigations?|lavages?|bains?\s+de\s+bouche|gouttes?|lotions?|mousses?)\b/i;
+
+function classifyConcentrationBasis(record) {
+  if (!record) return 'unknown';
+  const f = `${record.normForme || ''}`.trim();
+  if (!f) return 'unknown';
+  if (
+    /\b(?:cremes?|pommades?|gels?|pates?|emplatres?|compresses?|pansements?|baumes?|ovules?|suppositoires?|comprimes?|gelules?|capsules?|pastilles?)\b/i.test(f)
+  ) {
+    return 'mass_mass';
+  }
+  if (/\bpoudres?\b/i.test(f) && !/\b(?:solution|suspension|injectable|perfusion|buvable|lavage|irrigation)\b/i.test(f)) {
+    return 'mass_mass';
+  }
+  if (LIQUID_MV_FORME_RE.test(f)) {
+    return 'mass_volume';
+  }
+  return 'unknown';
+}
+
+function matchesVerbatimSansClause(record, verbatimQualifier) {
+  if (!record || !verbatimQualifier) return false;
+  const normQual = normalizeSearchText(verbatimQualifier).trim();
+  const parts = normQual.split(/\s+/);
+  const target = parts[parts.length - 1];
+  if (!target) return false;
+  const stem = target.replace(/s$/, '');
+  const hay = `${record.normDenom || record.normNom || ''} ; ${record.normForme || ''} ; ${record.normPresText || ''}`;
+  const re = new RegExp(`\\bsans\\s+(?:[a-z0-9]+\\s+ni\\s+)?${stem}s?\\b`, 'i');
+  return re.test(hay);
+}
+
+function hasConvertedConcentrationMatch(requested, candidate, { rawRequested = '', record = null, toleranceRatio = 0.02 } = {}) {
   if (!Array.isArray(requested) || !Array.isArray(candidate) || candidate.length === 0) return false;
+  // Interdire toute conversion / permutation sur préparations multi-substances
+  if ((record?.distinctActiveCount || 1) > 1) return false;
+  if (requested.filter((t) => t.unit === 'mg').length > 1) return false;
+  if (candidate.filter((t) => t.unit === 'mg').length > 1) return false;
+
+  const allowPctMgMl = classifyConcentrationBasis(record) === 'mass_volume';
   const close = (a, b) => Math.abs(a - b) <= Math.max(a, b) * toleranceRatio;
+
   if (requested.length === 2) {
+    if (rawRequested && !CONTIGUOUS_MASS_PER_VOL_RE.test(rawRequested)) return false;
     const mg = requested.find((t) => t.unit === 'mg');
     const ml = requested.find((t) => t.unit === 'ml');
     if (mg && ml && ml.amount > 0) {
@@ -760,18 +814,51 @@ function hasConvertedConcentrationMatch(requested, candidate, toleranceRatio = 0
       const pct = concMgMl / 10;
       return candidate.some((c) =>
         (c.unit === 'mg/ml' && close(c.amount, concMgMl)) ||
-        (c.unit === '%' && close(c.amount, pct))
+        (allowPctMgMl && c.unit === '%' && close(c.amount, pct))
       );
     }
   } else if (requested.length === 1) {
     const req = requested[0];
+    const candText = record ? `${record.denomination || record.nom || ''} ${record.normDenom || ''}` : '';
+    const candHasContiguousRatio = !candText || CONTIGUOUS_MASS_PER_VOL_RE.test(candText);
+    const candMg = candidate.length === 2 ? candidate.find((t) => t.unit === 'mg') : null;
+    const candMl = candidate.length === 2 ? candidate.find((t) => t.unit === 'ml') : null;
+
     if (req.unit === '%') {
+      if (!allowPctMgMl) return false;
       const concMgMl = req.amount * 10;
-      return candidate.some((c) => c.unit === 'mg/ml' && close(c.amount, concMgMl));
+      if (candidate.some((c) => c.unit === 'mg/ml' && close(c.amount, concMgMl))) return true;
+      if (candMg && candMl && candMl.amount > 0 && candHasContiguousRatio) {
+        return close(candMg.amount / candMl.amount, concMgMl);
+      }
+      return false;
     }
     if (req.unit === 'mg/ml') {
       const pct = req.amount / 10;
-      return candidate.some((c) => c.unit === '%' && close(c.amount, pct));
+      if (allowPctMgMl && candidate.some((c) => c.unit === '%' && close(c.amount, pct))) return true;
+      if (candMg && candMl && candMl.amount > 0 && candHasContiguousRatio) {
+        return close(candMg.amount / candMl.amount, req.amount);
+      }
+      return false;
+    }
+  }
+  return false;
+}
+
+function isNonComparableConcentrationBasis(rawRequested, requested, candidate, record) {
+  const reqHasMgPerG = MASS_PER_GRAM_RATIO_RE.test(rawRequested || '');
+  const candText = record ? `${record.denomination || record.nom || ''}` : '';
+  const candHasMgPerG = MASS_PER_GRAM_RATIO_RE.test(candText);
+  if (reqHasMgPerG !== candHasMgPerG) return true;
+
+  const basis = classifyConcentrationBasis(record);
+  if (basis !== 'mass_volume') {
+    const reqHasPct = requested.some((t) => t.unit === '%');
+    const reqHasMgMl = requested.some((t) => t.unit === 'mg/ml') || CONTIGUOUS_MASS_PER_VOL_RE.test(rawRequested || '');
+    const candHasPct = candidate.some((t) => t.unit === '%');
+    const candHasMgMl = candidate.some((t) => t.unit === 'mg/ml') || CONTIGUOUS_MASS_PER_VOL_RE.test(candText);
+    if ((reqHasPct && candHasMgMl) || (reqHasMgMl && candHasPct)) {
+      return true;
     }
   }
   return false;
@@ -795,6 +882,8 @@ function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
   if (eff.dosage) {
     if (inspectCriterionConstraint(eff.dosage)) {
       cs.dosage = 'unsupported';
+    } else if (NON_COMPARABLE_DOSAGE_RATIO_RE.test(eff.dosage)) {
+      cs.dosage = 'unknown';
     } else {
       const requested = parseDosageTokens(eff.dosage);
       if (requested.length === 0) {
@@ -805,30 +894,40 @@ function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
         const denomTokens = record.denomDosages || [];
         const compoTokens = record.compoDosages || [];
         if (denomTokens.length > 0) {
-          const { matched, extra } = matchDosageTokens(requested, denomTokens);
-          cm.dosage = matched === requested.length;
-          cs.dosage = cm.dosage ? 'matched' : 'contradicted';
-          if (matched > 0) {
-            boost += (3 * matched) / requested.length;
-            dosageExtra = extra;
-          } else if (useAliases && hasConvertedConcentrationMatch(requested, denomTokens)) {
-            cs.dosage = 'expanded';
-            boost += 1.0;
+          if (isNonComparableConcentrationBasis(eff.dosage, requested, denomTokens, record)) {
+            cm.dosage = false;
+            cs.dosage = 'unknown';
           } else {
-            boost -= 2.5; // contredit explicitement
+            const { matched, extra } = matchDosageTokens(requested, denomTokens);
+            cm.dosage = matched === requested.length;
+            cs.dosage = cm.dosage ? 'matched' : 'contradicted';
+            if (matched > 0) {
+              boost += (3 * matched) / requested.length;
+              dosageExtra = extra;
+            } else if (useAliases && hasConvertedConcentrationMatch(requested, denomTokens, { rawRequested: eff.dosage, record })) {
+              cs.dosage = 'expanded';
+              boost += 1.0;
+            } else {
+              boost -= 2.5; // contredit explicitement
+            }
           }
         } else if (compoTokens.length > 0) {
-          const { matched, extra } = matchDosageTokens(requested, compoTokens);
-          cm.dosage = matched === requested.length;
-          cs.dosage = cm.dosage ? 'matched' : 'contradicted';
-          if (matched > 0) {
-            boost += (2 * matched) / requested.length;
-            dosageExtra = extra;
-          } else if (useAliases && hasConvertedConcentrationMatch(requested, compoTokens)) {
-            cs.dosage = 'expanded';
-            boost += 1.0;
+          if (isNonComparableConcentrationBasis(eff.dosage, requested, compoTokens, record)) {
+            cm.dosage = false;
+            cs.dosage = 'unknown';
           } else {
-            boost -= 2.5;
+            const { matched, extra } = matchDosageTokens(requested, compoTokens);
+            cm.dosage = matched === requested.length;
+            cs.dosage = cm.dosage ? 'matched' : 'contradicted';
+            if (matched > 0) {
+              boost += (2 * matched) / requested.length;
+              dosageExtra = extra;
+            } else if (useAliases && hasConvertedConcentrationMatch(requested, compoTokens, { rawRequested: eff.dosage, record })) {
+              cs.dosage = 'expanded';
+              boost += 1.0;
+            } else {
+              boost -= 2.5;
+            }
           }
         } else {
           cs.dosage = 'unknown';
@@ -881,14 +980,18 @@ function evaluateEntityCriteria(record, parsed, { useAliases = false } = {}) {
     }
   }
 
-  // 4. Qualificatifs galéniques (effervescent, lp, orodispersible, pelliculé, à croquer)
+  // 4. Qualificatifs galéniques (effervescent, lp, orodispersible, pelliculé, à croquer, sans <X>)
   if (useAliases && eff.qualifiers && eff.qualifiers.length > 0 && record) {
     const qualClauses = splitGalenicClauses(`${record.normDenom || record.normNom || ''} ; ${record.normForme || ''}`);
     let matchedQual = 0;
     for (const q of eff.qualifiers) {
+      const isSansQual = q.startsWith('sans ');
       if (
-        matchesGalenicPhrase(qualClauses, q) ||
-        (q === 'orodispersible' && matchesGalenicPhrase(qualClauses, 'lyophilisat'))
+        (isSansQual && matchesVerbatimSansClause(record, q)) ||
+        (!isSansQual && (
+          matchesGalenicPhrase(qualClauses, q) ||
+          (q === 'orodispersible' && matchesGalenicPhrase(qualClauses, 'lyophilisat'))
+        ))
       ) {
         matchedQual++;
         boost += 1.5;
@@ -930,13 +1033,13 @@ function buildEntitySignals(ref, record, meta, parsed, { mode, store }) {
   let conceptBonus = 0;
   const isGenericIntent = Boolean(parsed?.extracted?.intents?.includes('generic_equivalent'));
   if (mode === 'concepts' && record) {
-    const nameTokens = (parsed.nameTokens || []).filter((t) => t.length >= 2);
-    const nonSaltTokens = nameTokens.filter((t) => t.length >= 3 && !/^\d+$/.test(t) && !SALT_WORDS.has(t));
+    const nameTokens = (parsed.nameTokens || []).filter((t) => t.length >= 1 && !CONCEPT_IGNORED_TOKENS.has(t));
+    const requestedSubstanceCount = countRequestedSubstanceEntities(nameTokens);
     const reqDosages = parsed.effectiveCriteria.dosage ? parseDosageTokens(parsed.effectiveCriteria.dosage) : [];
     const multiDoseRequested = reqDosages.filter((d) => d.unit === 'mg' || d.unit === 'ui').length >= 2;
 
     // Préférer mono-substance sur requête mono-molécule sans dosage d'association
-    const singleRequested = nameTokens.length >= 1 && nonSaltTokens.length <= 1 && !multiDoseRequested;
+    const singleRequested = nameTokens.length >= 1 && requestedSubstanceCount <= 1 && !multiDoseRequested;
     if (singleRequested && record.distinctActiveCount === 1) {
       conceptBonus += 1.2;
     } else if (singleRequested && record.distinctActiveCount > 1) {
@@ -971,11 +1074,13 @@ function buildEntitySignals(ref, record, meta, parsed, { mode, store }) {
     criteria_status.voie === 'expanded' ||
     criteria_status.species === 'matched' ||
     criteria_status.species === 'expanded';
+  const hasFullTokenCoverage =
+    Boolean(meta && meta.coveredTokens && meta.totalTokens && meta.coveredTokens >= meta.totalTokens);
   let qualityRank = MATCH_QUALITY_RANK[ref.match_quality] || 0;
   if (mode === 'concepts') {
     if (
       ref.match_quality === 'prefix' &&
-      Boolean(meta && meta.coveredTokens) &&
+      hasFullTokenCoverage &&
       hasSatisfiedCriterion &&
       !hasContradictedCriterion
     ) {
@@ -1195,6 +1300,12 @@ function executeExperimentalSearchPage(
     const record = store
       ? (ref.source === 'bdpm' ? store.bdpmByCis.get(ref.key) : store.vetByNum.get(ref.key))
       : buildStructuredEntityRecord(ref.source, ref.key, parsed);
+    if (
+      safety.verbatimQualifiers.length > 0 &&
+      !safety.verbatimQualifiers.every((vq) => matchesVerbatimSansClause(record, vq))
+    ) {
+      continue;
+    }
     const meta = matchesBySource[ref.source] && matchesBySource[ref.source].metaByKey[ref.key];
     scored.push(buildEntitySignals(ref, record, meta, parsed, { mode, store }));
   }

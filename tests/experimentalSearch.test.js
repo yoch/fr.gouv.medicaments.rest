@@ -61,7 +61,21 @@ function seedSyntheticCorpora() {
     makeRow({ cis: '68200002', denomination: 'LIDOCAINE ZENTIVA 2 %, solution buccale', forme_pharma: 'solution buccale', voies_admin: 'cutanée;orale;sublinguale', commercialisation: 'Commercialisée', titulaire: 'ZENTIVA' }),
     makeRow({ cis: '68200003', denomination: 'LIDOCAINE RENAUDIN 5 mg/ml, solution injectable', forme_pharma: 'solution injectable', voies_admin: 'sous-cutanée', commercialisation: 'Commercialisée', titulaire: 'RENAUDIN' }),
     makeRow({ cis: '68200004', denomination: 'LIDOCAINE BIOGARAN 5 %, gel', forme_pharma: 'gel', voies_admin: 'cutanée', commercialisation: 'Commercialisée', titulaire: 'BIOGARAN' }),
-    makeRow({ cis: '68200005', denomination: 'LIDOCAINE PATCH ET GEL 5 %, dispositif', forme_pharma: 'patch et gel', voies_admin: 'cutanée', commercialisation: 'Commercialisée', titulaire: 'MEDA' })
+    makeRow({ cis: '68200005', denomination: 'LIDOCAINE PATCH ET GEL 5 %, dispositif', forme_pharma: 'patch et gel', voies_admin: 'cutanée', commercialisation: 'Commercialisée', titulaire: 'MEDA' }),
+    makeRow({ cis: '67104999', denomination: 'VITAMINE B1 ARROW CONSEIL 250 mg, comprimé pelliculé', forme_pharma: 'comprimé pelliculé', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'ARROW' }),
+    makeRow({ cis: '60565134', denomination: 'VITAMINE B1 B6 BAYER, comprimé pelliculé', forme_pharma: 'comprimé pelliculé', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'BAYER' }),
+    makeRow({ cis: '66742764', denomination: 'VITAMINE B6 ARROW CONSEIL 250 mg, comprimé quadrisécable', forme_pharma: 'comprimé quadrisécable', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'ARROW' }),
+    makeRow({ cis: '69139714', denomination: 'VITAMINE PP AGUETTANT 500 mg/5 mL, solution injectable', forme_pharma: 'solution injectable', voies_admin: 'intramusculaire;intraveineuse', commercialisation: 'Commercialisée', titulaire: 'AGUETTANT' }),
+    makeRow({ cis: '63718901', denomination: 'HOMEOGENE 9, comprimé', forme_pharma: 'comprimé', voies_admin: 'orale;sublinguale', commercialisation: 'Commercialisée', titulaire: 'BOIRON' }),
+    makeRow({ cis: '61982231', denomination: 'HOMEOGENE 46, comprimé orodispersible', forme_pharma: 'comprimé orodispersible', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'BOIRON' }),
+    makeRow({ cis: '69000020', denomination: 'HULIO 20 mg, solution injectable en seringue préremplie', forme_pharma: 'solution injectable', voies_admin: 'sous-cutanée', commercialisation: 'Commercialisée', titulaire: 'VIATRIS' }),
+    makeRow({ cis: '69000040', denomination: 'HULIO 40 mg, solution injectable en seringue préremplie', forme_pharma: 'solution injectable', voies_admin: 'sous-cutanée', commercialisation: 'Commercialisée', titulaire: 'VIATRIS' }),
+    makeRow({ cis: '69000005', denomination: 'ROSUVASTATINE ARROW 5 mg, comprimé pelliculé', forme_pharma: 'comprimé pelliculé', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'ARROW' }),
+    makeRow({ cis: '69000010', denomination: 'ROSUVASTATINE ARROW 10 mg, comprimé pelliculé', forme_pharma: 'comprimé pelliculé', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'ARROW' }),
+    makeRow({ cis: '69000101', denomination: 'DRILL SANS SUCRE ANIS MENTHE, pastille', forme_pharma: 'pastille', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'PIERRE FABRE' }),
+    makeRow({ cis: '69000102', denomination: 'MAGNESIE SAN PELLEGRINO SANS ANIS 90 %, poudre pour suspension buvable', forme_pharma: 'poudre pour suspension buvable', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'SAN PELLEGRINO' }),
+    makeRow({ cis: '69000103', denomination: 'MAGNESIE SAN PELLEGRINO ANISEE 90 %, poudre pour suspension buvable', forme_pharma: 'poudre pour suspension buvable', voies_admin: 'orale', commercialisation: 'Commercialisée', titulaire: 'SAN PELLEGRINO' }),
+    makeRow({ cis: '69000201', denomination: 'CHLORURE DE SODIUM LAVOISIER 0,9 %, solution injectable', forme_pharma: 'solution injectable', voies_admin: 'intraveineuse', commercialisation: 'Commercialisée', titulaire: 'LAVOISIER' })
   ];
 
   const presentations = [
@@ -94,7 +108,17 @@ function seedSyntheticCorpora() {
     makeRow({ cis: '68200002', designation_element: 'solution', code_substance: '05552', denomination_substance: 'LIDOCAÏNE', dosage: '2 %', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '68200003', designation_element: 'solution', code_substance: '05552', denomination_substance: 'LIDOCAÏNE', dosage: '5 mg/ml', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '68200004', designation_element: 'gel', code_substance: '05552', denomination_substance: 'LIDOCAÏNE', dosage: '5 %', nature_composant: 'SA', numero_ordre: '1' }),
-    makeRow({ cis: '68200005', designation_element: 'patch', code_substance: '05552', denomination_substance: 'LIDOCAÏNE', dosage: '5 %', nature_composant: 'SA', numero_ordre: '1' })
+    makeRow({ cis: '68200005', designation_element: 'patch', code_substance: '05552', denomination_substance: 'LIDOCAÏNE', dosage: '5 %', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '67104999', designation_element: 'comprimé', code_substance: '07001', denomination_substance: 'CHLORHYDRATE DE THIAMINE', dosage: '250 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '60565134', designation_element: 'comprimé', code_substance: '07001', denomination_substance: 'CHLORHYDRATE DE THIAMINE', dosage: '250 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '60565134', designation_element: 'comprimé', code_substance: '07002', denomination_substance: 'CHLORHYDRATE DE PYRIDOXINE', dosage: '250 mg', nature_composant: 'SA', numero_ordre: '2' }),
+    makeRow({ cis: '66742764', designation_element: 'comprimé', code_substance: '07002', denomination_substance: 'CHLORHYDRATE DE PYRIDOXINE', dosage: '250 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '69139714', designation_element: 'solution', code_substance: '07003', denomination_substance: 'NICOTINAMIDE', dosage: '500 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '69000020', designation_element: 'solution', code_substance: '07010', denomination_substance: 'ADALIMUMAB', dosage: '20 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '69000040', designation_element: 'solution', code_substance: '07010', denomination_substance: 'ADALIMUMAB', dosage: '40 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '69000005', designation_element: 'comprimé', code_substance: '07020', denomination_substance: 'ROSUVASTATINE', dosage: '5 mg', nature_composant: 'FT', numero_ordre: '1' }),
+    makeRow({ cis: '69000010', designation_element: 'comprimé', code_substance: '07020', denomination_substance: 'ROSUVASTATINE', dosage: '10 mg', nature_composant: 'FT', numero_ordre: '1' }),
+    makeRow({ cis: '69000201', designation_element: 'solution', code_substance: '07030', denomination_substance: 'CHLORURE DE SODIUM', dosage: '0,9 g', nature_composant: 'SA', numero_ordre: '1' })
   ];
 
   const generiques = [
@@ -655,6 +679,111 @@ describe('structuredQueryParser & experimentalSearch (B1/B2)', () => {
         { useAliases: true }
       );
       expect(evChx.criteria_status.dosage).toBe('expanded');
+    });
+
+    it('§5 Audit : garde-fous concentrations (% m/m vs mg/ml, mg/g, UI/mg, mg/kg, multi-substances), clauses "sans <X>" contiguës et tokens courts/numériques', () => {
+      // 1. % m/m (gel, crème, pommade, poudre) vs mg/mL -> non comparable ('unknown'), jamais matched ni expanded
+      for (const semiSolidForme of ['gel', 'creme', 'pommade', 'poudre pour application cutanee']) {
+        const p25MgMl = parseStructuredQuery('ketoprofene', { dosage: '25 mg/ml' }, getTaxonomyVocab(), { useAliases: true });
+        const evSemi = evaluateEntityCriteria(
+          {
+            denomination: 'KETOPROFENE BIOGARAN 2,5 %, ' + semiSolidForme,
+            denomDosages: parseDosageTokens('KETOPROFENE BIOGARAN 2,5 %'),
+            compoDosages: [],
+            normForme: semiSolidForme,
+            normVoie: 'cutanee',
+            normPresText: '',
+            normDenom: 'ketoprofene biogaran 2 5 pour cent',
+            distinctActiveCount: 1
+          },
+          p25MgMl,
+          { useAliases: true }
+        );
+        expect(evSemi.criteria_match.dosage).toBe(false);
+        expect(evSemi.criteria_status.dosage).toBe('unknown');
+      }
+
+      // 2. Ratios non comparables : mg/g, UI/mg, mg/kg -> 'unknown', jamais matched
+      for (const ratioDosage of ['10 mg/g', '100 UI/mg', '12.5 mg/kg']) {
+        const pRatio = parseStructuredQuery('hydrocortisone', { dosage: ratioDosage }, getTaxonomyVocab(), { useAliases: true });
+        const evRatio = evaluateEntityCriteria(
+          {
+            denomination: 'HYDROCORTISONE 10 mg, comprimé',
+            denomDosages: parseDosageTokens('10 mg'),
+            compoDosages: [],
+            normForme: 'comprime',
+            normVoie: 'orale',
+            normPresText: '',
+            normDenom: 'hydrocortisone 10 mg comprime',
+            distinctActiveCount: 1
+          },
+          pRatio,
+          { useAliases: true }
+        );
+        expect(evRatio.criteria_match.dosage).toBe(false);
+        expect(evRatio.criteria_status.dosage).toBe('unknown');
+      }
+
+      // 3. Multi-substances : interdire toute conversion croisée M mg / V mL -> mg/mL
+      const pMulti = parseStructuredQuery('amoxicilline', { dosage: '100 mg/ml' }, getTaxonomyVocab(), { useAliases: true });
+      const evMulti = evaluateEntityCriteria(
+        {
+          denomination: 'AMOXICILLINE ACIDE CLAVULANIQUE 500 mg/62,5 mg/5 ml',
+          denomDosages: [{ amount: 500, unit: 'mg' }, { amount: 5, unit: 'ml' }],
+          compoDosages: [],
+          normForme: 'suspension buvable',
+          normVoie: 'orale',
+          normPresText: '',
+          normDenom: 'amoxicilline acide clavulanique',
+          distinctActiveCount: 2
+        },
+        pMulti,
+        { useAliases: true }
+      );
+      expect(evMulti.criteria_match.dosage).toBe(false);
+      expect(evMulti.criteria_status.dosage).toBe('contradicted');
+
+      // 4. Clauses "sans <X>" contiguës vs sac-de-mots ("SANS SUCRE ANIS MENTHE" et "ANISEE" rejetés sur "sans anis")
+      const magSansAnis = executeExperimentalSearchPage('Magnesie sans anis', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(magSansAnis.total).toBe(1);
+      expect(magSansAnis.results[0].cis).toBe('69000102');
+
+      const pastilleSansAnis = executeExperimentalSearchPage('pastille sans anis', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(pastilleSansAnis.results.some((r) => r.cis === '69000101')).toBe(false);
+
+      const sansAlcool = executeExperimentalSearchPage('bain de bouche sans alcool', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(sansAlcool.total).toBe(0);
+      expect(sansAlcool.search.abstained).toBe(true);
+
+      // 5. Tokens courts / numériques discriminants (vitamine B1 vs B6 vs PP, homeogene 9 vs 46, HULIO 40 vs 20, rosuvastatine 5 vs 10)
+      const vitB1 = executeExperimentalSearchPage('vitamine B1', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(vitB1.results[0].cis).toBe('67104999');
+      expect(vitB1.results.some((r) => r.cis === '69139714')).toBe(false);
+
+      const vitB1Dose500 = executeExperimentalSearchPage('vitamine B1', 'auto', 1, 5, { dosage: '500mg' }, { mode: 'concepts' });
+      expect(vitB1Dose500.results[0].cis).toBe('67104999');
+      expect(vitB1Dose500.results.some((r) => r.cis === '69139714')).toBe(false);
+
+      const vitB6 = executeExperimentalSearchPage('vitamine B6', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(vitB6.results[0].cis).toBe('66742764');
+      expect(vitB6.results.some((r) => r.cis === '67104999')).toBe(false);
+
+      const homeo9 = executeExperimentalSearchPage('homeogene 9', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(homeo9.total).toBe(1);
+      expect(homeo9.results[0].cis).toBe('63718901');
+
+      const hulio40 = executeExperimentalSearchPage('HULIO 40', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(hulio40.total).toBe(1);
+      expect(hulio40.results[0].cis).toBe('69000040');
+
+      const rosu5 = executeExperimentalSearchPage('rosuvastatine 5', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(rosu5.total).toBe(1);
+      expect(rosu5.results[0].cis).toBe('69000005');
+
+      // 6. Contre-ions primaires conservés (chlorure de sodium)
+      const nacl = executeExperimentalSearchPage('chlorure de sodium 0,9 %', 'auto', 1, 5, {}, { mode: 'concepts' });
+      expect(nacl.results[0].cis).toBe('69000201');
+      expect(nacl.results[0].criteria_match.dosage).toBe(true);
     });
   });
 });

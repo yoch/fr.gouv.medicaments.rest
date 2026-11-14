@@ -12,7 +12,6 @@ const VERBATIM_SANS_QUALIFIERS = new Set([
   'sucres',
   'conservateur',
   'conservateurs',
-  'alcool',
   'arome',
   'aromes',
   'sulfite',

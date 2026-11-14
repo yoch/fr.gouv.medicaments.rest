@@ -50,6 +50,11 @@ const PHARMA_ALIASES = Object.freeze([
   { pattern: /\b(?:lp|retard|prolonge[e]?)\b/g, kind: 'qualifier', value: 'liberation prolongee', source: 'galenic_abbrev' },
   { pattern: /\bpellicule[es]?\b/g, kind: 'qualifier', value: 'pellicule', source: 'bdpm_forme' },
   { pattern: /\ba\s+croquer\b|\bcroquer\b/g, kind: 'qualifier', value: 'a croquer', source: 'bdpm_forme' },
+  { pattern: /\bsans\s+(?:de\s+|d\s+)?sucres?\b/g, kind: 'qualifier', value: 'sans sucre', source: 'bdpm_verbatim_sans' },
+  { pattern: /\bsans\s+(?:de\s+|d\s+)?conservateurs?\b/g, kind: 'qualifier', value: 'sans conservateur', source: 'bdpm_verbatim_sans' },
+  { pattern: /\bsans\s+(?:de\s+|d\s+)?aromes?\b/g, kind: 'qualifier', value: 'sans arome', source: 'bdpm_verbatim_sans' },
+  { pattern: /\bsans\s+(?:de\s+|d\s+)?sulfites?\b/g, kind: 'qualifier', value: 'sans sulfite', source: 'bdpm_verbatim_sans' },
+  { pattern: /\bsans\s+(?:de\s+|d\s+)?anis\b/g, kind: 'qualifier', value: 'sans anis', source: 'bdpm_verbatim_sans' },
 
   // Qualificatifs d'intention non-clinique (équivalence générique)
   { pattern: /\b(?:generiques?|equivalents?)\b(?:\s+d[eu']|\s+d')?/g, kind: 'intent', value: 'generic_equivalent', source: 'bdpm_gener_intent' }

@@ -28,7 +28,7 @@ const SALT_WORDS = new Set([
   'ester', 'sels', 'base'
 ]);
 const CONCEPT_IGNORED_TOKENS = new Set([
-  'de', 'du', 'des', 'd', 'l', 'le', 'la', 'les', 'a', 'au', 'aux', 'en', 'et',
+  'de', 'du', 'des', 'l', 'le', 'la', 'les', 'au', 'aux', 'en', 'et',
   'hydrate', 'monohydrate', 'dihydrate', 'trihydrate', 'tetrahydrate',
   'pentahydrate', 'heptahydrate', 'hemihydrate', 'sesquihydrate', 'anhydre',
   'sels', 'base', 'ester'
@@ -45,6 +45,25 @@ function extractTokens(text, minLen = 2) {
   for (let i = 0; i < raw.length; i++) {
     const t = raw[i];
     if (t.length >= minLen) out.push(t);
+  }
+  return out;
+}
+
+function extractConceptTokens(rawText) {
+  if (!rawText) return [];
+  const precleaned = String(rawText)
+    .replace(/\b[dlDL]['’]/gu, ' ')
+    .replace(/\b[àÀ]\b/gu, ' ');
+  const norm = normalizeSearchText(precleaned);
+  if (!norm) return [];
+  const raw = norm.split(TOKEN_SPLIT_RE);
+  const out = [];
+  for (let i = 0; i < raw.length; i++) {
+    const t = raw[i];
+    if (!t || CONCEPT_IGNORED_TOKENS.has(t)) continue;
+    if (t.length >= 2 || /^\d$/.test(t) || /^[abcegkvd]$/.test(t)) {
+      out.push(t);
+    }
   }
   return out;
 }
@@ -79,7 +98,7 @@ function buildIngredientGroups(compRows) {
   for (let i = 0; i < compRows.length; i++) {
     const row = compRows[i];
     const normSub = normalizeSearchText(row.denomination_substance);
-    const subTokens = extractTokens(normSub, 2);
+    const subTokens = extractConceptTokens(row.denomination_substance);
     for (let k = 0; k < subTokens.length; k++) allTokens.add(subTokens[k]);
 
     if (row.dosage) {
@@ -186,7 +205,7 @@ function buildBdpmConceptIndexes() {
     const spec = corpus.specialites[i];
     const cis = spec.cis;
     const normDenom = normalizeSearchText(spec.denomination);
-    const denomTokens = extractTokens(normDenom, 2);
+    const denomTokens = extractConceptTokens(spec.denomination);
     for (let j = 0; j < denomTokens.length; j++) {
       pushUniqueCisList(bdpmDenomTokenToCis, denomTokens[j], cis);
     }
@@ -278,7 +297,7 @@ function buildVetConceptIndexes() {
     const med = corpus.medicaments[i];
     const num = med.num;
     const normNom = normalizeSearchText(med.nom);
-    const nomTokens = extractTokens(normNom, 2);
+    const nomTokens = extractConceptTokens(med.nom);
     for (let j = 0; j < nomTokens.length; j++) {
       pushUniqueCisList(vetNomTokenToNum, nomTokens[j], num);
     }
@@ -289,8 +308,7 @@ function buildVetConceptIndexes() {
 
     for (let j = 0; j < compIndices.length; j++) {
       const comp = corpus.compositions[compIndices[j]];
-      const normSub = normalizeSearchText(comp.substance);
-      const subTokens = extractTokens(normSub, 2);
+      const subTokens = extractConceptTokens(comp.substance);
       for (let k = 0; k < subTokens.length; k++) subTokensSeen.add(subTokens[k]);
       if (comp.quantite != null && comp.quantite !== '' && comp.unite) {
         const parsed = parseDosageTokens(`${comp.quantite} ${comp.unite}`);
@@ -421,6 +439,7 @@ module.exports = {
   SALT_WORDS,
   CONCEPT_IGNORED_TOKENS,
   extractTokens,
+  extractConceptTokens,
   canonicalizeSpeciesWord,
   buildConceptStore,
   getTaxonomyVocab,
