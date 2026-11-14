@@ -664,8 +664,9 @@
  *     description: |
  *       Recherche globale dans la BDPM (médicaments humains) et/ou l'ANMV (médicaments vétérinaires) reposant sur l'indexation lexicale `FrozenMiniSearch`.
  *       - `mode=legacy` (défaut) : comportement historique conservé à l'identique (`B0`).
- *       - `mode=structured` (`B1`, opt-in) : extraction structurée des dosages, formes et voies présents dans `q`, précédence stricte des paramètres explicites (`dosage`, `forme`, `voie`) avec traçabilité dans `search.conflicts`, statuts détaillés `criteria_status` (`matched`, `expanded`, `contradicted`, `unknown`, `unsupported`, `not_requested`) et abstention de sécurité (`search.abstained=true`) sur les contraintes négatives ou cliniques/RCP hors périmètre.
+ *       - `mode=structured` (`B1`, opt-in) : extraction structurée des dosages, formes et voies présents dans `q`, précédence stricte des paramètres explicites (`dosage`, `forme`, `voie`) avec traçabilité dans `search.parsed.conflicts`, statuts détaillés `criteria_status` (`matched`, `expanded`, `contradicted`, `unknown`, `unsupported`, `not_requested`) et abstention de sécurité (`search.abstained=true`) sur les contraintes négatives ou cliniques/RCP hors périmètre.
  *       - `mode=concepts` (`B2`, opt-in) : enrichit `structured` avec la résolution par concepts (substances actives `SA`/`FT`, groupes génériques, alias galéniques/voies, routage d'espèces vétérinaires et conversions de concentration dimensionnellement établies). Aucun index vectoriel (`FXV1`) ni modèle externe n'est chargé.
+ *       - `SEARCH_WARMUP_MODE` (`legacy` | `structured` | `concepts`) règle uniquement le préchauffage en mémoire au démarrage/rechargement et ne restreint pas l'autorisation serveur d'appeler un mode par requête.
  *     tags: [Médicaments]
  *     parameters:
  *       - in: query
@@ -705,7 +706,7 @@
  *           type: string
  *           enum: [json, markdown]
  *           default: json
- *         description: "json (défaut) ou markdown (texte compact pour agents LLM)"
+ *         description: "json (défaut) ou markdown (texte compact pour agents LLM ; en modes structured/concepts, rend visibles les statuts criteria_status, les conflits search.parsed.conflicts et les abstentions explicites abstained=true avec abstain_reason)"
  *       - in: query
  *         name: detail
  *         schema:
@@ -717,7 +718,7 @@
  *         name: dosage
  *         schema:
  *           type: string
- *         description: "Critère de scoring optionnel (non filtrant). Ex. '1 g', '500 mg'. En mode legacy, comparé au dosage de la dénomination. En modes structured/concepts, prime sur un dosage contradictoire extrait de q (signalé dans search.conflicts) et renseigne criteria_status.dosage (un résultat proche mais au dosage incompatible reste explicitement 'contradicted' avec criteria_match.dosage=false)."
+ *         description: "Critère de scoring optionnel (non filtrant). Ex. '1 g', '500 mg'. En mode legacy, comparé au dosage de la dénomination. En modes structured/concepts, prime sur un dosage contradictoire extrait de q (signalé dans search.parsed.conflicts) et renseigne criteria_status.dosage (un résultat proche mais au dosage incompatible reste explicitement 'contradicted' avec criteria_match.dosage=false)."
  *       - in: query
  *         name: forme
  *         schema:
@@ -781,7 +782,7 @@
  *                                   $ref: '#/components/schemas/Composition'
  *                     search:
  *                       type: object
- *                       description: "Métadonnées d'exécution de la recherche (query, source, criteria, et en modes structured/concepts : mode, parsed, conflicts, abstained, abstain_reason, safety)."
+ *                       description: "Métadonnées d'exécution de la recherche (query, source, criteria, et en modes structured/concepts : mode, parsed incluant parsed.conflicts, abstained, abstain_reason, safety)."
  *           text/markdown:
  *             schema:
  *               type: string

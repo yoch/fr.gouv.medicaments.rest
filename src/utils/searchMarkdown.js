@@ -38,7 +38,47 @@ function formatMatchLine(hit) {
   return `- Match: ${quality} (sur ${viaLabel})`;
 }
 
+const CRITERION_STATUS_FORMATTERS = {
+  matched: (key) => `${key} ✓`,
+  expanded: (key) => `${key} ≈ (expanded)`,
+  contradicted: (key) => `${key} ✗ (contradicted)`,
+  unknown: (key) => `${key} ? (unknown — non vérifiable)`,
+  unsupported: (key) => `${key} ! (unsupported — non pris en charge)`
+};
+
 function formatCriteriaLine(hit) {
+  const statusMap = hit.criteria_status;
+  if (statusMap && typeof statusMap === 'object') {
+    const requestedEntries = Object.entries(statusMap).filter(
+      ([, status]) => status && status !== 'not_requested'
+    );
+    if (requestedEntries.length === 0) return null;
+
+    const allMatched = requestedEntries.every(([, status]) => status === 'matched');
+    if (allMatched) {
+      return `- Critères: ${requestedEntries.map(([key]) => key).join(', ')} ✓`;
+    }
+
+    const formatted = requestedEntries.map(([key, status]) => {
+      const formatter = CRITERION_STATUS_FORMATTERS[status];
+      return formatter ? formatter(key) : `${key}: ${status}`;
+    });
+
+    const hasContradiction = requestedEntries.some(([, status]) => status === 'contradicted');
+    if (hasContradiction) {
+      return `- Critères (⚠️ contradiction — demande partiellement insatisfaite): ${formatted.join(', ')}`;
+    }
+
+    const hasIncomplete = requestedEntries.some(
+      ([, status]) => status === 'unknown' || status === 'unsupported'
+    );
+    if (hasIncomplete) {
+      return `- Critères (ℹ️ vérification incomplète): ${formatted.join(', ')}`;
+    }
+
+    return `- Critères: ${formatted.join(', ')}`;
+  }
+
   const match = hit.criteria_match;
   if (!match) return null;
   const satisfied = Object.entries(match)
@@ -151,6 +191,38 @@ function renderVetHit(hit, index) {
   return lines.join('\n');
 }
 
+function formatSearchWarningsBlock(searchMeta) {
+  const warnings = [];
+  const conflicts =
+    searchMeta?.parsed?.conflicts || searchMeta?.conflicts || searchMeta?.query_conflicts;
+  if (Array.isArray(conflicts) && conflicts.length > 0) {
+    for (const c of conflicts) {
+      const retained =
+        c.retained ??
+        c.explicit ??
+        searchMeta?.parsed?.[c.field] ??
+        searchMeta?.criteria?.[c.field] ??
+        '';
+      warnings.push(
+        `- ⚠️ Conflit de critère (${c.field}) : paramètre explicite « ${c.explicit} » prioritaire sur le texte « ${c.parsed} » (retenu : « ${retained} »)`
+      );
+    }
+  }
+
+  const unsupportedCriteria =
+    searchMeta?.safety?.unsupported_criteria || searchMeta?.parsed?.unsupported_criteria;
+  if (Array.isArray(unsupportedCriteria) && unsupportedCriteria.length > 0) {
+    for (const u of unsupportedCriteria) {
+      const label = u.field || u.source || 'critère';
+      const detail = u.value ? ` « ${u.value} »` : '';
+      const reason = u.reason || u.type || 'unsupported';
+      warnings.push(`- ⚠️ Contrainte non prise en charge (${label})${detail} : \`${reason}\``);
+    }
+  }
+
+  return warnings.length > 0 ? warnings.join('\n') : null;
+}
+
 function renderSearchMarkdown(data, pagination, searchMeta) {
   const query = searchMeta?.query || '';
   const total = pagination?.total ?? data.length;
@@ -159,9 +231,14 @@ function renderSearchMarkdown(data, pagination, searchMeta) {
 
   const header = [
     `# BDPM — recherche « ${query} »`,
-    `${shown} résultat${shown > 1 ? 's' : ''} (${total} au total) · page ${page}`,
-    ''
+    `${shown} résultat${shown > 1 ? 's' : ''} (${total} au total) · page ${page}`
   ];
+
+  const warningsBlock = formatSearchWarningsBlock(searchMeta);
+  if (warningsBlock) {
+    header.push(warningsBlock);
+  }
+  header.push('');
 
   const body = data.map((hit, i) => {
     if (hit.type === 'medicament_veterinaire') {
@@ -171,7 +248,17 @@ function renderSearchMarkdown(data, pagination, searchMeta) {
   });
 
   if (body.length === 0) {
-    body.push('_Aucun résultat._');
+    if (searchMeta?.abstained) {
+      const reason =
+        searchMeta.abstain_reason ||
+        searchMeta.safety?.intent ||
+        'unsupported_query_intent';
+      body.push(
+        `> ⚠️ **Abstention de recherche** (\`abstained=true\`, raison : \`${reason}\`) — Requête hors périmètre déterministe du référentiel BDPM/ANMV (aucune recherche exécutée ; différent de « aucun médicament trouvé »).`
+      );
+    } else {
+      body.push('_Aucun résultat._');
+    }
   }
 
   return [...header, ...body].join('\n\n');
@@ -186,6 +273,7 @@ function normalizeFormat(format) {
 module.exports = {
   renderSearchMarkdown,
   normalizeFormat,
+  formatCriteriaLine,
   formatMatchLine,
   formatSubstances,
   getSubstances

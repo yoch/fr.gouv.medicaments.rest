@@ -99,16 +99,22 @@ Le moteur lexical de production repose dans tous les modes sur `@yoch/frozenmini
 | Mode | Rôle | Comportement |
 |------|------|--------------|
 | `legacy` (défaut) | `B0` historique | Recherche lexicale directe sur `q`, scoring optionnel non destructif via `dosage`, `forme`, `voie`. |
-| `structured` (opt-in) | `B1` structuré | Détache automatiquement dosage/forme/voie présents dans `q`, applique la précédence stricte des paramètres explicites (`search.conflicts`), renseigne `criteria_status` et active les garde-fous d'abstention (`search.abstained`). |
+| `structured` (opt-in) | `B1` structuré | Détache automatiquement dosage/forme/voie présents dans `q`, applique la précédence stricte des paramètres explicites (`search.parsed.conflicts`), renseigne `criteria_status` et active les garde-fous d'abstention (`search.abstained`). |
 | `concepts` (opt-in) | `B2` concepts | Ajoute à `structured` la résolution par concepts : substances actives (`SA`/`FT`), groupes génériques, synonymes galéniques/voies (`per os` → `orale`, `collyre` → `ophtalmique`), routage d'espèces vétérinaires (`chien`, `chat`…) et conversions dimensionnelles vérifiées. |
 
-### Précédence et conflits (`search.conflicts`)
+> **Note sur `SEARCH_WARMUP_MODE`** : la variable d'environnement `SEARCH_WARMUP_MODE=legacy|structured|concepts` (défaut `legacy`) règle uniquement le **préchauffage** des structures en mémoire au démarrage et lors des rechargements du corpus (`loadData()` / `loadVetData()`), et non l'autorisation serveur d'appeler un mode (`mode=legacy|structured|concepts` reste sélectionnable par requête HTTP ; si un mode non préchauffé est appelé, ses structures sont initialisées à la demande).
 
-En modes `structured` et `concepts`, si `q` contient un critère contradictoire avec un paramètre explicite (ex. `q=amoxicilline sirop&forme=comprimé`), le paramètre explicite (`forme=comprimé`) l'emporte systématiquement et le conflit est tracé dans `search.conflicts` (`[{ field: "forme", explicit: "comprime", parsed: "sirop" }]`).
+### Précédence et conflits (`search.parsed.conflicts`)
 
-### Statuts de satisfaction (`criteria_status`)
+En modes `structured` et `concepts`, si `q` contient un critère contradictoire avec un paramètre explicite (ex. `q=amoxicilline sirop&forme=comprimé`), le paramètre explicite (`forme=comprimé`) l'emporte systématiquement et le conflit est tracé dans `search.parsed.conflicts` (`[{ field: "forme", explicit: "comprimé", parsed: "sirop" }]`) ainsi que dans l'en-tête Markdown (`format=markdown`).
 
-En modes `structured` et `concepts`, chaque fiche expose `criteria_status` (`{ dosage, forme, voie }`) en complément de `criteria_match` :
+### Statuts de satisfaction (`criteria_status`) et rendu Markdown (`format=markdown`)
+
+En modes `structured` et `concepts`, chaque fiche expose `criteria_status` (`{ dosage, forme, voie }`) en complément de `criteria_match`. En `format=markdown` (`detail=full` ou `detail=summary`), ces garanties sont rendues explicitement sur chaque fiche et dans l'en-tête :
+- les contradictions (`contradicted`) affichent `- Critères (⚠️ contradiction — demande partiellement insatisfaite): <critère> ✗ (contradicted)` afin qu'un résultat approché à dose, forme ou voie incompatible (ex. `VITAMINE B1 250 mg` pour `500 mg`, ou `VITAMINE B6 250 mg` pour `10 mg`) ne soit jamais présenté comme entièrement satisfaisant ;
+- les états `expanded` (`≈ (expanded)`), `unknown` (`? (unknown — non vérifiable)`) et `unsupported` (`! (unsupported — non pris en charge)`) sont distingués sans assimiler l'information inconnue à une contradiction prouvée ;
+- les critères `not_requested` sont omis ;
+- une abstention (`search.abstained: true`) affiche un bandeau explicite avec `abstain_reason`, distinct d'une recherche vide ordinaire (`_Aucun résultat._`).
 
 | Statut | `criteria_match` | Signification |
 |--------|------------------|---------------|

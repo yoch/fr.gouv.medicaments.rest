@@ -26,6 +26,7 @@ describe('runtimeConfig', () => {
 
     expect(config.version).toMatch(/^\d+\.\d+\.\d+$/);
     expect(config.reload_strategy).toBe('restart');
+    expect(config.search_warmup_mode).toBe('legacy');
     expect(config.features).toEqual({
       load_has_avis: false,
       load_mitm: false,
@@ -37,6 +38,20 @@ describe('runtimeConfig', () => {
     expect(config.limits.vet_load_delay_ms).toBe(15000);
     expect(config.corpus_light_omit_fields.presentations).toContain('statut_admin');
     expect(config.presentation_index_fields).toContain('indications');
+  });
+
+  it('gère SEARCH_WARMUP_MODE (legacy par défaut, structured/concepts acceptés, repli sur legacy)', () => {
+    delete process.env.SEARCH_WARMUP_MODE;
+    expect(loadConfig().search_warmup_mode).toBe('legacy');
+
+    process.env.SEARCH_WARMUP_MODE = 'structured';
+    expect(loadConfig().search_warmup_mode).toBe('structured');
+
+    process.env.SEARCH_WARMUP_MODE = 'concepts';
+    expect(loadConfig().search_warmup_mode).toBe('concepts');
+
+    process.env.SEARCH_WARMUP_MODE = 'invalid_mode';
+    expect(loadConfig().search_warmup_mode).toBe('legacy');
   });
 
   it('corpus_light_profile est indépendant de LOAD_HAS_AVIS', () => {

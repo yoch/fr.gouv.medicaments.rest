@@ -1,5 +1,8 @@
 'use strict';
 
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const request = require('supertest');
 const express = require('express');
 
@@ -1180,5 +1183,323 @@ describe('structuredQueryParser & experimentalSearch (B1/B2)', () => {
       expect(hasConceptStoreCached()).toBe(true);
       expect(getConceptStore()).not.toBe(prevStore);
     });
+
+    it('§1 PR#8 : garanties B1/B2 conservées en format=markdown (detail=full/summary) : positif strict, contradiction (vitamines B1 500mg / B6 10mg), expanded, unknown, unsupported, conflits et abstention vs vide ordinaire', async () => {
+      // 1. Positif strict (detail=full et detail=summary)
+      for (const detail of ['full', 'summary']) {
+        const posJson = await request(app).get(
+          `/api/medicaments/search?q=doliprane&dosage=1000%20mg&forme=comprim%C3%A9&mode=concepts&format=json&detail=${detail}`
+        );
+        expect(posJson.statusCode).toBe(200);
+        expect(posJson.body.data[0].cis).toBe('60234100');
+        expect(posJson.body.data[0].criteria_status).toEqual({
+          dosage: 'matched',
+          forme: 'matched',
+          voie: 'not_requested'
+        });
+
+        const posMd = await request(app).get(
+          `/api/medicaments/search?q=doliprane&dosage=1000%20mg&forme=comprim%C3%A9&mode=concepts&format=markdown&detail=${detail}`
+        );
+        expect(posMd.statusCode).toBe(200);
+        expect(posMd.headers['content-type']).toMatch(/text\/markdown/);
+        expect(posMd.text).toContain('## 1. DOLIPRANE 1000 mg, comprimé — CIS 60234100');
+        expect(posMd.text).toContain('- Critères: dosage, forme ✓');
+        expect(posMd.text).not.toContain('not_requested');
+      }
+
+      // 2. Contradiction explicite de dosage sur les deux demandes de vitamines (B1 500mg -> 250 mg ; B6 10 mg -> 250 mg)
+      for (const detail of ['full', 'summary']) {
+        const b1Json = await request(app).get(
+          `/api/medicaments/search?q=vitamine%20B1&dosage=500mg&mode=concepts&format=json&detail=${detail}`
+        );
+        expect(b1Json.statusCode).toBe(200);
+        expect(b1Json.body.data[0].cis).toBe('67104999');
+        expect(b1Json.body.data[0].criteria_match.dosage).toBe(false);
+        expect(b1Json.body.data[0].criteria_status.dosage).toBe('contradicted');
+
+        const b1Md = await request(app).get(
+          `/api/medicaments/search?q=vitamine%20B1&dosage=500mg&mode=concepts&format=markdown&detail=${detail}`
+        );
+        expect(b1Md.statusCode).toBe(200);
+        expect(b1Md.text).toContain('## 1. VITAMINE B1 ARROW CONSEIL 250 mg, comprimé pelliculé — CIS 67104999');
+        expect(b1Md.text).toContain(
+          '- Critères (⚠️ contradiction — demande partiellement insatisfaite): dosage ✗ (contradicted)'
+        );
+        expect(b1Md.text).not.toContain('- Critères: dosage ✓');
+
+        const b6Json = await request(app).get(
+          `/api/medicaments/search?q=vitamine%20b6&dosage=10%20mg&mode=concepts&format=json&detail=${detail}`
+        );
+        expect(b6Json.statusCode).toBe(200);
+        expect(b6Json.body.data[0].cis).toBe('66742764');
+        expect(b6Json.body.data[0].criteria_match.dosage).toBe(false);
+        expect(b6Json.body.data[0].criteria_status.dosage).toBe('contradicted');
+
+        const b6Md = await request(app).get(
+          `/api/medicaments/search?q=vitamine%20b6&dosage=10%20mg&mode=concepts&format=markdown&detail=${detail}`
+        );
+        expect(b6Md.statusCode).toBe(200);
+        expect(b6Md.text).toContain('## 1. VITAMINE B6 ARROW CONSEIL 250 mg, comprimé quadrisécable — CIS 66742764');
+        expect(b6Md.text).toContain(
+          '- Critères (⚠️ contradiction — demande partiellement insatisfaite): dosage ✗ (contradicted)'
+        );
+      }
+
+      // 3. États expanded, unknown et unsupported en Markdown
+      const expandedMd = await request(app).get(
+        '/api/medicaments/search?q=sulfate%20de%20magnesium&dosage=150%20mg/ml&mode=concepts&format=markdown&detail=summary'
+      );
+      expect(expandedMd.statusCode).toBe(200);
+      expect(expandedMd.text).toContain('SULFATE DE MAGNESIUM RENAUDIN 15 %');
+      expect(expandedMd.text).toContain('- Critères: dosage ≈ (expanded)');
+
+      const unknownMd = await request(app).get(
+        '/api/medicaments/search?q=solution%20exemple&dosage=20%20mg/ml&mode=concepts&format=markdown&detail=summary'
+      );
+      expect(unknownMd.statusCode).toBe(200);
+      expect(unknownMd.text).toContain('SOLUTION EXEMPLE 2 %');
+      expect(unknownMd.text).toContain(
+        '- Critères (ℹ️ vérification incomplète): dosage ? (unknown — non vérifiable)'
+      );
+      expect(unknownMd.text).not.toContain('contradicted');
+
+      const unsupportedMd = await request(app).get(
+        '/api/medicaments/search?q=doliprane&dosage=faible%20dose&mode=structured&format=markdown&detail=summary'
+      );
+      expect(unsupportedMd.statusCode).toBe(200);
+      expect(unsupportedMd.text).toContain(
+        '- Critères (ℹ️ vérification incomplète): dosage ! (unsupported — non pris en charge)'
+      );
+
+      // 4. Conflit entre q et paramètre explicite avec priorité retenue visible en Markdown
+      const conflictMd = await request(app).get(
+        '/api/medicaments/search?q=doliprane%201000%20mg&dosage=500%20mg&mode=concepts&format=markdown&detail=summary'
+      );
+      expect(conflictMd.statusCode).toBe(200);
+      expect(conflictMd.text).toContain(
+        '- ⚠️ Conflit de critère (dosage) : paramètre explicite « 500 mg » prioritaire sur le texte « 1000 mg » (retenu : « 500 mg »)'
+      );
+      expect(conflictMd.text).toContain('## 1. DOLIPRANE 500 mg, gélule — CIS 60234102');
+
+      // 5. Abstention explicite avec raison vs recherche vide ordinaire
+      const abstainedMd = await request(app).get(
+        '/api/medicaments/search?q=paracetamol%20pendant%20la%20grossesse&mode=concepts&format=markdown'
+      );
+      expect(abstainedMd.statusCode).toBe(200);
+      expect(abstainedMd.text).toContain('Abstention de recherche');
+      expect(abstainedMd.text).toContain('abstained=true');
+      expect(abstainedMd.text).toContain('clinical_rcp_property_not_indexed');
+      expect(abstainedMd.text).not.toContain('_Aucun résultat._');
+
+      const abstainedCritMd = await request(app).get(
+        '/api/medicaments/search?q=doliprane&forme=non%20injectable&mode=structured&format=markdown'
+      );
+      expect(abstainedCritMd.statusCode).toBe(200);
+      expect(abstainedCritMd.text).toContain(
+        '- ⚠️ Contrainte non prise en charge (forme) « non injectable » : `negation_in_explicit_criterion`'
+      );
+      expect(abstainedCritMd.text).toContain('Abstention de recherche');
+      expect(abstainedCritMd.text).toContain('explicit_criterion_negation_not_supported');
+      expect(abstainedCritMd.text).not.toContain('_Aucun résultat._');
+
+      const ordinaryEmptyMd = await request(app).get(
+        '/api/medicaments/search?q=medicament_totalement_inexistant_xyz&mode=concepts&format=markdown'
+      );
+      expect(ordinaryEmptyMd.statusCode).toBe(200);
+      expect(ordinaryEmptyMd.text).toContain('_Aucun résultat._');
+      expect(ordinaryEmptyMd.text).not.toContain('Abstention de recherche');
+
+      // 6. Contrat B0 (mode=legacy / défaut) strictement préservé
+      const b0Md = await request(app).get(
+        '/api/medicaments/search?q=doliprane&dosage=1000%20mg&forme=comprim%C3%A9&format=markdown&detail=summary'
+      );
+      expect(b0Md.statusCode).toBe(200);
+      expect(b0Md.text).toContain('- Critères: dosage, forme ✓');
+      expect(b0Md.text).not.toContain('contradiction');
+    });
+
+    it('§4 PR#8 : mode=structured (B1) fonctionne via HTTP sans imposer ni matérialiser ConceptStore', async () => {
+      resetConceptStoreCache();
+      expect(hasTaxonomyCached()).toBe(false);
+      expect(hasConceptStoreCached()).toBe(false);
+
+      const res = await request(app).get(
+        '/api/medicaments/search?q=doliprane&dosage=1000%20mg&forme=comprim%C3%A9&mode=structured'
+      );
+      expect(res.statusCode).toBe(200);
+      expect(res.body.search.mode).toBe('structured');
+      expect(res.body.data[0].cis).toBe('60234100');
+      expect(res.body.data[0].criteria_status.dosage).toBe('matched');
+      expect(hasTaxonomyCached()).toBe(true);
+      expect(hasConceptStoreCached()).toBe(false);
+    });
+  });
+});
+
+describe('cycle réel warmup → rechargement → invalidation/reconstruction (BDPM + ANMV)', () => {
+  const savedEnv = { ...process.env };
+  let tempDataDir;
+
+  beforeEach(() => {
+    jest.resetModules();
+    tempDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bdpm-warmup-cycle-'));
+    fs.writeFileSync(
+      path.join(tempDataDir, 'CIS_bdpm.txt'),
+      [
+        '60234100\tDOLIPRANE 1000 mg, comprimé\tcomprimé\torale\tAMM\tProc\tCommercialisée\t01/01/2000\t\t\tOPELLA\tNon',
+        '60234102\tDOLIPRANE 500 mg, gélule\tgélule\torale\tAMM\tProc\tCommercialisée\t01/01/2000\t\t\tOPELLA\tNon'
+      ].join('\n'),
+      'utf8'
+    );
+    fs.writeFileSync(
+      path.join(tempDataDir, 'CIS_CIP_bdpm.txt'),
+      '60234100\t3595583\tplaquette PVC aluminium de 8 comprimés\tPrésentation active\tCommercialisée\t01/01/2000\t3400935955838\toui\t65 %\t2,18\t2,18\t0\t',
+      'utf8'
+    );
+    fs.writeFileSync(
+      path.join(tempDataDir, 'CIS_COMPO_bdpm.txt'),
+      '60234100\tcomprimé\t02202\tPARACÉTAMOL\t1000 mg\tun comprimé\tSA\t1',
+      'utf8'
+    );
+    fs.writeFileSync(path.join(tempDataDir, 'CIS_GENER_bdpm.txt'), '1\tPARACETAMOL 1000 mg\t60234100\t0\t1', 'utf8');
+    fs.writeFileSync(path.join(tempDataDir, 'CIS_CPD_bdpm.txt'), '60234100\tsans prescription médicale', 'utf8');
+    fs.writeFileSync(path.join(tempDataDir, 'CIS_CIP_Dispo_Spec.txt'), '', 'utf8');
+
+    jest.spyOn(console, 'log').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    process.env = { ...savedEnv };
+    jest.restoreAllMocks();
+    jest.resetModules();
+    if (tempDataDir) {
+      fs.rmSync(tempDataDir, { recursive: true, force: true });
+      tempDataDir = null;
+    }
+  });
+
+  async function bootWithWarmup(warmupMode) {
+    process.env = {
+      ...savedEnv,
+      DATA_DIR: tempDataDir,
+      VET_DATA_DIR: path.join(__dirname, 'fixtures/veterinaires'),
+      VET_PRODUCTS_FILE: 'amm-vet-fixture.xml',
+      VET_DICT_FILE: 'amm-vet-d-fixture.xml',
+      LOAD_HAS_AVIS: 'false',
+      LOAD_MITM: 'false'
+    };
+    if (warmupMode === undefined) delete process.env.SEARCH_WARMUP_MODE;
+    else process.env.SEARCH_WARMUP_MODE = warmupMode;
+
+    const { loadData } = require('../src/services/dataLoader');
+    const { loadVetData } = require('../src/services/vetDataLoader');
+    const conceptStore = require('../src/search/conceptStore');
+    const { createApp } = require('../src/app');
+
+    await loadData();
+    await loadVetData();
+    const app = createApp();
+    return { app, loadData, loadVetData, conceptStore };
+  }
+
+  it('par défaut legacy : /config expose search_warmup_mode=legacy, aucun ConceptStore préchauffé, invalidation au rechargement, mais modes B1/B2 appelables à la demande', async () => {
+    const ctx = await bootWithWarmup(undefined);
+    try {
+      const cfg = await request(ctx.app).get('/config');
+      expect(cfg.statusCode).toBe(200);
+      expect(cfg.body.search_warmup_mode).toBe('legacy');
+      expect(ctx.conceptStore.hasTaxonomyCached()).toBe(false);
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(false);
+
+      // Recherche par défaut (B0 legacy) sans altérer les caches B1/B2
+      const b0 = await request(ctx.app).get('/api/medicaments/search?q=doliprane');
+      expect(b0.statusCode).toBe(200);
+      expect(b0.body.search.mode).toBeUndefined();
+      expect(ctx.conceptStore.hasTaxonomyCached()).toBe(false);
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(false);
+
+      // Appel explicite ?mode=structured (B1) alors que SEARCH_WARMUP_MODE=legacy : n'impose pas ConceptStore
+      const b1 = await request(ctx.app).get('/api/medicaments/search?q=doliprane&dosage=1000%20mg&mode=structured');
+      expect(b1.statusCode).toBe(200);
+      expect(b1.body.search.mode).toBe('structured');
+      expect(ctx.conceptStore.hasTaxonomyCached()).toBe(true);
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(false);
+
+      // Appel explicite ?mode=concepts (B2) : reste autorisé et matérialise ConceptStore à la demande
+      const b2 = await request(ctx.app).get('/api/medicaments/search?q=sultrian&source=auto&mode=concepts');
+      expect(b2.statusCode).toBe(200);
+      expect(b2.body.search.mode).toBe('concepts');
+      expect(b2.body.data[0].num).toBe('0452300');
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(true);
+
+      // Rechargement en mode warmup=legacy : invalide les caches précédents et ne préchauffe pas à nouveau
+      await ctx.loadData();
+      expect(ctx.conceptStore.hasTaxonomyCached()).toBe(false);
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(false);
+    } finally {
+      ctx.app.locals.dispose?.();
+    }
+  });
+
+  it('avec SEARCH_WARMUP_MODE=structured : préchauffe la taxonomie sans ConceptStore et la reconstruit au rechargement BDPM/ANMV', async () => {
+    const ctx = await bootWithWarmup('structured');
+    try {
+      expect(ctx.conceptStore.hasTaxonomyCached()).toBe(true);
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(false);
+      const taxInitial = ctx.conceptStore.getTaxonomyVocab();
+
+      await ctx.loadData();
+      expect(ctx.conceptStore.hasTaxonomyCached()).toBe(true);
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(false);
+      const taxAfterBdpm = ctx.conceptStore.getTaxonomyVocab();
+      expect(taxAfterBdpm).not.toBe(taxInitial);
+
+      await ctx.loadVetData();
+      expect(ctx.conceptStore.hasTaxonomyCached()).toBe(true);
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(false);
+      expect(ctx.conceptStore.getTaxonomyVocab()).not.toBe(taxAfterBdpm);
+
+      // B1 HTTP utilise la taxonomie préchauffée sans jamais exiger ConceptStore
+      const b1 = await request(ctx.app).get('/api/medicaments/search?q=doliprane&mode=structured');
+      expect(b1.statusCode).toBe(200);
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(false);
+    } finally {
+      ctx.app.locals.dispose?.();
+    }
+  });
+
+  it('avec SEARCH_WARMUP_MODE=concepts : préchauffe ConceptStore, invalide l ancienne génération et reconstruit avec les nouvelles données après rechargement', async () => {
+    const ctx = await bootWithWarmup('concepts');
+    try {
+      expect(ctx.conceptStore.hasTaxonomyCached()).toBe(true);
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(true);
+      const storeBeforeBdpmReload = ctx.conceptStore.getConceptStore();
+      expect(storeBeforeBdpmReload.bdpmByCis.has('69999888')).toBe(false);
+
+      // Met à jour le corpus BDPM sur disque avant rechargement
+      fs.appendFileSync(
+        path.join(tempDataDir, 'CIS_bdpm.txt'),
+        '\n69999888\tRELOADTEST 500 mg, comprimé\tcomprimé\torale\tAMM\tProc\tCommercialisée\t01/01/2000\t\t\tTESTLAB\tNon',
+        'utf8'
+      );
+
+      await ctx.loadData();
+      expect(ctx.conceptStore.hasTaxonomyCached()).toBe(true);
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(true);
+      const storeAfterBdpmReload = ctx.conceptStore.getConceptStore();
+      expect(storeAfterBdpmReload).not.toBe(storeBeforeBdpmReload);
+      expect(storeAfterBdpmReload.bdpmByCis.has('69999888')).toBe(true);
+
+      const reloadedHit = await request(ctx.app).get('/api/medicaments/search?q=reloadtest&mode=concepts');
+      expect(reloadedHit.statusCode).toBe(200);
+      expect(reloadedHit.body.data[0].cis).toBe('69999888');
+
+      await ctx.loadVetData();
+      expect(ctx.conceptStore.hasConceptStoreCached()).toBe(true);
+      expect(ctx.conceptStore.getConceptStore()).not.toBe(storeAfterBdpmReload);
+    } finally {
+      ctx.app.locals.dispose?.();
+    }
   });
 });
