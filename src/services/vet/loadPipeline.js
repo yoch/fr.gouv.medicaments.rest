@@ -31,6 +31,7 @@ const { cleanText } = require('../../utils/textCleanup');
 const { singleFlight } = require('../../utils/singleFlight');
 const config = require('../../config');
 const { VET_INDEX_SPECS } = require('../../search/indexSpecs');
+const { onCorpusCleared, onCorpusLoaded } = require('../../search/conceptStore');
 const state = require('./state');
 
 const { corpus, metadata, searchIndexes } = state;
@@ -306,6 +307,7 @@ function buildNumIndexes() {
 }
 
 function clearLoadedData() {
+  onCorpusCleared();
   state.reset();
   clearCorpus(corpus.medicaments);
   clearCorpus(corpus.compositions);
@@ -393,6 +395,7 @@ async function loadVetDataGeneration() {
   );
   loadMemoryMark('vet_index_compositions_done');
   buildNumIndexes();
+  onCorpusLoaded(config.searchWarmupMode);
   loadMemoryMark('vet_done', { medicaments: rowCount(corpus.medicaments) });
   console.log(`Données vétérinaires chargées: ${rowCount(corpus.medicaments)} médicaments`);
 }

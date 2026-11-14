@@ -661,6 +661,11 @@
  * /medicaments/search:
  *   get:
  *     summary: Recherche globale
+ *     description: |
+ *       Recherche globale dans la BDPM (médicaments humains) et/ou l'ANMV (médicaments vétérinaires) reposant sur l'indexation lexicale `FrozenMiniSearch`.
+ *       - `mode=legacy` (défaut) : comportement historique conservé à l'identique (`B0`).
+ *       - `mode=structured` (`B1`, opt-in) : extraction structurée des dosages, formes et voies présents dans `q`, précédence stricte des paramètres explicites (`dosage`, `forme`, `voie`) avec traçabilité dans `search.conflicts`, statuts détaillés `criteria_status` (`matched`, `expanded`, `contradicted`, `unknown`, `unsupported`, `not_requested`) et abstention de sécurité (`search.abstained=true`) sur les contraintes négatives ou cliniques/RCP hors périmètre.
+ *       - `mode=concepts` (`B2`, opt-in) : enrichit `structured` avec la résolution par concepts (substances actives `SA`/`FT`, groupes génériques, alias galéniques/voies, routage d'espèces vétérinaires et conversions de concentration dimensionnellement établies). Aucun index vectoriel (`FXV1`) ni modèle externe n'est chargé.
  *     tags: [Médicaments]
  *     parameters:
  *       - in: query
@@ -669,7 +674,14 @@
  *         schema:
  *           type: string
  *           maxLength: 512
- *         description: Terme de recherche
+ *         description: Terme de recherche (dénomination, substance active, CIS à 8 chiffres, CIP7/CIP13 ou code ATC)
+ *       - in: query
+ *         name: mode
+ *         schema:
+ *           type: string
+ *           enum: [legacy, structured, concepts]
+ *           default: legacy
+ *         description: "Mode d'exécution : legacy (défaut B0), structured (B1 opt-in) ou concepts (B2 opt-in)."
  *       - in: query
  *         name: source
  *         schema:
@@ -705,17 +717,17 @@
  *         name: dosage
  *         schema:
  *           type: string
- *         description: "Critère de scoring optionnel (non filtrant). Ex. '1 g', '500 mg'. Comparé au dosage présent dans la dénomination ; réordonne à l'intérieur d'un même niveau de pertinence sans écarter de résultats."
+ *         description: "Critère de scoring optionnel (non filtrant). Ex. '1 g', '500 mg'. En mode legacy, comparé au dosage de la dénomination. En modes structured/concepts, prime sur un dosage contradictoire extrait de q (signalé dans search.conflicts) et renseigne criteria_status.dosage (un résultat proche mais au dosage incompatible reste explicitement 'contradicted' avec criteria_match.dosage=false)."
  *       - in: query
  *         name: forme
  *         schema:
  *           type: string
- *         description: "Critère de scoring optionnel (non filtrant). Ex. 'comprimé', 'solution injectable'. Comparé à forme_pharma."
+ *         description: "Critère de scoring optionnel (non filtrant). Ex. 'comprimé', 'solution injectable'. Comparé à forme_pharma (avec priorité au paramètre explicite et statut criteria_status.forme en modes structured/concepts)."
  *       - in: query
  *         name: voie
  *         schema:
  *           type: string
- *         description: "Critère de scoring optionnel (non filtrant). Ex. 'orale', 'cutanée'. Comparé à voies_admin."
+ *         description: "Critère de scoring optionnel (non filtrant). Ex. 'orale', 'cutanée'. Comparé à voies_admin (avec priorité au paramètre explicite et statut criteria_status.voie en modes structured/concepts)."
  *     responses:
  *       200:
  *         description: Résultats de recherche (médicaments humains et/ou vétérinaires agrégés avec présentations et compositions)
@@ -736,6 +748,29 @@
  *                               type:
  *                                 type: string
  *                                 example: "medicament"
+ *                               criteria_match:
+ *                                 type: object
+ *                                 description: "Booléens de satisfaction stricte des critères demandés (true uniquement lorsque le critère est 'matched')."
+ *                                 properties:
+ *                                   dosage:
+ *                                     type: boolean
+ *                                   forme:
+ *                                     type: boolean
+ *                                   voie:
+ *                                     type: boolean
+ *                               criteria_status:
+ *                                 type: object
+ *                                 description: "Présent en modes structured et concepts. Statut fin de chaque critère : matched (correspondance stricte), expanded (équivalence/conversion ou expansion de rappel vérifiée), contradicted (incompatible, ex. autre dosage ou autre voie), unknown (base ou donnée source insuffisante pour conclure, ex. % sans base masse/volume établie), unsupported (contrainte négative non supportée), not_requested."
+ *                                 properties:
+ *                                   dosage:
+ *                                     type: string
+ *                                     enum: [matched, expanded, contradicted, unknown, unsupported, not_requested]
+ *                                   forme:
+ *                                     type: string
+ *                                     enum: [matched, expanded, contradicted, unknown, unsupported, not_requested]
+ *                                   voie:
+ *                                     type: string
+ *                                     enum: [matched, expanded, contradicted, unknown, unsupported, not_requested]
  *                               presentations:
  *                                 type: array
  *                                 items:
@@ -744,9 +779,14 @@
  *                                 type: array
  *                                 items:
  *                                   $ref: '#/components/schemas/Composition'
+ *                     search:
+ *                       type: object
+ *                       description: "Métadonnées d'exécution de la recherche (query, source, criteria, et en modes structured/concepts : mode, parsed, conflicts, abstained, abstain_reason, safety)."
  *           text/markdown:
  *             schema:
  *               type: string
+ *       400:
+ *         description: Paramètre q manquant ou mode invalide
  */
 
 module.exports = {};

@@ -3,6 +3,10 @@
 const express = require('express');
 const { getMetadata } = require('../../services/dataLoader');
 const { executeHybridSearchPage } = require('../../services/searchOrchestrator');
+const {
+  VALID_EXPERIMENTAL_MODES,
+  executeExperimentalSearchPage
+} = require('../../search/experimentalSearch');
 const { shapeSearchResults, normalizeDetail } = require('../../utils/searchResponseShape');
 const { renderSearchMarkdown, normalizeFormat } = require('../../utils/searchMarkdown');
 const { buildPagedResponse } = require('../../utils/corpusPaging');
@@ -16,10 +20,21 @@ function pickCriterion(value) {
 }
 
 router.get('/search', (req, res) => {
-  const { q, page = 1, limit = 50, source, format, detail, dosage, forme, voie } = req.query;
+  const { q, page = 1, limit = 50, source, format, detail, dosage, forme, voie, mode } = req.query;
 
   if (!q) {
     return res.status(400).json({ error: 'Paramètre de recherche "q" requis' });
+  }
+
+  const trimmedMode = pickCriterion(mode)?.toLowerCase() || null;
+  if (
+    trimmedMode &&
+    trimmedMode !== 'legacy' &&
+    !VALID_EXPERIMENTAL_MODES.has(trimmedMode)
+  ) {
+    return res.status(400).json({
+      error: `Paramètre "mode" invalide (${trimmedMode}). Valeurs acceptées : legacy, structured, concepts`
+    });
   }
 
   const criteria = {
@@ -28,13 +43,11 @@ router.get('/search', (req, res) => {
     voie: pickCriterion(voie)
   };
 
-  const { results, total, search: searchMeta } = executeHybridSearchPage(
-    q,
-    source,
-    page,
-    limit,
-    criteria
-  );
+  const searchResult = (trimmedMode && trimmedMode !== 'legacy')
+    ? executeExperimentalSearchPage(q, source, page, limit, criteria, { mode: trimmedMode })
+    : executeHybridSearchPage(q, source, page, limit, criteria);
+
+  const { results, total, search: searchMeta } = searchResult;
   const shaped = shapeSearchResults(results, { detail: normalizeDetail(detail) });
   const response = buildPagedResponse({
     total,

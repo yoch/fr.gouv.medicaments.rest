@@ -20,6 +20,7 @@ function getRuntimeConfig() {
     version,
     node_env: config.nodeEnv,
     reload_strategy: config.reloadStrategy,
+    search_warmup_mode: config.searchWarmupMode,
     features: {
       load_has_avis: config.loadHasAvis,
       load_mitm: config.loadMitm,
