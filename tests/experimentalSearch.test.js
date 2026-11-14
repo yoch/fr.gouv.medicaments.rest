@@ -1502,4 +1502,50 @@ describe('cycle réel warmup → rechargement → invalidation/reconstruction (B
       ctx.app.locals.dispose?.();
     }
   });
+
+  it('distingue rollback fonctionnel (retour mode=legacy conserve ConceptStore en RAM) et rollback ressource (libération au rechargement warmup=legacy vs persistance warmup=concepts)', async () => {
+    const ctxLegacy = await bootWithWarmup('legacy');
+    try {
+      const b2 = await request(ctxLegacy.app).get('/api/medicaments/search?q=doliprane&mode=concepts');
+      expect(b2.statusCode).toBe(200);
+      expect(b2.body.search.mode).toBe('concepts');
+      expect(ctxLegacy.conceptStore.hasTaxonomyCached()).toBe(true);
+      expect(ctxLegacy.conceptStore.hasConceptStoreCached()).toBe(true);
+
+      // Rollback fonctionnel : bascule client vers mode=legacy -> comportement B0 immédiat, mais RAM B2 toujours allouée
+      const b0AfterRollback = await request(ctxLegacy.app).get('/api/medicaments/search?q=doliprane&mode=legacy');
+      expect(b0AfterRollback.statusCode).toBe(200);
+      expect(b0AfterRollback.body.search.mode).toBeUndefined();
+      expect(ctxLegacy.conceptStore.hasTaxonomyCached()).toBe(true);
+      expect(ctxLegacy.conceptStore.hasConceptStoreCached()).toBe(true);
+
+      // Rollback ressources avec SEARCH_WARMUP_MODE=legacy : onCorpusCleared + rechargement (ou reset) libère le cache B2
+      await ctxLegacy.loadData();
+      expect(ctxLegacy.conceptStore.hasTaxonomyCached()).toBe(false);
+      expect(ctxLegacy.conceptStore.hasConceptStoreCached()).toBe(false);
+    } finally {
+      ctxLegacy.app.locals.dispose?.();
+    }
+
+    jest.resetModules();
+
+    // Si SEARCH_WARMUP_MODE=concepts est actif au process, un rechargement seul reconstruit ConceptStore
+    const ctxConcepts = await bootWithWarmup('concepts');
+    try {
+      expect(ctxConcepts.conceptStore.hasConceptStoreCached()).toBe(true);
+      const b0Call = await request(ctxConcepts.app).get('/api/medicaments/search?q=doliprane&mode=legacy');
+      expect(b0Call.statusCode).toBe(200);
+      expect(b0Call.body.search.mode).toBeUndefined();
+
+      await ctxConcepts.loadData();
+      expect(ctxConcepts.conceptStore.hasConceptStoreCached()).toBe(true);
+
+      // Libération explicite en maintenance / arrêt
+      ctxConcepts.conceptStore.resetConceptStoreCache();
+      expect(ctxConcepts.conceptStore.hasTaxonomyCached()).toBe(false);
+      expect(ctxConcepts.conceptStore.hasConceptStoreCached()).toBe(false);
+    } finally {
+      ctxConcepts.app.locals.dispose?.();
+    }
+  });
 });

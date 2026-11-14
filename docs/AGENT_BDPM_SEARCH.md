@@ -94,7 +94,7 @@ Utilise-le pour choisir la bonne variante sans relancer une recherche.
 
 ## Modes d'exécution (`mode=legacy|structured|concepts`)
 
-Le moteur lexical de production repose dans tous les modes sur `@yoch/frozenminisearch` (`specialites`, `presentations`, `compositions`, `generiques`, `mitm` et index ANMV). Aucun index vectoriel (`FXV1`) ni modèle externe n'est activé.
+Le moteur lexical de production repose dans tous les modes sur `@yoch/frozenminisearch` (`specialites`, `presentations`, `compositions` côté BDPM et index `medicaments`, `compositions` côté ANMV ; les index `generiques` et `mitm` servent leurs routes dédiées). Aucun index vectoriel (`FXV1`) ni modèle externe n'est activé.
 
 | Mode | Rôle | Comportement |
 |------|------|--------------|
@@ -102,7 +102,17 @@ Le moteur lexical de production repose dans tous les modes sur `@yoch/frozenmini
 | `structured` (opt-in) | `B1` structuré | Détache automatiquement dosage/forme/voie présents dans `q`, applique la précédence stricte des paramètres explicites (`search.parsed.conflicts`), renseigne `criteria_status` et active les garde-fous d'abstention (`search.abstained`). |
 | `concepts` (opt-in) | `B2` concepts | Ajoute à `structured` la résolution par concepts : substances actives (`SA`/`FT`), groupes génériques, synonymes galéniques/voies (`per os` → `orale`, `collyre` → `ophtalmique`), routage d'espèces vétérinaires (`chien`, `chat`…) et conversions dimensionnelles vérifiées. |
 
-> **Note sur `SEARCH_WARMUP_MODE`** : la variable d'environnement `SEARCH_WARMUP_MODE=legacy|structured|concepts` (défaut `legacy`) règle uniquement le **préchauffage** des structures en mémoire au démarrage et lors des rechargements du corpus (`loadData()` / `loadVetData()`), et non l'autorisation serveur d'appeler un mode (`mode=legacy|structured|concepts` reste sélectionnable par requête HTTP ; si un mode non préchauffé est appelé, ses structures sont initialisées à la demande).
+> **Note sur `SEARCH_WARMUP_MODE`** : la variable d'environnement `SEARCH_WARMUP_MODE=legacy|structured|concepts` (défaut `legacy`) règle uniquement le **préchauffage** des structures en mémoire au démarrage et lors des rechargements du corpus (`loadData()` / `loadVetData()`). Ce n'est **pas** un coupe-circuit fonctionnel B2 : `mode=legacy|structured|concepts` reste sélectionnable par requête HTTP (`?mode=...`, défaut `legacy`) et, si un mode non préchauffé est appelé, ses structures (`TaxonomyVocab` / `ConceptStore`) sont initialisées à la demande et conservées en mémoire.
+
+### Déploiement pilote, rollback et observabilité
+
+- **Activation pilote isolée** : déployer le candidat sur une instance/préproduction dédiée sans modifier le défaut serveur (`mode=legacy`), puis activer le mode cible uniquement côté client pilote via une configuration opérateur invisible au LLM (par exemple `BDPM_API_BASEURL`, `BDPM_SEARCH_MODE=concepts` et liste blanche `BDPM_PILOT_CHATBOT_IDS`).
+- **Rollback fonctionnel (immédiat)** : repasser le client pilote sur `mode=legacy` (ou retirer son identifiant de la liste blanche). Les requêtes suivantes reviennent immédiatement à `B0` sans redémarrage, mais `ConceptStore` et `TaxonomyVocab` déjà matérialisés restent en RAM.
+- **Rollback de ressources (mémoire)** :
+  - si `SEARCH_WARMUP_MODE=legacy` (défaut) : un rechargement du corpus (`onCorpusCleared()` + `loadData()` / `loadVetData()`), `resetConceptStoreCache()` ou un redémarrage du processus libère `ConceptStore` et `TaxonomyVocab` (`hasConceptStoreCached() === false`) ;
+  - si `SEARCH_WARMUP_MODE=concepts` a été activé au démarrage : `onCorpusLoaded` reconstruit automatiquement `ConceptStore` à chaque rechargement ; il faut alors repasser `SEARCH_WARMUP_MODE=legacy` et redémarrer le processus (ou appeler `resetConceptStoreCache()` après réinitialisation de la configuration de warmup).
+- **Observabilité légère recommandée** : journaliser/agréger par mode (`legacy`, `structured`, `concepts`) le volume d'appels, la latence p50/p95, le taux d'erreur/timeout HTTP, la part de `abstained=true` (ventilée par `abstain_reason`), de résultats vides ordinaires, de `search.parsed.conflicts`, de contradictions (`contradicted`), d'états `unknown`/`unsupported`, et la mémoire RSS / `hasConceptStoreCached()`.
+- **Holdout prospectif post-pilote** : prélever un échantillon horodaté de nouvelles requêtes réelles postérieures à l'activation du pilote (jamais vues pendant le développement, la calibration ou le test verrouillé) pour vérifier l'absence de dérive hors échantillon.
 
 ### Précédence et conflits (`search.parsed.conflicts`)
 
