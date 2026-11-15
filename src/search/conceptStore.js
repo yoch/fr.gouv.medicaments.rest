@@ -27,8 +27,11 @@ const SALT_WORDS = new Set([
   'hemihydrate', 'sesquihydrate', 'anhydre', 'lysine', 'arginine', 'trometamol',
   'ester', 'sels', 'base'
 ]);
+// « l » n'y figure pas : l'article élidé (« L'OLIVE ») est retiré avant découpage, et
+// un « l » isolé restant fait partie du nom (`L-THYROXINE`, `L.P.`, `ARACHIS HYPOGAEA L.`).
+// Côté requête, le parseur retire déjà l'article « l » isolé comme mot vide.
 const CONCEPT_IGNORED_TOKENS = new Set([
-  'de', 'du', 'des', 'l', 'le', 'la', 'les', 'au', 'aux', 'en', 'et',
+  'de', 'du', 'des', 'le', 'la', 'les', 'au', 'aux', 'en', 'et',
   'hydrate', 'monohydrate', 'dihydrate', 'trihydrate', 'tetrahydrate',
   'pentahydrate', 'heptahydrate', 'hemihydrate', 'sesquihydrate', 'anhydre',
   'sels', 'base', 'ester'
@@ -99,7 +102,9 @@ function extractConceptTokens(rawText) {
   for (let i = 0; i < raw.length; i++) {
     const t = raw[i];
     if (!t || CONCEPT_IGNORED_TOKENS.has(t)) continue;
-    if (t.length >= 2 || /^\d$/.test(t) || /^[abcegkvd]$/.test(t)) {
+    // Toute lettre ou tout chiffre isolé est indexé (`FACTEUR X`, `VITAMINE B`, `400-F`) :
+    // un mot de requête n'est jamais ignoré faute d'être représentable dans l'index.
+    if (t.length >= 2 || /^[\p{L}\d]$/u.test(t)) {
       out.push(t);
     }
   }
@@ -629,7 +634,6 @@ function onCorpusLoaded(configuredWarmupMode = 'legacy') {
 
 module.exports = {
   SALT_WORDS,
-  CONCEPT_IGNORED_TOKENS,
   extractTokens,
   extractConceptTokens,
   canonicalizeSpeciesWord,

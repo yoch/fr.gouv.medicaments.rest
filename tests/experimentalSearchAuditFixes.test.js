@@ -105,6 +105,12 @@ function seed() {
     spec('60904643', 'CODOLIPRANE 500 mg/30 mg, comprimé', 'comprimé'),
     spec('60904644', 'PARACETAMOL/CODEINE ARROW 500 mg/30 mg, comprimé', 'comprimé'),
     spec('64200001', "SERUM D'ANGUILLE BOIRON, granules", 'granules'),
+    // Lettre présente seulement dans la composition (« FACTEUR X »)
+    spec('64400001', 'OCTAPLEX 500 UI, poudre et solvant pour solution injectable', 'poudre et solvant pour solution injectable', 'intraveineuse'),
+    // Article élidé dans la dénomination
+    spec('64500001', "HUILE D'OLIVE COOPER, solution", 'solution'),
+    spec('64600001', 'MONOPROD S 10 mg, comprimé', 'comprimé'),
+    spec('64600002', 'AAPROD S 10 mg/5 mg, comprimé', 'comprimé'),
     // Dénomination sans le nom de la substance ; dosage horaire laissé dans la requête
     spec('64300001', 'NICOPATCH 21 mg/24 heures, dispositif transdermique', 'dispositif transdermique', 'transdermique'),
     // Mot d'espèce présent dans une dénomination humaine
@@ -120,6 +126,11 @@ function seed() {
     makeRow({ cis: '61000003', designation_element: 'comprimé', code_substance: '2', denomination_substance: 'VALPROATE DE SODIUM', dosage: '500 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '61000004', designation_element: 'comprimé', code_substance: '3', denomination_substance: 'ACIDE ALENDRONIQUE', dosage: '70 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '61000005', designation_element: 'comprimé', code_substance: '3', denomination_substance: 'ACIDE ALENDRONIQUE', dosage: '70 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '64600001', designation_element: 'comprimé', code_substance: '11', denomination_substance: 'ZOLMETRINE', dosage: '10 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '64600002', designation_element: 'comprimé', code_substance: '11', denomination_substance: 'ZOLMETRINE', dosage: '10 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '64600002', designation_element: 'comprimé', code_substance: '12', denomination_substance: 'CAFEINE', dosage: '5 mg', nature_composant: 'SA', numero_ordre: '2' }),
+    makeRow({ cis: '64400001', designation_element: 'poudre', code_substance: '9', denomination_substance: 'FACTEUR IX DE COAGULATION HUMAIN', dosage: '500 UI', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '64400001', designation_element: 'poudre', code_substance: '10', denomination_substance: 'FACTEUR X DE COAGULATION HUMAIN', dosage: '500 UI', nature_composant: 'SA', numero_ordre: '2' }),
     makeRow({ cis: '64300001', designation_element: 'dispositif', code_substance: '8', denomination_substance: 'NICOTINE', dosage: '52,5 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '60904643', designation_element: 'comprimé', code_substance: '6', denomination_substance: 'PARACÉTAMOL', dosage: '500 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '60904643', designation_element: 'comprimé', code_substance: '7', denomination_substance: 'PHOSPHATE DE CODÉINE HÉMIHYDRATÉ', dosage: '30 mg', nature_composant: 'SA', numero_ordre: '2' }),
@@ -420,6 +431,25 @@ describe('audit PR #8 — corrections du pipeline expérimental', () => {
       // une lettre ordinaire après un nombre reste exigée
       expect(executeExperimentalSearchPage('ibuprofene 400 x', 'human', 1, 50, {}, { mode: 'concepts' }).results
         .every((r) => r.match_quality === 'fuzzy')).toBe(true);
+    });
+
+    it('#6 une lettre isolée est indexée et peut être couverte par la composition (octaplex facteur x)', () => {
+      for (const q of ['octaplex facteur x', 'facteur x facteur ix']) {
+        const res = executeExperimentalSearchPage(q, 'human', 1, 50, {}, { mode: 'concepts' });
+        expect(keysOf(res)).toContain('64400001');
+      }
+    });
+
+    it('#6 une lettre de taille ne compte pas comme substance (préférence mono-substance conservée)', () => {
+      // AAPROD S (association) précède MONOPROD S par ordre alphabétique : seule la
+      // préférence mono-substance place MONOPROD S en tête
+      const res = executeExperimentalSearchPage('zolmetrine s', 'human', 1, 50, {}, { mode: 'concepts' });
+      expect(keysOf(res).slice(0, 2)).toEqual(['64600001', '64600002']);
+    });
+
+    it('#6 l’article élidé n’est pas exigé (huile de l’olive)', () => {
+      const res = executeExperimentalSearchPage("huile de l'olive", 'human', 1, 50, {}, { mode: 'concepts' });
+      expect(keysOf(res)).toContain('64500001');
     });
 
     it('le repli libelle_groupe exige tous les mots et un mot alphabétique significatif', () => {

@@ -53,7 +53,6 @@ const {
 const { analyzeQuerySafetyAndIntent, inspectCriterionConstraint } = require('./queryIntentGuard');
 const {
   SALT_WORDS,
-  CONCEPT_IGNORED_TOKENS,
   extractTokens,
   extractConceptTokens,
   canonicalizeSpeciesWord,
@@ -113,73 +112,41 @@ function hydrateExperimentalHit(ref, matchesBySource) {
 // directement par les tests) et de `buildEntitySignals` ; à faire dans un refactoring
 // dédié si ces fonctions évoluent. La `WeakMap` ne retient rien au-delà de la requête.
 const conceptQueryTokensCache = new WeakMap();
-const unindexedQueryLettersCache = new WeakMap();
+
+// Seule unité d'une lettre que le parseur laisse dans le nom (non interprétée comme dosage) :
+// `h` (`24 h`). `g` et `l` sont extraits comme dosages ; `400 f` garde son `f`.
+const UNIT_LETTER_RE = /\d\s*(h)(?![\p{L}\d])/gu;
 
 /**
  * Mots de la requête pour l'étape concepts, découpés par la même fonction que
  * l'index (`extractConceptTokens`) : `paracetamol-codeine` -> `paracetamol`, `codeine`
- * comme `PARACETAMOL-CODEINE` à l'indexation, et mêmes mots / lettres isolées ignorés.
+ * comme `PARACETAMOL-CODEINE` à l'indexation ; les lettres isolées sont indexées et
+ * donc exigées comme les autres mots (`octaplex facteur x` couvert par la composition
+ * « FACTEUR X »). Seule exception : une unité laissée dans le nom (`24 h`). L'article
+ * « l » isolé n'arrive pas jusqu'ici, le parseur le retire comme mot vide.
  */
 function conceptQueryTokens(parsed) {
   let tokens = conceptQueryTokensCache.get(parsed);
   if (!tokens) {
-    tokens = [...new Set(extractConceptTokens(parsed.nameQuery || ''))];
+    const nameQuery = normalizeSearchText(parsed.nameQuery || '');
+    const unitLetters = new Set();
+    for (const m of nameQuery.matchAll(UNIT_LETTER_RE)) unitLetters.add(m[1]);
+    tokens = [...new Set(extractConceptTokens(nameQuery))].filter((t) => !unitLetters.has(t));
     conceptQueryTokensCache.set(parsed, tokens);
   }
   return tokens;
 }
 
-// Lettre accolée par un tiret ou un point (`l-multi`, `400-f`, `l.p`) : partie du nom,
-// jamais l'article élidé « l' » que l'index ignore.
-// Seule unité d'une lettre que le parseur laisse dans le nom (non interprétée comme dosage) :
-// `h` (`24 h`). `g` et `l` sont extraits comme dosages ; `400 f` garde son `f`.
-const UNIT_LETTER_RE = /\d\s*(h)(?![\p{L}\d])/gu;
-const ATTACHED_LETTER_RE = /(?<![\p{L}\d])(\p{L})(?=[-.][\p{L}\d])|(?<=[\p{L}\d][-.])(\p{L})(?![\p{L}\d])/gu;
-
-/**
- * Lettres isolées de la requête que l'index de concepts ne représente pas
- * (`400-f`, `s-methoprene`, `l-multi`, `l.p`). L'étape concepts ne peut pas les vérifier
- * via ses index ; les ignorer élargirait la requête (`400-f` -> tout « 400 »,
- * `l-multi` -> tout « multi »), elles sont donc exigées en mot entier dans la
- * dénomination du candidat.
- */
-function unindexedQueryLetters(parsed) {
-  const cached = unindexedQueryLettersCache.get(parsed);
-  if (cached) return cached;
-  const nameQuery = normalizeSearchText(parsed.nameQuery || '');
-  const indexed = new Set(conceptQueryTokens(parsed));
-  const attached = new Set();
-  for (const m of nameQuery.matchAll(ATTACHED_LETTER_RE)) attached.add(m[1] || m[2]);
-  // Une unité laissée dans le nom (`24 h`) n'est pas une lettre du nom à retrouver
-  // dans la dénomination.
-  const unitLetters = new Set();
-  for (const m of nameQuery.matchAll(UNIT_LETTER_RE)) unitLetters.add(m[1]);
-  const letters = [...new Set(
-    extractTokens(nameQuery, 1).filter((t) =>
-      t.length === 1 && !indexed.has(t) && !unitLetters.has(t) &&
-      (attached.has(t) || !CONCEPT_IGNORED_TOKENS.has(t))
-    )
-  )];
-  unindexedQueryLettersCache.set(parsed, letters);
-  return letters;
-}
-
-// Coût connu (revue PR #8) : la dénomination du candidat est normalisée et découpée à
-// chaque appel. Ce chemin ne sert que si la requête contient une lettre isolée non
-// indexée (3 requêtes sur 1 544 dans un échantillon du corpus réel), et le court-circuit
-// `words.length === 0` évite tout travail sinon. Précalculer l'ensemble des mots de
-// chaque dénomination dans le ConceptStore supprimerait ce coût, mais garderait en
-// permanence un ensemble supplémentaire par spécialité / médicament vétérinaire (~19 000)
-// pour accélérer un cas rare. Ce filtre disparaîtrait si les lettres isolées étaient
-// indexées (voir `unindexedQueryLetters`).
-function denominationHasWords(text, words) {
-  if (words.length === 0) return true;
-  const toks = new Set(extractTokens(text || '', 1));
-  return words.every((w) => toks.has(w));
-}
+// Lettres isolées pouvant désigner une substance (vitamines A, B, C, D, E, K… : lettres
+// indexées avant l'indexation de toutes les lettres). Les autres lettres isolées sont des
+// tailles, abréviations ou codes (`chien s`, `l.p`, `400-f`) et ne comptent pas comme
+// substance demandée, sinon `fipronil s` perdrait la préférence mono-substance.
+const SUBSTANCE_LETTER_RE = /^[abcegkvd]$/;
 
 function countRequestedSubstanceEntities(tokens) {
-  const nonSalt = tokens.filter((t) => !/^\d+$/.test(t) && !SALT_WORDS.has(t));
+  const nonSalt = tokens.filter((t) =>
+    !/^\d+$/.test(t) && !SALT_WORDS.has(t) && (t.length > 1 || SUBSTANCE_LETTER_RE.test(t))
+  );
   if (nonSalt.length <= 1) return nonSalt.length;
   let count = 0;
   for (let i = 0; i < nonSalt.length; i++) {
@@ -213,7 +180,6 @@ function collectBdpmConceptMatches(parsed, store) {
   }
 
   const requestedSubstanceCount = countRequestedSubstanceEntities(queryToks);
-  const requiredLetters = unindexedQueryLetters(parsed);
 
   // Compter pour chaque CIS combien de tokens de la requête trouvent un appui
   // (dénomination OU substance active / fraction thérapeutique)
@@ -251,7 +217,7 @@ function collectBdpmConceptMatches(parsed, store) {
   for (const [cis, count] of hitCountByCis.entries()) {
     if (count < requiredHits) continue;
     const rec = store.bdpmByCis.get(cis);
-    if (!rec || !denominationHasWords(rec.denomination, requiredLetters)) continue;
+    if (!rec) continue;
 
     const denomHits = denomHitByCis.get(cis) || 0;
     const allInDenom = denomHits >= requiredHits || denominationCoversTokens(rec, queryToks);
@@ -410,11 +376,10 @@ function collectVetConceptMatches(parsed, store) {
   }
 
   const reqHits = queryToks.length;
-  const requiredLetters = unindexedQueryLetters(parsed);
   for (const [num, count] of hitCountByNum.entries()) {
     if (count < reqHits) continue;
     const rec = store.vetByNum.get(num);
-    if (!rec || !denominationHasWords(rec.nom, requiredLetters)) continue;
+    if (!rec) continue;
     const allInNom = (nomHitByNum.get(num) || 0) >= reqHits;
     qualityByKey[num] = 'prefix';
     metaByKey[num] = {
