@@ -33,6 +33,12 @@ Chaque passage échoue (code 3) si :
 
 L'oracle n'atteint pas `ndcg10 = 1` : l'idéal inclut les fiches de bonne identité mais d'autre variante, que l'oracle ne renvoie pas.
 
+## Calibrer un juge LLM sans relecture humaine
+
+`judge_calibration.py` réutilise la suite comme étalon : `prepare` la convertit au format du banc (`../production-replay/`), puis, après rejeu, packets et jugement, `score` compare chaque note à la réponse attendue (bonne variante : note ≥ 2 ; piège : note ≤ 1), compare deux juges et simule une stratégie hybride guidée par la confiance archivée d'un juge. Voir l'aide du script (`python judge_calibration.py -h`) et ses tests (`python -m unittest test_judge_calibration`).
+
+`eval_suite_v3.suspects.json` liste les cas dont la réponse attendue paraît fausse (relevés lors de la calibration du 2026-11-15) ; `--exclude-suspects` permet l'analyse de sensibilité sans modifier la suite.
+
 ## Limites
 
 - **Pas un test indépendant.** B1/B2 ont été mis au point sur `dev`, et `heldout` a déjà été consulté lors de la validation finale d'origine. B2 y est proche du plafond (≈ 0,99 en `variantTop1`) : la suite sert de **non-régression** et d'explication par famille, pas de mesure de progrès.
