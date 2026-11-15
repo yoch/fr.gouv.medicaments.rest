@@ -99,8 +99,8 @@ Le moteur lexical de production repose dans tous les modes sur `@yoch/frozenmini
 | Mode | Rôle | Comportement |
 |------|------|--------------|
 | `legacy` (défaut) | `B0` historique | Recherche lexicale directe sur `q`, scoring optionnel non destructif via `dosage`, `forme`, `voie`. |
-| `structured` (opt-in) | `B1` structuré | Détache automatiquement dosage/forme/voie présents dans `q`, applique la précédence stricte des paramètres explicites (`search.parsed.conflicts`), renseigne `criteria_status` et active les garde-fous d'abstention (`search.abstained`). |
-| `concepts` (opt-in) | `B2` concepts | Ajoute à `structured` la résolution par concepts : substances actives (`SA`/`FT`), groupes génériques, synonymes galéniques/voies (`per os` → `orale`, `collyre` → `ophtalmique`), routage d'espèces vétérinaires (`chien`, `chat`…) et conversions dimensionnelles vérifiées. |
+| `structured` (opt-in) | `B1` structuré | Détache automatiquement dosage/forme/voie présents dans `q` (seuls les dosages à unité interprétable — mg, g, µg, ml, l, UI, % — sont détachés ; `9 CH`, `10 cl`, `2 mmol` restent dans la requête lexicale), route vers l'ANMV une espèce animale citée (`chien`, `chat`…) en `source=auto`, applique la précédence stricte des paramètres explicites (`search.parsed.conflicts`), renseigne `criteria_status` et active les garde-fous d'abstention (`search.abstained`). |
+| `concepts` (opt-in) | `B2` concepts | Ajoute à `structured` la résolution par concepts : substances actives (`SA`/`FT`), groupes génériques, synonymes galéniques/voies (`per os` → `orale`, `collyre` → `ophtalmique`) et conversions dimensionnelles vérifiées. |
 
 > **Note sur `SEARCH_WARMUP_MODE`** : la variable d'environnement `SEARCH_WARMUP_MODE=legacy|structured|concepts` (défaut `legacy`) règle uniquement le **préchauffage** des structures en mémoire au démarrage et lors des rechargements du corpus (`loadData()` / `loadVetData()`). Ce n'est **pas** un coupe-circuit fonctionnel B2 : `mode=legacy|structured|concepts` reste sélectionnable par requête HTTP (`?mode=...`, défaut `legacy`) et, si un mode non préchauffé est appelé, ses structures (`TaxonomyVocab` / `ConceptStore`) sont initialisées à la demande et conservées en mémoire.
 
@@ -132,13 +132,13 @@ En modes `structured` et `concepts`, chaque fiche expose `criteria_status` (`{ d
 | `expanded` | `false` | Équivalence ou expansion vérifiée : synonyme galénique de rappel (`spray` ↔ `solution pour pulvérisation`), ou conversion de concentration dimensionnellement établie en `mode=concepts` (`1,5 g/10 ml` ↔ `150 mg/ml`, ou `%` ↔ `mg/ml` **uniquement** lorsque la base masse/volume `m/v` est prouvée par le texte ou par `CIS_COMPO` mono-substance non reconstituée). |
 | `contradicted` | `false` | Le candidat possède une valeur incompatible avec le critère demandé. **Important** : un résultat proche mais au dosage incompatible (ex. `VITAMINE B1 250 mg` pour une demande `500 mg`, ou un volume de présentation différent `50 mg/5 ml` pour `100 mg/10 ml`) reste explicitement `contradicted` (`criteria_match.dosage: false`). |
 | `unknown` | `false` | Donnée source insuffisante ou base physique non comparable sans hypothèse externe (ex. `%` dans une solution sans preuve masse/volume `m/v`, `% v/v`, `% m/m`, `mg/g`, `UI/mg`, `mg/kg`, débit `/24h`, concentration après reconstitution, ou spécialité sans dosage structuré). Aucun bonus d'équivalence n'est accordé. |
-| `unsupported` | `false` | Contrainte négative non supportée (ex. `voie=non orale`, `forme=sans comprimé`). |
+| `unsupported` | `false` | Critère non pris en charge : contrainte négative (ex. `voie=non orale`, `forme=sans comprimé`) ou dosage explicite sans unité interprétable (ex. `dosage=9 CH`). |
 | `not_requested` | `false` | Critère non demandé. |
 
 ### Garde-fous d'abstention (`search.abstained`) et limites du périmètre
 
 En modes `structured` et `concepts`, l'API s'abstient (`total: 0`, `data: []`, `search.abstained: true`, `search.abstain_reason`, `search.safety`) lorsque la requête exprime :
-- une exclusion de substance ou d'excipient non vérifiable dans le libellé (`sans paracétamol`, `sans alcool`, `sans paraben` — seuls les qualifiants commerciaux littéraux présents dans les dénominations BDPM comme `sans sucre`, `sans conservateur`, `sans arôme`, `sans anis` sont recherchés en littéral contigu) ;
+- une exclusion de substance ou d'excipient non vérifiable dans le libellé (`sans paracétamol`, `sans alcool`, `sans paraben` — seuls les qualifiants commerciaux littéraux présents dans les dénominations BDPM comme `sans sucre`, `sans conservateur`, `sans arôme`, `sans anis` sont recherchés en littéral contigu, y compris enchaînés : `sans sucre ni conservateur`) ;
 - une contrainte négative sur `forme` ou `voie` (`voie=non orale`) ;
 - une propriété clinique ou réglementaire relevant du RCP complet (grossesse, allaitement, insuffisance rénale/hépatique, contre-indications, effets indésirables, surdosage).
 

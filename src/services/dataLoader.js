@@ -144,7 +144,7 @@ function buildCisIndexes() {
 }
 
 function clearLoadedData() {
-  onCorpusCleared();
+  onCorpusCleared('bdpm');
   state.reset();
   for (const type of Object.keys(corpus)) {
     clearCorpus(corpus[type]);

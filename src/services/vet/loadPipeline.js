@@ -307,7 +307,7 @@ function buildNumIndexes() {
 }
 
 function clearLoadedData() {
-  onCorpusCleared();
+  onCorpusCleared('vet');
   state.reset();
   clearCorpus(corpus.medicaments);
   clearCorpus(corpus.compositions);

@@ -410,5 +410,7 @@ module.exports = {
   executeHybridSearch,
   executeHybridSearchPage,
   resolveBdpmCisKeys,
-  collectBdpmMatches
+  collectBdpmMatches,
+  collectVeterinaryMatches,
+  normalizeSource
 };

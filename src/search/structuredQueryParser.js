@@ -15,6 +15,8 @@
  */
 
 const { normalizeSearchText } = require('../utils/searchRanking');
+const { parseDosageTokens } = require('../utils/structuredSearchCriteria');
+const { significantFormeTokens, canonicalizeVoieEntry, extractVoieEntries } = require('./galenicVocab');
 
 const PHARMA_ALIASES = Object.freeze([
   // Voies d'administration (source: usages pharmaceutiques courants / ANSM)
@@ -60,6 +62,9 @@ const PHARMA_ALIASES = Object.freeze([
   { pattern: /\b(?:generiques?|equivalents?)\b(?:\s+d[eu']|\s+d')?/g, kind: 'intent', value: 'generic_equivalent', source: 'bdpm_gener_intent' }
 ]);
 
+const CHAINED_VERBATIM_NI_RE =
+  /\bni\s+(?=(?:de\s+|d\s+)?(?:sucres?|conservateurs?|aromes?|sulfites?|anis)\b)/g;
+
 const STOP_WORDS_FR = new Set([
   'de', 'du', 'des', 'd', 'le', 'la', 'les', 'l', 'un', 'une', 'en', 'pour', 'par',
   'avec', 'dans', 'sur', 'au', 'aux', 'a', 'et', 'ou'
@@ -82,6 +87,11 @@ const SINGLE_DOSAGE_RE = new RegExp(
   `(?:^|[\\s(/])(\\d+(?:[.,]\\d+)?)\\s*(${STANDALONE_UNIT_PATTERN})(?=$|[\\s),;+/])`,
   'gi'
 );
+
+// Délimiteurs (zone d'usage privé Unicode) d'un composé de dosage conservé tel quel
+const KEPT_OPEN = '\uE000';
+const KEPT_CLOSE = '\uE001';
+const KEPT_COMPOUND_RE = /\uE000(\d+)\uE001/g;
 
 function normalizeGluedUnits(text) {
   let s = String(text || '');
@@ -184,6 +194,52 @@ function buildTaxonomyVocab(bdpmCorpus, vetCorpus) {
   };
 }
 
+function compactText(value) {
+  return normalizeSearchText(value).replace(/\s+/g, '');
+}
+
+// `10 mg/1 ml` = `10 mg/ml` : un volume unitaire écrit équivaut à la concentration par ml
+function dosageTokensForComparison(value) {
+  const tokens = parseDosageTokens(value);
+  const vols = tokens.filter((t) => t.unit === 'ml');
+  if (/\//.test(value) && vols.length === 1 && vols[0].amount === 1 && tokens.length === 2) {
+    const other = tokens.find((t) => t.unit !== 'ml');
+    if (other.unit === 'mg' || other.unit === 'ui') return [{ amount: other.amount, unit: `${other.unit}/ml` }];
+  }
+  return tokens;
+}
+
+function sameDosageValue(explicitValue, parsedValue) {
+  const a = dosageTokensForComparison(explicitValue);
+  const b = dosageTokensForComparison(parsedValue);
+  if (a.length === 0 || b.length === 0) return compactText(explicitValue) === compactText(parsedValue);
+  // Une concentration (`12,5 mg/kg`, `10 mg/0,4 ml`) n'équivaut pas à une quantité nue
+  if (/\//.test(explicitValue) !== /\//.test(parsedValue)) return false;
+  if (a.length !== b.length) return false;
+  const byUnitThenAmount = (x, y) => (x.unit === y.unit ? x.amount - y.amount : (x.unit < y.unit ? -1 : 1));
+  const sa = [...a].sort(byUnitThenAmount);
+  const sb = [...b].sort(byUnitThenAmount);
+  return sa.every((t, i) =>
+    t.unit === sb[i].unit &&
+    Math.abs(t.amount - sb[i].amount) <= Math.max(t.amount, sb[i].amount) * 1e-6
+  );
+}
+
+function sameTokenSet(a, b) {
+  if (a.length !== b.length) return false;
+  const sb = new Set(b);
+  return a.every((t) => sb.has(t));
+}
+
+function sameFormeValue(explicitValue, parsedValue) {
+  return sameTokenSet(significantFormeTokens(explicitValue), significantFormeTokens(parsedValue));
+}
+
+function sameVoieValue(explicitValue, parsedVoies) {
+  const parsedEntries = [...new Set(parsedVoies.map(canonicalizeVoieEntry).filter(Boolean))];
+  return sameTokenSet(extractVoieEntries(explicitValue), parsedEntries);
+}
+
 /**
  * Interprète une requête utilisateur sans perte silencieuse.
  * @param {string} rawQuery
@@ -246,11 +302,23 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
   let working = normalizeGluedUnits(raw);
 
   // 1. Extraction des dosages / concentrations avec unité explicite
+  const keptCompounds = [];
   COMPOUND_DOSAGE_RE.lastIndex = 0;
+  // Un span n'est retiré du nom que s'il produit une quantité comparable : une
+  // unité non interprétée (`9 ch`, `10 cl`, `2 mmol`) reste dans la requête lexicale
+  // plutôt que de devenir un critère « unsupported » qui perdrait l'information.
   working = working.replace(COMPOUND_DOSAGE_RE, (full, n1, u1, n2, u2) => {
     const left = canonicalizeDosageSpan(n1, u1);
     const right = n2 ? canonicalizeDosageSpan(n2, u2) : normalizeUnitString(u2);
     const span = `${left}/${right}`;
+    // Le numérateur doit être interprétable à lui seul (`5 mmol/10 ml` ≠ `10 ml`).
+    // Le composé conservé est remplacé par un jeton opaque pour que la passe simple
+    // ne capture pas son dénominateur seul ; il est restitué juste après.
+    if (parseDosageTokens(left).length === 0) {
+      const lead = /^[\s(/]/.test(full) ? full[0] : '';
+      keptCompounds.push(full.slice(lead.length));
+      return `${lead}${KEPT_OPEN}${keptCompounds.length - 1}${KEPT_CLOSE}`;
+    }
     extractedDosages.push(span);
     provenance.push({ span: full.trim(), role: 'dosage_compound', value: span, source: 'unit_regex' });
     return ' ';
@@ -259,10 +327,12 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
   SINGLE_DOSAGE_RE.lastIndex = 0;
   working = working.replace(SINGLE_DOSAGE_RE, (full, n1, u1) => {
     const span = canonicalizeDosageSpan(n1, u1);
+    if (parseDosageTokens(span).length === 0) return full;
     extractedDosages.push(span);
     provenance.push({ span: full.trim(), role: 'dosage_single', value: span, source: 'unit_regex' });
     return ' ';
   });
+  working = working.replace(KEPT_COMPOUND_RE, (_, idx) => keptCompounds[Number(idx)]);
 
   // Normalisation douce pour les vocabulaires forme/voie/espèces
   let normWork = normalizeSearchText(working)
@@ -273,13 +343,23 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
 
   // 2. Alias pharmaceutiques traçables (B2 uniquement)
   if (useAliases) {
+    // « sans sucre ni conservateur » : la suite « ni <qualificatif littéral> » vaut
+    // « sans <qualificatif littéral> » (le garde-fou n'accepte « ni » qu'enchaîné ainsi).
+    normWork = normWork.replace(CHAINED_VERBATIM_NI_RE, 'sans ');
     for (const rule of PHARMA_ALIASES) {
       rule.pattern.lastIndex = 0;
       if (!rule.pattern.test(normWork)) continue;
       rule.pattern.lastIndex = 0;
       const nextWork = normWork.replace(rule.pattern, ' ').replace(/\s+/g, ' ').trim();
-      // Ne jamais vider la requête en supprimant un alias ambigu (ex. mot unique "patch" ou "spray")
-      if (!nextWork) continue;
+      // Ne jamais vider la requête en supprimant un alias ambigu (ex. mot unique "patch" ou "spray").
+      // Un qualificatif littéral reste alors dans le texte mais est tout de même extrait.
+      if (!nextWork) {
+        if (rule.source === 'bdpm_verbatim_sans') {
+          extractedQualifiers.push(rule.value);
+          provenance.push({ span: rule.value, role: rule.kind, value: rule.value, source: rule.source });
+        }
+        continue;
+      }
       rule.pattern.lastIndex = 0;
       let match;
       while ((match = rule.pattern.exec(normWork)) !== null) {
@@ -304,6 +384,8 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
   // 3. Expressions composées issues de la taxonomie BDPM / ANMV
   if (taxonomy) {
     for (const phrase of taxonomy.formeMulti) {
+      // Préfiltre bon marché : n'instancier la RegExp que si l'expression est présente
+      if (!normWork.includes(phrase)) continue;
       const re = new RegExp(`(?:^|\\s)${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=$|\\s)`, 'g');
       if (re.test(normWork)) {
         const remaining = normWork.replace(re, ' ').replace(/\s+/g, ' ').trim();
@@ -315,6 +397,8 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
       }
     }
     for (const phrase of taxonomy.voieMulti) {
+      // Préfiltre bon marché : n'instancier la RegExp que si l'expression est présente
+      if (!normWork.includes(phrase)) continue;
       const re = new RegExp(`(?:^|\\s)${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=$|\\s)`, 'g');
       if (re.test(normWork)) {
         const remaining = normWork.replace(re, ' ').replace(/\s+/g, ' ').trim();
@@ -338,7 +422,6 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
       // Garde 'a'/'d' si 'vitamine' ou marque à préfixe numérique ('A 313') est présent
       continue;
     }
-    const othersCount = rawTokens.length - 1 - (extractedSpecies.length + extractedFormes.length + extractedVoies.length === 0 ? 0 : 0);
     // On extrait un mot simple forme/voie/espèce uniquement si d'autres mots non vides restent pour le médicament
     const hasRemainingSubstantive = keptTokens.length > 0 || rawTokens.slice(i + 1).some((t) =>
       !STOP_WORDS_FR.has(t) &&
@@ -372,18 +455,23 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
   const finalNameTokens = keptTokens.length > 0 ? keptTokens : rawTokens;
 
   // Précédence stricte des paramètres explicites + détection visible de conflits
+  // (comparaison sur les valeurs interprétées, pas sur l'écriture : `500mg` = `500 mg`,
+  // `1 g` = `1000 mg`, `comprimés` = `comprime`, `voie orale` = `per os`)
   const conflicts = [];
-  const effDosage = explicit.dosage || (extractedDosages.length > 0 ? extractedDosages.join(' ') : null);
-  if (explicit.dosage && extractedDosages.length > 0 && normalizeSearchText(explicit.dosage) !== normalizeSearchText(extractedDosages.join(' '))) {
-    conflicts.push({ field: 'dosage', explicit: explicit.dosage, parsed: extractedDosages.join(' ') });
+  const parsedDosage = extractedDosages.join(' ');
+  const effDosage = explicit.dosage || (extractedDosages.length > 0 ? parsedDosage : null);
+  if (explicit.dosage && extractedDosages.length > 0 && !sameDosageValue(explicit.dosage, parsedDosage)) {
+    conflicts.push({ field: 'dosage', explicit: explicit.dosage, parsed: parsedDosage });
   }
-  const effForme = explicit.forme || (extractedFormes.length > 0 ? extractedFormes.join(' ') : null);
-  if (explicit.forme && extractedFormes.length > 0 && normalizeSearchText(explicit.forme) !== normalizeSearchText(extractedFormes.join(' '))) {
-    conflicts.push({ field: 'forme', explicit: explicit.forme, parsed: extractedFormes.join(' ') });
+  const parsedForme = extractedFormes.join(' ');
+  const effForme = explicit.forme || (extractedFormes.length > 0 ? parsedForme : null);
+  if (explicit.forme && extractedFormes.length > 0 && !sameFormeValue(explicit.forme, parsedForme)) {
+    conflicts.push({ field: 'forme', explicit: explicit.forme, parsed: parsedForme });
   }
-  const effVoie = explicit.voie || (extractedVoies.length > 0 ? extractedVoies.join(' ') : null);
-  if (explicit.voie && extractedVoies.length > 0 && normalizeSearchText(explicit.voie) !== normalizeSearchText(extractedVoies.join(' '))) {
-    conflicts.push({ field: 'voie', explicit: explicit.voie, parsed: extractedVoies.join(' ') });
+  const parsedVoie = extractedVoies.join(' ');
+  const effVoie = explicit.voie || (extractedVoies.length > 0 ? parsedVoie : null);
+  if (explicit.voie && extractedVoies.length > 0 && !sameVoieValue(explicit.voie, extractedVoies)) {
+    conflicts.push({ field: 'voie', explicit: explicit.voie, parsed: parsedVoie });
   }
 
   const rawAltFormeTokens = [...new Set([

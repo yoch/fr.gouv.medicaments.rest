@@ -22,12 +22,15 @@ const {
   HYDRATE_RELATED_LIMIT
 } = require('../services/dataLoader');
 const {
-  searchVetKeyMatches,
   getMedicamentByNum,
   getMedicamentLabelByNum,
   getRelatedByNum
 } = require('../services/vetDataLoader');
-const { collectBdpmMatches } = require('../services/searchOrchestrator');
+const {
+  collectBdpmMatches,
+  collectVeterinaryMatches,
+  normalizeSource
+} = require('../services/searchOrchestrator');
 const { parseListPaging } = require('../utils/corpusPaging');
 const {
   normalizeSearchText,
@@ -40,6 +43,13 @@ const {
   matchDosageTokens
 } = require('../utils/structuredSearchCriteria');
 const { parseStructuredQuery } = require('./structuredQueryParser');
+const {
+  FORME_STOP_WORDS,
+  tokenizeGalenicText,
+  significantFormeTokens,
+  canonicalizeVoieEntry,
+  extractVoieEntries
+} = require('./galenicVocab');
 const { analyzeQuerySafetyAndIntent, inspectCriterionConstraint } = require('./queryIntentGuard');
 const {
   SALT_WORDS,
@@ -63,11 +73,6 @@ const VIA_BONUS = {
   composition: 1,
   concept: 1
 };
-
-function normalizeSource(source) {
-  const value = (source || 'auto').toLowerCase();
-  return ['auto', 'human', 'veterinary', 'mixed'].includes(value) ? value : 'auto';
-}
 
 function hydrateExperimentalHit(ref, matchesBySource) {
   let result;
@@ -97,38 +102,6 @@ function hydrateExperimentalHit(ref, matchesBySource) {
   if (ref.criteria_match) result.criteria_match = ref.criteria_match;
   if (ref.criteria_status) result.criteria_status = ref.criteria_status;
   return result;
-}
-
-function collectLegacyVetMatches(q) {
-  const qualityByKey = {};
-  const metaByKey = {};
-  const searches = [
-    { items: searchVetKeyMatches('medicaments', q), via: 'denomination' },
-    { items: searchVetKeyMatches('compositions', q), via: 'composition' }
-  ];
-  for (const { items, via } of searches) {
-    for (const item of items) {
-      const key = item.num;
-      if (!key) continue;
-      const prevMeta = metaByKey[key];
-      if (
-        !prevMeta ||
-        MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[prevMeta.quality] ||
-        (item.match_quality === prevMeta.quality && (VIA_BONUS[via] || 0) > (VIA_BONUS[prevMeta.via] || 0))
-      ) {
-        metaByKey[key] = { quality: item.match_quality, via };
-      }
-      if (!qualityByKey[key] || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[qualityByKey[key]]) {
-        qualityByKey[key] = item.match_quality;
-      }
-    }
-  }
-  const trimmed = String(q || '').trim();
-  if (/^\d+$/.test(trimmed)) {
-    const num = trimmed.padStart(7, '0');
-    if (qualityByKey[num] === 'exact') metaByKey[num] = { quality: 'exact', via: 'num' };
-  }
-  return { qualityByKey, metaByKey };
 }
 
 function countRequestedSubstanceEntities(tokens) {
@@ -208,17 +181,9 @@ function collectBdpmConceptMatches(parsed, store) {
     if (!rec) continue;
 
     const denomHits = denomHitByCis.get(cis) || 0;
-    let allInDenom = denomHits >= requiredHits;
-    if (!allInDenom && rec.denomination) {
-      const dToks = extractConceptTokens(rec.denomination);
-      allInDenom = queryToks.every((qt) =>
-        dToks.some((dt) => dt === qt || (qt.length >= 4 && dt.startsWith(qt)))
-      );
-    }
+    const allInDenom = denomHits >= requiredHits || denominationCoversTokens(rec, queryToks);
     const cls = classifier(rec.denomination, { idValue: cis });
-    let quality = 'prefix';
-    if (cls === 2) quality = 'exact';
-    else if (!allInDenom && requiredHits >= 2) quality = 'prefix';
+    const quality = cls === 2 ? 'exact' : 'prefix';
 
     const via = allInDenom ? 'denomination' : 'composition';
     qualityByKey[cis] = quality;
@@ -237,14 +202,40 @@ function collectBdpmConceptMatches(parsed, store) {
   return { qualityByKey, metaByKey };
 }
 
+const GENERIC_DENOMINATION_HEADS = new Set([
+  'acide', 'acides', 'vitamine', 'vitamines', 'association', 'solution', 'serum', 'vaccin',
+  ...SALT_WORDS
+]);
+
+function denominationCoversTokens(rec, queryToks) {
+  if (!rec || !rec.denomination || queryToks.length === 0) return false;
+  const dToks = extractConceptTokens(rec.denomination);
+  return queryToks.every((qt) => dToks.some((dt) => dt === qt || (qt.length >= 4 && dt.startsWith(qt))));
+}
+
 /**
  * Résout l'intention explicite « générique de X » / « équivalent X » via CIS_GENER.
  */
 function expandGenericGroupMatches(parsed, baseMatches, store) {
   if (!parsed.extracted.intents.includes('generic_equivalent')) return null;
 
-  const anchorKeys = Object.keys(baseMatches.qualityByKey);
+  // Seules les spécialités dont la dénomination porte le nom demandé amorcent l'expansion :
+  // une association trouvée via sa composition ou ses présentations (« RHINOFEBRAL » pour
+  // « vitamine c ») n'est pas le produit visé. Les ancres fortes (exact/prefix) priment ;
+  // à défaut, une ancre approchée (fuzzy) sur la dénomination n'est retenue que pour un
+  // nom d'un seul mot (faute de frappe sur une marque : « oflocat »), jamais pour une
+  // expression où un mot approché importerait un produit sans rapport (« vitamine » ≈ « viramune »).
+  const queryToks = parsed.nameTokens.filter((t) => !CONCEPT_IGNORED_TOKENS.has(t));
+  const keys = Object.keys(baseMatches.qualityByKey);
+  const strongAnchors = keys.filter((cis) =>
+    isStrongMatchQuality(baseMatches.qualityByKey[cis]) &&
+    denominationCoversTokens(store.bdpmByCis.get(cis), queryToks)
+  );
+  const anchorKeys = strongAnchors.length > 0 || queryToks.length !== 1
+    ? strongAnchors
+    : keys.filter((cis) => baseMatches.metaByKey[cis] && baseMatches.metaByKey[cis].via === 'denomination');
   const groupIds = new Set();
+  const requestedNameTokens = new Set(parsed.nameTokens);
 
   for (const cis of anchorKeys) {
     const rec = store.bdpmByCis.get(cis);
@@ -252,11 +243,14 @@ function expandGenericGroupMatches(parsed, baseMatches, store) {
     for (const gid of rec.genericGroupIds) groupIds.add(gid);
   }
 
-  // Fallback si l'ancre exacte n'était pas directement dans CIS_GENER mais partage brandRoot
+  // Fallback si l'ancre exacte n'était pas directement dans CIS_GENER mais partage brandRoot.
+  // Le premier mot n'est une marque que s'il a été saisi et n'est pas un mot de tête
+  // générique de dénomination (« acide », « vitamine », sels...).
   if (groupIds.size === 0) {
     for (const cis of anchorKeys) {
       const rec = store.bdpmByCis.get(cis);
       if (!rec || !rec.brandRoot) continue;
+      if (!requestedNameTokens.has(rec.brandRoot) || GENERIC_DENOMINATION_HEADS.has(rec.brandRoot)) continue;
       const gSet = store.brandRootToGroupIds.get(rec.brandRoot);
       if (gSet) {
         for (const gid of gSet) groupIds.add(gid);
@@ -264,12 +258,14 @@ function expandGenericGroupMatches(parsed, baseMatches, store) {
     }
   }
 
-  // Dernier repli : chercher le nom de marque dans libelle_groupe
-  if (groupIds.size === 0 && parsed.nameTokens.length > 0) {
+  // Dernier repli, seulement sans aucune ancre de dénomination (marque absente du
+  // référentiel chargé) : chercher le nom dans libelle_groupe, par mots entiers.
+  // Avec des ancres, ce repli ramènerait les associations citant la substance.
+  if (groupIds.size === 0 && anchorKeys.length === 0 && parsed.nameTokens.length > 0) {
     const core = parsed.nameTokens.filter((t) => t.length >= 3);
     if (core.length > 0) {
       for (const [gid, grp] of store.generiquesByGroup.entries()) {
-        if (core.every((t) => grp.normLibelle.includes(t))) {
+        if (core.every((t) => grp.libelleTokens.has(t))) {
           groupIds.add(gid);
         }
       }
@@ -285,6 +281,7 @@ function expandGenericGroupMatches(parsed, baseMatches, store) {
     const grp = store.generiquesByGroup.get(gid);
     if (!grp) continue;
     for (const cis of grp.allCis) {
+      if (!store.bdpmByCis.has(cis)) continue; // CIS du groupe absent du référentiel chargé
       if (!qualityByKey[cis]) {
         qualityByKey[cis] = 'prefix';
         metaByKey[cis] = { quality: 'prefix', via: 'generique', genericExpanded: true };
@@ -376,8 +373,10 @@ function mergeMatchMaps(primary, secondary) {
   return { qualityByKey, metaByKey };
 }
 
-function buildStructuredEntityRecord(source, key, parsed) {
+function buildStructuredEntityRecord(source, key, parsed, { mode = 'structured' } = {}) {
   const needCompoDosage = Boolean(parsed?.effectiveCriteria?.dosage);
+  // Les volumes de présentation ne servent qu'à la conversion de concentration (alias B2)
+  const needPresVolumes = needCompoDosage && mode === 'concepts';
   const needSpecies = Boolean(parsed?.effectiveCriteria?.species?.length);
 
   if (source === 'bdpm') {
@@ -397,6 +396,8 @@ function buildStructuredEntityRecord(source, key, parsed) {
       compoConcentrationBasis = grp.compoConcentrationBasis;
       compoConcMgMl = grp.compoConcMgMl;
       distinctActiveCount = grp.distinctActiveCount;
+    }
+    if (needPresVolumes) {
       const pres = getRelatedByCis('presentations', key, 50) || [];
       const presText = pres.map((p) => p.libelle || '').join(' ');
       if (presText) {
@@ -437,6 +438,8 @@ function buildStructuredEntityRecord(source, key, parsed) {
         }
       }
     }
+  }
+  if (needPresVolumes) {
     const pres = getRelatedByNum('presentations', key) || [];
     const presText = pres.map((p) => p.libelle || '').join(' ');
     if (presText) {
@@ -471,140 +474,9 @@ function buildStructuredEntityRecord(source, key, parsed) {
   };
 }
 
-const FORME_STOP_WORDS = new Set([
-  'a', 'au', 'aux', 'd', 'dans', 'de', 'des', 'du', 'en', 'et', 'l', 'la', 'le', 'les', 'ou', 'par', 'pour', 'sans', 'sur', 'un', 'une'
-]);
 const GENERIC_GALENIC_CARRIERS = new Set([
   'solution', 'poudre', 'suspension', 'dispersion', 'emulsion', 'preparation', 'liquide', 'solvant'
 ]);
-const FORME_CANONICAL_TOKENS = new Map([
-  ['comprimes', 'comprime'],
-  ['cpr', 'comprime'],
-  ['cp', 'comprime'],
-  ['comp', 'comprime'],
-  ['gelules', 'gelule'],
-  ['gels', 'gel'],
-  ['capsules', 'capsule'],
-  ['sirops', 'sirop'],
-  ['collyres', 'collyre'],
-  ['suppositoires', 'suppositoire'],
-  ['suppos', 'suppositoire'],
-  ['suppo', 'suppositoire'],
-  ['sachets', 'sachet'],
-  ['sach', 'sachet'],
-  ['ampoules', 'ampoule'],
-  ['amp', 'ampoule'],
-  ['flacons', 'flacon'],
-  ['fl', 'flacon'],
-  ['ovules', 'ovule'],
-  ['poudres', 'poudre'],
-  ['pdr', 'poudre'],
-  ['solutions', 'solution'],
-  ['suspensions', 'suspension'],
-  ['emulsions', 'emulsion'],
-  ['pommades', 'pommade'],
-  ['cremes', 'creme'],
-  ['granules', 'granule'],
-  ['granule', 'granule'],
-  ['patchs', 'patch'],
-  ['effervescents', 'effervescent'],
-  ['effervescente', 'effervescent'],
-  ['effervescentes', 'effervescent'],
-  ['eff', 'effervescent'],
-  ['pellicules', 'pellicule'],
-  ['pelliculee', 'pellicule'],
-  ['pelliculees', 'pellicule'],
-  ['secables', 'secable'],
-  ['orodispersibles', 'orodispersible'],
-  ['oro', 'orodispersible'],
-  ['dispersibles', 'dispersible'],
-  ['resistants', 'resistant'],
-  ['resistante', 'resistant'],
-  ['resistantes', 'resistant'],
-  ['prolongee', 'prolonge'],
-  ['prolonges', 'prolonge'],
-  ['prolongees', 'prolonge'],
-  ['buvables', 'buvable'],
-  ['buv', 'buvable'],
-  ['injectables', 'injectable'],
-  ['inj', 'injectable'],
-  ['sublinguales', 'sublingual'],
-  ['sublinguale', 'sublingual'],
-  ['auriculaires', 'auriculaire']
-]);
-
-const VOIE_CANONICAL_ALIASES = new Map([
-  ['voie orale', 'orale'],
-  ['per os', 'orale'],
-  ['po', 'orale'],
-  ['voie per os', 'orale'],
-  ['oral', 'orale'],
-  ['orale', 'orale'],
-  ['iv', 'intraveineuse'],
-  ['voie iv', 'intraveineuse'],
-  ['intraveineux', 'intraveineuse'],
-  ['voie intraveineuse', 'intraveineuse'],
-  ['intraveineuse', 'intraveineuse'],
-  ['im', 'intramusculaire'],
-  ['voie im', 'intramusculaire'],
-  ['voie intramusculaire', 'intramusculaire'],
-  ['intramusculaire', 'intramusculaire'],
-  ['sc', 'sous cutanee'],
-  ['voie sc', 'sous cutanee'],
-  ['sous cutane', 'sous cutanee'],
-  ['sous cutanee', 'sous cutanee'],
-  ['voie sous cutanee', 'sous cutanee'],
-  ['cutane', 'cutanee'],
-  ['cutanee', 'cutanee'],
-  ['voie cutanee', 'cutanee'],
-  ['ophtalmique', 'ophtalmique'],
-  ['voie ophtalmique', 'ophtalmique'],
-  ['auriculaire', 'auriculaire'],
-  ['voie auriculaire', 'auriculaire'],
-  ['nasal', 'nasale'],
-  ['nasale', 'nasale'],
-  ['voie nasale', 'nasale'],
-  ['rectal', 'rectale'],
-  ['rectale', 'rectale'],
-  ['voie rectale', 'rectale'],
-  ['vaginal', 'vaginale'],
-  ['vaginale', 'vaginale'],
-  ['voie vaginale', 'vaginale'],
-  ['sublingual', 'sublinguale'],
-  ['sublinguale', 'sublinguale'],
-  ['voie sublinguale', 'sublinguale'],
-  ['transdermique', 'transdermique'],
-  ['voie transdermique', 'transdermique'],
-  ['inhale', 'inhalee'],
-  ['inhalee', 'inhalee'],
-  ['inhalation', 'inhalee'],
-  ['voie inhalee', 'inhalee'],
-  ['buccale autre', 'voie buccale autre'],
-  ['extracorporelle autre', 'voie extracorporelle autre'],
-  ['parenterale autre', 'voie parenterale autre']
-]);
-
-function normalizeGalenicWord(token) {
-  return FORME_CANONICAL_TOKENS.get(token) || token;
-}
-
-function tokenizeGalenicText(value) {
-  const cleaned = normalizeSearchText(value)
-    .replace(/([a-z0-9])\((?:e|es|s)\)/g, '$1')
-    .replace(/\blp\b/g, 'liberation prolonge')
-    .replace(/\bsol\s+buv(?:able)?\b/g, 'solution buvable')
-    .replace(/\bsol\s+inj(?:ectable)?\b/g, 'solution injectable');
-  if (!cleaned) return [];
-  const raw = cleaned.split(/[\s'’()\-–—,;:/]+/u);
-  const out = [];
-  for (let i = 0; i < raw.length; i++) {
-    const t = raw[i];
-    if (!t) continue;
-    out.push(normalizeGalenicWord(t));
-  }
-  return out;
-}
-
 function splitGalenicClauses(value) {
   const norm = normalizeSearchText(value)
     .replace(/([a-z0-9])\((?:e|es|s)\)/g, '$1');
@@ -658,6 +530,20 @@ const NEUTRAL_FORME_ADMIN_TOKENS = new Set([
   'application', 'administration', 'usage', 'voie', 'locale', 'local', 'externe'
 ]);
 
+// La forme demandée est identique pour tous les candidats d'une requête :
+// mémoïser sa tokenisation évite de la refaire à chaque candidat scoré.
+let lastRequestedForme = null;
+let lastRequestedFormeSignature = null;
+
+function requestedFormeSignature(requestedForme) {
+  if (requestedForme !== lastRequestedForme) {
+    const reqSig = significantFormeTokens(requestedForme);
+    lastRequestedForme = requestedForme;
+    lastRequestedFormeSignature = { reqSig, reqSigSet: new Set(reqSig) };
+  }
+  return lastRequestedFormeSignature;
+}
+
 /**
  * Évalue la satisfaction métier d'une forme galénique sur des tokens/expressions
  * complets (jamais par simple sous-chaîne : `gel` != `gelule`, `comprime` != `compresse`).
@@ -671,14 +557,11 @@ function matchFormeCriterion(requestedForme, candidateNormForme, { useAliases = 
     return { matched: false, status: 'unknown', boost: 0 };
   }
 
-  const reqAll = tokenizeGalenicText(requestedForme);
-  const reqFiltered = reqAll.filter((t) => !FORME_STOP_WORDS.has(t));
-  const reqSig = [...new Set(reqFiltered.length > 0 ? reqFiltered : reqAll)];
+  const { reqSig, reqSigSet } = requestedFormeSignature(requestedForme);
   if (reqSig.length === 0) {
     return { matched: false, status: 'unknown', boost: 0 };
   }
 
-  const reqSigSet = new Set(reqSig);
   const candVoieEntries = new Set(extractVoieEntries(normVoie));
   let bestNonCarrierRatio = 0;
 
@@ -714,7 +597,14 @@ function matchFormeCriterion(requestedForme, candidateNormForme, { useAliases = 
       }
     }
 
-    if (nonCarrierHits > 0) {
+    // Un recouvrement partiel n'est une expansion que si le candidat est seulement
+    // moins spécifique : un qualificatif demandé absent (`effervescent`) face à un
+    // qualificatif propre au candidat (`pellicule`) est une contradiction.
+    const missesQualifier = unmatchedReqTokens.some((t) => !GENERIC_GALENIC_CARRIERS.has(t));
+    const hasOwnQualifier = clause.sigTokens.some(
+      (t) => !reqSigSet.has(t) && !GENERIC_GALENIC_CARRIERS.has(t) && !NEUTRAL_FORME_ADMIN_TOKENS.has(t)
+    );
+    if (nonCarrierHits > 0 && !(missesQualifier && hasOwnQualifier)) {
       const ratio = hits / reqSig.length;
       if (ratio > bestNonCarrierRatio) bestNonCarrierRatio = ratio;
     }
@@ -737,27 +627,6 @@ function matchFormeCriterion(requestedForme, candidateNormForme, { useAliases = 
   }
 
   return { matched: false, status: 'contradicted', boost: -1.5 };
-}
-
-function canonicalizeVoieEntry(raw) {
-  const norm = normalizeSearchText(raw)
-    .replace(/['’]/g, ' ')
-    .replace(/[-–—]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  if (!norm) return '';
-  return VOIE_CANONICAL_ALIASES.get(norm) || norm;
-}
-
-function extractVoieEntries(raw) {
-  const text = String(raw ?? '').trim();
-  if (!text) return [];
-  const entries = [];
-  for (const part of text.split(/[;,]+/)) {
-    const canon = canonicalizeVoieEntry(part);
-    if (canon && !entries.includes(canon)) entries.push(canon);
-  }
-  return entries;
 }
 
 /**
@@ -1301,7 +1170,7 @@ function runBdpmStage(parsed, { mode, store }) {
 
 function runVetStage(parsed, { mode, store }) {
   if (parsed.kind === 'exact_code') {
-    const lexical = collectLegacyVetMatches(parsed.raw);
+    const lexical = collectVeterinaryMatches(parsed.raw);
     if (mode === 'concepts' && parsed.code.kind === 'atc_code') {
       return mergeMatchMaps(lexical, collectVetConceptMatches(parsed, store));
     }
@@ -1309,11 +1178,24 @@ function runVetStage(parsed, { mode, store }) {
   }
 
   const queryText = parsed.nameQuery || parsed.raw;
-  let matches = collectLegacyVetMatches(queryText);
+  let matches = collectVeterinaryMatches(queryText);
   if (mode === 'concepts') {
     matches = mergeMatchMaps(matches, collectVetConceptMatches(parsed, store));
   }
   return matches;
+}
+
+function withSpeciesRestoredInName(parsed) {
+  const speciesSpans = parsed.provenance.filter((p) => p.role === 'species').map((p) => p.span);
+  if (speciesSpans.length === 0) return parsed;
+  const nameTokens = [...parsed.nameTokens, ...speciesSpans];
+  return {
+    ...parsed,
+    nameTokens,
+    nameQuery: nameTokens.join(' '),
+    extracted: { ...parsed.extracted, species: [] },
+    effectiveCriteria: { ...parsed.effectiveCriteria, species: [] }
+  };
 }
 
 /**
@@ -1392,22 +1274,34 @@ function executeExperimentalSearchPage(
   let bdpmRefs = [];
   let vetRefs = [];
 
-  const speciesHintVet = mode === 'concepts' && sourceMode === 'auto' && parsed.extracted.species.length > 0;
+  // L'espèce est retirée du texte lexical dans les deux modes : elle doit donc
+  // aussi router vers l'ANMV dans les deux modes, sinon elle serait perdue.
+  const speciesHintVet = sourceMode === 'auto' && parsed.extracted.species.length > 0;
 
-  // 1. Cas espèce explicite en mode auto : interroger ANMV en priorité
+  // 1. Cas espèce explicite en mode auto : interroger ANMV en priorité. Seul un match
+  // ANMV fort court-circuite la BDPM (certains mots d'espèce figurent aussi dans des
+  // dénominations humaines : « venin d'abeille », « sérum d'anguille », « 170 bar »).
+  let vetStrongFromHint = false;
   if (speciesHintVet) {
     queried.push('anmv');
     matchesBySource.vet = runVetStage(parsed, { mode, store });
     vetRefs = buildRefsFromMatches(matchesBySource.vet, 'vet', getMedicamentLabelByNum, 'denomination');
     if (vetRefs.length > 0) withResults.push('anmv');
+    vetStrongFromHint = vetRefs.some((r) => isStrongMatchQuality(r.match_quality));
   }
 
   const needBdpm = sourceMode === 'human' || sourceMode === 'mixed' ||
-    (sourceMode === 'auto' && vetRefs.length === 0);
+    (sourceMode === 'auto' && !vetStrongFromHint);
+  // Repli BDPM après un routage d'espèce sans match ANMV fort : le mot d'espèce fait
+  // alors partie du nom (« venin d'abeille ») et n'est pas un critère d'espèce.
+  const parsedBySource = {
+    bdpm: speciesHintVet ? withSpeciesRestoredInName(parsed) : parsed,
+    vet: parsed
+  };
 
   if (needBdpm) {
     queried.push('bdpm');
-    matchesBySource.bdpm = runBdpmStage(parsed, { mode, store });
+    matchesBySource.bdpm = runBdpmStage(parsedBySource.bdpm, { mode, store });
     bdpmRefs = buildRefsFromMatches(matchesBySource.bdpm, 'bdpm', getSpecialiteLabelByCis, 'denomination');
     if (bdpmRefs.length > 0) withResults.push('bdpm');
   }
@@ -1426,15 +1320,21 @@ function executeExperimentalSearchPage(
     if (vetRefs.length > 0) withResults.push('anmv');
   }
 
-  const vetStrong = vetRefs.some((r) => isStrongMatchQuality(r.match_quality));
   let rawRefs;
   if (sourceMode === 'human') rawRefs = bdpmRefs;
   else if (sourceMode === 'veterinary') rawRefs = vetRefs;
   else if (sourceMode === 'mixed') rawRefs = [...bdpmRefs, ...vetRefs];
-  else if (speciesHintVet && vetRefs.length > 0) rawRefs = vetRefs;
+  else if (vetStrongFromHint) rawRefs = vetRefs;
   else if (bdpmStrong) rawRefs = bdpmRefs;
-  else if (vetStrong || bdpmRefs.length === 0) rawRefs = vetRefs;
-  else rawRefs = vetRefs.length > 0 ? [...bdpmRefs, ...vetRefs] : bdpmRefs;
+  // Même repli que legacy : sans match BDPM fort, l'ANMV remplace la BDPM si elle répond
+  else rawRefs = vetRefs.length > 0 ? vetRefs : bdpmRefs;
+
+  // Comme legacy (qui n'interroge pas l'ANMV après un match BDPM fort), ne pas annoncer
+  // l'ANMV parmi les référentiels ayant répondu quand ses résultats faibles sont écartés.
+  if (speciesHintVet && rawRefs === bdpmRefs && bdpmStrong) {
+    const idx = withResults.indexOf('anmv');
+    if (idx >= 0) withResults.splice(idx, 1);
+  }
 
   // Dédoublonnage strict (par source + clé) et scoring tri-état
   const dedup = new Map();
@@ -1448,9 +1348,10 @@ function executeExperimentalSearchPage(
 
   const scored = [];
   for (const ref of dedup.values()) {
+    const refParsed = parsedBySource[ref.source];
     const record = store
       ? (ref.source === 'bdpm' ? store.bdpmByCis.get(ref.key) : store.vetByNum.get(ref.key))
-      : buildStructuredEntityRecord(ref.source, ref.key, parsed);
+      : buildStructuredEntityRecord(ref.source, ref.key, refParsed, { mode });
     if (
       safety.verbatimQualifiers.length > 0 &&
       !safety.verbatimQualifiers.every((vq) => matchesVerbatimSansClause(record, vq))
@@ -1458,7 +1359,7 @@ function executeExperimentalSearchPage(
       continue;
     }
     const meta = matchesBySource[ref.source] && matchesBySource[ref.source].metaByKey[ref.key];
-    scored.push(buildEntitySignals(ref, record, meta, parsed, { mode, store }));
+    scored.push(buildEntitySignals(ref, record, meta, refParsed, { mode, store }));
   }
 
   scored.sort(compareExperimentalRefs);

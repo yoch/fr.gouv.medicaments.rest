@@ -94,7 +94,7 @@ Recherche globale multi-critères (spécialités, présentations, compositions a
     - `concepts` : ajoute à `structured` la résolution par concepts (`ConceptStore` : substances actives `SA`/`FT`, groupes génériques, synonymes galéniques/voies, espèces vétérinaires, conversions dimensionnelles vérifiées). Aucun index vectoriel (`FXV1`) ni modèle externe n'est chargé.
   - `page`, `limit` (défaut `limit=50`, pagination stable calculée sur la liste complète ordonnée avant découpage de page).
   - `source` (string, optionnel): `auto` (défaut), `human`, `veterinary`, `mixed`.
-    - `auto` : BDPM d'abord ; si aucun résultat (ou routage d'espèce vétérinaire explicite en `mode=concepts`), fallback ANMV.
+    - `auto` : BDPM d'abord ; si aucun résultat (ou routage d'espèce vétérinaire explicite en `mode=structured` ou `mode=concepts`), fallback ANMV.
     - `human` : BDPM uniquement (comportement historique).
     - `veterinary` : médicaments vétérinaires ANMV uniquement.
     - `mixed` : fusion des deux référentiels.

@@ -47,6 +47,18 @@ function normalizeCriterionText(value) {
     .trim();
 }
 
+/** Lit la clause qui suit « sans » / « ni » jusqu'au prochain « ni » / « sans ». */
+function readSansClause(tokens, start) {
+  let j = start;
+  while (j < tokens.length && STOP_CLAUSE_FILLERS.has(tokens[j])) j++;
+  const rest = [];
+  while (j < tokens.length && tokens[j] !== 'ni' && tokens[j] !== 'sans') {
+    if (!STOP_CLAUSE_FILLERS.has(tokens[j])) rest.push(tokens[j]);
+    j++;
+  }
+  return { phrase: rest.join(' '), end: j };
+}
+
 function inspectCriterionConstraint(value) {
   const norm = normalizeCriterionText(value);
   if (!norm) return null;
@@ -60,9 +72,19 @@ function inspectCriterionConstraint(value) {
   const tokens = norm.split(' ').filter(Boolean);
   const markers = [];
   const excluded = [];
+  // Vrai tant qu'on est dans une chaîne « sans <verbatim> [ni <verbatim>]* »
+  let inVerbatimSansChain = false;
 
   for (let i = 0; i < tokens.length; i++) {
     const tok = tokens[i];
+    if (tok === 'ni' && inVerbatimSansChain) {
+      const { phrase, end } = readSansClause(tokens, i + 1);
+      if (phrase && VERBATIM_SANS_QUALIFIERS.has(phrase)) {
+        i = Math.max(i, end - 1);
+        continue;
+      }
+    }
+    inVerbatimSansChain = false;
     if (EXPLICIT_NEGATION_TOKENS.has(tok)) {
       markers.push(tok);
       let j = i + 1;
@@ -70,19 +92,14 @@ function inspectCriterionConstraint(value) {
       const rest = tokens.slice(j).filter((t) => !STOP_CLAUSE_FILLERS.has(t) && !EXPLICIT_NEGATION_TOKENS.has(t));
       if (rest.length > 0) excluded.push(rest.join(' '));
     } else if (tok === 'sans') {
-      let j = i + 1;
-      while (j < tokens.length && STOP_CLAUSE_FILLERS.has(tokens[j])) j++;
-      const rest = [];
-      while (j < tokens.length && tokens[j] !== 'ni' && tokens[j] !== 'sans') {
-        if (!STOP_CLAUSE_FILLERS.has(tokens[j])) rest.push(tokens[j]);
-        j++;
-      }
-      const phrase = rest.join(' ');
+      const { phrase, end } = readSansClause(tokens, i + 1);
       if (!phrase || !VERBATIM_SANS_QUALIFIERS.has(phrase)) {
         markers.push('sans');
         if (phrase) excluded.push(phrase);
+      } else {
+        inVerbatimSansChain = true;
       }
-      i = Math.max(i, j - 1);
+      i = Math.max(i, end - 1);
     }
   }
 
@@ -158,9 +175,14 @@ function analyzeQuerySafetyAndIntent(rawQuery, parsed, explicitCriteria = {}) {
   // Analyse séquentielle de négations : « sans X », « sans X ni Y », « pas de X », « ni Y »
   const tokens = norm ? norm.split(' ') : [];
   const verbatimQualifiers = [];
+  // « ni <X> » prolonge une clause « sans <verbatim> » immédiatement précédente :
+  // « sans sucre ni conservateur » = deux qualificatifs littéraux BDPM.
+  let inVerbatimSansChain = false;
 
   for (let i = 0; i < tokens.length; i++) {
     const tok = tokens[i];
+    const continuesVerbatimChain = tok === 'ni' && inVerbatimSansChain;
+    inVerbatimSansChain = false;
     if (tok === 'sans' || tok === 'ni' || tok === 'pas') {
       if (tok === 'pas') {
         // « pas de X » / « pas d X » / « pas X »
@@ -196,8 +218,9 @@ function analyzeQuerySafetyAndIntent(rawQuery, parsed, explicitCriteria = {}) {
           j++;
         }
         const entity = canonicalizeEntityChunk(chunk);
-        if (tok === 'sans' && entity && VERBATIM_SANS_QUALIFIERS.has(entity)) {
+        if ((tok === 'sans' || continuesVerbatimChain) && entity && VERBATIM_SANS_QUALIFIERS.has(entity)) {
           verbatimQualifiers.push(`sans ${entity}`);
+          inVerbatimSansChain = j >= tokens.length || tokens[j] === 'ni';
         } else if (entity) {
           markers.push(tok);
           excluded.push(entity);

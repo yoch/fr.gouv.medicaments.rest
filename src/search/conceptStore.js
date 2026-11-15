@@ -34,6 +34,10 @@ const CONCEPT_IGNORED_TOKENS = new Set([
   'sels', 'base', 'ester'
 ]);
 
+// Chaque moitié (BDPM / ANMV) est mise en cache contre sa propre génération
+// d'index : recharger un référentiel ne reconstruit pas l'autre.
+let cachedBdpm = null;
+let cachedVet = null;
 let cachedEntry = null;
 let cachedTaxonomy = null;
 let warmedMode = null;
@@ -218,8 +222,10 @@ function buildGenericsStructures(generiquesRows) {
 
     let grp = generiquesByGroup.get(gid);
     if (!grp) {
+      const normLibelle = normalizeSearchText(row.libelle_groupe || '');
       grp = {
-        normLibelle: normalizeSearchText(row.libelle_groupe || ''),
+        normLibelle,
+        libelleTokens: new Set(extractConceptTokens(normLibelle)),
         allCis: []
       };
       generiquesByGroup.set(gid, grp);
@@ -476,12 +482,47 @@ function getTaxonomyVocab({ force = false } = {}) {
   return taxonomy;
 }
 
-function buildConceptStore() {
-  const taxonomy = getTaxonomyVocab();
-  const bdpm = buildBdpmConceptIndexes();
-  const vet = buildVetConceptIndexes();
+function getBdpmConceptHalf() {
+  const ref = bdpmState.cisIndexes || null;
+  if (!cachedBdpm || cachedBdpm.ref !== ref) {
+    cachedBdpm = { ref, indexes: buildBdpmConceptIndexes() };
+  }
+  return cachedBdpm.indexes;
+}
 
-  return {
+function getVetConceptHalf() {
+  const ref = vetState.numIndexes || null;
+  if (!cachedVet || cachedVet.ref !== ref) {
+    cachedVet = { ref, indexes: buildVetConceptIndexes() };
+  }
+  return cachedVet.indexes;
+}
+
+function isConceptStoreFresh() {
+  return Boolean(
+    cachedEntry &&
+    cachedEntry.bdpmRef === (bdpmState.cisIndexes || null) &&
+    cachedEntry.vetRef === (vetState.numIndexes || null)
+  );
+}
+
+/**
+ * Retourne le ConceptStore actif. Seule la moitié dont les index ont été
+ * rechargés depuis le dernier appel est reconstruite ; l'objet composé est
+ * nouveau dès qu'une moitié change.
+ */
+function getConceptStore({ force = false } = {}) {
+  if (force) {
+    cachedBdpm = null;
+    cachedVet = null;
+  }
+  if (!force && isConceptStoreFresh()) {
+    return cachedEntry.store;
+  }
+  const taxonomy = getTaxonomyVocab({ force });
+  const bdpm = getBdpmConceptHalf();
+  const vet = getVetConceptHalf();
+  const store = {
     taxonomy,
     ...bdpm,
     ...vet,
@@ -491,36 +532,12 @@ function buildConceptStore() {
       generiquesGroupCount: bdpm.generiquesByGroup.size
     }
   };
-}
-
-/**
- * Retourne le ConceptStore actif, reconstruit paresseusement si les index
- * BDPM ou ANMV ont été rechargés depuis le dernier appel.
- */
-function getConceptStore({ force = false } = {}) {
-  const bdpmRef = bdpmState.cisIndexes || null;
-  const vetRef = vetState.numIndexes || null;
-  if (
-    !force &&
-    cachedEntry &&
-    cachedEntry.bdpmRef === bdpmRef &&
-    cachedEntry.vetRef === vetRef
-  ) {
-    return cachedEntry.store;
-  }
-  const store = buildConceptStore();
-  cachedEntry = { bdpmRef, vetRef, store };
+  cachedEntry = { bdpmRef: cachedBdpm.ref, vetRef: cachedVet.ref, store };
   return store;
 }
 
 function hasConceptStoreCached() {
-  const bdpmRef = bdpmState.cisIndexes || null;
-  const vetRef = vetState.numIndexes || null;
-  return Boolean(
-    cachedEntry &&
-    cachedEntry.bdpmRef === bdpmRef &&
-    cachedEntry.vetRef === vetRef
-  );
+  return isConceptStoreFresh();
 }
 
 function hasTaxonomyCached() {
@@ -533,8 +550,14 @@ function hasTaxonomyCached() {
   );
 }
 
-function resetConceptStoreCache() {
+function releaseConceptHalves() {
+  cachedBdpm = null;
+  cachedVet = null;
   cachedEntry = null;
+}
+
+function resetConceptStoreCache() {
+  releaseConceptHalves();
   cachedTaxonomy = null;
   warmedMode = 'legacy';
 }
@@ -566,27 +589,42 @@ function warmExperimentalSearch(mode = 'legacy') {
 /**
  * Appelé avant un rechargement de corpus (`clearLoadedData`) pour libérer
  * immédiatement les structures dérivées de la génération précédente.
+ * `side` = 'bdpm' | 'vet' ne libère que la moitié concernée ; sans argument,
+ * tout est libéré.
  */
-function onCorpusCleared() {
+function onCorpusCleared(side) {
+  if (side === 'bdpm') cachedBdpm = null;
+  else if (side === 'vet') cachedVet = null;
+  else releaseConceptHalves();
   cachedEntry = null;
   cachedTaxonomy = null;
 }
 
 /**
  * Appelé à la fin d'un chargement/rechargement de corpus (`loadData` / `loadVetData`)
- * pour maintenir la cohérence des structures préchauffées.
+ * pour maintenir la cohérence des structures préchauffées. Hors mode `concepts`,
+ * libère le ConceptStore (rollback ressource). Ne lève jamais : un échec de cette
+ * fonctionnalité opt-in ne doit pas faire échouer le chargement des données.
  */
 function onCorpusLoaded(configuredWarmupMode = 'legacy') {
   const effectiveMode = warmedMode === 'concepts' || configuredWarmupMode === 'concepts'
     ? 'concepts'
     : (warmedMode === 'structured' || configuredWarmupMode === 'structured' ? 'structured' : 'legacy');
-  if (effectiveMode === 'concepts') {
-    return getConceptStore({ force: true });
+  try {
+    if (effectiveMode === 'concepts') {
+      return getConceptStore();
+    }
+    releaseConceptHalves();
+    if (effectiveMode === 'structured') {
+      return getTaxonomyVocab({ force: true });
+    }
+    return null;
+  } catch (err) {
+    releaseConceptHalves();
+    cachedTaxonomy = null;
+    console.error(`Préchauffage de la recherche expérimentale (${effectiveMode}) en échec :`, err);
+    return null;
   }
-  if (effectiveMode === 'structured') {
-    return getTaxonomyVocab({ force: true });
-  }
-  return null;
 }
 
 module.exports = {
