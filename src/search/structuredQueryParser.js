@@ -17,6 +17,7 @@
 const { normalizeSearchText } = require('../utils/searchRanking');
 const { parseDosageTokens } = require('../utils/structuredSearchCriteria');
 const { significantFormeTokens, canonicalizeVoieEntry, extractVoieEntries } = require('./galenicVocab');
+const { VERBATIM_SANS_QUALIFIER_WORDS } = require('./queryIntentGuard');
 
 const PHARMA_ALIASES = Object.freeze([
   // Voies d'administration (source: usages pharmaceutiques courants / ANSM)
@@ -52,18 +53,21 @@ const PHARMA_ALIASES = Object.freeze([
   { pattern: /\b(?:lp|retard|prolonge[e]?)\b/g, kind: 'qualifier', value: 'liberation prolongee', source: 'galenic_abbrev' },
   { pattern: /\bpellicule[es]?\b/g, kind: 'qualifier', value: 'pellicule', source: 'bdpm_forme' },
   { pattern: /\ba\s+croquer\b|\bcroquer\b/g, kind: 'qualifier', value: 'a croquer', source: 'bdpm_forme' },
-  { pattern: /\bsans\s+(?:de\s+|d\s+)?sucres?\b/g, kind: 'qualifier', value: 'sans sucre', source: 'bdpm_verbatim_sans' },
-  { pattern: /\bsans\s+(?:de\s+|d\s+)?conservateurs?\b/g, kind: 'qualifier', value: 'sans conservateur', source: 'bdpm_verbatim_sans' },
-  { pattern: /\bsans\s+(?:de\s+|d\s+)?aromes?\b/g, kind: 'qualifier', value: 'sans arome', source: 'bdpm_verbatim_sans' },
-  { pattern: /\bsans\s+(?:de\s+|d\s+)?sulfites?\b/g, kind: 'qualifier', value: 'sans sulfite', source: 'bdpm_verbatim_sans' },
-  { pattern: /\bsans\s+(?:de\s+|d\s+)?anis\b/g, kind: 'qualifier', value: 'sans anis', source: 'bdpm_verbatim_sans' },
+  ...VERBATIM_SANS_QUALIFIER_WORDS.map((w) => ({
+    pattern: new RegExp(`\\bsans\\s+(?:de\\s+|d\\s+)?${w}${w.endsWith('s') ? '' : 's?'}\\b`, 'g'),
+    kind: 'qualifier',
+    value: `sans ${w}`,
+    source: 'bdpm_verbatim_sans'
+  })),
 
   // Qualificatifs d'intention non-clinique (équivalence générique)
   { pattern: /\b(?:generiques?|equivalents?)\b(?:\s+d[eu']|\s+d')?/g, kind: 'intent', value: 'generic_equivalent', source: 'bdpm_gener_intent' }
 ]);
 
-const CHAINED_VERBATIM_NI_RE =
-  /\bni\s+(?=(?:de\s+|d\s+)?(?:sucres?|conservateurs?|aromes?|sulfites?|anis)\b)/g;
+const CHAINED_VERBATIM_NI_RE = new RegExp(
+  `\\bni\\s+(?=(?:de\\s+|d\\s+)?(?:${VERBATIM_SANS_QUALIFIER_WORDS.map((w) => (w.endsWith('s') ? w : `${w}s?`)).join('|')})\\b)`,
+  'g'
+);
 
 const STOP_WORDS_FR = new Set([
   'de', 'du', 'des', 'd', 'le', 'la', 'les', 'l', 'un', 'une', 'en', 'pour', 'par',
@@ -209,12 +213,20 @@ function dosageTokensForComparison(value) {
   return tokens;
 }
 
+// « / » suivi d'une base de rapport (volume, masse ou poids de référence), avec ou sans quantité
+const CONCENTRATION_RE = /\/\s*(?:\d+(?:[.,]\d+)?\s*)?(?:ml|l|kg|g|dose|doses|h|heures?)(?![\p{L}])/iu;
+
+function isConcentration(value) {
+  return CONCENTRATION_RE.test(normalizeSearchText(value));
+}
+
 function sameDosageValue(explicitValue, parsedValue) {
   const a = dosageTokensForComparison(explicitValue);
   const b = dosageTokensForComparison(parsedValue);
   if (a.length === 0 || b.length === 0) return compactText(explicitValue) === compactText(parsedValue);
-  // Une concentration (`12,5 mg/kg`, `10 mg/0,4 ml`) n'équivaut pas à une quantité nue
-  if (/\//.test(explicitValue) !== /\//.test(parsedValue)) return false;
+  // Une concentration (`12,5 mg/kg`, `10 mg/0,4 ml`) n'équivaut pas à une quantité nue ;
+  // une association (`500 mg/30 mg`) équivaut à la liste `500 mg 30 mg`.
+  if (isConcentration(explicitValue) !== isConcentration(parsedValue)) return false;
   if (a.length !== b.length) return false;
   const byUnitThenAmount = (x, y) => (x.unit === y.unit ? x.amount - y.amount : (x.unit < y.unit ? -1 : 1));
   const sa = [...a].sort(byUnitThenAmount);

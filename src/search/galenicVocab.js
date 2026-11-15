@@ -141,11 +141,15 @@ function tokenizeGalenicText(value) {
   return out;
 }
 
+/** Mots significatifs d'une suite de mots galéniques : sans mots vides, ou tous à défaut. */
+function significantTokens(allTokens) {
+  const filtered = allTokens.filter((t) => !FORME_STOP_WORDS.has(t));
+  return filtered.length > 0 ? filtered : allTokens;
+}
+
 /** Mots galéniques significatifs (canoniques, sans mots vides), dédoublonnés. */
 function significantFormeTokens(value) {
-  const all = tokenizeGalenicText(value);
-  const filtered = all.filter((t) => !FORME_STOP_WORDS.has(t));
-  return [...new Set(filtered.length > 0 ? filtered : all)];
+  return [...new Set(significantTokens(tokenizeGalenicText(value)))];
 }
 
 function canonicalizeVoieEntry(raw) {
@@ -170,8 +174,8 @@ function extractVoieEntries(raw) {
 }
 
 module.exports = {
-  FORME_STOP_WORDS,
   tokenizeGalenicText,
+  significantTokens,
   significantFormeTokens,
   canonicalizeVoieEntry,
   extractVoieEntries

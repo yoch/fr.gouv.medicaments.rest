@@ -44,8 +44,8 @@ const {
 } = require('../utils/structuredSearchCriteria');
 const { parseStructuredQuery } = require('./structuredQueryParser');
 const {
-  FORME_STOP_WORDS,
   tokenizeGalenicText,
+  significantTokens,
   significantFormeTokens,
   canonicalizeVoieEntry,
   extractVoieEntries
@@ -104,6 +104,80 @@ function hydrateExperimentalHit(ref, matchesBySource) {
   return result;
 }
 
+// La requête interprétée est immuable : ses mots ne sont découpés qu'une fois par
+// requête, pas à chaque candidat scoré.
+// Choix assumé (revue PR #8) : cache indexé sur l'objet `parsed` plutôt que des valeurs
+// passées en paramètre. L'alternative explicite — calculer ces valeurs une fois dans
+// `executeExperimentalSearchPage` et les transmettre jusqu'au scoring — changerait la
+// signature de `matchFormeCriterion` / `evaluateEntityCriteria` (exportées, appelées
+// directement par les tests) et de `buildEntitySignals` ; à faire dans un refactoring
+// dédié si ces fonctions évoluent. La `WeakMap` ne retient rien au-delà de la requête.
+const conceptQueryTokensCache = new WeakMap();
+const unindexedQueryLettersCache = new WeakMap();
+
+/**
+ * Mots de la requête pour l'étape concepts, découpés par la même fonction que
+ * l'index (`extractConceptTokens`) : `paracetamol-codeine` -> `paracetamol`, `codeine`
+ * comme `PARACETAMOL-CODEINE` à l'indexation, et mêmes mots / lettres isolées ignorés.
+ */
+function conceptQueryTokens(parsed) {
+  let tokens = conceptQueryTokensCache.get(parsed);
+  if (!tokens) {
+    tokens = [...new Set(extractConceptTokens(parsed.nameQuery || ''))];
+    conceptQueryTokensCache.set(parsed, tokens);
+  }
+  return tokens;
+}
+
+// Lettre accolée par un tiret ou un point (`l-multi`, `400-f`, `l.p`) : partie du nom,
+// jamais l'article élidé « l' » que l'index ignore.
+// Seule unité d'une lettre que le parseur laisse dans le nom (non interprétée comme dosage) :
+// `h` (`24 h`). `g` et `l` sont extraits comme dosages ; `400 f` garde son `f`.
+const UNIT_LETTER_RE = /\d\s*(h)(?![\p{L}\d])/gu;
+const ATTACHED_LETTER_RE = /(?<![\p{L}\d])(\p{L})(?=[-.][\p{L}\d])|(?<=[\p{L}\d][-.])(\p{L})(?![\p{L}\d])/gu;
+
+/**
+ * Lettres isolées de la requête que l'index de concepts ne représente pas
+ * (`400-f`, `s-methoprene`, `l-multi`, `l.p`). L'étape concepts ne peut pas les vérifier
+ * via ses index ; les ignorer élargirait la requête (`400-f` -> tout « 400 »,
+ * `l-multi` -> tout « multi »), elles sont donc exigées en mot entier dans la
+ * dénomination du candidat.
+ */
+function unindexedQueryLetters(parsed) {
+  const cached = unindexedQueryLettersCache.get(parsed);
+  if (cached) return cached;
+  const nameQuery = normalizeSearchText(parsed.nameQuery || '');
+  const indexed = new Set(conceptQueryTokens(parsed));
+  const attached = new Set();
+  for (const m of nameQuery.matchAll(ATTACHED_LETTER_RE)) attached.add(m[1] || m[2]);
+  // Une unité laissée dans le nom (`24 h`) n'est pas une lettre du nom à retrouver
+  // dans la dénomination.
+  const unitLetters = new Set();
+  for (const m of nameQuery.matchAll(UNIT_LETTER_RE)) unitLetters.add(m[1]);
+  const letters = [...new Set(
+    extractTokens(nameQuery, 1).filter((t) =>
+      t.length === 1 && !indexed.has(t) && !unitLetters.has(t) &&
+      (attached.has(t) || !CONCEPT_IGNORED_TOKENS.has(t))
+    )
+  )];
+  unindexedQueryLettersCache.set(parsed, letters);
+  return letters;
+}
+
+// Coût connu (revue PR #8) : la dénomination du candidat est normalisée et découpée à
+// chaque appel. Ce chemin ne sert que si la requête contient une lettre isolée non
+// indexée (3 requêtes sur 1 544 dans un échantillon du corpus réel), et le court-circuit
+// `words.length === 0` évite tout travail sinon. Précalculer l'ensemble des mots de
+// chaque dénomination dans le ConceptStore supprimerait ce coût, mais garderait en
+// permanence un ensemble supplémentaire par spécialité / médicament vétérinaire (~19 000)
+// pour accélérer un cas rare. Ce filtre disparaîtrait si les lettres isolées étaient
+// indexées (voir `unindexedQueryLetters`).
+function denominationHasWords(text, words) {
+  if (words.length === 0) return true;
+  const toks = new Set(extractTokens(text || '', 1));
+  return words.every((w) => toks.has(w));
+}
+
 function countRequestedSubstanceEntities(tokens) {
   const nonSalt = tokens.filter((t) => !/^\d+$/.test(t) && !SALT_WORDS.has(t));
   if (nonSalt.length <= 1) return nonSalt.length;
@@ -125,8 +199,8 @@ function countRequestedSubstanceEntities(tokens) {
 function collectBdpmConceptMatches(parsed, store) {
   const qualityByKey = {};
   const metaByKey = {};
-  const rawTokens = (parsed.nameTokens || []).filter((t) => t.length >= 1 && !CONCEPT_IGNORED_TOKENS.has(t));
-  if (rawTokens.length === 0) return { qualityByKey, metaByKey };
+  const queryToks = conceptQueryTokens(parsed);
+  if (queryToks.length === 0) return { qualityByKey, metaByKey };
 
   // Codes ATC exacts via MITM
   if (parsed.kind === 'exact_code' && parsed.code && parsed.code.kind === 'atc_code') {
@@ -138,9 +212,8 @@ function collectBdpmConceptMatches(parsed, store) {
     return { qualityByKey, metaByKey };
   }
 
-  const queryToks = [...new Set(rawTokens)];
-  if (queryToks.length === 0) return { qualityByKey, metaByKey };
   const requestedSubstanceCount = countRequestedSubstanceEntities(queryToks);
+  const requiredLetters = unindexedQueryLetters(parsed);
 
   // Compter pour chaque CIS combien de tokens de la requête trouvent un appui
   // (dénomination OU substance active / fraction thérapeutique)
@@ -178,7 +251,7 @@ function collectBdpmConceptMatches(parsed, store) {
   for (const [cis, count] of hitCountByCis.entries()) {
     if (count < requiredHits) continue;
     const rec = store.bdpmByCis.get(cis);
-    if (!rec) continue;
+    if (!rec || !denominationHasWords(rec.denomination, requiredLetters)) continue;
 
     const denomHits = denomHitByCis.get(cis) || 0;
     const allInDenom = denomHits >= requiredHits || denominationCoversTokens(rec, queryToks);
@@ -225,7 +298,7 @@ function expandGenericGroupMatches(parsed, baseMatches, store) {
   // à défaut, une ancre approchée (fuzzy) sur la dénomination n'est retenue que pour un
   // nom d'un seul mot (faute de frappe sur une marque : « oflocat »), jamais pour une
   // expression où un mot approché importerait un produit sans rapport (« vitamine » ≈ « viramune »).
-  const queryToks = parsed.nameTokens.filter((t) => !CONCEPT_IGNORED_TOKENS.has(t));
+  const queryToks = conceptQueryTokens(parsed);
   const keys = Object.keys(baseMatches.qualityByKey);
   const strongAnchors = keys.filter((cis) =>
     isStrongMatchQuality(baseMatches.qualityByKey[cis]) &&
@@ -235,7 +308,7 @@ function expandGenericGroupMatches(parsed, baseMatches, store) {
     ? strongAnchors
     : keys.filter((cis) => baseMatches.metaByKey[cis] && baseMatches.metaByKey[cis].via === 'denomination');
   const groupIds = new Set();
-  const requestedNameTokens = new Set(parsed.nameTokens);
+  const requestedNameTokens = new Set(queryToks);
 
   for (const cis of anchorKeys) {
     const rec = store.bdpmByCis.get(cis);
@@ -261,9 +334,12 @@ function expandGenericGroupMatches(parsed, baseMatches, store) {
   // Dernier repli, seulement sans aucune ancre de dénomination (marque absente du
   // référentiel chargé) : chercher le nom dans libelle_groupe, par mots entiers.
   // Avec des ancres, ce repli ramènerait les associations citant la substance.
-  if (groupIds.size === 0 && anchorKeys.length === 0 && parsed.nameTokens.length > 0) {
-    const core = parsed.nameTokens.filter((t) => t.length >= 3);
-    if (core.length > 0) {
+  // Tous les mots demandés doivent figurer dans le libellé (`pour-on` exige `pour` ET `on`),
+  // dont au moins un mot alphabétique significatif : un nombre seul (`200`) n'identifie
+  // pas un groupe.
+  if (groupIds.size === 0 && anchorKeys.length === 0 && queryToks.length > 0) {
+    const core = queryToks.filter((t) => t.length >= 2);
+    if (core.some((t) => t.length >= 3 && /\p{L}/u.test(t))) {
       for (const [gid, grp] of store.generiquesByGroup.entries()) {
         if (core.every((t) => grp.libelleTokens.has(t))) {
           groupIds.add(gid);
@@ -310,8 +386,7 @@ function collectVetConceptMatches(parsed, store) {
     return { qualityByKey, metaByKey };
   }
 
-  const rawTokens = (parsed.nameTokens || []).filter((t) => t.length >= 1 && !CONCEPT_IGNORED_TOKENS.has(t));
-  const queryToks = [...new Set(rawTokens)];
+  const queryToks = conceptQueryTokens(parsed);
   if (queryToks.length === 0) return { qualityByKey, metaByKey };
 
   const hitCountByNum = new Map();
@@ -335,10 +410,11 @@ function collectVetConceptMatches(parsed, store) {
   }
 
   const reqHits = queryToks.length;
+  const requiredLetters = unindexedQueryLetters(parsed);
   for (const [num, count] of hitCountByNum.entries()) {
     if (count < reqHits) continue;
     const rec = store.vetByNum.get(num);
-    if (!rec) continue;
+    if (!rec || !denominationHasWords(rec.nom, requiredLetters)) continue;
     const allInNom = (nomHitByNum.get(num) || 0) >= reqHits;
     qualityByKey[num] = 'prefix';
     metaByKey[num] = {
@@ -371,6 +447,26 @@ function mergeMatchMaps(primary, secondary) {
     }
   }
   return { qualityByKey, metaByKey };
+}
+
+function buildVetSpeciesTokens(med) {
+  const speciesTokens = new Set();
+  for (const esp of (med && med.especes) || []) {
+    const canonical = canonicalizeSpeciesWord(esp);
+    if (canonical) speciesTokens.add(canonical);
+    for (const w of extractTokens(esp, 3)) {
+      speciesTokens.add(canonicalizeSpeciesWord(w));
+    }
+  }
+  return speciesTokens;
+}
+
+/** Le médicament vétérinaire est-il autorisé pour toutes les espèces demandées ? */
+function vetRefTargetsSpecies(num, species, store) {
+  const tokens = store
+    ? (store.vetByNum.get(num) || {}).speciesTokens
+    : buildVetSpeciesTokens(getMedicamentByNum(num));
+  return Boolean(tokens) && species.every((sp) => tokens.has(sp));
 }
 
 function buildStructuredEntityRecord(source, key, parsed, { mode = 'structured' } = {}) {
@@ -446,16 +542,7 @@ function buildStructuredEntityRecord(source, key, parsed, { mode = 'structured' 
       presVolumesMl = parseDosageTokens(presText).filter((t) => t.unit === 'ml').map((t) => t.amount);
     }
   }
-  const speciesTokens = new Set();
-  if (needSpecies) {
-    for (const esp of med.especes || []) {
-      const canonical = canonicalizeSpeciesWord(esp);
-      if (canonical) speciesTokens.add(canonical);
-      for (const w of extractTokens(esp, 3)) {
-        speciesTokens.add(canonicalizeSpeciesWord(w));
-      }
-    }
-  }
+  const speciesTokens = needSpecies ? buildVetSpeciesTokens(med) : new Set();
   return {
     num: key,
     nom,
@@ -486,12 +573,12 @@ function splitGalenicClauses(value) {
   for (const part of parts) {
     const allTokens = tokenizeGalenicText(part);
     if (allTokens.length === 0) continue;
-    const filtered = allTokens.filter((t) => !FORME_STOP_WORDS.has(t));
+    const sigTokens = significantTokens(allTokens);
     clauses.push({
       allTokens,
       tokenSet: new Set(allTokens),
-      sigTokens: filtered.length > 0 ? filtered : allTokens,
-      sigSet: new Set(filtered.length > 0 ? filtered : allTokens)
+      sigTokens,
+      sigSet: new Set(sigTokens)
     });
   }
   return clauses;
@@ -532,6 +619,9 @@ const NEUTRAL_FORME_ADMIN_TOKENS = new Set([
 
 // La forme demandée est identique pour tous les candidats d'une requête :
 // mémoïser sa tokenisation évite de la refaire à chaque candidat scoré.
+// Cache à une entrée, partagé au niveau du module : correct car la signature ne dépend
+// que de la chaîne demandée (une autre chaîne invalide l'entrée). Même alternative et
+// même raison de la différer que pour `conceptQueryTokensCache` ci-dessus.
 let lastRequestedForme = null;
 let lastRequestedFormeSignature = null;
 
@@ -1053,7 +1143,7 @@ function buildEntitySignals(ref, record, meta, parsed, { mode, store }) {
   let conceptBonus = 0;
   const isGenericIntent = Boolean(parsed?.extracted?.intents?.includes('generic_equivalent'));
   if (mode === 'concepts' && record) {
-    const nameTokens = (parsed.nameTokens || []).filter((t) => t.length >= 1 && !CONCEPT_IGNORED_TOKENS.has(t));
+    const nameTokens = conceptQueryTokens(parsed);
     const requestedSubstanceCount = countRequestedSubstanceEntities(nameTokens);
     const reqDosages = parsed.effectiveCriteria.dosage ? parseDosageTokens(parsed.effectiveCriteria.dosage) : [];
     const multiDoseRequested = reqDosages.filter((d) => d.unit === 'mg' || d.unit === 'ui').length >= 2;
@@ -1185,6 +1275,13 @@ function runVetStage(parsed, { mode, store }) {
   return matches;
 }
 
+// Limite connue (revue PR #8) : les mots d'espèce sont remis en fin de requête, pas à
+// leur position d'origine (« abeille venin alyostal » -> « venin alyostal abeille »).
+// Sans effet mesurable : la recherche lexicale exige tous les mots quel que soit leur
+// ordre, et le classement `exact` (dénomination entière égale à la requête) n'est
+// quasiment jamais atteint par une requête contenant un mot d'espèce ; le reste du
+// classement compare des mots entiers. Correctif si besoin : enregistrer dans
+// `provenance` la position de chaque mot d'espèce extrait et le réinsérer à cette place.
 function withSpeciesRestoredInName(parsed) {
   const speciesSpans = parsed.provenance.filter((p) => p.role === 'species').map((p) => p.span);
   if (speciesSpans.length === 0) return parsed;
@@ -1269,7 +1366,6 @@ function executeExperimentalSearchPage(
   const store = needsConceptStore ? getConceptStore() : null;
 
   const queried = [];
-  const withResults = [];
   const matchesBySource = {};
   let bdpmRefs = [];
   let vetRefs = [];
@@ -1279,15 +1375,18 @@ function executeExperimentalSearchPage(
   const speciesHintVet = sourceMode === 'auto' && parsed.extracted.species.length > 0;
 
   // 1. Cas espèce explicite en mode auto : interroger ANMV en priorité. Seul un match
-  // ANMV fort court-circuite la BDPM (certains mots d'espèce figurent aussi dans des
-  // dénominations humaines : « venin d'abeille », « sérum d'anguille », « 170 bar »).
+  // ANMV fort sur un produit autorisé pour l'espèce demandée court-circuite la BDPM
+  // (certains mots d'espèce figurent aussi dans des dénominations humaines : « venin
+  // d'abeille », « sérum d'anguille », « 170 bar » ; un « SERUM TRIVALENT EQUIN » ne
+  // répond pas à « sérum d'anguille »).
   let vetStrongFromHint = false;
   if (speciesHintVet) {
     queried.push('anmv');
     matchesBySource.vet = runVetStage(parsed, { mode, store });
     vetRefs = buildRefsFromMatches(matchesBySource.vet, 'vet', getMedicamentLabelByNum, 'denomination');
-    if (vetRefs.length > 0) withResults.push('anmv');
-    vetStrongFromHint = vetRefs.some((r) => isStrongMatchQuality(r.match_quality));
+    vetStrongFromHint = vetRefs.some((r) =>
+      isStrongMatchQuality(r.match_quality) && vetRefTargetsSpecies(r.key, parsed.extracted.species, store)
+    );
   }
 
   const needBdpm = sourceMode === 'human' || sourceMode === 'mixed' ||
@@ -1303,7 +1402,6 @@ function executeExperimentalSearchPage(
     queried.push('bdpm');
     matchesBySource.bdpm = runBdpmStage(parsedBySource.bdpm, { mode, store });
     bdpmRefs = buildRefsFromMatches(matchesBySource.bdpm, 'bdpm', getSpecialiteLabelByCis, 'denomination');
-    if (bdpmRefs.length > 0) withResults.push('bdpm');
   }
 
   const bdpmStrong = bdpmRefs.some((r) => isStrongMatchQuality(r.match_quality));
@@ -1317,7 +1415,6 @@ function executeExperimentalSearchPage(
     queried.push('anmv');
     matchesBySource.vet = runVetStage(parsed, { mode, store });
     vetRefs = buildRefsFromMatches(matchesBySource.vet, 'vet', getMedicamentLabelByNum, 'denomination');
-    if (vetRefs.length > 0) withResults.push('anmv');
   }
 
   let rawRefs;
@@ -1329,12 +1426,6 @@ function executeExperimentalSearchPage(
   // Même repli que legacy : sans match BDPM fort, l'ANMV remplace la BDPM si elle répond
   else rawRefs = vetRefs.length > 0 ? vetRefs : bdpmRefs;
 
-  // Comme legacy (qui n'interroge pas l'ANMV après un match BDPM fort), ne pas annoncer
-  // l'ANMV parmi les référentiels ayant répondu quand ses résultats faibles sont écartés.
-  if (speciesHintVet && rawRefs === bdpmRefs && bdpmStrong) {
-    const idx = withResults.indexOf('anmv');
-    if (idx >= 0) withResults.splice(idx, 1);
-  }
 
   // Dédoublonnage strict (par source + clé) et scoring tri-état
   const dedup = new Map();
@@ -1363,6 +1454,14 @@ function executeExperimentalSearchPage(
   }
 
   scored.sort(compareExperimentalRefs);
+
+  // `with_results` = référentiels effectivement présents dans les résultats renvoyés
+  // (après repli source=auto et filtre des qualificatifs littéraux), dans l'ordre
+  // d'interrogation. `queried` reste la liste des référentiels interrogés.
+  // Écart volontaire avec legacy, qui annonce aussi un référentiel dont les
+  // résultats faibles ont été remplacés par le repli ANMV.
+  const sourcesInResults = new Set(scored.map((r) => (r.source === 'bdpm' ? 'bdpm' : 'anmv')));
+  const withResults = queried.filter((src) => sourcesInResults.has(src));
 
   const { offset, safeLimit } = parseListPaging(page, limit);
   const pageRefs = scored.slice(offset, offset + safeLimit);

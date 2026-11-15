@@ -101,6 +101,12 @@ function seed() {
     // Terme approchant à la fois BDPM et ANMV (aucun match fort)
     spec('65000001', 'ZORBAMINE 10 mg, comprimé', 'comprimé'),
     spec('68888888', 'MELOXICAM TEVA 15 mg, comprimé', 'comprimé'),
+    // Association dont la dénomination ne cite pas les substances (trouvée par l'étape concepts)
+    spec('60904643', 'CODOLIPRANE 500 mg/30 mg, comprimé', 'comprimé'),
+    spec('60904644', 'PARACETAMOL/CODEINE ARROW 500 mg/30 mg, comprimé', 'comprimé'),
+    spec('64200001', "SERUM D'ANGUILLE BOIRON, granules", 'granules'),
+    // Dénomination sans le nom de la substance ; dosage horaire laissé dans la requête
+    spec('64300001', 'NICOPATCH 21 mg/24 heures, dispositif transdermique', 'dispositif transdermique', 'transdermique'),
     // Mot d'espèce présent dans une dénomination humaine
     spec('66100001', "ALYOSTAL VENIN D'ABEILLE 110 microgrammes, poudre pour solution injectable", 'poudre pour solution injectable', 'sous-cutanée'),
     spec('66100002', 'ALYOSTAL VENIN DE GUEPE 110 microgrammes, poudre pour solution injectable', 'poudre pour solution injectable', 'sous-cutanée'),
@@ -114,12 +120,17 @@ function seed() {
     makeRow({ cis: '61000003', designation_element: 'comprimé', code_substance: '2', denomination_substance: 'VALPROATE DE SODIUM', dosage: '500 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '61000004', designation_element: 'comprimé', code_substance: '3', denomination_substance: 'ACIDE ALENDRONIQUE', dosage: '70 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '61000005', designation_element: 'comprimé', code_substance: '3', denomination_substance: 'ACIDE ALENDRONIQUE', dosage: '70 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '64300001', designation_element: 'dispositif', code_substance: '8', denomination_substance: 'NICOTINE', dosage: '52,5 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '60904643', designation_element: 'comprimé', code_substance: '6', denomination_substance: 'PARACÉTAMOL', dosage: '500 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '60904643', designation_element: 'comprimé', code_substance: '7', denomination_substance: 'PHOSPHATE DE CODÉINE HÉMIHYDRATÉ', dosage: '30 mg', nature_composant: 'SA', numero_ordre: '2' }),
+    makeRow({ cis: '60904644', designation_element: 'comprimé', code_substance: '6', denomination_substance: 'PARACÉTAMOL', dosage: '500 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '60904644', designation_element: 'comprimé', code_substance: '7', denomination_substance: 'PHOSPHATE DE CODÉINE HÉMIHYDRATÉ', dosage: '30 mg', nature_composant: 'SA', numero_ordre: '2' }),
     makeRow({ cis: '62100001', designation_element: 'comprimé', code_substance: '4', denomination_substance: 'ACIDE FOLIQUE', dosage: '1 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '62100001', designation_element: 'comprimé', code_substance: '5', denomination_substance: 'CAFEINE', dosage: '50 mg', nature_composant: 'SA', numero_ordre: '2' })
   );
   bdpmState.corpus.generiques.push(
-    makeRow({ id_groupe: '100', libelle_groupe: 'VALPROATE DE SODIUM 500 mg - DEPAKINE 500 mg', cis: '61000002', type_generique: '1', numero_ordre: '1' }),
-    makeRow({ id_groupe: '100', libelle_groupe: 'VALPROATE DE SODIUM 500 mg - DEPAKINE 500 mg', cis: '61000003', type_generique: '1', numero_ordre: '2' }),
+    makeRow({ id_groupe: '100', libelle_groupe: 'VALPROATE DE SODIUM 500 mg - DEPAKINE 500 mg, poudre pour solution buvable', cis: '61000002', type_generique: '1', numero_ordre: '1' }),
+    makeRow({ id_groupe: '100', libelle_groupe: 'VALPROATE DE SODIUM 500 mg - DEPAKINE 500 mg, poudre pour solution buvable', cis: '61000003', type_generique: '1', numero_ordre: '2' }),
     makeRow({ id_groupe: '200', libelle_groupe: 'ACIDE ALENDRONIQUE 70 mg - FOSAMAX 70 mg', cis: '61000005', type_generique: '0', numero_ordre: '1' }),
     makeRow({ id_groupe: '200', libelle_groupe: 'ACIDE ALENDRONIQUE 70 mg - FOSAMAX 70 mg', cis: '61000004', type_generique: '1', numero_ordre: '2' }),
     makeRow({ id_groupe: '300', libelle_groupe: 'OFLOXACINE 200 mg - OFLOCET 200 mg', cis: '62000001', type_generique: '0', numero_ordre: '1' }),
@@ -133,7 +144,9 @@ function seed() {
   vetState.corpus.medicaments.push(
     makeRow({ num: '0000101', nom: 'METACAM 1,5 MG/ML SUSPENSION BUVABLE POUR CHIENS', forme_pharmaceutique: 'Suspension buvable', statut_amm: 'Autorisation active', codes_atcvet: ['QM01AC06'], especes: ['Chien'] }),
     makeRow({ num: '0000202', nom: 'ZORBAMIXE 50 MG COMPRIMES POUR CHATS', forme_pharmaceutique: 'Comprimé', statut_amm: 'Autorisation active', codes_atcvet: [], especes: ['Chat'] }),
-    makeRow({ num: '0000303', nom: 'ALYOSTAX GEL POUR ABEILLES', forme_pharmaceutique: 'Gel', statut_amm: 'Autorisation active', codes_atcvet: [], especes: ['Abeilles'] })
+    makeRow({ num: '0000303', nom: 'ALYOSTAX GEL POUR ABEILLES', forme_pharmaceutique: 'Gel', statut_amm: 'Autorisation active', codes_atcvet: [], especes: ['Abeilles'] }),
+    makeRow({ num: '0000404', nom: 'SERUM TRIVALENT EQUIN', forme_pharmaceutique: 'Solution injectable', statut_amm: 'Autorisation active', codes_atcvet: [], especes: ['Chevaux'] }),
+    makeRow({ num: '0000505', nom: 'ANGUIVET BAIN POUR ANGUILLES', forme_pharmaceutique: 'Solution', statut_amm: 'Autorisation active', codes_atcvet: [], especes: ['Anguilles'] })
   );
   vetState.corpus.compositions.push(
     makeRow({ num: '0000101', substance: 'Méloxicam', quantite: '1.5', unite: 'mg/ml' })
@@ -227,6 +240,13 @@ describe('audit PR #8 — corrections du pipeline expérimental', () => {
       expect(parseStructuredQuery('doliprane per os', { voie: 'voie orale' }, tax(), { useAliases: true }).conflicts).toEqual([]);
     });
 
+    it('n’annonce pas de conflit pour une association écrite avec ou sans « / »', () => {
+      expect(parseStructuredQuery('codoliprane 500 mg 30 mg', { dosage: '500 mg/30 mg' }, tax()).conflicts).toEqual([]);
+      // une concentration reste distincte d'une quantité nue
+      expect(parseStructuredQuery('amoxicilline 12,5 mg', { dosage: '12,5 mg/kg' }, tax()).conflicts).toHaveLength(1);
+      expect(parseStructuredQuery('metoject 10 mg', { dosage: '10 mg/0,4 ml' }, tax()).conflicts).toHaveLength(1);
+    });
+
     it('signale toujours un vrai conflit', () => {
       const parsed = parseStructuredQuery('doliprane 500 mg comprimé', { dosage: '1000 mg', forme: 'gélule' }, tax());
       expect(parsed.conflicts.map((c) => c.field).sort()).toEqual(['dosage', 'forme']);
@@ -250,6 +270,15 @@ describe('audit PR #8 — corrections du pipeline expérimental', () => {
         // l'ANMV écartée n'est pas annoncée parmi les référentiels ayant répondu
         expect(res.search.referentiels.queried).toEqual(['anmv', 'bdpm']);
         expect(res.search.referentiels.with_results).toEqual(['bdpm']);
+      }
+    });
+
+    it('un match ANMV fort pour une autre espèce ne court-circuite pas la BDPM (sérum d’anguille ≠ sérum équin)', () => {
+      for (const mode of ['structured', 'concepts']) {
+        const res = executeExperimentalSearchPage("serum d'anguille", 'auto', 1, 5, {}, { mode });
+        expect(res.search.parsed.species).toEqual(['anguille']);
+        expect(res.search.referentiels.queried).toEqual(['anmv', 'bdpm']);
+        expect(keysOf(res)).toEqual(['64200001']);
       }
     });
 
@@ -303,6 +332,26 @@ describe('audit PR #8 — corrections du pipeline expérimental', () => {
     });
   });
 
+  describe('#3 referentiels.with_results décrit les sources présentes dans les résultats', () => {
+    it('n’annonce pas la BDPM quand ses résultats faibles sont remplacés par l’ANMV', () => {
+      for (const mode of ['structured', 'concepts']) {
+        const exp = executeExperimentalSearchPage('zorbamize', 'auto', 1, 50, {}, { mode });
+        expect(exp.search.referentiels.queried).toEqual(['bdpm', 'anmv']);
+        expect(exp.search.referentiels.with_results).toEqual(['anmv']);
+      }
+      // Écart volontaire et documenté : legacy annonce aussi la BDPM écartée
+      expect(executeHybridSearchPage('zorbamize', 'auto', 1, 50).search.referentiels.with_results).toEqual(['bdpm', 'anmv']);
+    });
+
+    it('n’annonce pas une source dont tous les résultats sont écartés par un qualificatif littéral', () => {
+      // en concepts, l'alias retire « sans sucre » : la BDPM répond, puis le filtre écarte tout
+      const res = executeExperimentalSearchPage('zorbamine sans sucre', 'human', 1, 50, {}, { mode: 'concepts' });
+      expect(res.total).toBe(0);
+      expect(res.search.referentiels.queried).toEqual(['bdpm']);
+      expect(res.search.referentiels.with_results).toEqual([]);
+    });
+  });
+
   describe('#7 « sans X ni Y » sur qualificatifs verbatim', () => {
     it('ne s’abstient pas sur une chaîne de qualificatifs littéraux', () => {
       const q = 'pectosirop sans sucre ni conservateur';
@@ -315,6 +364,17 @@ describe('audit PR #8 — corrections du pipeline expérimental', () => {
       const parsed = parseStructuredQuery('sirop sans sucre ni conservateur', {}, null, { useAliases: true });
       expect(parsed.extracted.qualifiers).toEqual(['sans sucre', 'sans conservateur']);
       expect(parsed.nameQuery).not.toMatch(/\bni\b/);
+    });
+
+    it('chaque qualificatif littéral du garde-fou est reconnu par le parseur, seul ou enchaîné', () => {
+      const { VERBATIM_SANS_QUALIFIER_WORDS } = require('../src/search/queryIntentGuard');
+      for (const w of VERBATIM_SANS_QUALIFIER_WORDS) {
+        const q = `pectosirop sans sucre ni ${w}`;
+        expect(analyzeQuerySafetyAndIntent(q, null).supported).toBe(true);
+        const parsed = parseStructuredQuery(q, {}, null, { useAliases: true });
+        expect(parsed.extracted.qualifiers).toContain(`sans ${w}`);
+        expect(parsed.nameQuery).toBe('pectosirop');
+      }
     });
 
     it('s’abstient toujours sur « ni » hors chaîne verbatim', () => {
@@ -332,6 +392,40 @@ describe('audit PR #8 — corrections du pipeline expérimental', () => {
         const res = executeExperimentalSearchPage('pectosirop sans sucre ni conservateur', 'human', 1, 10, {}, { mode });
         expect(res.search.abstained).toBe(false);
         expect(keysOf(res)).toEqual(['64000001']);
+      }
+    });
+  });
+
+  describe('découpage identique requête / index de concepts (noms à tiret)', () => {
+    it('« paracetamol-codeine » retrouve les mêmes spécialités, dans le même ordre, que « paracetamol codeine »', () => {
+      const spaced = executeExperimentalSearchPage('paracetamol codeine', 'human', 1, 50, {}, { mode: 'concepts' });
+      const hyphen = executeExperimentalSearchPage('paracetamol-codeine', 'human', 1, 50, {}, { mode: 'concepts' });
+      expect(keysOf(spaced)).toContain('60904643'); // CODOLIPRANE, trouvé par ses compositions
+      expect(keysOf(hyphen)).toEqual(keysOf(spaced));
+      expect(hyphen.total).toBe(spaced.total);
+    });
+
+    it('une lettre isolée non indexée reste exigée (pas d’élargissement à « ibuprofene » seul)', () => {
+      const res = executeExperimentalSearchPage('ibuprofene-x', 'human', 1, 50, {}, { mode: 'concepts' });
+      expect(res.total).toBe(0);
+      // « l » accolé fait partie du nom, ce n'est pas l'article élidé
+      // (la recherche lexicale le rapproche en fuzzy ; l'étape concepts ne doit pas le promouvoir)
+      const lIbu = executeExperimentalSearchPage('l-ibuprofene', 'human', 1, 50, {}, { mode: 'concepts' });
+      expect(lIbu.results.map((r) => r.match_quality)).toEqual(lIbu.results.map(() => 'fuzzy'));
+    });
+
+    it('une lettre d’unité laissée dans la requête (« 24 h ») n’est pas exigée dans la dénomination', () => {
+      const res = executeExperimentalSearchPage('nicotine 24 h', 'human', 1, 50, {}, { mode: 'concepts' });
+      expect(keysOf(res)).toContain('64300001');
+      // une lettre ordinaire après un nombre reste exigée
+      expect(executeExperimentalSearchPage('ibuprofene 400 x', 'human', 1, 50, {}, { mode: 'concepts' }).results
+        .every((r) => r.match_quality === 'fuzzy')).toBe(true);
+    });
+
+    it('le repli libelle_groupe exige tous les mots et un mot alphabétique significatif', () => {
+      for (const q of ['générique pour-on', 'générique 200-cb']) {
+        const res = executeExperimentalSearchPage(q, 'human', 1, 50, {}, { mode: 'concepts' });
+        expect(res.results.filter((r) => r.match_via === 'generique')).toEqual([]);
       }
     });
   });

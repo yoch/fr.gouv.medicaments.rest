@@ -3,21 +3,16 @@
 const { normalizeSearchText } = require('../utils/searchRanking');
 
 /**
- * Qualificatifs négatifs figurant littéralement dans les dénominations BDPM.
+ * Qualificatifs négatifs figurant littéralement dans les dénominations BDPM
+ * (`SANS SUCRE`, `SANS CONSERVATEUR`...). Source unique : le garde-fou, les alias
+ * du parseur (`sans <X>` et la suite `ni <X>`) en dérivent.
  * Toute autre clause « sans <entité> » ou négation (« pas de », « ni ») est traitée
  * comme une exclusion / contrainte clinique non vérifiable sans RCP complet.
  */
-const VERBATIM_SANS_QUALIFIERS = new Set([
-  'sucre',
-  'sucres',
-  'conservateur',
-  'conservateurs',
-  'arome',
-  'aromes',
-  'sulfite',
-  'sulfites',
-  'anis'
-]);
+const VERBATIM_SANS_QUALIFIER_WORDS = Object.freeze(['sucre', 'conservateur', 'arome', 'sulfite', 'anis']);
+const VERBATIM_SANS_QUALIFIERS = new Set(
+  VERBATIM_SANS_QUALIFIER_WORDS.flatMap((w) => (w.endsWith('s') ? [w] : [w, `${w}s`]))
+);
 
 const NEGATION_CLAUSE_BOUNDARY = new Set([
   'en', 'avec', 'pour', 'comprime', 'comprimes', 'gelule', 'gelules',
@@ -279,6 +274,7 @@ function analyzeQuerySafetyAndIntent(rawQuery, parsed, explicitCriteria = {}) {
 }
 
 module.exports = {
+  VERBATIM_SANS_QUALIFIER_WORDS,
   analyzeQuerySafetyAndIntent,
   inspectCriterionConstraint
 };
