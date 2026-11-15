@@ -85,25 +85,39 @@ Tous ces endpoints acceptent les paramètres standards :
 - **MITM**: `code_atc`, `denomination`, `lien_fi` (Lien Fiche Info).
 
 #### `GET /medicaments/search`
-Recherche globale multi-critères (spécialités, présentations, compositions agrégées par CIS). Peut interroger la BDPM seule, l'ANMV seule, ou les deux selon `source`.
+Recherche globale multi-critères (spécialités, présentations, compositions agrégées par CIS) propulsée par le moteur lexical `@yoch/frozenminisearch`. Peut interroger la BDPM seule, l'ANMV seule, ou les deux selon `source`.
 - **Paramètres**:
   - `q` (string, requis): Terme de recherche.
-  - `page`, `limit` (défaut `limit=50`).
+  - `mode` (string, optionnel): `legacy` (défaut, `B0`), `structured` (`B1` opt-in), `concepts` (`B2` opt-in).
+    - `legacy` : comportement par défaut inchangé.
+    - `structured` : extraction structurée des dosages/formes/voies dans `q`, précédence stricte des paramètres explicites (`search.parsed.conflicts`), statuts `criteria_status` et garde-fous d'abstention (`search.abstained`).
+    - `concepts` : ajoute à `structured` la résolution par concepts (`ConceptStore` : substances actives `SA`/`FT`, groupes génériques, synonymes galéniques/voies, espèces vétérinaires, conversions dimensionnelles vérifiées). Aucun index vectoriel (`FXV1`) ni modèle externe n'est chargé.
+  - `page`, `limit` (défaut `limit=50`, pagination stable calculée sur la liste complète ordonnée avant découpage de page).
   - `source` (string, optionnel): `auto` (défaut), `human`, `veterinary`, `mixed`.
-    - `auto` : BDPM d'abord ; si aucun résultat, fallback ANMV.
+    - `auto` : BDPM d'abord ; si aucun résultat (ou routage d'espèce vétérinaire explicite en `mode=structured` ou `mode=concepts`), fallback ANMV.
     - `human` : BDPM uniquement (comportement historique).
     - `veterinary` : médicaments vétérinaires ANMV uniquement.
     - `mixed` : fusion des deux référentiels.
-  - `format` (optionnel): `json` (défaut) ou `markdown`. En `markdown`, le corps est du texte `text/markdown` (pas de JSON) ; la pagination n’apparaît que dans l’en-tête du document.
+  - `format` (optionnel): `json` (défaut) ou `markdown`. En `markdown`, le corps est du texte `text/markdown` (pas de JSON) ; la pagination, les conflits `search.parsed.conflicts`, les statuts `criteria_status` (`matched`, `expanded`, `contradicted`, `unknown`, `unsupported`) et les abstentions explicites (`abstained=true` + `abstain_reason`, distinctes de `_Aucun résultat._`) sont rendus directement dans le document Markdown.
   - `detail` (optionnel): `full` (défaut) ou `summary`. Voir ci-dessous.
   - `dosage`, `forme`, `voie` (string, optionnels): **critères de scoring non destructifs**. Ils ne filtrent jamais les résultats et ne participent pas au rappel : ils ne font que **réordonner à l'intérieur d'un même niveau de pertinence** (`match_quality`). Un résultat sans rapport ne peut donc jamais remonter au-dessus d'un match plus fort.
-    - `dosage` : ex. `1 g`, `500 mg`, `40 mg/ml`. Comparé au dosage porté par la **dénomination** de la spécialité (les unités équivalentes sont normalisées, `1 gramme` ↔ `1000 mg`). Chaque quantité écrite est comparée telle quelle, sans calcul de concentration : `250 mg` trouve `250 mg/5 ml`, mais `40 mg/ml` ne trouve pas `200 mg/5 ml`. `criteria_match.dosage` n'est vrai que si toutes les quantités demandées sont retrouvées. Le critère de scoring ne s'appuie que sur la dénomination — `compositions.dosage` reste indexé et interrogeable via `q` / `GET /medicaments/compositions`, mais n'entre pas dans ce boost.
-    - `forme` : ex. `comprimé`, `solution injectable`. Comparé à `forme_pharma`.
-    - `voie` : ex. `orale`, `cutanée`. Comparé à `voies_admin`.
-    - Chaque fiche renvoie alors `criteria_match` (`{ dosage, forme, voie }` en booléens) pour tracer les critères satisfaits.
+    - `dosage` : ex. `1 g`, `500 mg`, `40 mg/ml`. En `mode=legacy`, comparé au dosage porté par la **dénomination** de la spécialité (les unités équivalentes sont normalisées, `1 gramme` ↔ `1000 mg`, sans calcul de concentration). En `mode=structured` et `mode=concepts`, le paramètre explicite `dosage` prime sur tout dosage contradictoire extrait de `q` (conflit tracé dans `search.parsed.conflicts`), et évalue `criteria_status.dosage` (`matched`, `expanded`, `contradicted`, `unknown`, `unsupported`, `not_requested`). En `mode=concepts`, les conversions de concentration dimensionnellement établies (`1,5 g/10 ml` ↔ `150 mg/ml`, et `%` ↔ `mg/ml` uniquement si la base masse/volume `m/v` est prouvée par le texte ou par `CIS_COMPO` mono-substance non reconstituée) sont marquées `expanded` (`criteria_match.dosage: false`). Les bases non comparables ou non prouvées (`%` de base inconnue, `% v/v`, `% m/m`, `mg/g`, `UI/mg`, `mg/kg`, débit `/24h`, concentration après reconstitution) restent `unknown` sans bonus, et un résultat proche au dosage ou volume de présentation incompatible reste explicitement `contradicted` (`criteria_match.dosage: false`).
+    - `forme` : ex. `comprimé`, `solution injectable`. Comparé à `forme_pharma`. En `mode=concepts`, une forme demandée combinant galénique et voie (ex. `émulsion cutanée`) peut être satisfaite (`matched`) par `forme_pharma="émulsion pour application"` + `voies_admin="cutanée"` si la voie canonique complète est compatible et qu'aucun qualificatif galénique contradictoire (ex. `solution injectable` avec voie `sous-cutanée`) n'est présent.
+    - `voie` : ex. `orale`, `cutanée`. Comparé aux entrées canoniques complètes de `voies_admin` (`cutanée` ne matche jamais `sous-cutanée`).
+    - Chaque fiche renvoie alors `criteria_match` (`{ dosage, forme, voie }` en booléens) et, en modes `structured`/`concepts`, `criteria_status` (`{ dosage, forme, voie }`).
 - **Réponse BDPM** (`detail=full`): Objets `medicament` agrégés par `cis`, avec `presentations` et `compositions` (jusqu’à `SEARCH_HYDRATE_RELATED_LIMIT` entrées par tableau, défaut 50).
 - **Réponse ANMV**: Objets `medicament_veterinaire` agrégés par `num`, avec `presentations` et `compositions`.
-- **Métadonnées** (`search` à la racine, JSON uniquement) : `query`. Si `source` est fourni ou si le fallback ANMV est utilisé : `source` et `referentiels` (`queried`, `with_results`). Si des critères structurés sont passés : `criteria` (echo des `dosage`/`forme`/`voie` actifs).
+- **Métadonnées** (`search` à la racine, JSON uniquement) : `query`. Si `source` est fourni ou si le fallback ANMV est utilisé : `source` et `referentiels` (`queried`, `with_results`). Si des critères structurés sont passés : `criteria` (echo des `dosage`/`forme`/`voie` actifs). En modes `structured` et `concepts` : `mode`, `parsed` (incluant `parsed.conflicts`), `abstained`, `abstain_reason`, `safety` ; `referentiels.queried` liste les référentiels interrogés et `referentiels.with_results` ceux présents dans les résultats renvoyés (en `mode=legacy`, `with_results` liste aussi un référentiel dont les résultats faibles ont été remplacés par le repli ANMV). Un refus (`abstained: true`) indique qu'une contrainte négative ou clinique/RCP (ex. exclusion d'excipient, grossesse/allaitement) ne peut pas être résolue par le corpus indexé ; cela ne prouve pas que l'application résout cette contrainte sur d'autres requêtes ni qu'une spécialité sans mention est exempte d'excipient ou sans risque.
+
+#### `SEARCH_WARMUP_MODE` (variable d'environnement)
+
+`SEARCH_WARMUP_MODE` règle uniquement le **préchauffage** des structures en mémoire lors du chargement/rechargement du corpus (`loadData()` / `loadVetData()`), et **ne restreint pas l'autorisation serveur d'appeler un mode** (`mode=legacy|structured|concepts` demeure appelable par requête HTTP ; un mode non préchauffé construit ses structures à la demande lors du premier appel).
+
+| Valeur | Effet |
+|--------|-------|
+| `legacy` (défaut) | Aucun préchauffage de taxonomie ni de `ConceptStore` au chargement des données (`B0` uniquement). |
+| `structured` | Préchauffe la taxonomie galénique/voies (`getTaxonomyVocab()`) hors de la première requête utilisateur lors de `loadData()` / `loadVetData()`, sans construire le `ConceptStore`. |
+| `concepts` | Préchauffe la taxonomie et le `ConceptStore` (`getConceptStore()`) hors de la première requête utilisateur lors de `loadData()` / `loadVetData()`, et les reconstruit automatiquement après rechargement. |
 
 ##### `detail=summary` (réponse allégée)
 Remplace `compositions[]` par `substances[]` (dénomination, dosage, nature). Chaque présentation ne conserve que `libelle`, `cip13`, `taux_remboursement`, `etat_commercialisation`, `prix_public` (champs non vides). Maximum **3** présentations par fiche + `presentations_count` si troncature. Champs spécialité retirés : `statut_amm`, `type_amm`, `date_amm`, `statut_bdm`, `num_autorisation_euro`.

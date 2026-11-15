@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+      - 'feat/**'
+  workflow_dispatch:
+    inputs:
+      run_external_corpus:
+        description: 'Exécuter les suites dépendant du corpus externe BDPM/ANMV (requiert un runner self-hosted équipé ; non disponible sur ubuntu-latest standard)'
+        type: boolean
+        required: false
+        default: false
+      data_dir:
+        description: 'Chemin local sur le runner self-hosted vers DATA_DIR contenant CIS_bdpm.txt et les fichiers BDPM/ANMV'
+        type: string
+        required: false
+        default: ''
+      vet_data_dir:
+        description: 'Chemin optionnel vers VET_DATA_DIR (défaut : <data_dir>/veterinaires s’il existe)'
+        type: string
+        required: false
+        default: ''
+      vet_rcp_equivalence_xml:
+        description: 'Chemin optionnel sur le runner self-hosted vers VET_RCP_EQUIVALENCE_XML pour les tests XML complets'
+        type: string
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Fast CI (HTTP, fixtures, B0 non-regression, OpenAPI)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Verify locked dependencies and hygiene
+        run: |
+          node -e '
+            const fs = require("fs");
+            const { execSync } = require("child_process");
+            const lock = JSON.parse(fs.readFileSync("package-lock.json", "utf8"));
+            const pkg = lock.packages?.["node_modules/@yoch/frozenminisearch"];
+            if (!pkg?.version) {
+              throw new Error("Missing @yoch/frozenminisearch entry in package-lock.json");
+            }
+            console.log("Locked @yoch/frozenminisearch version:", pkg.version);
+            const tracked = execSync("git ls-files", { encoding: "utf8" }).trim().split(/\r?\n/);
+            const forbidden = tracked.filter((f) =>
+              /(^\.env$|\.jsonl$|\.key$|\.pem$|private\/|fxv1|wordpiece)/i.test(f)
+            );
+            if (forbidden.length > 0) {
+              throw new Error("Forbidden private/log/FXV1 files tracked: " + forbidden.join(", "));
+            }
+          '
+
+      - name: Install dependencies cleanly from lockfile
+        run: npm ci
+
+      - name: Run fast Jest suites (fixtures, Markdown, runtime)
+        run: npm test
+
+      - name: Verify HTTP app routes, B0 default legacy contract & search non-regression
+        run: |
+          RUN_SLOW_TESTS=1 npx jest --runInBand tests/appHttp.test.js
+          npx jest --runInBand \
+            tests/searchRanking.test.js \
+            tests/searchRankedPage.test.js \
+            tests/searchOrchestratorOrder.test.js \
+            tests/searchQueryValidation.test.js \
+            tests/searchResponseShape.test.js \
+            tests/structuredSearchCriteria.test.js \
+            tests/experimentalSearch.test.js \
+            tests/runtimeConfig.test.js \
+            tests/openapi.test.js
+
+      - name: Verify OpenAPI specification is up to date
+        run: |
+          npm run generate:openapi
+          git diff --exit-code src/openapi.generated.json
+
+  # Job manuel hors CI standard (ubuntu-latest ne contient pas les fichiers bruts BDPM/ANMV
+  # non versionnés). À lancer sur un runner self-hosted équipé du corpus, ou localement via :
+  #   DATA_DIR=... VET_DATA_DIR=... VET_RCP_EQUIVALENCE_XML=... npm run test:all
+  integration-external-corpus:
+    name: Manual External Corpus Integration (RUN_SLOW_TESTS=1, self-hosted)
+    if: github.event_name == 'workflow_dispatch' && inputs.run_external_corpus == true
+    runs-on: self-hosted
+    env:
+      RUN_SLOW_TESTS: '1'
+      DATA_DIR: ${{ inputs.data_dir }}
+      VET_RCP_EQUIVALENCE_XML: ${{ inputs.vet_rcp_equivalence_xml }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Check external corpus prerequisites
+        env:
+          INPUT_VET_DATA_DIR: ${{ inputs.vet_data_dir }}
+        run: |
+          if [ -z "$DATA_DIR" ] || [ ! -f "$DATA_DIR/CIS_bdpm.txt" ]; then
+            echo "Prerequisite missing: DATA_DIR must point to a local directory on the self-hosted runner containing CIS_bdpm.txt (and BDPM/ANMV raw files)." >&2
+            echo "Otherwise run locally: DATA_DIR=/path/to/data VET_DATA_DIR=/path/to/data/veterinaires VET_RCP_EQUIVALENCE_XML=/path/to/amm-vet-fr-v2-v.xml npm run test:all" >&2
+            exit 1
+          fi
+          RESOLVED_VET_DATA_DIR="$INPUT_VET_DATA_DIR"
+          if [ -z "$RESOLVED_VET_DATA_DIR" ] && [ -d "$DATA_DIR/veterinaires" ]; then
+            RESOLVED_VET_DATA_DIR="$DATA_DIR/veterinaires"
+          fi
+          if [ -n "$RESOLVED_VET_DATA_DIR" ]; then
+            if [ ! -d "$RESOLVED_VET_DATA_DIR" ]; then
+              echo "Prerequisite invalid: VET_DATA_DIR ($RESOLVED_VET_DATA_DIR) does not exist." >&2
+              exit 1
+            fi
+            echo "VET_DATA_DIR=$RESOLVED_VET_DATA_DIR" >> "$GITHUB_ENV"
+          fi
+          if [ -n "$VET_RCP_EQUIVALENCE_XML" ] && [ ! -f "$VET_RCP_EQUIVALENCE_XML" ]; then
+            echo "Prerequisite invalid: VET_RCP_EQUIVALENCE_XML ($VET_RCP_EQUIVALENCE_XML) does not exist." >&2
+            exit 1
+          fi
+
+      - name: Install dependencies cleanly from lockfile
+        run: npm ci
+
+      - name: Run full corpus integration suites
+        run: npm run test:all

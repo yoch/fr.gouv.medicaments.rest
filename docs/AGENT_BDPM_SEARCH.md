@@ -92,6 +92,60 @@ Utilise-le pour choisir la bonne variante sans relancer une recherche.
 
 ---
 
+## Modes d'exécution (`mode=legacy|structured|concepts`)
+
+Le moteur lexical de production repose dans tous les modes sur `@yoch/frozenminisearch` (`specialites`, `presentations`, `compositions` côté BDPM et index `medicaments`, `compositions` côté ANMV ; les index `generiques` et `mitm` servent leurs routes dédiées). Aucun index vectoriel (`FXV1`) ni modèle externe n'est activé.
+
+| Mode | Rôle | Comportement |
+|------|------|--------------|
+| `legacy` (défaut) | `B0` historique | Recherche lexicale directe sur `q`, scoring optionnel non destructif via `dosage`, `forme`, `voie`. |
+| `structured` (opt-in) | `B1` structuré | Détache automatiquement dosage/forme/voie présents dans `q` (seuls les dosages à unité interprétable — mg, g, µg, ml, l, UI, % — sont détachés ; `9 CH`, `10 cl`, `2 mmol` restent dans la requête lexicale), route vers l'ANMV une espèce animale citée (`chien`, `chat`…) en `source=auto`, applique la précédence stricte des paramètres explicites (`search.parsed.conflicts`), renseigne `criteria_status` et active les garde-fous d'abstention (`search.abstained`). |
+| `concepts` (opt-in) | `B2` concepts | Ajoute à `structured` la résolution par concepts : substances actives (`SA`/`FT`), groupes génériques, synonymes galéniques/voies (`per os` → `orale`, `collyre` → `ophtalmique`) et conversions dimensionnelles vérifiées. |
+
+> **Note sur `SEARCH_WARMUP_MODE`** : la variable d'environnement `SEARCH_WARMUP_MODE=legacy|structured|concepts` (défaut `legacy`) règle uniquement le **préchauffage** des structures en mémoire au démarrage et lors des rechargements du corpus (`loadData()` / `loadVetData()`). Ce n'est **pas** un coupe-circuit fonctionnel B2 : `mode=legacy|structured|concepts` reste sélectionnable par requête HTTP (`?mode=...`, défaut `legacy`) et, si un mode non préchauffé est appelé, ses structures (`TaxonomyVocab` / `ConceptStore`) sont initialisées à la demande et conservées en mémoire.
+
+### Déploiement pilote, rollback et observabilité
+
+- **Activation pilote isolée** : déployer le candidat sur une instance/préproduction dédiée sans modifier le défaut serveur (`mode=legacy`), puis activer le mode cible uniquement côté client pilote via une configuration opérateur invisible au LLM (par exemple `BDPM_API_BASEURL`, `BDPM_SEARCH_MODE=concepts` et liste blanche `BDPM_PILOT_CHATBOT_IDS`).
+- **Rollback fonctionnel (immédiat)** : repasser le client pilote sur `mode=legacy` (ou retirer son identifiant de la liste blanche). Les requêtes suivantes reviennent immédiatement à `B0` sans redémarrage, mais `ConceptStore` et `TaxonomyVocab` déjà matérialisés restent en RAM.
+- **Rollback de ressources (mémoire)** :
+  - si `SEARCH_WARMUP_MODE=legacy` (défaut) : un rechargement du corpus (`onCorpusCleared()` + `loadData()` / `loadVetData()`), `resetConceptStoreCache()` ou un redémarrage du processus libère `ConceptStore` et `TaxonomyVocab` (`hasConceptStoreCached() === false`) ;
+  - si `SEARCH_WARMUP_MODE=concepts` a été activé au démarrage : `onCorpusLoaded` reconstruit automatiquement `ConceptStore` à chaque rechargement ; il faut alors repasser `SEARCH_WARMUP_MODE=legacy` et redémarrer le processus (ou appeler `resetConceptStoreCache()` après réinitialisation de la configuration de warmup).
+- **Observabilité légère recommandée** : journaliser/agréger par mode (`legacy`, `structured`, `concepts`) le volume d'appels, la latence p50/p95, le taux d'erreur/timeout HTTP, la part de `abstained=true` (ventilée par `abstain_reason`), de résultats vides ordinaires, de `search.parsed.conflicts`, de contradictions (`contradicted`), d'états `unknown`/`unsupported`, et la mémoire RSS / `hasConceptStoreCached()`.
+- **Holdout prospectif post-pilote** : prélever un échantillon horodaté de nouvelles requêtes réelles postérieures à l'activation du pilote (jamais vues pendant le développement, la calibration ou le test verrouillé) pour vérifier l'absence de dérive hors échantillon.
+
+### Précédence et conflits (`search.parsed.conflicts`)
+
+En modes `structured` et `concepts`, si `q` contient un critère contradictoire avec un paramètre explicite (ex. `q=amoxicilline sirop&forme=comprimé`), le paramètre explicite (`forme=comprimé`) l'emporte systématiquement et le conflit est tracé dans `search.parsed.conflicts` (`[{ field: "forme", explicit: "comprimé", parsed: "sirop" }]`) ainsi que dans l'en-tête Markdown (`format=markdown`).
+
+### Statuts de satisfaction (`criteria_status`) et rendu Markdown (`format=markdown`)
+
+En modes `structured` et `concepts`, chaque fiche expose `criteria_status` (`{ dosage, forme, voie }`) en complément de `criteria_match`. En `format=markdown` (`detail=full` ou `detail=summary`), ces garanties sont rendues explicitement sur chaque fiche et dans l'en-tête :
+- les contradictions (`contradicted`) affichent `- Critères (⚠️ contradiction — demande partiellement insatisfaite): <critère> ✗ (contradicted)` afin qu'un résultat approché à dose, forme ou voie incompatible (ex. `VITAMINE B1 250 mg` pour `500 mg`, ou `VITAMINE B6 250 mg` pour `10 mg`) ne soit jamais présenté comme entièrement satisfaisant ;
+- les états `expanded` (`≈ (expanded)`), `unknown` (`? (unknown — non vérifiable)`) et `unsupported` (`! (unsupported — non pris en charge)`) sont distingués sans assimiler l'information inconnue à une contradiction prouvée ;
+- les critères `not_requested` sont omis ;
+- une abstention (`search.abstained: true`) affiche un bandeau explicite avec `abstain_reason`, distinct d'une recherche vide ordinaire (`_Aucun résultat._`).
+
+| Statut | `criteria_match` | Signification |
+|--------|------------------|---------------|
+| `matched` | `true` | Correspondance stricte du critère demandé (ou forme complétée par la voie canonique exacte et compatible de la même spécialité, ex. `forme=émulsion cutanée` sur `forme_pharma="émulsion pour application"` + `voies_admin="cutanée"`). |
+| `expanded` | `false` | Équivalence ou expansion vérifiée : synonyme galénique de rappel (`spray` ↔ `solution pour pulvérisation`), ou conversion de concentration dimensionnellement établie en `mode=concepts` (`1,5 g/10 ml` ↔ `150 mg/ml`, ou `%` ↔ `mg/ml` **uniquement** lorsque la base masse/volume `m/v` est prouvée par le texte ou par `CIS_COMPO` mono-substance non reconstituée). |
+| `contradicted` | `false` | Le candidat possède une valeur incompatible avec le critère demandé. **Important** : un résultat proche mais au dosage incompatible (ex. `VITAMINE B1 250 mg` pour une demande `500 mg`, ou un volume de présentation différent `50 mg/5 ml` pour `100 mg/10 ml`) reste explicitement `contradicted` (`criteria_match.dosage: false`). |
+| `unknown` | `false` | Donnée source insuffisante ou base physique non comparable sans hypothèse externe (ex. `%` dans une solution sans preuve masse/volume `m/v`, `% v/v`, `% m/m`, `mg/g`, `UI/mg`, `mg/kg`, débit `/24h`, concentration après reconstitution, ou spécialité sans dosage structuré). Aucun bonus d'équivalence n'est accordé. |
+| `unsupported` | `false` | Critère non pris en charge : contrainte négative (ex. `voie=non orale`, `forme=sans comprimé`) ou dosage explicite sans unité interprétable (ex. `dosage=9 CH`). |
+| `not_requested` | `false` | Critère non demandé. |
+
+### Garde-fous d'abstention (`search.abstained`) et limites du périmètre
+
+En modes `structured` et `concepts`, l'API s'abstient (`total: 0`, `data: []`, `search.abstained: true`, `search.abstain_reason`, `search.safety`) lorsque la requête exprime :
+- une exclusion de substance ou d'excipient non vérifiable dans le libellé (`sans paracétamol`, `sans alcool`, `sans paraben` — seuls les qualifiants commerciaux littéraux présents dans les dénominations BDPM comme `sans sucre`, `sans conservateur`, `sans arôme`, `sans anis` sont recherchés en littéral contigu, y compris enchaînés : `sans sucre ni conservateur`) ;
+- une contrainte négative sur `forme` ou `voie` (`voie=non orale`) ;
+- une propriété clinique ou réglementaire relevant du RCP complet (grossesse, allaitement, insuffisance rénale/hépatique, contre-indications, effets indésirables, surdosage).
+
+> **Attention** : un refus (`abstained: true`) signale que le corpus indexé ne permet pas de résoudre la contrainte en sécurité ; ce n'est **pas** la preuve que l'application sait vérifier cette contrainte sur les requêtes non bloquées. L'absence de mention d'un excipient ou d'une contre-indication dans les champs BDPM ne signifie jamais absence d'excipient ni innocuité : toujours vérifier le RCP officiel (`url_bdpm`).
+
+---
+
 ## Paramètres recommandés
 
 ```
@@ -123,6 +177,10 @@ Comportement `auto` (à connaître) :
 3. Sinon interroge l'ANMV.
 4. Si l'ANMV a des résultats → retourne l'ANMV.
 5. Si l'ANMV est vide → **conserve** les résultats BDPM, y compris `fuzzy` (ex. typo `dolipranr`).
+
+En modes `structured` et `concepts`, l'étape 4 diffère : quand ni la BDPM ni l'ANMV n'ont de match fort, les deux listes sont **fusionnées** (les critères départagent le classement) au lieu que l'ANMV remplace la BDPM.
+
+`search.referentiels.queried` liste les référentiels interrogés. En modes `structured` et `concepts`, `search.referentiels.with_results` ne liste que ceux présents dans `data` (après repli et filtres) ; en `mode=legacy`, il liste aussi la BDPM quand ses résultats faibles ont été remplacés par l'ANMV à l'étape 4.
 
 ---
 

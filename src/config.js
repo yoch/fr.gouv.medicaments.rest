@@ -30,6 +30,12 @@ function parseReloadStrategy(raw) {
   return accepted.has(value) ? value : 'in-process';
 }
 
+function parseSearchWarmupMode(raw) {
+  const value = String(raw || 'legacy').toLowerCase().trim();
+  const accepted = new Set(['legacy', 'structured', 'concepts']);
+  return accepted.has(value) ? value : 'legacy';
+}
+
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../data');
 const VET_DATA_DIR = process.env.VET_DATA_DIR || path.join(DATA_DIR, 'veterinaires');
 
@@ -40,6 +46,7 @@ const config = Object.freeze({
 
   // Cycle de vie / rechargement
   reloadStrategy: parseReloadStrategy(process.env.RELOAD_STRATEGY),
+  searchWarmupMode: parseSearchWarmupMode(process.env.SEARCH_WARMUP_MODE),
   vetLoadDeferred: parseBoolFlag(process.env.VET_LOAD_DEFERRED, false),
   vetLoadDelayMs: validateTimerDelay(parsePositiveInt(process.env.VET_LOAD_DELAY_MS, 0), 'VET_LOAD_DELAY_MS', true),
   postLoadGc: parseBoolFlag(process.env.POST_LOAD_GC, false),

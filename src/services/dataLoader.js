@@ -47,6 +47,7 @@ const { buildDisponibiliteAlertId } = require('../utils/disponibiliteQuery');
 const config = require('../config');
 const state = require('./bdpm/state');
 const { exportBdpmSearchIndexes, exportBdpmCorpusDocuments } = require('./bdpm/exportApi');
+const { onCorpusCleared, onCorpusLoaded } = require('../search/conceptStore');
 
 const DATA_DIR = config.dataDir;
 
@@ -143,6 +144,7 @@ function buildCisIndexes() {
 }
 
 function clearLoadedData() {
+  onCorpusCleared('bdpm');
   state.reset();
   for (const type of Object.keys(corpus)) {
     clearCorpus(corpus[type]);
@@ -197,6 +199,7 @@ async function loadDataGeneration() {
   loadMemoryMark('bdpm_after_substances', { rows: rowCount(corpus.substances) });
 
   buildCisIndexes();
+  onCorpusLoaded(config.searchWarmupMode);
   loadMemoryMark('bdpm_done', { specialites: rowCount(corpus.specialites) });
   console.log(`Données chargées et indexées: ${rowCount(corpus.specialites)} spécialités`);
 }

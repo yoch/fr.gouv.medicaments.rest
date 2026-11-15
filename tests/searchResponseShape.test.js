@@ -5,6 +5,7 @@ const {
 const {
   renderSearchMarkdown,
   normalizeFormat,
+  formatCriteriaLine,
   formatMatchLine,
   formatSubstances,
   getSubstances
@@ -181,5 +182,105 @@ describe('searchMarkdown', () => {
     expect(md).toContain('CIS 60234100');
     expect(md).toContain('PARACÉTAMOL');
     expect(md).toContain('https://example.test/extrait');
+  });
+
+  it('formatCriteriaLine renders B1/B2 criteria_status (contradicted, expanded, unknown, unsupported) while preserving B0', () => {
+    // B0 contract preserved when criteria_status is absent
+    expect(
+      formatCriteriaLine({
+        criteria_match: { dosage: true, forme: false, voie: false }
+      })
+    ).toBe('- Critères: dosage ✓');
+    expect(
+      formatCriteriaLine({
+        criteria_match: { dosage: false, forme: false, voie: false }
+      })
+    ).toBeNull();
+
+    // Probe 1: criteria_match.dosage=false + criteria_status.dosage='contradicted'
+    expect(
+      formatCriteriaLine({
+        criteria_match: { dosage: false, forme: false, voie: false },
+        criteria_status: {
+          dosage: 'contradicted',
+          forme: 'not_requested',
+          voie: 'not_requested'
+        }
+      })
+    ).toBe('- Critères (⚠️ contradiction — demande partiellement insatisfaite): dosage ✗ (contradicted)');
+
+    // Expanded, unknown, unsupported
+    expect(
+      formatCriteriaLine({
+        criteria_match: { dosage: false, forme: true, voie: false },
+        criteria_status: {
+          dosage: 'expanded',
+          forme: 'matched',
+          voie: 'not_requested'
+        }
+      })
+    ).toBe('- Critères: dosage ≈ (expanded), forme ✓');
+
+    expect(
+      formatCriteriaLine({
+        criteria_match: { dosage: false, forme: false, voie: false },
+        criteria_status: {
+          dosage: 'unknown',
+          forme: 'unsupported',
+          voie: 'not_requested'
+        }
+      })
+    ).toBe(
+      '- Critères (ℹ️ vérification incomplète): dosage ? (unknown — non vérifiable), forme ! (unsupported — non pris en charge)'
+    );
+  });
+
+  it('renderSearchMarkdown distinguishes abstention with reason from ordinary empty search and renders query conflicts', () => {
+    const ordinaryEmpty = renderSearchMarkdown([], { total: 0, page: 1 }, { query: 'inconnu_xyz' });
+    expect(ordinaryEmpty).toContain('_Aucun résultat._');
+    expect(ordinaryEmpty).not.toContain('Abstention de recherche');
+
+    // Probe 2: abstained=true with abstain_reason must never render as ordinary _Aucun résultat._
+    const abstainedEmpty = renderSearchMarkdown(
+      [],
+      { total: 0, page: 1 },
+      {
+        query: 'anticoagulant oral',
+        mode: 'concepts',
+        abstained: true,
+        abstain_reason: 'therapeutic_class_or_property_lookup'
+      }
+    );
+    expect(abstainedEmpty).toContain('Abstention de recherche');
+    expect(abstainedEmpty).toContain('abstained=true');
+    expect(abstainedEmpty).toContain('therapeutic_class_or_property_lookup');
+    expect(abstainedEmpty).not.toContain('_Aucun résultat._');
+
+    // Conflict between query text and explicit criterion parameter
+    const withConflict = renderSearchMarkdown(
+      [
+        {
+          type: 'medicament',
+          cis: '60234102',
+          denomination: 'DOLIPRANE 500 mg, gélule',
+          match_quality: 'prefix',
+          criteria_match: { dosage: true, forme: false, voie: false },
+          criteria_status: { dosage: 'matched', forme: 'not_requested', voie: 'not_requested' }
+        }
+      ],
+      { total: 1, page: 1 },
+      {
+        query: 'doliprane 1000 mg',
+        mode: 'concepts',
+        parsed: {
+          dosage: '500 mg',
+          conflicts: [{ field: 'dosage', explicit: '500 mg', parsed: '1000 mg' }]
+        }
+      }
+    );
+    expect(withConflict).toContain(
+      '- ⚠️ Conflit de critère (dosage) : paramètre explicite « 500 mg » prioritaire sur le texte « 1000 mg » (retenu : « 500 mg »)'
+    );
+    expect(withConflict).toContain('- Critères: dosage ✓');
   });
 });
