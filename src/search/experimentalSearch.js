@@ -48,7 +48,8 @@ const {
   significantTokens,
   significantFormeTokens,
   canonicalizeVoieEntry,
-  extractVoieEntries
+  extractVoieEntries,
+  isRouteWord
 } = require('./galenicVocab');
 const { analyzeQuerySafetyAndIntent, inspectCriterionConstraint } = require('./queryIntentGuard');
 const {
@@ -655,7 +656,9 @@ function matchFormeCriterion(requestedForme, candidateNormForme, { useAliases = 
     // Un recouvrement partiel n'est une expansion que si le candidat est seulement
     // moins spécifique : un qualificatif demandé absent (`effervescent`) face à un
     // qualificatif propre au candidat (`pellicule`) est une contradiction.
-    const missesQualifier = unmatchedReqTokens.some((t) => !GENERIC_GALENIC_CARRIERS.has(t));
+    // Un mot de voie demandé (`gel oral`) n'est pas un qualificatif de forme : face à
+    // `gel buvable`, il ne doit pas faire conclure à une contradiction.
+    const missesQualifier = unmatchedReqTokens.some((t) => !GENERIC_GALENIC_CARRIERS.has(t) && !isRouteWord(t));
     const hasOwnQualifier = clause.sigTokens.some(
       (t) => !reqSigSet.has(t) && !GENERIC_GALENIC_CARRIERS.has(t) && !NEUTRAL_FORME_ADMIN_TOKENS.has(t)
     );
@@ -1382,14 +1385,19 @@ function executeExperimentalSearchPage(
     vetRefs = buildRefsFromMatches(matchesBySource.vet, 'vet', getMedicamentLabelByNum, 'denomination');
   }
 
+  const vetStrong = vetRefs.some((r) => isStrongMatchQuality(r.match_quality));
   let rawRefs;
   if (sourceMode === 'human') rawRefs = bdpmRefs;
   else if (sourceMode === 'veterinary') rawRefs = vetRefs;
   else if (sourceMode === 'mixed') rawRefs = [...bdpmRefs, ...vetRefs];
   else if (vetStrongFromHint) rawRefs = vetRefs;
   else if (bdpmStrong) rawRefs = bdpmRefs;
-  // Même repli que legacy : sans match BDPM fort, l'ANMV remplace la BDPM si elle répond
-  else rawRefs = vetRefs.length > 0 ? vetRefs : bdpmRefs;
+  else if (vetStrong || bdpmRefs.length === 0) rawRefs = vetRefs;
+  // Écart volontaire avec legacy : sans match fort d'aucun côté, les deux listes faibles
+  // sont fusionnées plutôt que la BDPM remplacée par l'ANMV. Le scoring par critères
+  // départage ensuite ; remplacer perdait la seule fiche BDPM utile sur du trafic réel
+  // (une forme demandée, aucun nom exact), au profit d'un produit vétérinaire sans rapport.
+  else rawRefs = [...bdpmRefs, ...vetRefs];
 
 
   // Dédoublonnage strict (par source + clé) et scoring tri-état

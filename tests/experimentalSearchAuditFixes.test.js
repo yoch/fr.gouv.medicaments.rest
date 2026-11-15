@@ -186,6 +186,8 @@ describe('audit PR #8 — corrections du pipeline expérimental', () => {
     it('garde "expanded" quand le candidat est seulement moins spécifique', () => {
       expect(matchFormeCriterion('comprimé effervescent', 'comprimé').status).toBe('expanded');
       expect(matchFormeCriterion('solution buvable', 'suspension buvable').status).toBe('expanded');
+      // un mot de voie demandé n'est pas un qualificatif de forme manquant
+      expect(matchFormeCriterion('gel oral', 'gel buvable').status).toBe('expanded');
     });
 
     it('ne remonte pas le comprimé pelliculé au-dessus du comprimé simple en mode concepts', () => {
@@ -330,28 +332,26 @@ describe('audit PR #8 — corrections du pipeline expérimental', () => {
     });
   });
 
-  describe('#6 source=auto sans match fort : même fallback que legacy', () => {
-    it('remplace les résultats BDPM faibles par les résultats ANMV', () => {
+  describe('#6 source=auto sans match fort : fusion BDPM + ANMV (écart volontaire avec legacy)', () => {
+    it('garde les résultats BDPM faibles à côté des résultats ANMV faibles', () => {
+      // legacy remplace la BDPM par l'ANMV ; B1/B2 fusionnent et laissent les critères départager
       const legacy = executeHybridSearchPage('zorbamize', 'auto', 1, 50);
-      const legacyKeys = legacy.results.map((r) => r.cis || r.num).sort();
-      expect(legacyKeys.length).toBeGreaterThan(0);
+      expect(legacy.results.map((r) => r.cis || r.num)).toEqual(['0000202']);
       for (const mode of ['structured', 'concepts']) {
         const exp = executeExperimentalSearchPage('zorbamize', 'auto', 1, 50, {}, { mode });
-        expect(keysOf(exp).sort()).toEqual(legacyKeys);
-        expect(exp.total).toBe(legacy.total);
+        expect(keysOf(exp).sort()).toEqual(['0000202', '65000001']);
+        expect(exp.total).toBe(2);
       }
     });
   });
 
   describe('#3 referentiels.with_results décrit les sources présentes dans les résultats', () => {
-    it('n’annonce pas la BDPM quand ses résultats faibles sont remplacés par l’ANMV', () => {
+    it('annonce les deux référentiels quand les deux listes faibles sont fusionnées', () => {
       for (const mode of ['structured', 'concepts']) {
         const exp = executeExperimentalSearchPage('zorbamize', 'auto', 1, 50, {}, { mode });
         expect(exp.search.referentiels.queried).toEqual(['bdpm', 'anmv']);
-        expect(exp.search.referentiels.with_results).toEqual(['anmv']);
+        expect(exp.search.referentiels.with_results).toEqual(['bdpm', 'anmv']);
       }
-      // Écart volontaire et documenté : legacy annonce aussi la BDPM écartée
-      expect(executeHybridSearchPage('zorbamize', 'auto', 1, 50).search.referentiels.with_results).toEqual(['bdpm', 'anmv']);
     });
 
     it('n’annonce pas une source dont tous les résultats sont écartés par un qualificatif littéral', () => {

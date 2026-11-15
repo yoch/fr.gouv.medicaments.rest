@@ -162,6 +162,14 @@ function canonicalizeVoieEntry(raw) {
   return VOIE_CANONICAL_ALIASES.get(norm) || norm;
 }
 
+/**
+ * Mot désignant une voie d'administration (`oral`, `orale`, `nasal`, `cutane`...) : une
+ * information de voie, pas un qualificatif de forme galénique.
+ */
+function isRouteWord(token) {
+  return VOIE_CANONICAL_ALIASES.has(token);
+}
+
 function extractVoieEntries(raw) {
   const text = String(raw ?? '').trim();
   if (!text) return [];
@@ -178,5 +186,6 @@ module.exports = {
   significantTokens,
   significantFormeTokens,
   canonicalizeVoieEntry,
-  extractVoieEntries
+  extractVoieEntries,
+  isRouteWord
 };

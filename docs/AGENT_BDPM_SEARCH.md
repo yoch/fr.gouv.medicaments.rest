@@ -178,6 +178,8 @@ Comportement `auto` (à connaître) :
 4. Si l'ANMV a des résultats → retourne l'ANMV.
 5. Si l'ANMV est vide → **conserve** les résultats BDPM, y compris `fuzzy` (ex. typo `dolipranr`).
 
+En modes `structured` et `concepts`, l'étape 4 diffère : quand ni la BDPM ni l'ANMV n'ont de match fort, les deux listes sont **fusionnées** (les critères départagent le classement) au lieu que l'ANMV remplace la BDPM.
+
 `search.referentiels.queried` liste les référentiels interrogés. En modes `structured` et `concepts`, `search.referentiels.with_results` ne liste que ceux présents dans `data` (après repli et filtres) ; en `mode=legacy`, il liste aussi la BDPM quand ses résultats faibles ont été remplacés par l'ANMV à l'étape 4.
 
 ---
