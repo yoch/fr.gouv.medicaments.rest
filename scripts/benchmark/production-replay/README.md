@@ -17,6 +17,8 @@ Ce dépôt ne contient que le **code** du banc, ses rubriques, son protocole et 
 - `PROTOCOL.md` : critères de validation et limites des mesures.
 - `tests/` : données exclusivement synthétiques.
 - `anthropic_schema_shim.py` : proxy local Chat Completions → Anthropic (adaptation de schéma uniquement ; voir ci-dessous).
+- `compare_replays.py` : bilan reproductible des requêtes dont le résultat change entre deux rejeux (même gel, même snapshot), sans nouvelle annotation ; les requêtes `test_locked` ne sont jamais affichées.
+- `prospective_filter.py` : sélectionne, dans une nouvelle extraction, les appels postérieurs au gel et dont les arguments n'ont jamais été vus, pour une évaluation prospective.
 - `private/` : données de production préparées, à exclure de Git et des partages publics.
 
 Le code est ciblé sur les interfaces observées dans `yoch/fr.gouv.medicaments.rest`, `experiment/semantic-light-search@f4ef0b9d8e7ac00d61ea4054a5fccc9f0406eb5f`, avec B0 historique dans ce même checkout. La base `main` observée était `8787e979300b499db653b31d110e5a016e70e4d3`. Revalider les refs distantes avant un rejeu ou une modification : un nom de branche ne vaut pas preuve.
