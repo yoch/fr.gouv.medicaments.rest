@@ -110,6 +110,10 @@ function seed() {
     // Article élidé dans la dénomination
     spec('64500001', "HUILE D'OLIVE COOPER, solution", 'solution'),
     spec('64600001', 'MONOPROD S 10 mg, comprimé', 'comprimé'),
+    // Dilution homéopathique écrite séparée dans la dénomination
+    spec('64700001', 'RIBES NIGRUM MACERAT GLYCERINE 1 DH BOIRON', 'solution buvable'),
+    // Préfixe chimique omis par la BDPM (« ACETYLCYSTEINE », jamais « N-ACETYLCYSTEINE »)
+    spec('64800001', 'ACETYLCYSTEINE EXEMPLE 200 mg, poudre pour solution buvable', 'poudre pour solution buvable'),
     spec('64600002', 'AAPROD S 10 mg/5 mg, comprimé', 'comprimé'),
     // Dénomination sans le nom de la substance ; dosage horaire laissé dans la requête
     spec('64300001', 'NICOPATCH 21 mg/24 heures, dispositif transdermique', 'dispositif transdermique', 'transdermique'),
@@ -126,6 +130,7 @@ function seed() {
     makeRow({ cis: '61000003', designation_element: 'comprimé', code_substance: '2', denomination_substance: 'VALPROATE DE SODIUM', dosage: '500 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '61000004', designation_element: 'comprimé', code_substance: '3', denomination_substance: 'ACIDE ALENDRONIQUE', dosage: '70 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '61000005', designation_element: 'comprimé', code_substance: '3', denomination_substance: 'ACIDE ALENDRONIQUE', dosage: '70 mg', nature_composant: 'SA', numero_ordre: '1' }),
+    makeRow({ cis: '64800001', designation_element: 'poudre', code_substance: '13', denomination_substance: 'ACÉTYLCYSTÉINE', dosage: '200 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '64600001', designation_element: 'comprimé', code_substance: '11', denomination_substance: 'ZOLMETRINE', dosage: '10 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '64600002', designation_element: 'comprimé', code_substance: '11', denomination_substance: 'ZOLMETRINE', dosage: '10 mg', nature_composant: 'SA', numero_ordre: '1' }),
     makeRow({ cis: '64600002', designation_element: 'comprimé', code_substance: '12', denomination_substance: 'CAFEINE', dosage: '5 mg', nature_composant: 'SA', numero_ordre: '2' }),
@@ -157,10 +162,12 @@ function seed() {
     makeRow({ num: '0000202', nom: 'ZORBAMIXE 50 MG COMPRIMES POUR CHATS', forme_pharmaceutique: 'Comprimé', statut_amm: 'Autorisation active', codes_atcvet: [], especes: ['Chat'] }),
     makeRow({ num: '0000303', nom: 'ALYOSTAX GEL POUR ABEILLES', forme_pharmaceutique: 'Gel', statut_amm: 'Autorisation active', codes_atcvet: [], especes: ['Abeilles'] }),
     makeRow({ num: '0000404', nom: 'SERUM TRIVALENT EQUIN', forme_pharmaceutique: 'Solution injectable', statut_amm: 'Autorisation active', codes_atcvet: [], especes: ['Chevaux'] }),
-    makeRow({ num: '0000505', nom: 'ANGUIVET BAIN POUR ANGUILLES', forme_pharmaceutique: 'Solution', statut_amm: 'Autorisation active', codes_atcvet: [], especes: ['Anguilles'] })
+    makeRow({ num: '0000505', nom: 'ANGUIVET BAIN POUR ANGUILLES', forme_pharmaceutique: 'Solution', statut_amm: 'Autorisation active', codes_atcvet: [], especes: ['Anguilles'] }),
+    makeRow({ num: '0000606', nom: 'N.A.C. COLLYRE 25 MG/ML COLLYRE EN SOLUTION', forme_pharmaceutique: 'Collyre', statut_amm: 'Autorisation active', codes_atcvet: [], especes: ['Chiens'] })
   );
   vetState.corpus.compositions.push(
-    makeRow({ num: '0000101', substance: 'Méloxicam', quantite: '1.5', unite: 'mg/ml' })
+    makeRow({ num: '0000101', substance: 'Méloxicam', quantite: '1.5', unite: 'mg/ml' }),
+    makeRow({ num: '0000606', substance: 'Acétylcystéine', quantite: '25', unite: 'mg/ml' })
   );
   indexVet();
 }
@@ -445,6 +452,20 @@ describe('audit PR #8 — corrections du pipeline expérimental', () => {
       // préférence mono-substance place MONOPROD S en tête
       const res = executeExperimentalSearchPage('zolmetrine s', 'human', 1, 50, {}, { mode: 'concepts' });
       expect(keysOf(res).slice(0, 2)).toEqual(['64600001', '64600002']);
+    });
+
+    it('une dilution collée (« 1dh ») retrouve la dénomination qui l’écrit séparée', () => {
+      for (const mode of ['structured', 'concepts']) {
+        const res = executeExperimentalSearchPage('ribes nigrum 1dh', 'human', 1, 10, {}, { mode });
+        expect(keysOf(res)).toContain('64700001');
+        expect(res.search.parsed.dosage).toBeNull();
+      }
+    });
+
+    it('un préfixe chimique « n- » n’est pas exigé : la spécialité humaine passe avant le collyre vétérinaire', () => {
+      const res = executeExperimentalSearchPage('n-acetylcysteine 200mg', 'auto', 1, 10, {}, { mode: 'concepts' });
+      expect(keysOf(res)[0]).toBe('64800001');
+      expect(res.results.some((r) => r.type === 'medicament_veterinaire')).toBe(false);
     });
 
     it('#6 l’article élidé n’est pas exigé (huile de l’olive)', () => {

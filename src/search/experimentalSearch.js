@@ -116,6 +116,7 @@ const conceptQueryTokensCache = new WeakMap();
 
 // Seule unité d'une lettre que le parseur laisse dans le nom (non interprétée comme dosage) :
 // `h` (`24 h`). `g` et `l` sont extraits comme dosages ; `400 f` garde son `f`.
+const CHEMICAL_PREFIX_RE = /(?<![\p{L}\d])([a-km-z])-(?=\p{L}{4,})/gu;
 const UNIT_LETTER_RE = /\d\s*(h)(?![\p{L}\d])/gu;
 
 /**
@@ -132,7 +133,12 @@ function conceptQueryTokens(parsed) {
     const nameQuery = normalizeSearchText(parsed.nameQuery || '');
     const unitLetters = new Set();
     for (const m of nameQuery.matchAll(UNIT_LETTER_RE)) unitLetters.add(m[1]);
-    tokens = [...new Set(extractConceptTokens(nameQuery))].filter((t) => !unitLetters.has(t));
+    // Préfixe chimique d'une lettre accolé par un tiret (`n-acetylcysteine`, `o-…`, `s-…`) :
+    // les dénominations BDPM l'omettent (« ACÉTYLCYSTÉINE »), il n'est donc pas exigé.
+    // `l-` fait exception : il figure dans les dénominations (`L-THYROXINE`, `L-MULTI`).
+    const optionalPrefixes = new Set();
+    for (const m of nameQuery.matchAll(CHEMICAL_PREFIX_RE)) optionalPrefixes.add(m[1]);
+    tokens = [...new Set(extractConceptTokens(nameQuery))].filter((t) => !unitLetters.has(t) && !optionalPrefixes.has(t));
     conceptQueryTokensCache.set(parsed, tokens);
   }
   return tokens;

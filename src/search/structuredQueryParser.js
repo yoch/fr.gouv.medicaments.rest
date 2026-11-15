@@ -339,7 +339,12 @@ function parseStructuredQuery(rawQuery, explicitCriteria = {}, taxonomy = null, 
   SINGLE_DOSAGE_RE.lastIndex = 0;
   working = working.replace(SINGLE_DOSAGE_RE, (full, n1, u1) => {
     const span = canonicalizeDosageSpan(n1, u1);
-    if (parseDosageTokens(span).length === 0) return full;
+    if (parseDosageTokens(span).length === 0) {
+      // Unité non interprétée gardée dans le nom, mais séparée de son nombre comme dans
+      // les dénominations : « 1dh » -> « 1 dh » (RIBES NIGRUM … 1 DH), « 9ch » -> « 9 ch ».
+      const lead = /^[\s(/]/.test(full) ? full[0] : '';
+      return `${lead}${n1} ${u1}`;
+    }
     extractedDosages.push(span);
     provenance.push({ span: full.trim(), role: 'dosage_single', value: span, source: 'unit_regex' });
     return ' ';
