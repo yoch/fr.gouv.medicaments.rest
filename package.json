@@ -8,6 +8,8 @@
   },
   "scripts": {
     "start": "node --env-file=.env src/server.js",
+    "start:bun": "bun --env-file=.env src/bunServer.mts",
+    "build:bun-aot": "bun build --compile --aot src/bunServer.mts --outfile dist/medicaments-api",
     "dev": "node --watch --env-file=.env src/server.js",
     "download-data": "node src/scripts/download-initial-data.js",
     "export-search-indexes": "node src/scripts/export-search-indexes.js",

@@ -2,34 +2,18 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import swaggerUi from 'swagger-ui-express';
 
 import config from './config.mts';
-import { getMetadata } from './services/dataLoader.mts';
 import { getRuntimeConfig } from './runtimeConfig.mts';
-import { memoryUsageMb } from './utils/processMemory.mts';
+import { buildHealthPayload, resolvePublicIndexHtmlPath } from './handlers/apiHandlers.mts';
 import medicamentRoutes from './routes/medicaments/index.mts';
 import veterinaireRoutes from './routes/veterinaires.mts';
 import swaggerSpecs from './swagger.js';
 
 function healthHandler(req, res) {
-  const metadata = getMetadata();
   const { pretty } = req.query;
-
-  const responseData = {
-    status: 'ok',
-    message: 'API des médicaments française',
-    attribution: 'base de données publique des médicaments - gouv.fr',
-    metadata: {
-      last_updated: metadata.last_updated,
-      source: metadata.source
-    },
-    memory: memoryUsageMb(),
-    reload_strategy: config.reloadStrategy,
-    uptime_seconds: Math.floor(process.uptime())
-  };
+  const responseData = buildHealthPayload();
 
   if (pretty === 'true' || pretty === '1') {
     res.set('Content-Type', 'application/json; charset=utf-8');
@@ -39,10 +23,7 @@ function healthHandler(req, res) {
   }
 }
 
-const APP_DIR = path.dirname(fileURLToPath(import.meta.url));
-const PUBLIC_INDEX_HTML = APP_DIR.startsWith('/$bunfs')
-  ? path.join(process.cwd(), 'public/index.html')
-  : path.resolve(APP_DIR, '../public/index.html');
+const PUBLIC_INDEX_HTML = resolvePublicIndexHtmlPath();
 
 function createApp() {
   const app = express();

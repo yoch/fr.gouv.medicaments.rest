@@ -3,11 +3,9 @@ import {
   listVetCorpusPage,
   searchVet,
   searchVetPage,
-  getVetMetadata,
-  getMedicamentByNum,
-  getRelatedByNum
+  getVetMetadata
 } from '../services/vetDataLoader.mts';
-import config from '../config.mts';
+import { getVeterinaireDetailResult } from '../handlers/apiHandlers.mts';
 import { createListHandler } from '../utils/routeHelpers.mts';
 import { validateSearchQuery } from '../utils/validateSearchQuery.mts';
 
@@ -27,22 +25,8 @@ const listHandler = createListHandler({
 router.get('/medicaments', listHandler('medicaments'));
 
 router.get('/medicaments/:num', (req, res) => {
-  const medicament = getMedicamentByNum(req.params.num);
-  if (!medicament) {
-    return res.status(404).json({ error: 'Médicament vétérinaire non trouvé' });
-  }
-
-  const metadata = getVetMetadata();
-  res.json({
-    ...medicament,
-    presentations: getRelatedByNum('presentations', req.params.num, config.detailHydrateRelatedLimit),
-    compositions: getRelatedByNum('compositions', req.params.num, config.detailHydrateRelatedLimit),
-    temps_attente: getRelatedByNum('temps_attente', req.params.num, config.detailHydrateRelatedLimit),
-    metadata: {
-      last_updated: metadata.last_updated,
-      source: metadata.source
-    }
-  });
+  const result = getVeterinaireDetailResult(req.params.num);
+  return res.status(result.status).json(result.json);
 });
 
 router.get('/compositions', listHandler('compositions'));

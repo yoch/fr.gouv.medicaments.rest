@@ -66,10 +66,15 @@ const PROJECT_ROOT = MODULE_DIR.startsWith('/$bunfs')
 const DATA_DIR = process.env.DATA_DIR || path.join(PROJECT_ROOT, 'data');
 const VET_DATA_DIR = process.env.VET_DATA_DIR || path.join(DATA_DIR, 'veterinaires');
 
+function readRuntimeEnv(key: string): string | undefined {
+  // Évite le constant-folding de `process.env.NODE_ENV` lors de `bun build --compile`.
+  return process.env[key];
+}
+
 const config: AppConfig = Object.freeze({
   // Serveur
   port: parseInt(process.env.PORT ?? '', 10) || 3000,
-  nodeEnv: process.env.NODE_ENV || 'development',
+  nodeEnv: readRuntimeEnv('NODE_ENV') || 'development',
 
   // Cycle de vie / rechargement
   reloadStrategy: parseReloadStrategy(process.env.RELOAD_STRATEGY),
