@@ -22,7 +22,7 @@ Ce projet est un fork du travail original de **Mathieu Vedie** disponible sur le
 ## Endpoints disponibles
 
 ### Health Check
-- `GET /health` — status de l'API et mémoire processus
+- `GET /health` — status de l'API, version déployée et mémoire processus
 
 ### Spécialités pharmaceutiques
 - `GET /api/medicaments/specialites` - Liste des spécialités

@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const swaggerUi = require('swagger-ui-express');
 
+const { version } = require('../package.json');
 const config = require('./config');
 const { getMetadata } = require('./services/dataLoader');
 const { getRuntimeConfig } = require('./runtimeConfig');
@@ -21,6 +22,7 @@ function healthHandler(req, res) {
 
   const responseData = {
     status: 'ok',
+    version,
     message: 'API des médicaments française',
     attribution: 'base de données publique des médicaments - gouv.fr',
     metadata: {

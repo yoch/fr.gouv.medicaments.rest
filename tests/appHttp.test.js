@@ -23,11 +23,13 @@ describeSlow('Application HTTP', () => {
     const health = await request(app).get('/health');
     expect(health.statusCode).toBe(200);
     expect(health.body.status).toBe('ok');
+    expect(health.body.version).toMatch(/^\d+\.\d+\.\d+$/);
     expect(health.body.memory.rss_mb).toEqual(expect.any(Number));
 
     const runtimeConfig = await request(app).get('/config');
     expect(runtimeConfig.statusCode).toBe(200);
     expect(runtimeConfig.body.version).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(health.body.version).toBe(runtimeConfig.body.version);
 
     const swagger = await request(app).get('/api-docs.json');
     expect(swagger.statusCode).toBe(200);
