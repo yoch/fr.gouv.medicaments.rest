@@ -234,32 +234,34 @@ function startBunHttpServer(options: BunServeOptions = {}) {
     };
   }
 
+  function executeGuarded(req: Request, handler: () => Response): Response {
+    if (req.method === 'OPTIONS') {
+      return new Response(null, { status: 204, headers: PREFLIGHT_HEADERS });
+    }
+    const { decision, blocked } = evaluateRateLimit(req);
+    if (blocked) return blocked;
+    const response =
+      req.method === 'GET' || req.method === 'HEAD'
+        ? handler()
+        : Response.json({ error: 'Not Found' }, { status: 404, headers: JSON_SECURITY_HEADERS });
+    return decision ? applyRateLimitHeaders(response, decision) : response;
+  }
+
   function handleWithValidation(
     req: Request,
     handler: (params: URLSearchParams) => Response
   ): Response {
-    if (req.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: PREFLIGHT_HEADERS });
-    }
-    const { decision, blocked } = evaluateRateLimit(req);
-    if (blocked) return blocked;
-
-    const params = new URL(req.url).searchParams;
-    const validationError = validateBunSearchQuery(params);
-    const response = validationError
-      ? Response.json({ error: validationError }, { status: 400, headers: JSON_SECURITY_HEADERS })
-      : handler(params);
-    return decision ? applyRateLimitHeaders(response, decision) : response;
+    return executeGuarded(req, () => {
+      const params = new URL(req.url).searchParams;
+      const validationError = validateBunSearchQuery(params);
+      return validationError
+        ? Response.json({ error: validationError }, { status: 400, headers: JSON_SECURITY_HEADERS })
+        : handler(params);
+    });
   }
 
   function handleSimple(req: Request, handler: () => Response): Response {
-    if (req.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: PREFLIGHT_HEADERS });
-    }
-    const { decision, blocked } = evaluateRateLimit(req);
-    if (blocked) return blocked;
-    const response = handler();
-    return decision ? applyRateLimitHeaders(response, decision) : response;
+    return executeGuarded(req, handler);
   }
 
   function serveBdpmList(dataType: string) {
@@ -394,10 +396,9 @@ function startBunHttpServer(options: BunServeOptions = {}) {
       '/api/veterinaires/presentations': serveVetList('presentations')
     },
     fetch(req: Request): Response {
-      if (req.method === 'OPTIONS') {
-        return new Response(null, { status: 204, headers: PREFLIGHT_HEADERS });
-      }
-      return Response.json({ error: 'Not Found' }, { status: 404, headers: JSON_SECURITY_HEADERS });
+      return executeGuarded(req, () =>
+        Response.json({ error: 'Not Found' }, { status: 404, headers: JSON_SECURITY_HEADERS })
+      );
     }
   };
 
