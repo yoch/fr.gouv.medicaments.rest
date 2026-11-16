@@ -1,0 +1,14 @@
+{
+  "schema_version": "bdpm-replay-contract/1",
+  "tool": "bdpm_search",
+  "default_limit": 10,
+  "default_source": "auto",
+  "page": 1,
+  "query_argument": "query",
+  "criteria_arguments": ["dosage", "forme", "voie"],
+  "verified_against_production_tool_wrapper": false,
+  "note": "Defaults inferred from the supplied logs and current API conventions, NOT verified in the LangGraph tool wrapper. Confirm before the final evaluation; do not rewrite production arguments.",
+  "baseline_ref": "8787e979300b499db653b31d110e5a016e70e4d3",
+  "candidate_ref": "f4ef0b9d8e7ac00d61ea4054a5fccc9f0406eb5f",
+  "systems": ["B0", "B1", "B2"]
+}

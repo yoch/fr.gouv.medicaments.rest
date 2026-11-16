@@ -1,0 +1,23 @@
+{
+  "schema_version": "curated-suite-suspects/1",
+  "suite": "eval_suite_v3.json",
+  "note": "Cas dont la réponse attendue paraît fausse, relevés le 2026-11-15 lors de la calibration des juges (les deux juges indépendants les notent à l'opposé de la suite). La suite n'est pas modifiée : ce fichier sert à une analyse de sensibilité (--exclude-suspects) et à une révision ultérieure des cas.",
+  "suspects": [
+    {
+      "id": "c_ho_f2_apixaban_5mg_no_space",
+      "observation": "Pour « apixaban 5mg », expectedVariantIds contient ELIQUIS 0,5 mg, 1,5 mg et 2,5 mg : dosages contradictoires, ce sont au mieux des fiches de bonne identité."
+    },
+    {
+      "id": "c_ho_f7_generique_eliquis",
+      "observation": "Pour « generique apixaban 5 mg », expectedVariantIds contient ELIQUIS (princeps, pas un générique) et des dosages autres que 5 mg."
+    },
+    {
+      "id": "c_ho_f7_perindopril_sel_vs_ft",
+      "observation": "Pour « perindopril 5 mg comprime », expectedVariantIds contient des spécialités PERINDOPRIL ARGININE 2,5 mg : dosage contradictoire."
+    },
+    {
+      "id": "c_dev_f7_cerulyse_spray_flacon",
+      "observation": "Pour « Cerulyse spray », la variante attendue est une solution pour instillation auriculaire : une instillation n'est pas un spray. Discutable plutôt que fausse."
+    }
+  ]
+}
