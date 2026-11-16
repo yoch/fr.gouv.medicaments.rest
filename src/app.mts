@@ -27,6 +27,9 @@ const PUBLIC_INDEX_HTML = resolvePublicIndexHtmlPath();
 
 function createApp() {
   const app = express();
+  if (config.trustProxy) {
+    app.set('trust proxy', 1);
+  }
   let store = null;
   // Le MemoryStore du rate limiter garde un timer : à appeler quand l'app est abandonnée.
   app.locals.dispose = () => {

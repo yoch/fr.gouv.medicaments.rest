@@ -164,6 +164,40 @@ function handleGuardedBdpmList(
   );
 }
 
+interface RateLimitDecision {
+  allowed: boolean;
+  remaining: number;
+  resetSeconds: number;
+}
+
+function resolveClientIp(
+  req: Request,
+  server: ReturnType<typeof Bun.serve>,
+  trustProxy: boolean
+): string {
+  if (trustProxy) {
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    if (forwardedFor) {
+      // Le proxy de confiance ajoute l'IP cliente en fin de chaîne (anti-spoofing 1 hop).
+      const parts = forwardedFor.split(',');
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const candidate = parts[i].trim();
+        if (candidate) return candidate;
+      }
+    }
+    const realIp = req.headers.get('x-real-ip')?.trim();
+    if (realIp) return realIp;
+  }
+  return server.requestIP(req)?.address ?? 'unknown';
+}
+
+function applyRateLimitHeaders(response: Response, decision: RateLimitDecision): Response {
+  response.headers.set('RateLimit-Limit', String(config.rateLimitMax));
+  response.headers.set('RateLimit-Remaining', String(decision.remaining));
+  response.headers.set('RateLimit-Reset', String(decision.resetSeconds));
+  return response;
+}
+
 function startBunHttpServer(options: BunServeOptions = {}) {
   const port = options.port ?? config.port;
   const hostname = options.hostname;
@@ -174,27 +208,30 @@ function startBunHttpServer(options: BunServeOptions = {}) {
 
   let activeServer: ReturnType<typeof Bun.serve> | null = null;
 
-  function applyRateLimit(req: Request): Response | null {
-    if (!rateLimiter || !activeServer) return null;
-    const ip = activeServer.requestIP(req)?.address ?? 'unknown';
+  function evaluateRateLimit(req: Request): { decision: RateLimitDecision | null; blocked: Response | null } {
+    if (!rateLimiter || !activeServer) return { decision: null, blocked: null };
+    const ip = resolveClientIp(req, activeServer, config.trustProxy);
     const decision = rateLimiter.check(ip);
-    if (decision.allowed) return null;
-    return Response.json(
-      {
-        status: 429,
-        error: 'Too Many Requests',
-        message: 'Vous avez dépassé la limite de requêtes autorisée. Veuillez réessayer plus tard.'
-      },
-      {
-        status: 429,
-        headers: {
-          ...JSON_SECURITY_HEADERS,
-          'RateLimit-Limit': String(config.rateLimitMax),
-          'RateLimit-Remaining': String(decision.remaining),
-          'RateLimit-Reset': String(decision.resetSeconds)
+    if (decision.allowed) return { decision, blocked: null };
+    return {
+      decision,
+      blocked: Response.json(
+        {
+          status: 429,
+          error: 'Too Many Requests',
+          message: 'Vous avez dépassé la limite de requêtes autorisée. Veuillez réessayer plus tard.'
+        },
+        {
+          status: 429,
+          headers: {
+            ...JSON_SECURITY_HEADERS,
+            'RateLimit-Limit': String(config.rateLimitMax),
+            'RateLimit-Remaining': String(decision.remaining),
+            'RateLimit-Reset': String(decision.resetSeconds)
+          }
         }
-      }
-    );
+      )
+    };
   }
 
   function handleWithValidation(
@@ -204,24 +241,25 @@ function startBunHttpServer(options: BunServeOptions = {}) {
     if (req.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: PREFLIGHT_HEADERS });
     }
-    const limited = applyRateLimit(req);
-    if (limited) return limited;
+    const { decision, blocked } = evaluateRateLimit(req);
+    if (blocked) return blocked;
 
     const params = new URL(req.url).searchParams;
     const validationError = validateBunSearchQuery(params);
-    if (validationError) {
-      return Response.json({ error: validationError }, { status: 400, headers: JSON_SECURITY_HEADERS });
-    }
-    return handler(params);
+    const response = validationError
+      ? Response.json({ error: validationError }, { status: 400, headers: JSON_SECURITY_HEADERS })
+      : handler(params);
+    return decision ? applyRateLimitHeaders(response, decision) : response;
   }
 
   function handleSimple(req: Request, handler: () => Response): Response {
     if (req.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: PREFLIGHT_HEADERS });
     }
-    const limited = applyRateLimit(req);
-    if (limited) return limited;
-    return handler();
+    const { decision, blocked } = evaluateRateLimit(req);
+    if (blocked) return blocked;
+    const response = handler();
+    return decision ? applyRateLimitHeaders(response, decision) : response;
   }
 
   function serveBdpmList(dataType: string) {

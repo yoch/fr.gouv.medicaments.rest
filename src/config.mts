@@ -21,6 +21,7 @@ export interface AppConfig {
   readonly vetLoadDelayMs: number;
   readonly postLoadGc: boolean;
   readonly enableRateLimit: boolean;
+  readonly trustProxy: boolean;
   readonly rateLimitWindowMs: number;
   readonly rateLimitMax: number;
   readonly loadHasAvis: boolean;
@@ -84,6 +85,7 @@ const config: AppConfig = Object.freeze({
 
   // Rate limiting
   enableRateLimit: parseBoolFlag(process.env.ENABLE_RATE_LIMIT, false),
+  trustProxy: parseBoolFlag(process.env.TRUST_PROXY, false),
   rateLimitWindowMs: validateTimerDelay(parsePositiveInt(process.env.RATE_LIMIT_WINDOW_MS, 60000), 'RATE_LIMIT_WINDOW_MS'),
   rateLimitMax: parsePositiveInt(process.env.RATE_LIMIT_MAX, 500),
 
