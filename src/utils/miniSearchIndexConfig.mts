@@ -1,16 +1,23 @@
+import type { Options, SearchOptions } from '@yoch/frozenminisearch';
 import { miniSearchOptions } from './searchRanking.mts';
 
-function miniSearchIndexConfig(fields: string[], boost: Record<string, number> | null = null) {
-  const indexConfig: Record<string, unknown> & { searchOptions: Record<string, unknown> } = {
+function miniSearchIndexConfig(
+  fields: string[],
+  boost: Record<string, number> | null = null
+): Options<Record<string, unknown>> {
+  const searchOptions: SearchOptions = boost
+    ? { ...miniSearchOptions.searchOptions, boost }
+    : { ...miniSearchOptions.searchOptions };
+
+  return {
     fields,
     storeFields: [],
-    ...miniSearchOptions,
-    searchOptions: { ...miniSearchOptions.searchOptions }
+    tokenize: miniSearchOptions.tokenize,
+    processTerm: miniSearchOptions.processTerm,
+    searchOptions
   };
-  if (boost) indexConfig.searchOptions.boost = boost;
-  return indexConfig;
 }
 
 export {
-miniSearchIndexConfig
+  miniSearchIndexConfig
 };

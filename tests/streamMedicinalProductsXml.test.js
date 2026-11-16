@@ -3,7 +3,7 @@
 const {
   stripIgnoredProductTags,
   streamMedicinalProducts
-} = require('../src/utils/streamMedicinalProductsXml');
+} = require('../src/utils/streamMedicinalProductsXml.mts');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');

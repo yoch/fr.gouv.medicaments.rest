@@ -10,7 +10,7 @@ describe('runtimeConfig', () => {
 
   function loadConfig() {
     jest.resetModules();
-    return require('../src/runtimeConfig').getRuntimeConfig();
+    return require('../src/runtimeConfig.mts').getRuntimeConfig();
   }
 
   it('expose les feature flags et la version', () => {

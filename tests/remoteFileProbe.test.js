@@ -1,7 +1,7 @@
 'use strict';
 
 const http = require('node:http');
-const { fetchRemoteFingerprint, parseIntervalHours } = require('../src/utils/remoteFileProbe');
+const { fetchRemoteFingerprint, parseIntervalHours } = require('../src/utils/remoteFileProbe.mts');
 
 afterEach(() => jest.restoreAllMocks());
 

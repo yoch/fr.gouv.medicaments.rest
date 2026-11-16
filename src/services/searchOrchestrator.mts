@@ -17,8 +17,8 @@ import {
 import { parseListPaging } from '../utils/corpusPaging.mts';
 import {
   isStrongMatchQuality,
-  MATCH_QUALITY_RANK,
-  MATCH_VIA_RANK,
+  matchQualityRank,
+  matchViaRank,
   type MatchQuality,
   type MatchVia
 } from '../utils/searchRanking.mts';
@@ -84,13 +84,13 @@ function recordMatchMeta(
     metaByKey.set(key, candidate);
     return;
   }
-  const rankNew = MATCH_QUALITY_RANK[candidate.quality] || 0;
-  const rankOld = MATCH_QUALITY_RANK[previous.quality] || 0;
+  const rankNew = matchQualityRank(candidate.quality);
+  const rankOld = matchQualityRank(previous.quality);
   if (rankNew > rankOld) {
     metaByKey.set(key, candidate);
     return;
   }
-  if (rankNew === rankOld && MATCH_VIA_RANK[via] > MATCH_VIA_RANK[previous.via]) {
+  if (rankNew === rankOld && matchViaRank(via) > matchViaRank(previous.via)) {
     metaByKey.set(key, candidate);
   }
 }
@@ -125,7 +125,7 @@ function mergeSearchHits(
       const key = String(rawKey);
       recordMatchMeta(metaByKey, key, item.match_quality, via);
       const previous = qualityByKey.get(key);
-      if (!previous || MATCH_QUALITY_RANK[item.match_quality] > MATCH_QUALITY_RANK[previous]) {
+      if (!previous || matchQualityRank(item.match_quality) > matchQualityRank(previous)) {
         qualityByKey.set(key, item.match_quality);
       }
     }
@@ -175,8 +175,8 @@ function resolveBdpmCisKeys(q: unknown, { limit = 100 }: { limit?: number } = {}
   const { qualityByKey } = collectBdpmMatches(trimmed);
   const keys = Array.from(qualityByKey.keys());
   keys.sort((a, b) => {
-    const rankA = MATCH_QUALITY_RANK[qualityByKey.get(a) || ''] || 0;
-    const rankB = MATCH_QUALITY_RANK[qualityByKey.get(b) || ''] || 0;
+    const rankA = matchQualityRank(qualityByKey.get(a) || '');
+    const rankB = matchQualityRank(qualityByKey.get(b) || '');
     if (rankB !== rankA) return rankB - rankA;
     return a.localeCompare(b);
   });
@@ -245,8 +245,8 @@ function hydrateVeterinaryResult(
 
 function sortMergedResults<T extends Record<string, unknown>>(results: T[]): T[] {
   return [...results].sort((a, b) => {
-    const rankA = MATCH_QUALITY_RANK[String(a.match_quality || '')] || 0;
-    const rankB = MATCH_QUALITY_RANK[String(b.match_quality || '')] || 0;
+    const rankA = matchQualityRank(String(a.match_quality || ''));
+    const rankB = matchQualityRank(String(b.match_quality || ''));
     if (rankB !== rankA) return rankB - rankA;
     const labelA = String(a.denomination || a.nom || '');
     const labelB = String(b.denomination || b.nom || '');
@@ -256,8 +256,8 @@ function sortMergedResults<T extends Record<string, unknown>>(results: T[]): T[]
 
 function sortResultRefs(refs: ResultRef[]): ResultRef[] {
   return [...refs].sort((a, b) => {
-    const rankA = MATCH_QUALITY_RANK[a.match_quality] || 0;
-    const rankB = MATCH_QUALITY_RANK[b.match_quality] || 0;
+    const rankA = matchQualityRank(a.match_quality);
+    const rankB = matchQualityRank(b.match_quality);
     if (rankB !== rankA) return rankB - rankA;
     return a.label.localeCompare(b.label, 'fr');
   });
@@ -340,7 +340,24 @@ function applyCriteriaToRefs(refs: ResultRef[], criteria: SearchCriteria): Resul
     return a._index - b._index;
   });
 
-  return scored.map(({ _index, _dosageExtra, ...ref }) => ref);
+  return scored.map((entry): ResultRef => ({
+    source: entry.source,
+    key: entry.key,
+    match_quality: entry.match_quality,
+    label: entry.label,
+    criteria_boost: entry.criteria_boost,
+    criteria_match: entry.criteria_match
+  }));
+}
+
+export interface SearchMeta {
+  query: string;
+  source?: SourceMode;
+  referentiels?: {
+    queried: string[];
+    with_results: string[];
+  };
+  criteria?: Record<string, string>;
 }
 
 function buildSearchMeta({
@@ -348,39 +365,49 @@ function buildSearchMeta({
   sourceMode,
   queried,
   withResults,
-  explicitSource
+  explicitSource,
+  activeCriteria
 }: {
   q: string;
   sourceMode: SourceMode;
   queried: string[];
   withResults: string[];
   explicitSource: boolean;
-}): Record<string, unknown> {
+  activeCriteria?: Record<string, string>;
+}): SearchMeta {
   if (!explicitSource && sourceMode === 'auto' && withResults.length === 1 && withResults[0] === 'bdpm') {
-    return { query: q };
+    return activeCriteria ? { query: q, criteria: activeCriteria } : { query: q };
   }
 
-  return {
-    query: q,
-    source: sourceMode,
-    referentiels: {
-      queried,
-      with_results: withResults
-    }
-  };
+  const referentiels = { queried, with_results: withResults };
+  return activeCriteria
+    ? { query: q, source: sourceMode, referentiels, criteria: activeCriteria }
+    : { query: q, source: sourceMode, referentiels };
 }
 
-const SEARCH_PLANS: Record<SourceMode, { bdpm: boolean; vet: boolean; merge: 'replace' | 'concat' | 'auto' }> = {
-  human:      { bdpm: true,  vet: false, merge: 'replace' },
-  veterinary: { bdpm: false, vet: true,  merge: 'replace' },
-  mixed:      { bdpm: true,  vet: true,  merge: 'concat' },
-  auto:       { bdpm: true,  vet: true,  merge: 'auto' }
-};
+interface SearchPlan {
+  bdpm: boolean;
+  vet: boolean;
+  merge: 'replace' | 'concat' | 'auto';
+}
+
+function getSearchPlan(sourceMode: SourceMode): SearchPlan {
+  switch (sourceMode) {
+    case 'human':
+      return { bdpm: true, vet: false, merge: 'replace' };
+    case 'veterinary':
+      return { bdpm: false, vet: true, merge: 'replace' };
+    case 'mixed':
+      return { bdpm: true, vet: true, merge: 'concat' };
+    case 'auto':
+      return { bdpm: true, vet: true, merge: 'auto' };
+  }
+}
 
 function executeHybridSearch(q: string, source?: unknown, criteria: SearchCriteria = {}) {
   const sourceMode = normalizeSource(source);
   const explicitSource = source != null && String(source).trim() !== '';
-  const plan = SEARCH_PLANS[sourceMode];
+  const plan = getSearchPlan(sourceMode);
   const queried: string[] = [];
   const withResults: string[] = [];
 
@@ -428,11 +455,12 @@ function executeHybridSearchPage(
   source?: unknown,
   page: unknown = 1,
   limit: unknown = 50,
-  criteria: SearchCriteria = {}
+  criteria: SearchCriteria = {},
+  activeCriteria?: Record<string, string>
 ) {
   const sourceMode = normalizeSource(source);
   const explicitSource = source != null && String(source).trim() !== '';
-  const plan = SEARCH_PLANS[sourceMode];
+  const plan = getSearchPlan(sourceMode);
   const queried: string[] = [];
   const withResults: string[] = [];
   const matchesBySource: { bdpm?: MatchCollection; vet?: MatchCollection } = {};
@@ -477,7 +505,7 @@ function executeHybridSearchPage(
   return {
     total: refs.length,
     results: pageRefs.map((ref) => hydrateResultRef(ref, matchesBySource)),
-    search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
+    search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource, activeCriteria })
   };
 }
 

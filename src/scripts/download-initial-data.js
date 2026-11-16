@@ -1,5 +1,5 @@
-const { downloadDataIfNeeded } = require('../services/dataDownloader');
-const { downloadVetDataIfNeeded } = require('../services/vetDataDownloader');
+const { downloadDataIfNeeded } = require('../services/dataDownloader.mts');
+const { downloadVetDataIfNeeded } = require('../services/vetDataDownloader.mts');
 
 async function downloadInitialData() {
   try {

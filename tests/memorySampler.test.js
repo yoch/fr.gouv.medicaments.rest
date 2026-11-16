@@ -1,6 +1,6 @@
 'use strict';
 
-const { createMemorySampler, installLoadMemoryMarks, uninstallLoadMemoryMarks, loadMemoryMark } = require('../src/utils/memorySampler');
+const { createMemorySampler, installLoadMemoryMarks, uninstallLoadMemoryMarks, loadMemoryMark } = require('../src/utils/memorySampler.mts');
 
 afterEach(() => { uninstallLoadMemoryMarks(); jest.restoreAllMocks(); jest.useRealTimers(); });
 

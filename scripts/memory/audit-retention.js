@@ -21,7 +21,7 @@ function positive(name, fallback) {
 async function worker() {
   const bdpm = require('../../src/services/dataLoader.mts');
   const vet = require('../../src/services/vetDataLoader.mts');
-  const pool = require('../../src/utils/stringPool');
+  const pool = require('../../src/utils/stringPool.mts');
   const states = [require('../../src/services/bdpm/state.mts').state, require('../../src/services/vet/state.mts').state];
   const oldIndexes = [];
   let server;

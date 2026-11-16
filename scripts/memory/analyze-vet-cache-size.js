@@ -11,7 +11,7 @@ const {
   createMemorySampler,
   installLoadMemoryMarks,
   uninstallLoadMemoryMarks
-} = require('../../src/utils/memorySampler');
+} = require('../../src/utils/memorySampler.mts');
 const { frozenBreakdown } = require('./frozenBreakdown');
 
 function mb(bytes) {
@@ -84,7 +84,7 @@ async function main() {
     VET_DATA_DIR,
     PRODUCTS_XML_NAME,
     DICT_XML_NAME
-  } = require('../../src/services/vetDataDownloader');
+  } = require('../../src/services/vetDataDownloader.mts');
 
   const dataDir = process.env.VET_DATA_DIR || VET_DATA_DIR;
   const productsPath = path.join(dataDir, PRODUCTS_XML_NAME);

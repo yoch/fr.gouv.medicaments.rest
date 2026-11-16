@@ -1,6 +1,5 @@
 import express from 'express';
-import __cjs_______utils_validateSearchQuery from '../../utils/validateSearchQuery.js';
-const { validateSearchQuery } = __cjs_______utils_validateSearchQuery;
+import { validateSearchQuery } from '../../utils/validateSearchQuery.mts';
 
 // Annotations OpenAPI centralisées (scannées par swagger-jsdoc).
 import './swagger.js';

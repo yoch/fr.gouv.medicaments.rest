@@ -21,8 +21,8 @@ import {
 } from '../utils/corpusStore.mts';
 import { normalizeSearchText } from '../utils/searchRanking.mts';
 import { buildPagedResponse } from '../utils/corpusPaging.mts';
-import { buildLienRcpFromNom, ANMV_RCP_URL_PREFIX } from '../models/vet/rcp.js';
-import config from '../config.js';
+import { buildLienRcpFromNom, ANMV_RCP_URL_PREFIX } from '../models/vet/rcp.mts';
+import config from '../config.mts';
 import { VET_INDEX_SPECS } from '../search/indexSpecs.mts';
 import { state } from './vet/state.mts';
 import { loadVetData, normalizeNum } from './vet/loadPipeline.mts';

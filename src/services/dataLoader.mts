@@ -6,20 +6,20 @@
  * (conservé inchangé pour les callers existants).
  */
 
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { parse } from 'csv-parse';
 import { pipeline } from 'node:stream/promises';
-import { singleFlight } from '../utils/singleFlight.js';
-import { withInternPool } from '../utils/stringPool.js';
+import { singleFlight } from '../utils/singleFlight.mts';
+import { withInternPool } from '../utils/stringPool.mts';
 import {
   buildFrozenIndexFromAsyncIterable,
   buildFrozenIndexFromRows
-} from '../utils/frozenMiniSearch.js';
-import { loadMemoryMark } from '../utils/memorySampler.js';
+} from '../utils/frozenMiniSearch.mts';
+import { loadMemoryMark } from '../utils/memorySampler.mts';
 import { buildPagedResponse } from '../utils/corpusPaging.mts';
 import { miniSearchIndexConfig } from '../utils/miniSearchIndexConfig.mts';
-import { BDPM_SCHEMAS } from '../utils/corpusSchemas.js';
+import { BDPM_SCHEMAS } from '../utils/corpusSchemas.mts';
 import {
   scoredSearch,
   searchKeyQualities,
@@ -37,13 +37,12 @@ import {
   buildIndexDocument,
   appendToKeyList
 } from '../utils/corpusStore.mts';
-import bdpmModels from '../models/bdpm/index.js';
-const { FROM_CSV, bdpmExtraitUrl, Substance } = bdpmModels;
+import { FROM_CSV, bdpmExtraitUrl, Substance } from '../models/bdpm/index.mts';
 import { BDPM_INDEX_SPECS } from '../search/indexSpecs.mts';
-import { normalizeAnsmUrl } from '../utils/ansmUrl.js';
-import { cleanText } from '../utils/textCleanup.js';
-import { buildDisponibiliteAlertId } from '../utils/disponibiliteQuery.js';
-import config from '../config.js';
+import { normalizeAnsmUrl } from '../utils/ansmUrl.mts';
+import { cleanText } from '../utils/textCleanup.mts';
+import { buildDisponibiliteAlertId } from '../utils/disponibiliteQuery.mts';
+import config from '../config.mts';
 import { state } from './bdpm/state.mts';
 import { exportBdpmSearchIndexes, exportBdpmCorpusDocuments } from './bdpm/exportApi.mts';
 

@@ -9,8 +9,8 @@ const {
   isDisponibiliteAlertId,
   mapRowToDisponibiliteAlert,
   formatBdpmDateIso
-} = require('../src/utils/disponibiliteQuery');
-const { normalizeAnsmUrl } = require('../src/utils/ansmUrl');
+} = require('../src/utils/disponibiliteQuery.mts');
+const { normalizeAnsmUrl } = require('../src/utils/ansmUrl.mts');
 
 describe('disponibiliteQuery', () => {
   test('parseBdpmDate accepte JJ/MM/AAAA', () => {
@@ -49,16 +49,16 @@ describe('disponibiliteQuery', () => {
 
   test('lienFilterInvalid produit une sélection vide (défense service)', () => {
     jest.resetModules();
-    jest.doMock('../src/utils/ansmUrl', () => ({
+    jest.doMock('../src/utils/ansmUrl.mts', () => ({
       normalizeAnsmUrl: () => ''
     }));
-    const { parseDisponibiliteFilters: parse } = require('../src/utils/disponibiliteQuery');
+    const { parseDisponibiliteFilters: parse } = require('../src/utils/disponibiliteQuery.mts');
     const { selectRuptureIndices } = require('../src/services/bdpm/disponibiliteService.mts');
     const filters = parse({ lien_ansm: 'https://ansm.sante.fr/x' });
     expect(filters.lienFilterInvalid).toBe(true);
     expect(filters.hasExactFilters).toBe(true);
     expect(selectRuptureIndices({ filters })).toEqual([]);
-    jest.dontMock('../src/utils/ansmUrl');
+    jest.dontMock('../src/utils/ansmUrl.mts');
     jest.resetModules();
   });
 

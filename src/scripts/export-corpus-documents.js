@@ -9,7 +9,7 @@
 
 const { loadData, exportBdpmCorpusDocuments } = require('../services/dataLoader.mts');
 const { loadVetData, exportVetCorpusDocuments } = require('../services/vetDataLoader.mts');
-const config = require('../config');
+const config = require('../config.mts').default;
 
 const OUT_DIR = config.corpusExportOutDir;
 const SKIP_VET = config.skipVet;

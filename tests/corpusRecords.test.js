@@ -1,6 +1,6 @@
 'use strict';
 
-const { BDPM_SCHEMAS, VET_SCHEMAS } = require('../src/utils/corpusSchemas');
+const { BDPM_SCHEMAS, VET_SCHEMAS } = require('../src/utils/corpusSchemas.mts');
 const {
   Specialite,
   Presentation,
@@ -14,9 +14,9 @@ const {
   Substance,
   FROM_CSV,
   BDPM_RECORD_CLASSES
-} = require('../src/models/bdpm');
-const { MedicamentVet, CompositionVet, PresentationVet } = require('../src/models/vet');
-const { TempsAttenteEntry } = require('../src/models/tempsAttente');
+} = require('../src/models/bdpm/index.mts');
+const { MedicamentVet, CompositionVet, PresentationVet } = require('../src/models/vet/index.mts');
+const { TempsAttenteEntry } = require('../src/models/tempsAttente.mts');
 const {
   createCorpus,
   push,
@@ -26,8 +26,8 @@ const {
   buildIndexDocument
 } = require('../src/utils/corpusStore.mts');
 const { rankAndMaterializeSearch } = require('../src/utils/corpusSearch.mts');
-const { bdpmExtraitUrl } = require('../src/models/bdpm/constants');
-const { defineCorpusRecord } = require('../src/models/defineCorpusRecord');
+const { bdpmExtraitUrl } = require('../src/models/bdpm/constants.mts');
+const { defineCorpusRecord } = require('../src/models/defineCorpusRecord.mts');
 
 function emptyCsv(fields, overrides = {}) {
   return { ...Object.fromEntries(fields.map((f) => [f, ''])), ...overrides };

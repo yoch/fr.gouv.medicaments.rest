@@ -7,9 +7,9 @@ const {
   EXPECTED_PRESENTATION_COLUMN_COUNT
 } = require('./fixtures/cis-cip-samples');
 const { parsePresentationTsv, isPlausibleCip13 } = require('./helpers/bdpmPresentation');
-const { Presentation } = require('../src/models/bdpm');
+const { Presentation } = require('../src/models/bdpm/index.mts');
 const { parse } = require('csv-parse/sync');
-const { BDPM_SCHEMAS } = require('../src/utils/corpusSchemas');
+const { BDPM_SCHEMAS } = require('../src/utils/corpusSchemas.mts');
 
 describe('BDPM presentations schema (CIS_CIP_bdpm.txt)', () => {
   it('aligne 13 colonnes comme le format gouv officiel', () => {

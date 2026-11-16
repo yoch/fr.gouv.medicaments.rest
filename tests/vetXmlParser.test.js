@@ -5,7 +5,7 @@ const {
   defaultProductParser,
   parseProductBlock,
   VET_SKIP_SCAN_TAGS
-} = require('../src/utils/vetXmlParser');
+} = require('../src/utils/vetXmlParser.mts');
 
 describe('vetXmlParser', () => {
   it('garde les valeurs en texte, espaces normalisés et entités décodées', () => {

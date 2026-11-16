@@ -19,12 +19,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const { gcBeforeMeasure } = require('../../src/utils/loadGc');
+const { gcBeforeMeasure } = require('../../src/utils/loadGc.mts');
 const {
   createMemorySampler,
   installLoadMemoryMarks,
   uninstallLoadMemoryMarks
-} = require('../../src/utils/memorySampler');
+} = require('../../src/utils/memorySampler.mts');
 
 const PROFILE_SAMPLE_MS = parseInt(process.env.PROFILE_SAMPLE_MS || '200', 10);
 const PROFILE_VET = process.env.PROFILE_VET !== '0';

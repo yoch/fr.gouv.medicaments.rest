@@ -4,8 +4,7 @@ import {
   listDisponibiliteAlerts,
   getDisponibiliteAlertById
 } from '../../services/bdpm/disponibiliteService.mts';
-import __cjs_______utils_disponibiliteQuery from '../../utils/disponibiliteQuery.js';
-const { parseDisponibiliteFilters } = __cjs_______utils_disponibiliteQuery;
+import { parseDisponibiliteFilters } from '../../utils/disponibiliteQuery.mts';
 
 const router = express.Router();
 

@@ -273,6 +273,35 @@ const miniSearchOptions = {
   }
 };
 
+function matchQualityRank(quality: string): number {
+  switch (quality) {
+    case 'exact':
+      return 3;
+    case 'prefix':
+      return 2;
+    case 'fuzzy':
+      return 1;
+    default:
+      return 0;
+  }
+}
+
+function matchViaRank(via: string): number {
+  switch (via) {
+    case 'cis':
+    case 'num':
+      return 4;
+    case 'denomination':
+      return 3;
+    case 'presentation':
+      return 2;
+    case 'composition':
+      return 1;
+    default:
+      return 0;
+  }
+}
+
 const MATCH_QUALITY_RANK: Record<string, number> = { exact: 3, prefix: 2, fuzzy: 1 };
 const MATCH_VIA_RANK: Record<string, number> = {
   cis: 4,
@@ -289,6 +318,8 @@ export {
   matchQualityFromPriority,
   isStrongMatchQuality,
   queryTerms,
+  matchQualityRank,
+  matchViaRank,
   MATCH_QUALITY_RANK,
   MATCH_VIA_RANK
 };

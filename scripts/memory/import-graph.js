@@ -5,8 +5,8 @@
  */
 'use strict';
 
-require('../../src/config');
-require('../../src/utils/frozenMiniSearch');
+require('../../src/config.mts');
+require('../../src/utils/frozenMiniSearch.mts');
 require('../../src/services/dataLoader.mts');
 require('../../src/services/vetDataLoader.mts');
 require('@yoch/frozenminisearch');

@@ -5,8 +5,8 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { gzipSync } = require('node:zlib');
-const { fetchRemoteFingerprint } = require('../src/utils/remoteFileProbe');
-const { downloadFile } = require('../src/services/download/syncHelpers');
+const { fetchRemoteFingerprint } = require('../src/utils/remoteFileProbe.mts');
+const { downloadFile } = require('../src/services/download/syncHelpers.mts');
 
 test.each([
   ['probe', 404, false], ['probe', 503, false],

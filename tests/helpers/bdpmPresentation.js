@@ -1,7 +1,7 @@
 'use strict';
 
 const { parse } = require('csv-parse/sync');
-const { BDPM_SCHEMAS } = require('../../src/utils/corpusSchemas');
+const { BDPM_SCHEMAS } = require('../../src/utils/corpusSchemas.mts');
 
 function parsePresentationTsv(line) {
   return parse(line, {

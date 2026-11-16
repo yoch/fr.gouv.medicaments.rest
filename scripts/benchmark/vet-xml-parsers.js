@@ -18,10 +18,10 @@
 const fs = require('fs');
 const path = require('path');
 const { XMLParser: FxpParser } = require('fast-xml-parser');
-const { streamMedicinalProducts } = require('../../src/utils/streamMedicinalProductsXml');
-const { defaultProductParser, parseProductBlock } = require('../../src/utils/vetXmlParser');
+const { streamMedicinalProducts } = require('../../src/utils/streamMedicinalProductsXml.mts');
+const { defaultProductParser, parseProductBlock } = require('../../src/utils/vetXmlParser.mts');
 
-const { gcBeforeMeasure } = require('../../src/utils/loadGc');
+const { gcBeforeMeasure } = require('../../src/utils/loadGc.mts');
 
 const DEFAULT_PRODUCTS = path.join(
   __dirname,

@@ -9,7 +9,7 @@
 
 const { loadData, exportBdpmSearchIndexes } = require('../services/dataLoader.mts');
 const { loadVetData, exportVetSearchIndexes } = require('../services/vetDataLoader.mts');
-const config = require('../config');
+const config = require('../config.mts').default;
 
 const OUT_DIR = config.searchIndexOutDir;
 const SKIP_VET = config.skipVet;

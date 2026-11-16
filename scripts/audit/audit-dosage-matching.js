@@ -7,7 +7,7 @@
 // interdit à un critère de franchir un niveau de match_quality.
 const fs = require('node:fs');
 const path = require('node:path');
-const config = require('../../src/config');
+const config = require('../../src/config.mts').default;
 const { loadData } = require('../../src/services/dataLoader.mts');
 const { executeHybridSearch } = require('../../src/services/searchOrchestrator.mts');
 const { normalizeSearchText, MATCH_QUALITY_RANK } = require('../../src/utils/searchRanking.mts');

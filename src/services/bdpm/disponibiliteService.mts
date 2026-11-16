@@ -7,15 +7,14 @@ import { buildPagedResponse } from '../../utils/corpusPaging.mts';
 import { materializeIndices, materializeRange, rowCount } from '../../utils/corpusStore.mts';
 import { rankSearchResults, scoredSearch } from '../../utils/corpusSearch.mts';
 import { BDPM_INDEX_SPECS } from '../../search/indexSpecs.mts';
-import __cjs_______utils_disponibiliteQuery from '../../utils/disponibiliteQuery.js';
-const {
+import {
   rowMatchesDisponibiliteFilters,
   isDisponibiliteAlertId,
   mapRowToDisponibiliteAlert,
   compareDisponibiliteRowsByMajDesc
-} = __cjs_______utils_disponibiliteQuery;
+} from '../../utils/disponibiliteQuery.mts';
 import { resolveBdpmCisKeys } from '../searchOrchestrator.mts';
-import config from '../../config.js';
+import config from '../../config.mts';
 import { state } from './state.mts';
 
 const { corpus, metadata, searchIndexes } = state;

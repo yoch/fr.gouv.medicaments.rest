@@ -11,7 +11,7 @@ const {
   createMemorySampler,
   installLoadMemoryMarks,
   uninstallLoadMemoryMarks
-} = require('../../src/utils/memorySampler');
+} = require('../../src/utils/memorySampler.mts');
 const { frozenBreakdown } = require('./frozenBreakdown');
 
 function mb(bytes) {

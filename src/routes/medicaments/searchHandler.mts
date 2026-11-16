@@ -7,10 +7,23 @@ import { buildPagedResponse } from '../../utils/corpusPaging.mts';
 
 const router = express.Router();
 
-function pickCriterion(value) {
+function pickCriterion(value: unknown): string | null {
   if (value == null) return null;
   const trimmed = String(value).trim();
   return trimmed === '' ? null : trimmed;
+}
+
+function buildActiveCriteria(
+  dosage: string | null,
+  forme: string | null,
+  voie: string | null
+): Record<string, string> | undefined {
+  if (!dosage && !forme && !voie) return undefined;
+  const active: Record<string, string> = {};
+  if (dosage) active.dosage = dosage;
+  if (forme) active.forme = forme;
+  if (voie) active.voie = voie;
+  return active;
 }
 
 router.get('/search', (req, res) => {
@@ -20,18 +33,23 @@ router.get('/search', (req, res) => {
     return res.status(400).json({ error: 'Paramètre de recherche "q" requis' });
   }
 
+  const dosageValue = pickCriterion(dosage);
+  const formeValue = pickCriterion(forme);
+  const voieValue = pickCriterion(voie);
   const criteria = {
-    dosage: pickCriterion(dosage),
-    forme: pickCriterion(forme),
-    voie: pickCriterion(voie)
+    dosage: dosageValue,
+    forme: formeValue,
+    voie: voieValue
   };
+  const activeCriteria = buildActiveCriteria(dosageValue, formeValue, voieValue);
 
   const { results, total, search: searchMeta } = executeHybridSearchPage(
-    q,
+    String(q),
     source,
     page,
     limit,
-    criteria
+    criteria,
+    activeCriteria
   );
   const shaped = shapeSearchResults(results, { detail: normalizeDetail(detail) });
   const response = buildPagedResponse({
@@ -39,16 +57,9 @@ router.get('/search', (req, res) => {
     page,
     limit,
     metadata: getMetadata(),
-    materializePage: () => shaped
+    materializePage: () => shaped,
+    search: searchMeta
   });
-  response.search = searchMeta;
-
-  const activeCriteria = Object.fromEntries(
-    Object.entries(criteria).filter(([, value]) => value != null)
-  );
-  if (Object.keys(activeCriteria).length > 0) {
-    response.search.criteria = activeCriteria;
-  }
 
   if (normalizeFormat(format) === 'markdown') {
     const markdown = renderSearchMarkdown(response.data, response.pagination, searchMeta);

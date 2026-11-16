@@ -136,7 +136,7 @@ describe('pipeline ANMV fixture', () => {
 
   it('remplace le pool à chaque génération et partage les appels simultanés', async () => {
     await withProductsXml([], async ({ loadVetData, getMedicamentByNum }) => {
-      const { internPoolSize } = require('../src/utils/stringPool');
+      const { internPoolSize } = require('../src/utils/stringPool.mts');
       for (let cycle = 0; cycle < 3; cycle++) {
         fs.writeFileSync(path.join(process.env.VET_DATA_DIR, 'products.xml'),
           `<root><medicinal-product><num>1</num><nom>TEST</nom><maj-rcp>DATE_${cycle}</maj-rcp><modele-destine-vente><mod-vte><lib-mod>LIBELLE_${cycle}</lib-mod></mod-vte></modele-destine-vente></medicinal-product></root>`);
@@ -160,7 +160,7 @@ describe('pipeline ANMV fixture', () => {
       });
       await expect(loadVetData()).rejects.toThrow('token incomplet supérieur');
       expect(reader.destroyed).toBe(true);
-      expect(require('../src/utils/stringPool').internPoolSize()).toBe(0);
+      expect(require('../src/utils/stringPool.mts').internPoolSize()).toBe(0);
     });
   });
 });

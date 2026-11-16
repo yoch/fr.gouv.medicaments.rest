@@ -1,4 +1,4 @@
-import { normalizeSearchText, MATCH_QUALITY_RANK } from './searchRanking.mts';
+import { normalizeSearchText, matchQualityRank } from './searchRanking.mts';
 
 export interface DosageToken {
   amount: number;
@@ -23,28 +23,64 @@ export interface CriteriaScoreResult {
   dosage_extra: number | null;
 }
 
-// Facteur de conversion vers l'unité canonique (mg, ml, ui, %).
-const UNITS: Record<string, [number, string]> = {
-  mg: [1, 'mg'],
-  g: [1000, 'mg'],
-  gramme: [1000, 'mg'],
-  grammes: [1000, 'mg'],
-  ug: [0.001, 'mg'],
-  µg: [0.001, 'mg'],
-  μg: [0.001, 'mg'],
-  mcg: [0.001, 'mg'],
-  microgramme: [0.001, 'mg'],
-  microgrammes: [0.001, 'mg'],
-  ml: [1, 'ml'],
-  l: [1000, 'ml'],
-  ui: [1, 'ui'],
-  u: [1, 'ui'],
-  iu: [1, 'ui'],
-  unite: [1, 'ui'],
-  unites: [1, 'ui'],
-  '%': [1, '%'],
-  'pour cent': [1, '%']
-};
+function dosageUnitFactor(unit: string): number {
+  switch (unit) {
+    case 'mg':
+    case 'ml':
+    case 'ui':
+    case 'u':
+    case 'iu':
+    case 'unite':
+    case 'unites':
+    case '%':
+    case 'pour cent':
+      return 1;
+    case 'g':
+    case 'gramme':
+    case 'grammes':
+    case 'l':
+      return 1000;
+    case 'ug':
+    case 'µg':
+    case 'μg':
+    case 'mcg':
+    case 'microgramme':
+    case 'microgrammes':
+      return 0.001;
+    default:
+      return 0;
+  }
+}
+
+function dosageCanonicalUnit(unit: string): string {
+  switch (unit) {
+    case 'mg':
+    case 'g':
+    case 'gramme':
+    case 'grammes':
+    case 'ug':
+    case 'µg':
+    case 'μg':
+    case 'mcg':
+    case 'microgramme':
+    case 'microgrammes':
+      return 'mg';
+    case 'ml':
+    case 'l':
+      return 'ml';
+    case 'ui':
+    case 'u':
+    case 'iu':
+    case 'unite':
+    case 'unites':
+      return 'ui';
+    case '%':
+    case 'pour cent':
+      return '%';
+    default:
+      return '';
+  }
+}
 
 const UI_THOUSANDS = String.raw`(?<![\p{L}\d.,])\d{1,3}(?:[ \u00a0]\d{3})+(?=\s*(?:ui|iu|u|unites?)(?![\p{L}]))`;
 const DECIMAL = String.raw`\d+(?:[.,]\d+)?`;
@@ -59,17 +95,28 @@ function parseDosageTokens(value: unknown): DosageToken[] {
   if (!text) return [];
 
   const tokens: DosageToken[] = [];
-  for (const match of text.matchAll(DOSAGE_TOKEN_RE)) {
-    const amount = Number.parseFloat(match[1].replace(/[\s\u00a0]/g, '').replace(',', '.'));
-    const unit = UNITS[match[2].normalize('NFD').replace(/[\u0300-\u036f]/g, '')];
-    if (!Number.isFinite(amount) || !unit) continue;
-    const [factor, canonical] = unit;
-    if (match[3]) {
-      const perFactor = match[3] === 'l' ? 1000 : 1;
-      tokens.push({ amount: (amount * factor) / perFactor, unit: `${canonical}/ml` });
-    } else {
-      tokens.push({ amount: amount * factor, unit: canonical });
+  DOSAGE_TOKEN_RE.lastIndex = 0;
+  try {
+    let match: RegExpExecArray | null;
+    while ((match = DOSAGE_TOKEN_RE.exec(text)) !== null) {
+      const rawAmount = match[1];
+      const rawUnit = match[2];
+      if (!rawAmount || !rawUnit) continue;
+      const amount = Number.parseFloat(rawAmount.replace(/[\s\u00a0]/g, '').replace(',', '.'));
+      const normalizedUnit = rawUnit.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const factor = dosageUnitFactor(normalizedUnit);
+      const canonical = dosageCanonicalUnit(normalizedUnit);
+      if (!Number.isFinite(amount) || factor === 0 || !canonical) continue;
+      const denom = match[3];
+      if (denom) {
+        const perFactor = denom === 'l' ? 1000 : 1;
+        tokens.push({ amount: (amount * factor) / perFactor, unit: `${canonical}/ml` });
+      } else {
+        tokens.push({ amount: amount * factor, unit: canonical });
+      }
     }
+  } finally {
+    DOSAGE_TOKEN_RE.lastIndex = 0;
   }
   return tokens;
 }
@@ -179,8 +226,8 @@ interface RankableItem {
 }
 
 function compareByQualityThenBoost(a: RankableItem, b: RankableItem): number {
-  const rankA = MATCH_QUALITY_RANK[a.match_quality] || 0;
-  const rankB = MATCH_QUALITY_RANK[b.match_quality] || 0;
+  const rankA = matchQualityRank(a.match_quality);
+  const rankB = matchQualityRank(b.match_quality);
   if (rankB !== rankA) return rankB - rankA;
   const boostA = a.criteria_boost || 0;
   const boostB = b.criteria_boost || 0;
@@ -191,6 +238,12 @@ function compareByQualityThenBoost(a: RankableItem, b: RankableItem): number {
   return extraA < extraB ? -1 : 1;
 }
 
+interface RerankWrapper<T> extends RankableItem {
+  hit: T;
+  criteria_match: CriteriaMatchFlags;
+  _index: number;
+}
+
 function rerankWithStructuredCriteria<T extends Record<string, unknown> & RankableItem>(
   results: T[],
   criteria: SearchCriteria = {}
@@ -199,9 +252,16 @@ function rerankWithStructuredCriteria<T extends Record<string, unknown> & Rankab
     return results;
   }
 
-  const scored = results.map((hit, index) => {
+  const scored: RerankWrapper<T>[] = results.map((hit, index) => {
     const { boost, criteria_match, dosage_extra } = scoreStructuredCriteria(hit, criteria);
-    return { ...hit, criteria_boost: boost, criteria_match, _dosageExtra: dosage_extra, _index: index };
+    return {
+      hit,
+      match_quality: hit.match_quality,
+      criteria_boost: boost,
+      criteria_match,
+      _dosageExtra: dosage_extra,
+      _index: index
+    };
   });
 
   scored.sort((a, b) => {
@@ -210,7 +270,11 @@ function rerankWithStructuredCriteria<T extends Record<string, unknown> & Rankab
     return a._index - b._index;
   });
 
-  return scored.map(({ _index, _dosageExtra, ...hit }) => hit as unknown as T);
+  return scored.map((entry) => ({
+    ...entry.hit,
+    criteria_boost: entry.criteria_boost,
+    criteria_match: entry.criteria_match
+  }));
 }
 
 export {

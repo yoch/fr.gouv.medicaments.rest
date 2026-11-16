@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const { BDPM_SCHEMAS } = require('../../src/utils/corpusSchemas');
+const { BDPM_SCHEMAS } = require('../../src/utils/corpusSchemas.mts');
 
 function mb(bytes) {
   return Math.round((bytes / 1024 / 1024) * 1000) / 1000;

@@ -6,15 +6,16 @@ export interface ListPaging {
   offset: number;
 }
 
-export interface PagedResponseInput<T = unknown> {
+export interface PagedResponseInput<T = unknown, S = unknown> {
   total: number;
   page?: unknown;
   limit?: unknown;
   metadata: { last_updated: unknown; source: unknown };
   materializePage?: (offset: number, end: number) => T[];
+  search?: S;
 }
 
-export interface PagedResponse<T = unknown> {
+export interface PagedResponse<T = unknown, S = unknown> {
   data: T[];
   pagination: {
     total: number;
@@ -26,7 +27,7 @@ export interface PagedResponse<T = unknown> {
     last_updated: unknown;
     source: unknown;
   };
-  search?: Record<string, unknown>;
+  search?: S;
 }
 
 function parseListPaging(page: unknown, limit: unknown, maxLimit = MAX_LIST_LIMIT): ListPaging {
@@ -39,31 +40,33 @@ function parseListPaging(page: unknown, limit: unknown, maxLimit = MAX_LIST_LIMI
 /**
  * Construit l'enveloppe de réponse paginée standard `{ data, pagination, metadata }`.
  */
-function buildPagedResponse<T = unknown>({
+function buildPagedResponse<T = unknown, S = unknown>({
   total,
   page,
   limit,
   metadata,
-  materializePage
-}: PagedResponseInput<T>): PagedResponse<T> {
+  materializePage,
+  search
+}: PagedResponseInput<T, S>): PagedResponse<T, S> {
   const { safePage, safeLimit, offset } = parseListPaging(page, limit);
   const safeTotal = Math.max(0, total | 0);
   const end = Math.min(offset + safeLimit, safeTotal);
   const data = materializePage ? materializePage(offset, end) : [];
 
-  return {
-    data,
-    pagination: {
-      total: safeTotal,
-      page: safePage,
-      limit: safeLimit,
-      pages: Math.ceil(safeTotal / safeLimit) || 0
-    },
-    metadata: {
-      last_updated: metadata.last_updated,
-      source: metadata.source
-    }
+  const pagination = {
+    total: safeTotal,
+    page: safePage,
+    limit: safeLimit,
+    pages: Math.ceil(safeTotal / safeLimit) || 0
   };
+  const responseMetadata = {
+    last_updated: metadata.last_updated,
+    source: metadata.source
+  };
+
+  return search !== undefined
+    ? { data, pagination, metadata: responseMetadata, search }
+    : { data, pagination, metadata: responseMetadata };
 }
 
 export {

@@ -31,8 +31,8 @@ async function abandon(port) {
 }
 (async()=>{
   if (!global.gc) throw new Error('--expose-gc requis');
-  await require(root+'/src/services/dataLoader').loadData();
-  const {createApp} = require(root+'/src/app');
+  await require(root + '/src/services/dataLoader.mts').loadData();
+  const {createApp} = require(root + '/src/app.mts');
   let app=createApp();
   let server=app.listen(0,'127.0.0.1');
   try {

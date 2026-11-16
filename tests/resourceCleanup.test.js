@@ -26,7 +26,7 @@ describe('fermeture des ressources', () => {
       writer = originalWrite(...args);
       return writer;
     });
-    helpers = require('../src/services/download/syncHelpers');
+    helpers = require('../src/services/download/syncHelpers.mts');
     jest.spyOn(console, 'log').mockImplementation(() => {});
   });
 
@@ -126,7 +126,7 @@ describe('fermeture des ressources', () => {
     const exists = fs.existsSync;
     jest.spyOn(fs, 'existsSync').mockImplementation(file => String(file).endsWith('.txt') || exists(file));
     jest.spyOn(fs, 'createReadStream').mockReturnValue(source);
-    jest.spyOn(require('../src/utils/frozenMiniSearch'), 'buildFrozenIndexFromAsyncIterable')
+    jest.spyOn(require('../src/utils/frozenMiniSearch.mts'), 'buildFrozenIndexFromAsyncIterable')
       .mockRejectedValue(new Error('index failed'));
     await expect(require('../src/services/dataLoader.mts').loadData()).rejects.toThrow('index failed');
     expect(source.destroyed).toBe(true);

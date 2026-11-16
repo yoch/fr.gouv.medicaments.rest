@@ -13,8 +13,8 @@ describe('cycle de vie du serveur', () => {
     downloadVet = jest.fn().mockResolvedValue({ changed: false });
     loadBdpm = jest.fn().mockResolvedValue(undefined);
     loadVet = jest.fn().mockResolvedValue(undefined);
-    jest.doMock('../src/services/dataDownloader', () => ({ downloadDataIfNeeded: downloadBdpm }));
-    jest.doMock('../src/services/vetDataDownloader', () => ({ downloadVetDataIfNeeded: downloadVet }));
+    jest.doMock('../src/services/dataDownloader.mts', () => ({ downloadDataIfNeeded: downloadBdpm }));
+    jest.doMock('../src/services/vetDataDownloader.mts', () => ({ downloadVetDataIfNeeded: downloadVet }));
     jest.doMock('../src/services/dataLoader.mts', () => ({ loadData: loadBdpm }));
     jest.doMock('../src/services/vetDataLoader.mts', () => ({ loadVetData: loadVet }));
     jest.spyOn(console, 'log').mockImplementation(() => {});
@@ -24,23 +24,30 @@ describe('cycle de vie du serveur', () => {
     if (running) await running.stop();
     running = null;
     jest.restoreAllMocks();
-    for (const module of ['config', 'services/dataDownloader', 'services/vetDataDownloader', 'services/dataLoader.mts', 'services/vetDataLoader.mts']) {
+    for (const module of ['config.mts', 'services/dataDownloader.mts', 'services/vetDataDownloader.mts', 'services/dataLoader.mts', 'services/vetDataLoader.mts']) {
       jest.dontMock(`../src/${module}`);
     }
     jest.resetModules();
   });
 
   function configure(overrides = {}) {
-    jest.doMock('../src/config', () => ({
-      ...jest.requireActual('../src/config'), port: 0, enableRateLimit: false,
-      vetLoadDeferred: false, vetLoadDelayMs: 0, ...overrides
+    jest.doMock('../src/config.mts', () => ({
+      __esModule: true,
+      default: {
+        ...jest.requireActual('../src/config.mts').default,
+        port: 0,
+        enableRateLimit: false,
+        vetLoadDeferred: false,
+        vetLoadDelayMs: 0,
+        ...overrides
+      }
     }));
   }
 
   test('partage le démarrage et un rafraîchissement bloqué puis libère les timers et le serveur', async () => {
     configure();
     const timers = jest.spyOn(global, 'setTimeout');
-    const { startServer } = require('../src/server');
+    const { startServer } = require('../src/server.mts');
     const first = startServer();
     expect(startServer()).toBe(first);
     running = await first;
@@ -71,7 +78,7 @@ describe('cycle de vie du serveur', () => {
 
   test('annule le chargement différé et les rafraîchissements qui attendent ce chargement', async () => {
     configure({ vetLoadDeferred: true, vetLoadDelayMs: 60000 });
-    running = await require('../src/server').startServer();
+    running = await require('../src/server.mts').startServer();
     const refresh = running.refreshVet();
     await running.stop();
     await refresh;
@@ -84,7 +91,7 @@ describe('cycle de vie du serveur', () => {
     let release;
     const gate = new Promise(resolve => { release = resolve; });
     downloadVet.mockImplementationOnce(() => gate);
-    running = await require('../src/server').startServer();
+    running = await require('../src/server.mts').startServer();
     const refresh = running.refreshVet();
     expect(running.refreshVet()).toBe(refresh);
     await Promise.resolve();
@@ -99,7 +106,7 @@ describe('cycle de vie du serveur', () => {
     configure({ enableRateLimit: true });
     const { MemoryStore } = require('express-rate-limit');
     const shutdown = jest.spyOn(MemoryStore.prototype, 'shutdown');
-    running = await require('../src/server').startServer();
+    running = await require('../src/server.mts').startServer();
     expect(shutdown).not.toHaveBeenCalled();
     await running.stop();
     expect(shutdown).toHaveBeenCalledTimes(1);
@@ -114,7 +121,7 @@ describe('cycle de vie du serveur', () => {
       const shutdown = jest.spyOn(MemoryStore.prototype, 'shutdown');
       const exit = jest.spyOn(process, 'exit').mockImplementation(() => {});
       jest.spyOn(console, 'error').mockImplementation(() => {});
-      await require('../src/server').startServer();
+      await require('../src/server.mts').startServer();
       expect(exit).toHaveBeenCalledWith(1);
       expect(shutdown).toHaveBeenCalledTimes(1);
     } finally {

@@ -14,6 +14,27 @@ const {
 function esmToCjsPlugin() {
   return {
     visitor: {
+      MetaProperty(metaPath) {
+        if (metaPath.node.meta.name === 'import' && metaPath.node.property.name === 'meta') {
+          metaPath.replaceWith(
+            t.objectExpression([
+              t.objectProperty(
+                t.identifier('url'),
+                t.memberExpression(
+                  t.callExpression(
+                    t.memberExpression(
+                      t.callExpression(t.identifier('require'), [t.stringLiteral('node:url')]),
+                      t.identifier('pathToFileURL')
+                    ),
+                    [t.identifier('__filename')]
+                  ),
+                  t.identifier('href')
+                )
+              )
+            ])
+          );
+        }
+      },
       Program: {
         exit(path) {
           if (!isModule(path)) return;

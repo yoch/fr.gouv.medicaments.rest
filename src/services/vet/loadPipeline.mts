@@ -5,19 +5,15 @@
  * `vetDataLoader.js` (façade).
  */
 
-import fs from 'fs';
-import path from 'path';
-import __cjs_______utils_frozenMiniSearch from '../../utils/frozenMiniSearch.js';
-const { buildFrozenIndexFromRows } = __cjs_______utils_frozenMiniSearch;
-import __cjs_______utils_streamMedicinalProductsXml from '../../utils/streamMedicinalProductsXml.js';
-const { streamMedicinalProducts } = __cjs_______utils_streamMedicinalProductsXml;
-import __cjs_______utils_vetXmlParser from '../../utils/vetXmlParser.js';
-const {
+import fs from 'node:fs';
+import path from 'node:path';
+import { buildFrozenIndexFromRows } from '../../utils/frozenMiniSearch.mts';
+import { streamMedicinalProducts } from '../../utils/streamMedicinalProductsXml.mts';
+import {
   defaultProductParser,
   parseProductBlock
-} = __cjs_______utils_vetXmlParser;
-import __cjs_______utils_memorySampler from '../../utils/memorySampler.js';
-const { loadMemoryMark } = __cjs_______utils_memorySampler;
+} from '../../utils/vetXmlParser.mts';
+import { loadMemoryMark } from '../../utils/memorySampler.mts';
 import {
   clearCorpus,
   push,
@@ -26,17 +22,12 @@ import {
   buildIndexDocument
 } from '../../utils/corpusStore.mts';
 import { miniSearchIndexConfig } from '../../utils/miniSearchIndexConfig.mts';
-import __cjs_______models_vet from '../../models/vet/index.js';
-const { MedicamentVet, CompositionVet, PresentationVet } = __cjs_______models_vet;
-import __cjs_______models_tempsAttente from '../../models/tempsAttente.js';
-const { TempsAttenteEntry } = __cjs_______models_tempsAttente;
-import __cjs_______utils_stringPool from '../../utils/stringPool.js';
-const { intern, withInternPool } = __cjs_______utils_stringPool;
-import __cjs_______utils_textCleanup from '../../utils/textCleanup.js';
-const { cleanText } = __cjs_______utils_textCleanup;
-import __cjs_______utils_singleFlight from '../../utils/singleFlight.js';
-const { singleFlight } = __cjs_______utils_singleFlight;
-import config from '../../config.js';
+import { MedicamentVet, CompositionVet, PresentationVet } from '../../models/vet/index.mts';
+import { TempsAttenteEntry } from '../../models/tempsAttente.mts';
+import { intern, withInternPool } from '../../utils/stringPool.mts';
+import { cleanText } from '../../utils/textCleanup.mts';
+import { singleFlight } from '../../utils/singleFlight.mts';
+import config from '../../config.mts';
 import { VET_INDEX_SPECS } from '../../search/indexSpecs.mts';
 import { state as state } from './state.mts';
 

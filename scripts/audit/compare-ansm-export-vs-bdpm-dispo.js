@@ -15,7 +15,7 @@
 const fs = require('fs');
 const path = require('path');
 const XLSX = require('xlsx');
-const { normalizeAnsmUrl } = require('../../src/utils/ansmUrl');
+const { normalizeAnsmUrl } = require('../../src/utils/ansmUrl.mts');
 
 const ROOT_DIR = path.resolve(__dirname, '../..');
 const AUDIT_DIR = path.join(ROOT_DIR, 'tmp/audit');

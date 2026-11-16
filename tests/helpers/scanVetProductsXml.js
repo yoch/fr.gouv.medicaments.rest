@@ -1,9 +1,9 @@
-const { streamMedicinalProducts } = require('../../src/utils/streamMedicinalProductsXml');
+const { streamMedicinalProducts } = require('../../src/utils/streamMedicinalProductsXml.mts');
 const {
   createVetProductBlockParser,
   parseProductBlock,
   VET_SKIP_SCAN_TAGS
-} = require('../../src/utils/vetXmlParser');
+} = require('../../src/utils/vetXmlParser.mts');
 
 const scanParser = createVetProductBlockParser(VET_SKIP_SCAN_TAGS);
 

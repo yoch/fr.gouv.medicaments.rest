@@ -14,9 +14,9 @@
  */
 
 const { loadData, getBdpmCorpusStats } = require('../../src/services/dataLoader.mts');
-const { BDPM_RECORD_CLASSES } = require('../../src/models/bdpm');
-const { internPoolSize } = require('../../src/utils/stringPool');
-const { BDPM_LOW_CARDINALITY_FIELDS } = require('../../src/utils/bdpmInterning');
+const { BDPM_RECORD_CLASSES } = require('../../src/models/bdpm/index.mts');
+const { internPoolSize } = require('../../src/utils/stringPool.mts');
+const { BDPM_LOW_CARDINALITY_FIELDS } = require('../../src/utils/bdpmInterning.mts');
 
 const MIN_COPIES_FOR_INTERN = 20;
 const MAX_DISTINCT_RATIO = 0.05;

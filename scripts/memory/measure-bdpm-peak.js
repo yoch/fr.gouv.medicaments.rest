@@ -14,7 +14,7 @@ const {
   createMemorySampler,
   installLoadMemoryMarks,
   uninstallLoadMemoryMarks
-} = require('../../src/utils/memorySampler');
+} = require('../../src/utils/memorySampler.mts');
 
 const forceGcAtEnd = process.argv.includes('--gc-at-end');
 

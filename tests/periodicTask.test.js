@@ -1,6 +1,6 @@
 'use strict';
 
-const { startPeriodicTask } = require('../src/utils/periodicTask');
+const { startPeriodicTask } = require('../src/utils/periodicTask.mts');
 
 describe('rafraîchissements séquentiels', () => {
   beforeEach(() => jest.useFakeTimers());

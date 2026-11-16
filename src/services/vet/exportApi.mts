@@ -4,8 +4,7 @@
  * `src/scripts/export-corpus-documents.js` — hors chemin runtime.
  */
 
-import __cjs_______utils_frozenMiniSearch from '../../utils/frozenMiniSearch.js';
-const { exportFrozenIndexes } = __cjs_______utils_frozenMiniSearch;
+import { exportFrozenIndexes } from '../../utils/frozenMiniSearch.mts';
 import {
   exportCorpusDocuments,
   buildDatasetsFromSpecs

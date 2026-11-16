@@ -1,6 +1,6 @@
 'use strict';
 
-const { intern, internPoolSize, clearInternPool, withInternPool } = require('../src/utils/stringPool');
+const { intern, internPoolSize, clearInternPool, withInternPool } = require('../src/utils/stringPool.mts');
 
 afterEach(clearInternPool);
 

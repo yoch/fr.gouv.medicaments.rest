@@ -1,9 +1,9 @@
 'use strict';
 
-const { BDPM_SCHEMAS } = require('../src/utils/corpusSchemas');
-const { BDPM_LOW_CARDINALITY_FIELDS } = require('../src/utils/bdpmInterning');
-const { Presentation } = require('../src/models/bdpm');
-const { clearInternPool } = require('../src/utils/stringPool');
+const { BDPM_SCHEMAS } = require('../src/utils/corpusSchemas.mts');
+const { BDPM_LOW_CARDINALITY_FIELDS } = require('../src/utils/bdpmInterning.mts');
+const { Presentation } = require('../src/models/bdpm/index.mts');
+const { clearInternPool } = require('../src/utils/stringPool.mts');
 const { DOLIPRANE_8CP_JSON } = require('./fixtures/cis-cip-samples');
 
 describe('bdpmInterning', () => {

@@ -5,9 +5,9 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const { downloadFile } = require('../src/services/download/syncHelpers');
-const { fetchRemoteFingerprint } = require('../src/utils/remoteFileProbe');
-const { describeError } = require('../src/utils/httpErrors');
+const { downloadFile } = require('../src/services/download/syncHelpers.mts');
+const { fetchRemoteFingerprint } = require('../src/utils/remoteFileProbe.mts');
+const { describeError } = require('../src/utils/httpErrors.mts');
 
 let dir;
 let server;

@@ -26,7 +26,7 @@ async function runCase(name) {
       process.env.VET_DICT_FILE = 'dict.xml';
       fs.writeFileSync(path.join(temp, 'dict.xml'), '<root/>');
       const { loadVetData } = require('../../src/services/vetDataLoader.mts');
-      const { internPoolSize, clearInternPool } = require('../../src/utils/stringPool');
+      const { internPoolSize, clearInternPool } = require('../../src/utils/stringPool.mts');
       const { state } = require('../../src/services/vet/state.mts');
       result.cycles = [];
       for (let cycle = 0; cycle < 3; cycle++) {
@@ -63,7 +63,7 @@ async function runCase(name) {
         return sink;
       };
       if (name === 'download-directory-error') extra.ensureDir = async () => { throw new Error('AUDIT_DIRECTORY_FAILURE'); };
-      const { downloadFile } = require('../../src/services/download/syncHelpers');
+      const { downloadFile } = require('../../src/services/download/syncHelpers.mts');
       let status = 'pending';
       const download = downloadFile('http://audit.invalid/local-mock', path.join(temp, 'file'));
       download.then(() => { status = 'resolved'; }, error => { status = `rejected: ${error.message}`; });
@@ -123,16 +123,16 @@ async function runCase(name) {
         require(modulePath);
         require.cache[resolved].exports = exports;
       }
-      replace('../../src/services/dataDownloader', { downloadDataIfNeeded: () => {
+      replace('../../src/services/dataDownloader.mts', { downloadDataIfNeeded: () => {
         bdpmCalls++;
         return bdpmCalls === 1 ? Promise.resolve({ changed: false }) : new Promise(resolve => {
           releaseDownload = () => resolve({ changed: false });
         });
       } });
-      replace('../../src/services/vetDataDownloader', { downloadVetDataIfNeeded: async () => ({ changed: false }) });
+      replace('../../src/services/vetDataDownloader.mts', { downloadVetDataIfNeeded: async () => ({ changed: false }) });
       replace('../../src/services/dataLoader.mts', { loadData: async () => {} });
       replace('../../src/services/vetDataLoader.mts', { loadVetData: async () => {} });
-      replace('../../src/app', { createApp: () => ({ listen() {
+      replace('../../src/app.mts', { createApp: () => ({ listen() {
         const server = new (require('node:events').EventEmitter)();
         server.listening = true;
         server.close = callback => { server.listening = false; callback(); };
@@ -142,7 +142,7 @@ async function runCase(name) {
       const originalTimeout = global.setTimeout;
       global.setTimeout = () => ({ unref() {} });
       cleanups.push(() => { global.setTimeout = originalTimeout; });
-      const running = await require('../../src/server').startServer();
+      const running = await require('../../src/server.mts').startServer();
       const first = running.refreshBdpm();
       const shared = [running.refreshBdpm(), running.refreshBdpm()].every(promise => promise === first);
       await Promise.resolve();
@@ -154,7 +154,7 @@ async function runCase(name) {
     } else if (name === 'timer-overflow') {
       process.env.BDPM_CHECK_INTERVAL_HOURS = '597';
       try {
-        require('../../src/config');
+        require('../../src/config.mts');
         result.configuration_rejected = false;
       } catch (error) {
         Object.assign(result, { configuration_rejected: true, error: error.message });
@@ -174,7 +174,7 @@ async function runCase(name) {
       // Loopback uniquement ; conserver le proxy pour tout accès externe.
       process.env.NO_PROXY = [process.env.NO_PROXY, '127.0.0.1'].filter(Boolean).join(',');
       const before = process.memoryUsage();
-      const fingerprint = await require('../../src/utils/remoteFileProbe').fetchRemoteFingerprint(`http://127.0.0.1:${server.address().port}/file`);
+      const fingerprint = await require('../../src/utils/remoteFileProbe.mts').fetchRemoteFingerprint(`http://127.0.0.1:${server.address().port}/file`);
       Object.assign(result, { payload_bytes: payloadBytes, fingerprint, before, after: process.memoryUsage() });
     } else throw new Error(`Cas inconnu: ${name}`);
     return result;

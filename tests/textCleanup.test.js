@@ -1,6 +1,6 @@
 'use strict';
 
-const { cleanText } = require('../src/utils/textCleanup');
+const { cleanText } = require('../src/utils/textCleanup.mts');
 
 describe('cleanText', () => {
   it('renvoie la même chaîne quand il n’y a rien à corriger', () => {

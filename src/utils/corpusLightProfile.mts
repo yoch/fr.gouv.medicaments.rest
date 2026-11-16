@@ -1,4 +1,4 @@
-import config from '../config.js';
+import config from '../config.mts';
 
 /**
  * Profil corpus allégé : ne pas charger en RAM certains champs peu utiles aux agents —

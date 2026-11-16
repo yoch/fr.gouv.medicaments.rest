@@ -1,7 +1,7 @@
 'use strict';
 
-const { Presentation, Composition } = require('../src/models/bdpm');
-const { MedicamentVet } = require('../src/models/vet');
+const { Presentation, Composition } = require('../src/models/bdpm/index.mts');
+const { MedicamentVet } = require('../src/models/vet/index.mts');
 const {
   DOLIPRANE_8CP_TSV,
   DOLIPRANE_8CP_JSON,
@@ -26,9 +26,9 @@ describe('corpusLightProfile', () => {
     jest.resetModules();
     return {
       light: require('../src/utils/corpusLightProfile.mts'),
-      Presentation: require('../src/models/bdpm').Presentation,
-      Composition: require('../src/models/bdpm').Composition,
-      MedicamentVet: require('../src/models/vet').MedicamentVet,
+      Presentation: require('../src/models/bdpm/index.mts').Presentation,
+      Composition: require('../src/models/bdpm/index.mts').Composition,
+      MedicamentVet: require('../src/models/vet/index.mts').MedicamentVet,
       parsePresentationTsv: require('./helpers/bdpmPresentation').parsePresentationTsv,
       isPlausibleCip13: require('./helpers/bdpmPresentation').isPlausibleCip13
     };

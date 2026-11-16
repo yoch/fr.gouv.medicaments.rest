@@ -7,10 +7,9 @@ import {
   getMedicamentByNum,
   getRelatedByNum
 } from '../services/vetDataLoader.mts';
-import config from '../config.js';
+import config from '../config.mts';
 import { createListHandler } from '../utils/routeHelpers.mts';
-import __cjs____utils_validateSearchQuery from '../utils/validateSearchQuery.js';
-const { validateSearchQuery } = __cjs____utils_validateSearchQuery;
+import { validateSearchQuery } from '../utils/validateSearchQuery.mts';
 
 // Annotations OpenAPI dans `veterinaires.swagger.js` (scannées par swagger-jsdoc).
 import './veterinaires.swagger.js';
