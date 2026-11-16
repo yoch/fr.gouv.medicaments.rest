@@ -7,12 +7,25 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+## [1.8.0] - 2026-11-16
+
 ### Ajouté
 
 - `GET /health` expose désormais `version` (lue dans `package.json`), pour savoir quelle version tourne en production.
+- Modes de recherche optionnels sur `GET /api/medicaments/search`, via le paramètre `mode` : `legacy` (défaut, comportement inchangé), `structured` (B1) et `concepts` (B2). Sans `mode`, la requête suit le chemin existant. Une valeur inconnue renvoie une erreur 400.
+  - `structured` extrait dosage, forme et voie de `q`, donne la priorité aux paramètres explicites (conflits tracés dans `search.parsed.conflicts`), renvoie `criteria_status` par fiche et s'abstient (`search.abstained`) sur les contraintes négatives ou cliniques que le corpus ne peut pas résoudre.
+  - `concepts` ajoute à `structured` une résolution par concepts (substances actives, groupes génériques, synonymes galéniques et voies, espèces vétérinaires, conversions de concentration vérifiées). Aucun index vectoriel ni modèle externe n'est chargé.
+  - Détails, champs de réponse et limites connues : `API_REFERENCE.md` et `docs/AGENT_BDPM_SEARCH.md`.
+- Variable d'environnement `SEARCH_WARMUP_MODE` (`legacy` par défaut, `structured`, `concepts`) : préchauffe les structures du mode choisi au chargement des données. Elle ne limite pas les modes appelables par requête ; un mode non préchauffé se construit au premier appel. Exposée dans `GET /config` (`search_warmup_mode`).
+- Intégration continue GitHub Actions (`.github/workflows/ci.yml`), avec un job manuel pour les suites qui dépendent du corpus BDPM/ANMV externe.
+
+### Modifié
+
+- Dépendances directes : `@yoch/frozenminisearch` 1.13.0, `express-rate-limit` 8.7.4, `fast-xml-parser` 5.12.1, `knip` 6.45.1 et `supertest` 7.3.2, avec leurs dépendances transitives dans les plages déclarées.
 
 ### Sécurité
 
+- `fast-xml-parser` 5.12.1 corrige [GHSA-474x-hrwr-fgx4](https://github.com/advisories/GHSA-474x-hrwr-fgx4) (consommation CPU quadratique sur des balises `stop-node` non terminées). Dépendance de développement uniquement.
 - Outils de développement : `overrides` npm forçant `glob` 14.0.3 ([GHSA-3g3m-2fjr-6pw4](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)) et `minimatch` 11.0.3 ([GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249)) sous Jest et `swagger-jsdoc`, qui déclarent encore des versions vulnérables. `npm audit` passe de 20 alertes à 5 alertes faibles sur `deepmerge` ([GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4), sans version corrigée, limité à la lecture de la configuration Jest). Aucune dépendance de production n'était concernée. Retirer ces `overrides` quand Jest et `swagger-jsdoc` auront mis leurs dépendances à jour.
 
 ## [1.7.3] - 2026-11-01
@@ -260,7 +273,8 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 API REST sur la base BDPM (projet d’origine de Mathieu Vedie, puis fork et évolutions maintenues sur ce dépôt).
 
-[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.3...HEAD
+[Non publié]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.3...v1.8.0
 [1.7.3]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.2...v1.7.3
 [1.7.2]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/yoch/fr.gouv.medicaments.rest/compare/v1.7.0...v1.7.1
