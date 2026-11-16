@@ -1,9 +1,7 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const { buildIndexDocument } = require('./corpusStore');
-const { miniSearchIndexConfig } = require('./miniSearchIndexConfig');
+import fs from 'fs';
+import path from 'path';
+import { buildIndexDocument } from './corpusStore.mts';
+import { miniSearchIndexConfig } from './miniSearchIndexConfig.mts';
 
 /**
  * Écrit un tableau de lignes en JSONL (un objet JSON par ligne).
@@ -32,9 +30,13 @@ function writeJsonl(filePath, rows, mapRow) {
  *     n'exporte que les types indexés ; vet exporte aussi presentations non-indexé)
  *   - `searchIndexes` : requis si `onlyIndexed` (map type → frozen index)
  */
-function buildDatasetsFromSpecs(corpus, specs, options = {}) {
+function buildDatasetsFromSpecs(
+  corpus: Record<string, unknown[]>,
+  specs: Record<string, { fields: string[]; boost?: Record<string, number> }>,
+  options: { onlyIndexed?: boolean; searchIndexes?: Record<string, unknown> } = {}
+) {
   const { onlyIndexed = false, searchIndexes = {} } = options;
-  const datasets = [];
+  const datasets: Array<Record<string, unknown>> = [];
 
   for (const [type, spec] of Object.entries(specs)) {
     const rows = corpus[type];
@@ -92,7 +94,7 @@ function exportCorpusDocuments(datasets, outDir, prefix, manifestExtra = {}) {
   return manifest;
 }
 
-module.exports = {
-  buildDatasetsFromSpecs,
+export {
+buildDatasetsFromSpecs,
   exportCorpusDocuments
 };

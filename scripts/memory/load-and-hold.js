@@ -78,7 +78,7 @@ function settleCheckpoints(totalMs) {
 (async () => {
   emit('runtime', { runtime: runtimeInfo() });
 
-  const { loadData, search } = require('../../src/services/dataLoader');
+  const { loadData, search } = require('../../src/services/dataLoader.mts');
   emit('bdpm_start');
   const bdpmT0 = Date.now();
   await loadData();
@@ -90,7 +90,7 @@ function settleCheckpoints(totalMs) {
     emit('vet_gap_done');
   }
 
-  const { loadVetData, searchVet } = require('../../src/services/vetDataLoader');
+  const { loadVetData, searchVet } = require('../../src/services/vetDataLoader.mts');
   emit('vet_start');
   const vetT0 = Date.now();
   await loadVetData();

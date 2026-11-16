@@ -1,19 +1,18 @@
-'use strict';
-
 /**
  * Export des index FrozenMiniSearch et documents corpus BDPM.
  * Utilisé par `src/scripts/export-search-indexes.js` et
  * `src/scripts/export-corpus-documents.js` — hors chemin runtime.
  */
 
-const { exportFrozenIndexes } = require('../../utils/frozenMiniSearch');
-const {
+import __cjs_______utils_frozenMiniSearch from '../../utils/frozenMiniSearch.js';
+const { exportFrozenIndexes } = __cjs_______utils_frozenMiniSearch;
+import {
   exportCorpusDocuments,
   buildDatasetsFromSpecs
-} = require('../../utils/exportCorpusDocuments');
-const { BDPM_INDEX_SPECS } = require('../../search/indexSpecs');
-const config = require('../../config');
-const state = require('./state');
+} from '../../utils/exportCorpusDocuments.mts';
+import { BDPM_INDEX_SPECS } from '../../search/indexSpecs.mts';
+import config from '../../config.js';
+import { state } from './state.mts';
 
 function exportBdpmSearchIndexes(outDir) {
   return exportFrozenIndexes(state.searchIndexes, outDir, 'bdpm', {
@@ -37,4 +36,6 @@ function exportBdpmCorpusDocuments(outDir) {
   });
 }
 
-module.exports = { exportBdpmSearchIndexes, exportBdpmCorpusDocuments };
+export {
+exportBdpmSearchIndexes, exportBdpmCorpusDocuments
+};

@@ -1,18 +1,17 @@
-'use strict';
-
 /**
  * Export des index FrozenMiniSearch et documents corpus vétérinaire.
  * Utilisé par `src/scripts/export-search-indexes.js` et
  * `src/scripts/export-corpus-documents.js` — hors chemin runtime.
  */
 
-const { exportFrozenIndexes } = require('../../utils/frozenMiniSearch');
-const {
+import __cjs_______utils_frozenMiniSearch from '../../utils/frozenMiniSearch.js';
+const { exportFrozenIndexes } = __cjs_______utils_frozenMiniSearch;
+import {
   exportCorpusDocuments,
   buildDatasetsFromSpecs
-} = require('../../utils/exportCorpusDocuments');
-const { VET_INDEX_SPECS } = require('../../search/indexSpecs');
-const state = require('./state');
+} from '../../utils/exportCorpusDocuments.mts';
+import { VET_INDEX_SPECS } from '../../search/indexSpecs.mts';
+import { state as state } from './state.mts';
 
 function exportVetSearchIndexes(outDir) {
   return exportFrozenIndexes(state.searchIndexes, outDir, 'vet', {
@@ -21,17 +20,19 @@ function exportVetSearchIndexes(outDir) {
   });
 }
 
-function exportVetCorpusDocuments(outDir) {
-  const datasets = buildDatasetsFromSpecs(state.corpus, VET_INDEX_SPECS);
+function exportVetCorpusDocuments(outDir: string) {
+  const datasets: Array<Record<string, unknown>> = buildDatasetsFromSpecs(state.corpus, VET_INDEX_SPECS);
   // Presentations vet : non indexées (pas dans VET_INDEX_SPECS), exportées
   // sans indexOptions pour reindexation côté consommateur.
   if (state.corpus.presentations.length > 0) {
     datasets.push({ type: 'presentations', rows: state.corpus.presentations });
   }
-  return exportCorpusDocuments(datasets, outDir, 'vet', {
+  return exportCorpusDocuments(datasets as any, outDir, 'vet', {
     last_updated: state.metadata.last_updated,
     source: state.metadata.source
   });
 }
 
-module.exports = { exportVetSearchIndexes, exportVetCorpusDocuments };
+export {
+exportVetSearchIndexes, exportVetCorpusDocuments
+};

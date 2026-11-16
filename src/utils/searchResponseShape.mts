@@ -12,7 +12,7 @@ function extractSubstances(compositions, isVet) {
       const key = `${denomination}\0${dosage}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      const entry = { denomination };
+      const entry: Record<string, unknown> = { denomination };
       if (dosage) entry.dosage = dosage;
       result.push(entry);
     } else {
@@ -32,8 +32,8 @@ function extractSubstances(compositions, isVet) {
   return result;
 }
 
-function shapeHumanPresentation(p) {
-  const out = { libelle: p.libelle };
+function shapeHumanPresentation(p: Record<string, unknown>) {
+  const out: Record<string, unknown> = { libelle: p.libelle };
   if (p.cip13) out.cip13 = p.cip13;
   if (p.taux_remboursement) out.taux_remboursement = p.taux_remboursement;
   if (p.etat_commercialisation) out.etat_commercialisation = p.etat_commercialisation;
@@ -41,10 +41,10 @@ function shapeHumanPresentation(p) {
   return out;
 }
 
-function shapeVetPresentation(p) {
-  const out = { libelle: p.libelle };
+function shapeVetPresentation(p: Record<string, unknown>) {
+  const out: Record<string, unknown> = { libelle: p.libelle };
   if (p.gtin) out.gtin = p.gtin;
-  if (p.conditions_delivrance && p.conditions_delivrance.length > 0) {
+  if (Array.isArray(p.conditions_delivrance) && p.conditions_delivrance.length > 0) {
     out.conditions_delivrance = p.conditions_delivrance;
   }
   return out;
@@ -83,7 +83,7 @@ function shapeVetSummary(hit) {
     .slice(0, MAX_SUMMARY_PRESENTATIONS)
     .map(shapeVetPresentation);
 
-  const shaped = {
+  const shaped: Record<string, unknown> = {
     type: hit.type,
     num: hit.num,
     nom: hit.nom,
@@ -115,7 +115,7 @@ function normalizeDetail(detail) {
   return 'full';
 }
 
-function shapeSearchHit(hit, options = {}) {
+function shapeSearchHit(hit: Record<string, unknown>, options: { detail?: string } = {}) {
   const detail = normalizeDetail(options.detail);
   if (detail === 'full') {
     if (hit.criteria_boost != null) {
@@ -130,12 +130,12 @@ function shapeSearchHit(hit, options = {}) {
   return shapeHumanSummary(hit);
 }
 
-function shapeSearchResults(results, options = {}) {
+function shapeSearchResults(results: Array<Record<string, unknown>>, options: { detail?: string } = {}) {
   return results.map((hit) => shapeSearchHit(hit, options));
 }
 
-module.exports = {
-  shapeSearchHit,
+export {
+shapeSearchHit,
   shapeSearchResults,
   normalizeDetail,
   extractSubstances

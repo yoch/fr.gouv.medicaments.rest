@@ -1,17 +1,31 @@
-'use strict';
+import { createCorpus, type Corpus, type CorpusRecordLike } from '../../utils/corpusStore.mts';
+import type { SearchIndexLike } from '../../utils/corpusSearch.mts';
 
-/**
- * État mutable partagé du domaine BDPM : corpus, index de recherche, index
- * par CIS, metadata. Centralisé ici pour permettre aux sous-modules
- * (loadPipeline, exportApi) de partager la même source de vérité.
- *
- * Objet unique à propriétés mutables — pas de getters/setters partiels.
- * Le reset synchrone invalide les index avant le rechargement progressif.
- */
+export interface BdpmState {
+  corpus: Record<string, Corpus<CorpusRecordLike>>;
+  metadata: {
+    last_updated: string | null;
+    source: string;
+  };
+  searchIndexes: Record<string, SearchIndexLike | null>;
+  cisIndexes: {
+    specialitesByCis: Map<string, number>;
+    presentationsByCis: Map<string, number[]>;
+    compositionsByCis: Map<string, number[]>;
+    avisSmrByCis: Map<string, number[]>;
+    avisAsmrByCis: Map<string, number[]>;
+    conditionsByCis: Map<string, number[]>;
+    rupturesByCis: Map<string, number[]>;
+    generiquesByCis: Map<string, number[]>;
+    generiquesByGroupe: Map<string, number[]>;
+    rupturesByLienAnsm: Map<string, number[]>;
+    rupturesByAlertId: Map<string, number>;
+  } | null;
+  RELATED_BY_CIS_MAPS: Record<string, string>;
+  reset(): void;
+}
 
-const { createCorpus } = require('../../utils/corpusStore');
-
-const state = {
+export const state: BdpmState = {
   corpus: {
     specialites: createCorpus(),
     presentations: createCorpus(),
@@ -66,5 +80,3 @@ const state = {
     this.cisIndexes = null;
   }
 };
-
-module.exports = state;

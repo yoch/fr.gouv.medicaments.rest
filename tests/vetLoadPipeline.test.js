@@ -30,7 +30,7 @@ describe('pipeline ANMV fixture', () => {
       getMedicamentByNum,
       getMedicamentSearchRecordByNum,
       getRelatedByNum
-    } = require('../src/services/vetDataLoader');
+    } = require('../src/services/vetDataLoader.mts');
 
     await loadVetData();
 
@@ -81,7 +81,7 @@ describe('pipeline ANMV fixture', () => {
       return originalRead(fd, ...args);
     });
     const close = jest.spyOn(fs, 'closeSync');
-    await require('../src/services/vetDataLoader').loadVetData();
+    await require('../src/services/vetDataLoader.mts').loadVetData();
     expect(headerFd).toEqual(expect.any(Number));
     expect(close).toHaveBeenCalledWith(headerFd);
     expect(() => fs.fstatSync(headerFd)).toThrow();
@@ -100,7 +100,7 @@ describe('pipeline ANMV fixture', () => {
       );
       process.env.VET_DATA_DIR = dir;
       process.env.VET_PRODUCTS_FILE = 'products.xml';
-      await run(require('../src/services/vetDataLoader'));
+      await run(require('../src/services/vetDataLoader.mts'));
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }

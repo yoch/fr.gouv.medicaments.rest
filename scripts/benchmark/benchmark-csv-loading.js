@@ -83,13 +83,13 @@ async function worker(variant) {
   const { parse } = require('csv-parse');
   const { BDPM_SCHEMAS } = require('../../src/utils/corpusSchemas');
   const { FROM_CSV, BDPM_RECORD_CLASSES, Substance } = require('../../src/models/bdpm');
-  const { omitStoredFieldsFor } = require('../../src/utils/corpusLightProfile');
+  const { omitStoredFieldsFor } = require('../../src/utils/corpusLightProfile.mts');
   const { lowCardinalityFieldsFor } = require('../../src/utils/bdpmInterning');
   const { intern } = require('../../src/utils/stringPool');
-  const { BDPM_INDEX_SPECS } = require('../../src/search/indexSpecs');
-  const { miniSearchIndexConfig } = require('../../src/utils/miniSearchIndexConfig');
+  const { BDPM_INDEX_SPECS } = require('../../src/search/indexSpecs.mts');
+  const { miniSearchIndexConfig } = require('../../src/utils/miniSearchIndexConfig.mts');
   const { buildFrozenIndexFromAsyncIterable, buildFrozenIndexFromRows } = require('../../src/utils/frozenMiniSearch');
-  const { buildIndexDocument, buildKeyIndex } = require('../../src/utils/corpusStore');
+  const { buildIndexDocument, buildKeyIndex } = require('../../src/utils/corpusStore.mts');
   const config = require('../../src/config');
 
   const activeTypes = ['specialites', 'presentations', 'compositions'];

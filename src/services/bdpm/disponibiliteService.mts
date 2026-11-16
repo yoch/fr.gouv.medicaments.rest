@@ -1,23 +1,22 @@
-'use strict';
-
 /**
  * Listing / alertes MVP pour le corpus `ruptures` (disponibilité BDPM).
  * Séparé de dataLoader : chargeur + maps d’un côté, projection API de l’autre.
  */
 
-const { buildPagedResponse } = require('../../utils/corpusPaging');
-const { materializeIndices, materializeRange, rowCount } = require('../../utils/corpusStore');
-const { rankSearchResults, scoredSearch } = require('../../utils/corpusSearch');
-const { BDPM_INDEX_SPECS } = require('../../search/indexSpecs');
+import { buildPagedResponse } from '../../utils/corpusPaging.mts';
+import { materializeIndices, materializeRange, rowCount } from '../../utils/corpusStore.mts';
+import { rankSearchResults, scoredSearch } from '../../utils/corpusSearch.mts';
+import { BDPM_INDEX_SPECS } from '../../search/indexSpecs.mts';
+import __cjs_______utils_disponibiliteQuery from '../../utils/disponibiliteQuery.js';
 const {
   rowMatchesDisponibiliteFilters,
   isDisponibiliteAlertId,
   mapRowToDisponibiliteAlert,
   compareDisponibiliteRowsByMajDesc
-} = require('../../utils/disponibiliteQuery');
-const { resolveBdpmCisKeys } = require('../searchOrchestrator');
-const config = require('../../config');
-const state = require('./state');
+} = __cjs_______utils_disponibiliteQuery;
+import { resolveBdpmCisKeys } from '../searchOrchestrator.mts';
+import config from '../../config.js';
+import { state } from './state.mts';
 
 const { corpus, metadata, searchIndexes } = state;
 const DETAIL_HYDRATE_RELATED_LIMIT = config.detailHydrateRelatedLimit;
@@ -52,7 +51,14 @@ function rankedRupturesSearch(query) {
  * Note : `q` ici = recherche MiniSearch sur `libelle_statut` (endpoint brut
  * `/disponibilite`). Pour nom/DCI sur `/alerts`, voir `selectAlertRuptureIndices`.
  */
-function selectRuptureIndices({ q, filters } = {}) {
+interface DisponibiliteQueryParams {
+  q?: string | null;
+  filters?: any;
+  page?: number;
+  limit?: number;
+}
+
+function selectRuptureIndices({ q, filters }: DisponibiliteQueryParams = {}) {
   const rows = corpus.ruptures;
   if (!rows) return [];
 
@@ -84,7 +90,7 @@ function selectRuptureIndices({ q, filters } = {}) {
  * Si `q` est fourni : résolution CIS (specialites/presentations/compositions)
  * puis union `rupturesByCis` — sans toucher à la sémantique de `/disponibilite?q=`.
  */
-function selectAlertRuptureIndices({ q, filters } = {}) {
+function selectAlertRuptureIndices({ q, filters }: DisponibiliteQueryParams = {}) {
   const rows = corpus.ruptures;
   if (!rows) return [];
   if (filters?.lienFilterInvalid) return [];
@@ -135,7 +141,7 @@ function listCorpusRupturesPage(page = 1, limit = 100) {
   });
 }
 
-function listDisponibilitePage({ q, filters, page = 1, limit = 100 } = {}) {
+function listDisponibilitePage({ q, filters, page = 1, limit = 100 }: DisponibiliteQueryParams = {}) {
   const rows = corpus.ruptures;
   if (!rows) {
     return buildPagedResponse({
@@ -177,7 +183,7 @@ function getRupturesForCis(cis) {
   return materializeIndices(rows, slice);
 }
 
-function listDisponibiliteAlerts({ q, filters, page = 1, limit = 30 } = {}) {
+function listDisponibiliteAlerts({ q, filters, page = 1, limit = 30 }: DisponibiliteQueryParams = {}) {
   const rows = corpus.ruptures;
   const pageNum = Math.max(1, Number(page) || 1);
   const limitNum = Math.min(500, Math.max(1, Number(limit) || 30));
@@ -202,7 +208,7 @@ function listDisponibiliteAlerts({ q, filters, page = 1, limit = 30 } = {}) {
   const alerts = indices.slice(offset, offset + limitNum).map((rowIndex) => {
     const row = rows[rowIndex].toJSON();
     const specialite = getSpecialiteJson(row.cis);
-    return mapRowToDisponibiliteAlert(row, specialite?.denomination || null);
+    return mapRowToDisponibiliteAlert(row, specialite ? String(specialite.denomination || '') || null : null);
   });
 
   return {
@@ -235,8 +241,8 @@ function getDisponibiliteAlertById(alertId) {
   };
 }
 
-module.exports = {
-  selectRuptureIndices,
+export {
+selectRuptureIndices,
   selectAlertRuptureIndices,
   listDisponibilitePage,
   listDisponibiliteAlerts,

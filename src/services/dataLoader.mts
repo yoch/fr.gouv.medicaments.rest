@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Domaine BDPM — chargement, recherche, hydratation, export.
  *
@@ -8,28 +6,28 @@
  * (conservé inchangé pour les callers existants).
  */
 
-const fs = require('fs');
-const path = require('path');
-const { parse } = require('csv-parse');
-const { pipeline } = require('node:stream/promises');
-const { singleFlight } = require('../utils/singleFlight');
-const { withInternPool } = require('../utils/stringPool');
-const {
+import fs from 'fs';
+import path from 'path';
+import { parse } from 'csv-parse';
+import { pipeline } from 'node:stream/promises';
+import { singleFlight } from '../utils/singleFlight.js';
+import { withInternPool } from '../utils/stringPool.js';
+import {
   buildFrozenIndexFromAsyncIterable,
   buildFrozenIndexFromRows
-} = require('../utils/frozenMiniSearch');
-const { loadMemoryMark } = require('../utils/memorySampler');
-const { buildPagedResponse } = require('../utils/corpusPaging');
-const { miniSearchIndexConfig } = require('../utils/miniSearchIndexConfig');
-const { BDPM_SCHEMAS } = require('../utils/corpusSchemas');
-const {
+} from '../utils/frozenMiniSearch.js';
+import { loadMemoryMark } from '../utils/memorySampler.js';
+import { buildPagedResponse } from '../utils/corpusPaging.mts';
+import { miniSearchIndexConfig } from '../utils/miniSearchIndexConfig.mts';
+import { BDPM_SCHEMAS } from '../utils/corpusSchemas.js';
+import {
   scoredSearch,
   searchKeyQualities,
   searchRankedPage,
   materializeRankedSearchRange,
   rankAndMaterializeSearch
-} = require('../utils/corpusSearch');
-const {
+} from '../utils/corpusSearch.mts';
+import {
   clearCorpus,
   push,
   rowCount,
@@ -38,15 +36,16 @@ const {
   buildKeyIndex,
   buildIndexDocument,
   appendToKeyList
-} = require('../utils/corpusStore');
-const { FROM_CSV, bdpmExtraitUrl, Substance } = require('../models/bdpm');
-const { BDPM_INDEX_SPECS } = require('../search/indexSpecs');
-const { normalizeAnsmUrl } = require('../utils/ansmUrl');
-const { cleanText } = require('../utils/textCleanup');
-const { buildDisponibiliteAlertId } = require('../utils/disponibiliteQuery');
-const config = require('../config');
-const state = require('./bdpm/state');
-const { exportBdpmSearchIndexes, exportBdpmCorpusDocuments } = require('./bdpm/exportApi');
+} from '../utils/corpusStore.mts';
+import bdpmModels from '../models/bdpm/index.js';
+const { FROM_CSV, bdpmExtraitUrl, Substance } = bdpmModels;
+import { BDPM_INDEX_SPECS } from '../search/indexSpecs.mts';
+import { normalizeAnsmUrl } from '../utils/ansmUrl.js';
+import { cleanText } from '../utils/textCleanup.js';
+import { buildDisponibiliteAlertId } from '../utils/disponibiliteQuery.js';
+import config from '../config.js';
+import { state } from './bdpm/state.mts';
+import { exportBdpmSearchIndexes, exportBdpmCorpusDocuments } from './bdpm/exportApi.mts';
 
 const DATA_DIR = config.dataDir;
 
@@ -106,10 +105,10 @@ async function loadParseAndIndex(type, filename, fields, boost = null) {
   );
 }
 
-async function indexInMemoryCorpus(type, fields, boost = null) {
+async function indexInMemoryCorpus(type: string, fields: string[], boost: Record<string, number> | null = null) {
   console.log(`Indexation de ${type}...`);
   const rows = corpus[type];
-  const options = miniSearchIndexConfig(fields, boost);
+  const options = miniSearchIndexConfig(fields, boost as any);
   searchIndexes[type] = buildFrozenIndexFromRows(
     rows,
     (item, rowIndex) => buildIndexDocument(item, rowIndex, fields),
@@ -149,9 +148,9 @@ function clearLoadedData() {
   }
 }
 
-async function loadOne(type, markLabel) {
+async function loadOne(type: string, markLabel?: string) {
   const spec = BDPM_INDEX_SPECS[type];
-  await loadParseAndIndex(type, spec.file, spec.fields, spec.boost);
+  await loadParseAndIndex(type, spec.file, spec.fields, spec.boost as any);
   if (markLabel) loadMemoryMark(markLabel, { rows: rowCount(corpus[type]) });
 }
 
@@ -192,7 +191,7 @@ async function loadDataGeneration() {
   await indexInMemoryCorpus(
     'substances',
     BDPM_INDEX_SPECS.substances.fields,
-    BDPM_INDEX_SPECS.substances.boost
+    BDPM_INDEX_SPECS.substances.boost || null
   );
   loadMemoryMark('bdpm_after_substances', { rows: rowCount(corpus.substances) });
 
@@ -202,13 +201,14 @@ async function loadDataGeneration() {
 }
 
 function deriveSubstances() {
+  const SubstanceCtor = Substance as any;
   const substancesMap = new Map();
   for (const comp of corpus.compositions) {
     if (comp.code_substance && comp.denomination_substance) {
       if (!substancesMap.has(comp.code_substance)) {
         substancesMap.set(
           comp.code_substance,
-          new Substance(comp.code_substance, comp.denomination_substance, 0)
+          new SubstanceCtor(comp.code_substance, comp.denomination_substance, 0)
         );
       }
       substancesMap.get(comp.code_substance).medicaments_count++;
@@ -224,13 +224,13 @@ function deriveSubstances() {
  * API de recherche et d'hydratation
  * ------------------------------------------------------------------ */
 
-function search(type, query) {
+function search(type: string, query: string) {
   const rows = corpus[type];
-  if (!rows || !query) return [];
-  if (!searchIndexes[type]) return [];
+  const index = searchIndexes[type];
+  if (!rows || !query || !index) return [];
 
   const spec = BDPM_INDEX_SPECS[type];
-  const results = scoredSearch(searchIndexes[type], query);
+  const results = scoredSearch(index, query);
   return rankAndMaterializeSearch(rows, results, query, {
     primaryField: spec.primaryField,
     idField: spec.idField,
@@ -238,10 +238,14 @@ function search(type, query) {
   });
 }
 
-function searchPage(type, query, page = 1, limit = 100) {
+function searchPage(type: string, query: string, page = 1, limit = 100) {
   const rows = corpus[type];
+  const index = searchIndexes[type];
+  if (!rows || !query || !index) {
+    return buildPagedResponse({ total: 0, page, limit, metadata, materializePage: () => [] });
+  }
   const { total, ranked } = searchRankedPage(
-    rows, searchIndexes[type], query, BDPM_INDEX_SPECS[type], page, limit
+    rows, index, query, BDPM_INDEX_SPECS[type], page, limit
   );
   return buildPagedResponse({
     total,
@@ -253,16 +257,12 @@ function searchPage(type, query, page = 1, limit = 100) {
   });
 }
 
-/**
- * `{ cis, match_quality }` de chaque correspondance, dans l'ordre du corpus.
- * Les CIS sont des clés entières : la fusion les ordonne numériquement, quel
- * que soit l'ordre des correspondances, d'où l'absence de score.
- */
-function searchKeyMatches(type, query) {
+function searchKeyMatches(type: string, query: string) {
   const rows = corpus[type];
   const spec = BDPM_INDEX_SPECS[type];
-  if (!rows || !query || !spec || !spec.idField || !searchIndexes[type]) return [];
-  return searchKeyQualities(rows, searchIndexes[type], query, spec);
+  const index = searchIndexes[type];
+  if (!rows || !query || !spec || !spec.idField || !index) return [];
+  return searchKeyQualities(rows, index, query, spec);
 }
 
 function listCorpusPage(type, page = 1, limit = 100) {
@@ -332,7 +332,7 @@ function getGeneriquesForCis(cis) {
   if (!indices || indices.length === 0) return null;
 
   const first = corpus.generiques[indices[0]].toJSON();
-  const id_groupe = first.id_groupe;
+  const id_groupe = String(first.id_groupe || '');
   const groupeIndices = cisIndexes.generiquesByGroupe.get(id_groupe) || [];
   return {
     id_groupe,
@@ -369,8 +369,8 @@ function getBdpmSearchIndexes() {
   return out;
 }
 
-module.exports = {
-  loadData,
+export {
+loadData,
   exportBdpmSearchIndexes,
   exportBdpmCorpusDocuments,
   listCorpusPage,

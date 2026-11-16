@@ -110,7 +110,7 @@ describe('fermeture des ressources', () => {
     jest.spyOn(fs, 'existsSync').mockImplementation(file => String(file).endsWith('.txt') || exists(file));
     jest.spyOn(fs, 'createReadStream').mockReturnValue(source);
     const ready = once(source, 'resume');
-    const loader = require('../src/services/dataLoader');
+    const loader = require('../src/services/dataLoader.mts');
     const first = loader.loadData();
     expect(loader.loadData()).toBe(first);
     const result = expect(first).rejects.toThrow('csv read failed');
@@ -128,7 +128,7 @@ describe('fermeture des ressources', () => {
     jest.spyOn(fs, 'createReadStream').mockReturnValue(source);
     jest.spyOn(require('../src/utils/frozenMiniSearch'), 'buildFrozenIndexFromAsyncIterable')
       .mockRejectedValue(new Error('index failed'));
-    await expect(require('../src/services/dataLoader').loadData()).rejects.toThrow('index failed');
+    await expect(require('../src/services/dataLoader.mts').loadData()).rejects.toThrow('index failed');
     expect(source.destroyed).toBe(true);
   });
 });

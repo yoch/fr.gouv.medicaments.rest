@@ -2,9 +2,9 @@
  * Analyse des réponses /search pour usage LLM (taille, redondance, couverture).
  * Usage: node tests/analyze_search_llm.js
  */
-const { loadData } = require('../../src/services/dataLoader');
-const { executeHybridSearch } = require('../../src/services/searchOrchestrator');
-const { getSpecialiteByCis, getRelatedByCis } = require('../../src/services/dataLoader');
+const { loadData } = require('../../src/services/dataLoader.mts');
+const { executeHybridSearch } = require('../../src/services/searchOrchestrator.mts');
+const { getSpecialiteByCis, getRelatedByCis } = require('../../src/services/dataLoader.mts');
 
 const QUERIES = [
   { q: 'doliprane', desc: 'marque exacte connue' },

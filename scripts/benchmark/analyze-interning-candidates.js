@@ -13,7 +13,7 @@
  * Heuristique « skip » : ratio > 50 % ou longueur médiane > 300.
  */
 
-const { loadData, getBdpmCorpusStats } = require('../../src/services/dataLoader');
+const { loadData, getBdpmCorpusStats } = require('../../src/services/dataLoader.mts');
 const { BDPM_RECORD_CLASSES } = require('../../src/models/bdpm');
 const { internPoolSize } = require('../../src/utils/stringPool');
 const { BDPM_LOW_CARDINALITY_FIELDS } = require('../../src/utils/bdpmInterning');

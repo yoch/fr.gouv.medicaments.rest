@@ -1,14 +1,12 @@
-'use strict';
-
-const express = require('express');
-const {
+import express from 'express';
+import {
   getMetadata,
   getSpecialiteByCis,
   getRelatedByCis,
   getGeneriquesForCis,
   isHasAvisLoaded,
   DETAIL_HYDRATE_RELATED_LIMIT
-} = require('../../services/dataLoader');
+} from '../../services/dataLoader.mts';
 
 const router = express.Router();
 
@@ -21,7 +19,7 @@ router.get('/specialites/:cis', (req, res) => {
   }
 
   const detailLimit = DETAIL_HYDRATE_RELATED_LIMIT;
-  const payload = {
+  const payload: Record<string, unknown> = {
     ...specialite,
     presentations: getRelatedByCis('presentations', cis, detailLimit),
     compositions: getRelatedByCis('compositions', cis, detailLimit),
@@ -44,4 +42,4 @@ router.get('/specialites/:cis', (req, res) => {
   res.json(payload);
 });
 
-module.exports = router;
+export default router;

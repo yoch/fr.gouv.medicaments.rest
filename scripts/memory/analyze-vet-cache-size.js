@@ -111,8 +111,8 @@ async function main() {
     getVetCorpusStats,
     getVetSearchIndexes,
     getRelatedByNum
-  } = require('../../src/services/vetDataLoader');
-  const { materializeRange, rowCount } = require('../../src/utils/corpusStore');
+  } = require('../../src/services/vetDataLoader.mts');
+  const { materializeRange, rowCount } = require('../../src/utils/corpusStore.mts');
 
   if (typeof global.gc === 'function') global.gc();
   const memBefore = process.memoryUsage();

@@ -7,6 +7,6 @@
 
 require('../../src/config');
 require('../../src/utils/frozenMiniSearch');
-require('../../src/services/dataLoader');
-require('../../src/services/vetDataLoader');
+require('../../src/services/dataLoader.mts');
+require('../../src/services/vetDataLoader.mts');
 require('@yoch/frozenminisearch');

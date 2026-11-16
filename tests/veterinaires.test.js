@@ -7,10 +7,10 @@ process.env.VET_DICT_FILE = 'amm-vet-d-fixture.xml';
 
 const request = require('supertest');
 const express = require('express');
-const medicamentRoutes = require('../src/routes/medicaments');
-const veterinaireRoutes = require('../src/routes/veterinaires');
-const { loadData } = require('../src/services/dataLoader');
-const { loadVetData, searchVet } = require('../src/services/vetDataLoader');
+const medicamentRoutes = require('../src/routes/medicaments/index.mts').default;
+const veterinaireRoutes = require('../src/routes/veterinaires.mts').default;
+const { loadData } = require('../src/services/dataLoader.mts');
+const { loadVetData, searchVet } = require('../src/services/vetDataLoader.mts');
 const { DOLIPRANE_CIP13, DOLIPRANE_CIS } = require('./fixtures/cis-cip-samples');
 const { describeSlow } = require('./helpers/slowTests');
 

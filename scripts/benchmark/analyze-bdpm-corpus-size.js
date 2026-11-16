@@ -43,7 +43,7 @@ function materializedPageJsonBytes(corpus, pageSize = 100) {
 }
 
 async function main() {
-  const { loadData, getBdpmCorpusStats } = require('../../src/services/dataLoader');
+  const { loadData, getBdpmCorpusStats } = require('../../src/services/dataLoader.mts');
 
   if (typeof global.gc === 'function') global.gc();
   const memBefore = process.memoryUsage();

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Pipeline de chargement ANMV : streaming du dictionnaire + des produits,
  * construction des corpus et index FrozenMiniSearch. État mutable partagé
@@ -7,31 +5,40 @@
  * `vetDataLoader.js` (façade).
  */
 
-const fs = require('fs');
-const path = require('path');
-const { buildFrozenIndexFromRows } = require('../../utils/frozenMiniSearch');
-const { streamMedicinalProducts } = require('../../utils/streamMedicinalProductsXml');
+import fs from 'fs';
+import path from 'path';
+import __cjs_______utils_frozenMiniSearch from '../../utils/frozenMiniSearch.js';
+const { buildFrozenIndexFromRows } = __cjs_______utils_frozenMiniSearch;
+import __cjs_______utils_streamMedicinalProductsXml from '../../utils/streamMedicinalProductsXml.js';
+const { streamMedicinalProducts } = __cjs_______utils_streamMedicinalProductsXml;
+import __cjs_______utils_vetXmlParser from '../../utils/vetXmlParser.js';
 const {
   defaultProductParser,
   parseProductBlock
-} = require('../../utils/vetXmlParser');
-const { loadMemoryMark } = require('../../utils/memorySampler');
-const {
+} = __cjs_______utils_vetXmlParser;
+import __cjs_______utils_memorySampler from '../../utils/memorySampler.js';
+const { loadMemoryMark } = __cjs_______utils_memorySampler;
+import {
   clearCorpus,
   push,
   rowCount,
   buildKeyIndex,
   buildIndexDocument
-} = require('../../utils/corpusStore');
-const { miniSearchIndexConfig } = require('../../utils/miniSearchIndexConfig');
-const { MedicamentVet, CompositionVet, PresentationVet } = require('../../models/vet');
-const { TempsAttenteEntry } = require('../../models/tempsAttente');
-const { intern, withInternPool } = require('../../utils/stringPool');
-const { cleanText } = require('../../utils/textCleanup');
-const { singleFlight } = require('../../utils/singleFlight');
-const config = require('../../config');
-const { VET_INDEX_SPECS } = require('../../search/indexSpecs');
-const state = require('./state');
+} from '../../utils/corpusStore.mts';
+import { miniSearchIndexConfig } from '../../utils/miniSearchIndexConfig.mts';
+import __cjs_______models_vet from '../../models/vet/index.js';
+const { MedicamentVet, CompositionVet, PresentationVet } = __cjs_______models_vet;
+import __cjs_______models_tempsAttente from '../../models/tempsAttente.js';
+const { TempsAttenteEntry } = __cjs_______models_tempsAttente;
+import __cjs_______utils_stringPool from '../../utils/stringPool.js';
+const { intern, withInternPool } = __cjs_______utils_stringPool;
+import __cjs_______utils_textCleanup from '../../utils/textCleanup.js';
+const { cleanText } = __cjs_______utils_textCleanup;
+import __cjs_______utils_singleFlight from '../../utils/singleFlight.js';
+const { singleFlight } = __cjs_______utils_singleFlight;
+import config from '../../config.js';
+import { VET_INDEX_SPECS } from '../../search/indexSpecs.mts';
+import { state as state } from './state.mts';
 
 const { corpus, metadata, searchIndexes } = state;
 
@@ -265,7 +272,7 @@ function parseTempsAttente(product, dict) {
   for (const route of asArray(product['voie-administration']?.['voie-admin'])) {
     if (!route['qte-ta']) continue;
     items.push(
-      new TempsAttenteEntry(
+      new (TempsAttenteEntry as any)(
         resolveTerm(dict, 'term-va', route['term-va']),
         resolveTerm(dict, 'term-esp', route['term-esp']),
         resolveTerm(dict, 'term-denr', route['term-denr']),
@@ -347,7 +354,7 @@ async function loadVetDataGeneration() {
     let product;
     try {
       product = parseProductBlock(blockXml, defaultProductParser);
-    } catch (err) {
+    } catch (err: any) {
       const num = blockXml.match(/<num>([^<]*)<\/num>/)?.[1] ?? '?';
       malformedCount++;
       if (malformed.length < 5) malformed.push(`${num} (${err.message})`);
@@ -361,7 +368,7 @@ async function loadVetDataGeneration() {
 
     const waiting = parseTempsAttente(product, dict);
     if (waiting.length > 0) {
-      const medNum = corpus.medicaments[rowIndex].num;
+      const medNum = String(corpus.medicaments[rowIndex].num || '');
       state.tempsAttente.set(medNum, waiting);
     }
   });
@@ -380,7 +387,7 @@ async function loadVetDataGeneration() {
   searchIndexes.medicaments = buildFrozenIndexFromRows(
     corpus.medicaments,
     (item, rowIndex) => buildIndexDocument(item, rowIndex, medicamentFields),
-    miniSearchIndexConfig(medicamentFields, VET_INDEX_SPECS.medicaments.boost)
+    miniSearchIndexConfig(medicamentFields, VET_INDEX_SPECS.medicaments.boost || null)
   );
   loadMemoryMark('vet_index_medicaments_done');
 
@@ -389,7 +396,7 @@ async function loadVetDataGeneration() {
   searchIndexes.compositions = buildFrozenIndexFromRows(
     corpus.compositions,
     (item, rowIndex) => buildIndexDocument(item, rowIndex, compositionFields),
-    miniSearchIndexConfig(compositionFields, VET_INDEX_SPECS.compositions.boost)
+    miniSearchIndexConfig(compositionFields, VET_INDEX_SPECS.compositions.boost || null)
   );
   loadMemoryMark('vet_index_compositions_done');
   buildNumIndexes();
@@ -397,7 +404,7 @@ async function loadVetDataGeneration() {
   console.log(`Données vétérinaires chargées: ${rowCount(corpus.medicaments)} médicaments`);
 }
 
-module.exports = {
-  loadVetData,
+export {
+loadVetData,
   normalizeNum
 };

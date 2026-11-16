@@ -6,7 +6,7 @@ const {
   isStrongMatchQuality,
   normalizeSearchText,
   queryTerms
-} = require('../src/utils/searchRanking');
+} = require('../src/utils/searchRanking.mts');
 
 const computeMatchPriority = (primaryValue, query, options) =>
   createMatchPriorityClassifier(query)(primaryValue, options);

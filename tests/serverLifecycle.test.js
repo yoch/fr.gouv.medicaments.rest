@@ -15,8 +15,8 @@ describe('cycle de vie du serveur', () => {
     loadVet = jest.fn().mockResolvedValue(undefined);
     jest.doMock('../src/services/dataDownloader', () => ({ downloadDataIfNeeded: downloadBdpm }));
     jest.doMock('../src/services/vetDataDownloader', () => ({ downloadVetDataIfNeeded: downloadVet }));
-    jest.doMock('../src/services/dataLoader', () => ({ loadData: loadBdpm }));
-    jest.doMock('../src/services/vetDataLoader', () => ({ loadVetData: loadVet }));
+    jest.doMock('../src/services/dataLoader.mts', () => ({ loadData: loadBdpm }));
+    jest.doMock('../src/services/vetDataLoader.mts', () => ({ loadVetData: loadVet }));
     jest.spyOn(console, 'log').mockImplementation(() => {});
   });
 
@@ -24,7 +24,7 @@ describe('cycle de vie du serveur', () => {
     if (running) await running.stop();
     running = null;
     jest.restoreAllMocks();
-    for (const module of ['config', 'services/dataDownloader', 'services/vetDataDownloader', 'services/dataLoader', 'services/vetDataLoader']) {
+    for (const module of ['config', 'services/dataDownloader', 'services/vetDataDownloader', 'services/dataLoader.mts', 'services/vetDataLoader.mts']) {
       jest.dontMock(`../src/${module}`);
     }
     jest.resetModules();
@@ -126,7 +126,7 @@ describe('cycle de vie du serveur', () => {
     configure({ enableRateLimit: true });
     const { MemoryStore } = require('express-rate-limit');
     const shutdown = jest.spyOn(MemoryStore.prototype, 'shutdown');
-    const app = require('../src/app').createApp();
+    const app = require('../src/app.mts').createApp();
     app.locals.dispose();
     app.locals.dispose();
     expect(shutdown).toHaveBeenCalledTimes(1);

@@ -5,11 +5,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const { performance } = require('node:perf_hooks');
-const { loadData } = require('../../src/services/dataLoader');
-const state = require('../../src/services/bdpm/state');
-const { BDPM_INDEX_SPECS } = require('../../src/search/indexSpecs');
-const { rankSearchResults, searchRankedPage } = require('../../src/utils/corpusSearch');
-const { parseListPaging } = require('../../src/utils/corpusPaging');
+const { loadData } = require('../../src/services/dataLoader.mts');
+const { state } = require('../../src/services/bdpm/state.mts');
+const { BDPM_INDEX_SPECS } = require('../../src/search/indexSpecs.mts');
+const { rankSearchResults, searchRankedPage } = require('../../src/utils/corpusSearch.mts');
+const { parseListPaging } = require('../../src/utils/corpusPaging.mts');
 
 const RUNS = 5;
 const WARMUP = 50;

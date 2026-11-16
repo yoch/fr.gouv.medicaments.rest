@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { scanVetProductsXml } = require('./helpers/scanVetProductsXml');
-const { buildLienRcpFromNom, ANMV_RCP_URL_PREFIX } = require('../src/services/vetDataLoader');
+const { buildLienRcpFromNom, ANMV_RCP_URL_PREFIX } = require('../src/services/vetDataLoader.mts');
 
 const FIXTURE_XML = path.join(__dirname, 'fixtures/veterinaires/amm-vet-fixture.xml');
 

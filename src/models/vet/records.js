@@ -3,7 +3,7 @@
 const { VET_SCHEMAS } = require('../../utils/corpusSchemas');
 const { defineCorpusRecord } = require('../defineCorpusRecord');
 const { buildLienRcpFromNom } = require('./rcp');
-const { omitStoredFieldsFor } = require('../../utils/corpusLightProfile');
+const { omitStoredFieldsFor } = require('../../utils/corpusLightProfile.mts');
 
 const MedicamentVet = defineCorpusRecord('MedicamentVet', {
   fields: VET_SCHEMAS.medicaments,

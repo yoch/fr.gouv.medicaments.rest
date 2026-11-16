@@ -1,4 +1,4 @@
-const { extractSubstances } = require('./searchResponseShape');
+import { extractSubstances } from './searchResponseShape.mts';
 
 const VIA_LABELS = {
   cis: 'CIS',
@@ -183,8 +183,8 @@ function normalizeFormat(format) {
   return 'json';
 }
 
-module.exports = {
-  renderSearchMarkdown,
+export {
+renderSearchMarkdown,
   normalizeFormat,
   formatMatchLine,
   formatSubstances,

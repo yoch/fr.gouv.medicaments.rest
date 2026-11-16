@@ -9,7 +9,7 @@
  */
 'use strict';
 
-const { loadData } = require('../../src/services/dataLoader');
+const { loadData } = require('../../src/services/dataLoader.mts');
 const {
   createMemorySampler,
   installLoadMemoryMarks,

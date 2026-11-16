@@ -6,7 +6,7 @@ const {
   isCorpusLightProfile,
   presentationIndexFields,
   OMIT_STORED_FIELDS_BY_TYPE
-} = require('./utils/corpusLightProfile');
+} = require('./utils/corpusLightProfile.mts');
 const { internPoolSize } = require('./utils/stringPool');
 
 /**

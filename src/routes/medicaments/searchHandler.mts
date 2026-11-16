@@ -1,11 +1,9 @@
-'use strict';
-
-const express = require('express');
-const { getMetadata } = require('../../services/dataLoader');
-const { executeHybridSearchPage } = require('../../services/searchOrchestrator');
-const { shapeSearchResults, normalizeDetail } = require('../../utils/searchResponseShape');
-const { renderSearchMarkdown, normalizeFormat } = require('../../utils/searchMarkdown');
-const { buildPagedResponse } = require('../../utils/corpusPaging');
+import express from 'express';
+import { getMetadata } from '../../services/dataLoader.mts';
+import { executeHybridSearchPage } from '../../services/searchOrchestrator.mts';
+import { shapeSearchResults, normalizeDetail } from '../../utils/searchResponseShape.mts';
+import { renderSearchMarkdown, normalizeFormat } from '../../utils/searchMarkdown.mts';
+import { buildPagedResponse } from '../../utils/corpusPaging.mts';
 
 const router = express.Router();
 
@@ -60,4 +58,4 @@ router.get('/search', (req, res) => {
   res.json(response);
 });
 
-module.exports = router;
+export default router;

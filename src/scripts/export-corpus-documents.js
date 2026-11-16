@@ -7,8 +7,8 @@
  *   CORPUS_EXPORT_OUT_DIR=data/corpus-export SKIP_VET=1 node src/scripts/export-corpus-documents.js
  */
 
-const { loadData, exportBdpmCorpusDocuments } = require('../services/dataLoader');
-const { loadVetData, exportVetCorpusDocuments } = require('../services/vetDataLoader');
+const { loadData, exportBdpmCorpusDocuments } = require('../services/dataLoader.mts');
+const { loadVetData, exportVetCorpusDocuments } = require('../services/vetDataLoader.mts');
 const config = require('../config');
 
 const OUT_DIR = config.corpusExportOutDir;

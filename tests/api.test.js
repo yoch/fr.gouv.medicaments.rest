@@ -1,7 +1,7 @@
 const request = require('supertest');
 const express = require('express');
-const medicamentRoutes = require('../src/routes/medicaments');
-const { loadData, search } = require('../src/services/dataLoader');
+const medicamentRoutes = require('../src/routes/medicaments/index.mts').default;
+const { loadData, search } = require('../src/services/dataLoader.mts');
 const { describeSlow } = require('./helpers/slowTests');
 const { DOLIPRANE_CIS, DOLIPRANE_CIP13, DOLIPRANE_CIP7 } = require('./fixtures/cis-cip-samples');
 const { isPlausibleCip13 } = require('./helpers/bdpmPresentation');

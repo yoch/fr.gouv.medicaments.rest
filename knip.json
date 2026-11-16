@@ -4,7 +4,7 @@
     "scripts/**/*.js",
     "tests/**/*.test.js"
   ],
-  "project": ["src/**/*.js", "scripts/**/*.js"],
+  "project": ["src/**/*.js", "src/**/*.mts", "scripts/**/*.js"],
   "ignore": [
     "scripts/benchmark/*.js",
     "scripts/memory/profile-*.js"

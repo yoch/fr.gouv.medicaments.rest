@@ -1,4 +1,4 @@
-jest.mock('../src/services/dataLoader', () => {
+jest.mock('../src/services/dataLoader.mts', () => {
   const rows = {
     '10000001': { cis: '10000001', denomination: 'GALIUM APARINE', match_quality: 'fuzzy' },
     '90000001': { cis: '90000001', denomination: 'ASPIRINE', match_quality: 'exact' },
@@ -14,7 +14,7 @@ jest.mock('../src/services/dataLoader', () => {
     HYDRATE_RELATED_LIMIT: 10
   };
 });
-jest.mock('../src/services/vetDataLoader', () => {
+jest.mock('../src/services/vetDataLoader.mts', () => {
   const rows = {
     '0000001': { num: '0000001', nom: 'APARINE VET', match_quality: 'fuzzy' },
     '0000002': { num: '0000002', nom: 'ASPIRINE VET', match_quality: 'prefix' }
@@ -28,7 +28,7 @@ jest.mock('../src/services/vetDataLoader', () => {
   };
 });
 
-const { executeHybridSearch, executeHybridSearchPage } = require('../src/services/searchOrchestrator');
+const { executeHybridSearch, executeHybridSearchPage } = require('../src/services/searchOrchestrator.mts');
 const ranks = { exact: 3, prefix: 2, fuzzy: 1 };
 
 test.each(['auto', 'human', 'veterinary', 'mixed'])('classe avant pagination pour source=%s', (source) => {

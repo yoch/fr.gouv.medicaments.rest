@@ -1,7 +1,7 @@
 const request = require('supertest');
 const express = require('express');
-const medicaments = require('../src/routes/medicaments');
-const veterinaires = require('../src/routes/veterinaires');
+const medicaments = require('../src/routes/medicaments/index.mts').default;
+const veterinaires = require('../src/routes/veterinaires.mts').default;
 
 const app = express();
 app.use('/api/medicaments', medicaments);

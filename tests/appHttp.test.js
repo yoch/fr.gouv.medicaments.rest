@@ -14,7 +14,7 @@ describeSlow('Application HTTP', () => {
   function createFreshApp(overrides = {}) {
     jest.resetModules();
     process.env = { ...env, ...overrides };
-    return require('../src/app').createApp();
+    return require('../src/app.mts').createApp();
   }
 
   it('expose /health, /config et /api-docs.json', async () => {

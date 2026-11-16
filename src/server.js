@@ -3,9 +3,9 @@
 const config = require('./config');
 const { downloadDataIfNeeded } = require('./services/dataDownloader');
 const { downloadVetDataIfNeeded } = require('./services/vetDataDownloader');
-const { loadData } = require('./services/dataLoader');
-const { loadVetData } = require('./services/vetDataLoader');
-const { createApp } = require('./app');
+const { loadData } = require('./services/dataLoader.mts');
+const { loadVetData } = require('./services/vetDataLoader.mts');
+const { createApp } = require('./app.mts');
 const { logMemoryUsage } = require('./utils/processMemory');
 const { singleFlight } = require('./utils/singleFlight');
 const { startPeriodicTask } = require('./utils/periodicTask');

@@ -14,7 +14,7 @@ describe('app et entrée publique', () => {
   it('src/app expose createApp sans démarrer de serveur', () => {
     const listenSpy = spyListen();
 
-    const { createApp } = require('../src/app');
+    const { createApp } = require('../src/app.mts');
 
     expect(typeof createApp).toBe('function');
     expect(listenSpy).not.toHaveBeenCalled();

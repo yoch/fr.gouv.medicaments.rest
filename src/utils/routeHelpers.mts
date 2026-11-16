@@ -1,12 +1,10 @@
-'use strict';
-
 /**
  * Helpers partagés pour les routes de liste : pagination uniforme et factory
  * de handler de liste. La source de métadonnées est injectée pour éviter le
  * couplage dur vers un loader spécifique.
  */
 
-const { buildPagedResponse } = require('./corpusPaging');
+import { buildPagedResponse } from './corpusPaging.mts';
 
 function createPaginate(getMetadata) {
   return (data, page, limit) =>
@@ -41,4 +39,6 @@ function createListHandler({ getMetadata, search, searchPage, listCorpusPage }) 
   };
 }
 
-module.exports = { createListHandler };
+export {
+createListHandler
+};

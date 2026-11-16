@@ -59,5 +59,22 @@
     "gouv"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "mjs",
+      "cjs",
+      "jsx",
+      "ts",
+      "mts",
+      "cts",
+      "tsx",
+      "json",
+      "node"
+    ],
+    "transform": {
+      "\\.mts$": "<rootDir>/scripts/jest-ts-transformer.js"
+    }
+  }
 }

@@ -1,9 +1,9 @@
 'use strict';
 
-const { createApp } = require('./app');
-const bdpm = require('./services/dataLoader');
-const vet = require('./services/vetDataLoader');
-const { executeHybridSearch } = require('./services/searchOrchestrator');
+const { createApp } = require('./app.mts');
+const bdpm = require('./services/dataLoader.mts');
+const vet = require('./services/vetDataLoader.mts');
+const { executeHybridSearch } = require('./services/searchOrchestrator.mts');
 const { getRuntimeConfig } = require('./runtimeConfig');
 const swaggerSpecs = require('./swagger');
 

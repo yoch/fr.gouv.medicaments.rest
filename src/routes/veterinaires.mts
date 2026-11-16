@@ -1,18 +1,19 @@
-const express = require('express');
-const {
+import express from 'express';
+import {
   listVetCorpusPage,
   searchVet,
   searchVetPage,
   getVetMetadata,
   getMedicamentByNum,
   getRelatedByNum
-} = require('../services/vetDataLoader');
-const config = require('../config');
-const { createListHandler } = require('../utils/routeHelpers');
-const { validateSearchQuery } = require('../utils/validateSearchQuery');
+} from '../services/vetDataLoader.mts';
+import config from '../config.js';
+import { createListHandler } from '../utils/routeHelpers.mts';
+import __cjs____utils_validateSearchQuery from '../utils/validateSearchQuery.js';
+const { validateSearchQuery } = __cjs____utils_validateSearchQuery;
 
 // Annotations OpenAPI dans `veterinaires.swagger.js` (scannées par swagger-jsdoc).
-require('./veterinaires.swagger');
+import './veterinaires.swagger.js';
 
 const router = express.Router();
 router.use(validateSearchQuery);
@@ -48,4 +49,4 @@ router.get('/medicaments/:num', (req, res) => {
 router.get('/compositions', listHandler('compositions'));
 router.get('/presentations', listHandler('presentations'));
 
-module.exports = router;
+export default router;

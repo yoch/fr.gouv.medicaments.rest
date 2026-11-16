@@ -19,10 +19,10 @@ function positive(name, fallback) {
 }
 
 async function worker() {
-  const bdpm = require('../../src/services/dataLoader');
-  const vet = require('../../src/services/vetDataLoader');
+  const bdpm = require('../../src/services/dataLoader.mts');
+  const vet = require('../../src/services/vetDataLoader.mts');
   const pool = require('../../src/utils/stringPool');
-  const states = [require('../../src/services/bdpm/state'), require('../../src/services/vet/state')];
+  const states = [require('../../src/services/bdpm/state.mts').state, require('../../src/services/vet/state.mts').state];
   const oldIndexes = [];
   let server;
   let peakRss = 0;
@@ -69,7 +69,7 @@ async function worker() {
         await bdpm.loadData();
         await vet.loadVetData();
         if (!server) {
-          server = require('../../src/app').createApp().listen(0, '127.0.0.1');
+          server = require('../../src/app.mts').createApp().listen(0, '127.0.0.1');
           await new Promise(resolve => server.once('listening', resolve));
         }
         result = { port: server.address().port, ...await measure(forceGc) };

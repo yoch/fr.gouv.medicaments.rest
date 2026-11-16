@@ -3,10 +3,10 @@
 
 // Audit local des corpus déjà téléchargés, sans accès à la production.
 const assert = require('node:assert/strict');
-const { loadData } = require('../../src/services/dataLoader');
-const { loadVetData } = require('../../src/services/vetDataLoader');
-const { executeHybridSearch, executeHybridSearchPage } = require('../../src/services/searchOrchestrator');
-const { MATCH_QUALITY_RANK: ranks } = require('../../src/utils/searchRanking');
+const { loadData } = require('../../src/services/dataLoader.mts');
+const { loadVetData } = require('../../src/services/vetDataLoader.mts');
+const { executeHybridSearch, executeHybridSearchPage } = require('../../src/services/searchOrchestrator.mts');
+const { MATCH_QUALITY_RANK: ranks } = require('../../src/utils/searchRanking.mts');
 
 async function main() {
   await loadData();

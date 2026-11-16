@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * État mutable partagé du domaine vétérinaire : corpus, index de recherche,
  * index par num, metadata, temps d'attente. Centralisé ici pour permettre
@@ -9,9 +7,27 @@
  * Le reset synchrone invalide les index avant le rechargement progressif.
  */
 
-const { createCorpus } = require('../../utils/corpusStore');
+import { createCorpus, type Corpus, type CorpusRecordLike } from '../../utils/corpusStore.mts';
+import type { SearchIndexLike } from '../../utils/corpusSearch.mts';
 
-const state = {
+export interface VetState {
+  corpus: Record<string, Corpus<CorpusRecordLike>>;
+  metadata: {
+    last_updated: string | null;
+    source: string;
+  };
+  searchIndexes: Record<string, SearchIndexLike | null>;
+  numIndexes: {
+    medicamentsByNum: Map<string, number>;
+    compositionsByNum: Map<string, number[]>;
+    presentationsByNum: Map<string, number[]>;
+  } | null;
+  tempsAttente: Map<string, CorpusRecordLike[]>;
+  RELATED_BY_NUM_MAPS: Record<string, string>;
+  reset(): void;
+}
+
+export const state: VetState = {
   corpus: {
     medicaments: createCorpus(),
     compositions: createCorpus(),
@@ -49,4 +65,3 @@ const state = {
   }
 };
 
-module.exports = state;

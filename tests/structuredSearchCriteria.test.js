@@ -6,7 +6,7 @@ const {
   textOverlapScore,
   scoreStructuredCriteria,
   rerankWithStructuredCriteria
-} = require('../src/utils/structuredSearchCriteria');
+} = require('../src/utils/structuredSearchCriteria.mts');
 
 describe('structuredSearchCriteria', () => {
   describe('parseDosageTokens', () => {

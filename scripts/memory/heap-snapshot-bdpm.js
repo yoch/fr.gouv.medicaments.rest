@@ -17,7 +17,7 @@
 
 const v8 = require('v8');
 const path = require('path');
-const { loadData } = require('../../src/services/dataLoader');
+const { loadData } = require('../../src/services/dataLoader.mts');
 
 const mode = process.argv[2] || 'peak';
 const OUT = path.join(__dirname, '..', '..', 'bdpm.heapsnapshot');

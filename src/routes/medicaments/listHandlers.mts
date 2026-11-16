@@ -1,8 +1,6 @@
-'use strict';
-
-const express = require('express');
-const { createListHandler } = require('../../utils/routeHelpers');
-const { listCorpusPage, search, searchPage, getMetadata } = require('../../services/dataLoader');
+import express from 'express';
+import { createListHandler } from '../../utils/routeHelpers.mts';
+import { listCorpusPage, search, searchPage, getMetadata } from '../../services/dataLoader.mts';
 
 const listHandler = createListHandler({ getMetadata, search, searchPage, listCorpusPage });
 
@@ -12,4 +10,4 @@ router.get('/specialites', listHandler('specialites'));
 router.get('/presentations', listHandler('presentations'));
 router.get('/compositions', listHandler('compositions'));
 
-module.exports = router;
+export default router;

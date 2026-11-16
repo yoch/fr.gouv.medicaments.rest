@@ -1,15 +1,13 @@
-'use strict';
-
-const express = require('express');
-const { createListHandler } = require('../../utils/routeHelpers');
-const {
+import express from 'express';
+import { createListHandler } from '../../utils/routeHelpers.mts';
+import {
   listCorpusPage,
   search,
   searchPage,
   getMetadata,
   isHasAvisLoaded,
   isMitmLoaded
-} = require('../../services/dataLoader');
+} from '../../services/dataLoader.mts';
 
 const listHandler = createListHandler({ getMetadata, search, searchPage, listCorpusPage });
 
@@ -35,4 +33,4 @@ router.get('/avis-smr', avisHandler('avis_smr'));
 router.get('/avis-asmr', avisHandler('avis_asmr'));
 router.get('/interet-therapeutique-majeur', mitmHandler('mitm'));
 
-module.exports = router;
+export default router;

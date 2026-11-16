@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Domaine vétérinaire (ANMV) — façade API.
  *
@@ -9,26 +7,26 @@
  * inchangé pour les callers existants).
  */
 
-const {
+import {
   scoredSearch,
   rankSearchResults,
   searchRankedPage,
   materializeRankedSearchRange,
   rankAndMaterializeSearch
-} = require('../utils/corpusSearch');
-const {
+} from '../utils/corpusSearch.mts';
+import {
   rowCount,
   materializeRange,
   materializeIndices
-} = require('../utils/corpusStore');
-const { normalizeSearchText } = require('../utils/searchRanking');
-const { buildPagedResponse } = require('../utils/corpusPaging');
-const { buildLienRcpFromNom, ANMV_RCP_URL_PREFIX } = require('../models/vet/rcp');
-const config = require('../config');
-const { VET_INDEX_SPECS } = require('../search/indexSpecs');
-const state = require('./vet/state');
-const { loadVetData, normalizeNum } = require('./vet/loadPipeline');
-const { exportVetSearchIndexes, exportVetCorpusDocuments } = require('./vet/exportApi');
+} from '../utils/corpusStore.mts';
+import { normalizeSearchText } from '../utils/searchRanking.mts';
+import { buildPagedResponse } from '../utils/corpusPaging.mts';
+import { buildLienRcpFromNom, ANMV_RCP_URL_PREFIX } from '../models/vet/rcp.js';
+import config from '../config.js';
+import { VET_INDEX_SPECS } from '../search/indexSpecs.mts';
+import { state } from './vet/state.mts';
+import { loadVetData, normalizeNum } from './vet/loadPipeline.mts';
+import { exportVetSearchIndexes, exportVetCorpusDocuments } from './vet/exportApi.mts';
 
 const { corpus, metadata, searchIndexes, RELATED_BY_NUM_MAPS } = state;
 
@@ -81,8 +79,12 @@ function searchVetPage(type, query, page = 1, limit = 100) {
   }
 
   const rows = corpus[type];
+  const index = searchIndexes[type];
+  if (!index) {
+    return buildPagedResponse({ total: 0, page, limit, metadata, materializePage: () => [] });
+  }
   const { total, ranked } = searchRankedPage(
-    rows, searchIndexes[type], query, VET_INDEX_SPECS[type], page, limit
+    rows, index, query, VET_INDEX_SPECS[type], page, limit
   );
   return buildPagedResponse({
     total,
@@ -112,14 +114,14 @@ function searchVetKeyMatches(type, query) {
   return out;
 }
 
-function collectPresentationMatchIndices(query) {
+function collectPresentationMatchIndices(query: string) {
   const presentations = corpus.presentations;
   const normalizedQuery = normalizeSearchText(query);
-  const indices = [];
+  const indices: number[] = [];
   for (let i = 0; i < presentations.length; i++) {
     const row = presentations[i];
     const libelle = normalizeSearchText(row.libelle);
-    const gtin = row.gtin;
+    const gtin = String(row.gtin || '');
     if (libelle.includes(normalizedQuery) || gtin.includes(query)) {
       indices.push(i);
     }
@@ -151,24 +153,24 @@ function getVetMetadata() {
   return metadata;
 }
 
-function getMedicamentByNum(num) {
-  const numIndexes = state.numIndexes;
+function getMedicamentByNum(num: unknown) {
+  const numIndexes = state.numIndexes as any;
   if (!numIndexes) return undefined;
   const rowIndex = numIndexes.medicamentsByNum.get(normalizeNum(num));
   if (rowIndex === undefined) return undefined;
   return corpus.medicaments[rowIndex].toJSON();
 }
 
-function getMedicamentLabelByNum(num) {
-  const numIndexes = state.numIndexes;
+function getMedicamentLabelByNum(num: unknown) {
+  const numIndexes = state.numIndexes as any;
   if (!numIndexes) return '';
   const rowIndex = numIndexes.medicamentsByNum.get(normalizeNum(num));
   if (rowIndex === undefined) return '';
   return corpus.medicaments[rowIndex].nom || '';
 }
 
-function getMedicamentSearchRecordByNum(num) {
-  const numIndexes = state.numIndexes;
+function getMedicamentSearchRecordByNum(num: unknown) {
+  const numIndexes = state.numIndexes as any;
   if (!numIndexes) return null;
   const rowIndex = numIndexes.medicamentsByNum.get(normalizeNum(num));
   if (rowIndex === undefined) return null;
@@ -180,14 +182,14 @@ function getMedicamentSearchRecordByNum(num) {
   };
 }
 
-function getRelatedByNum(type, num, limit = config.searchHydrateRelatedLimit) {
+function getRelatedByNum(type: string, num: unknown, limit = config.searchHydrateRelatedLimit) {
   if (!num) return [];
   const normalized = normalizeNum(num);
   if (type === 'temps_attente') {
     const entries = state.tempsAttente.get(normalized) || [];
-    return entries.map((e) => e.toJSON());
+    return entries.map((e: any) => e.toJSON());
   }
-  const numIndexes = state.numIndexes;
+  const numIndexes = state.numIndexes as any;
   if (!numIndexes) return [];
   const mapKey = RELATED_BY_NUM_MAPS[type];
   if (!mapKey) return [];
@@ -209,8 +211,8 @@ function getVetSearchIndexes() {
   return { medicaments: searchIndexes.medicaments, compositions: searchIndexes.compositions };
 }
 
-module.exports = {
-  loadVetData,
+export {
+loadVetData,
   exportVetSearchIndexes,
   exportVetCorpusDocuments,
   searchVet,

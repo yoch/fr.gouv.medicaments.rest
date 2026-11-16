@@ -77,12 +77,12 @@ async function main() {
 
   try {
     if (PROFILE_BDPM) {
-      const { loadData } = require('../../src/services/dataLoader');
+      const { loadData } = require('../../src/services/dataLoader.mts');
       await loadData();
     }
 
     if (PROFILE_VET) {
-      const { loadVetData } = require('../../src/services/vetDataLoader');
+      const { loadVetData } = require('../../src/services/vetDataLoader.mts');
       await loadVetData();
     }
   } finally {

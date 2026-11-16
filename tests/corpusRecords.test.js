@@ -24,8 +24,8 @@ const {
   materializeIndices,
   buildKeyIndex,
   buildIndexDocument
-} = require('../src/utils/corpusStore');
-const { rankAndMaterializeSearch } = require('../src/utils/corpusSearch');
+} = require('../src/utils/corpusStore.mts');
+const { rankAndMaterializeSearch } = require('../src/utils/corpusSearch.mts');
 const { bdpmExtraitUrl } = require('../src/models/bdpm/constants');
 const { defineCorpusRecord } = require('../src/models/defineCorpusRecord');
 

@@ -1,12 +1,11 @@
-'use strict';
-
-const express = require('express');
-const {
+import express from 'express';
+import {
   listDisponibilitePage,
   listDisponibiliteAlerts,
   getDisponibiliteAlertById
-} = require('../../services/bdpm/disponibiliteService');
-const { parseDisponibiliteFilters } = require('../../utils/disponibiliteQuery');
+} from '../../services/bdpm/disponibiliteService.mts';
+import __cjs_______utils_disponibiliteQuery from '../../utils/disponibiliteQuery.js';
+const { parseDisponibiliteFilters } = __cjs_______utils_disponibiliteQuery;
 
 const router = express.Router();
 
@@ -40,4 +39,4 @@ router.get('/disponibilite', (req, res) => {
   res.json(listDisponibilitePage({ q, filters, page, limit }));
 });
 
-module.exports = router;
+export default router;

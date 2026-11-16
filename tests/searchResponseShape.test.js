@@ -1,14 +1,14 @@
 const {
   shapeSearchHit,
   normalizeDetail
-} = require('../src/utils/searchResponseShape');
+} = require('../src/utils/searchResponseShape.mts');
 const {
   renderSearchMarkdown,
   normalizeFormat,
   formatMatchLine,
   formatSubstances,
   getSubstances
-} = require('../src/utils/searchMarkdown');
+} = require('../src/utils/searchMarkdown.mts');
 
 describe('searchResponseShape', () => {
   const fullHit = {

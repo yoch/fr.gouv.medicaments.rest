@@ -24,7 +24,7 @@ function parseArgs(argv) {
 
 async function main() {
   const { vet, label } = parseArgs(process.argv.slice(2));
-  const { loadData, getBdpmCorpusStats } = require('../../src/services/dataLoader');
+  const { loadData, getBdpmCorpusStats } = require('../../src/services/dataLoader.mts');
 
   if (typeof global.gc !== 'function') {
     console.warn('Recommandé: node --expose-gc pour des mesures stables');
@@ -36,7 +36,7 @@ async function main() {
   await loadData();
   let vetStats = null;
   if (vet) {
-    const { loadVetData, getVetCorpusStats } = require('../../src/services/vetDataLoader');
+    const { loadVetData, getVetCorpusStats } = require('../../src/services/vetDataLoader.mts');
     await loadVetData();
     vetStats = getVetCorpusStats();
   }

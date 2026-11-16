@@ -7,7 +7,7 @@
 
 const v8 = require('v8');
 const path = require('path');
-const { loadVetData } = require('../../src/services/vetDataLoader');
+const { loadVetData } = require('../../src/services/vetDataLoader.mts');
 
 (async () => {
   console.log('[vet] loadVetData()...');

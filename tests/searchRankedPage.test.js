@@ -1,9 +1,9 @@
 'use strict';
 
 const { FrozenMiniSearch } = require('@yoch/frozenminisearch');
-const { miniSearchOptions } = require('../src/utils/searchRanking');
-const { rankSearchResults, searchKeyQualities, searchRankedPage } = require('../src/utils/corpusSearch');
-const { parseListPaging } = require('../src/utils/corpusPaging');
+const { miniSearchOptions } = require('../src/utils/searchRanking.mts');
+const { rankSearchResults, searchKeyQualities, searchRankedPage } = require('../src/utils/corpusSearch.mts');
+const { parseListPaging } = require('../src/utils/corpusPaging.mts');
 
 const rows = Array.from({ length: 1400 }, (_, id) => ({
   id,

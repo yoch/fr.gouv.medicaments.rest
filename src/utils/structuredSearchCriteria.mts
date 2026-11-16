@@ -1,9 +1,30 @@
-'use strict';
+import { normalizeSearchText, MATCH_QUALITY_RANK } from './searchRanking.mts';
 
-const { normalizeSearchText, MATCH_QUALITY_RANK } = require('./searchRanking');
+export interface DosageToken {
+  amount: number;
+  unit: string;
+}
+
+export interface SearchCriteria {
+  dosage?: string | null;
+  forme?: string | null;
+  voie?: string | null;
+}
+
+export interface CriteriaMatchFlags {
+  dosage: boolean;
+  forme: boolean;
+  voie: boolean;
+}
+
+export interface CriteriaScoreResult {
+  boost: number;
+  criteria_match: CriteriaMatchFlags;
+  dosage_extra: number | null;
+}
 
 // Facteur de conversion vers l'unité canonique (mg, ml, ui, %).
-const UNITS = {
+const UNITS: Record<string, [number, string]> = {
   mg: [1, 'mg'],
   g: [1000, 'mg'],
   gramme: [1000, 'mg'],
@@ -25,28 +46,19 @@ const UNITS = {
   'pour cent': [1, '%']
 };
 
-// Le séparateur de milliers n'est accepté que devant une unité internationale :
-// devant mg, « MAG 2 100 mg » ou « D3 500 mg » seraient lus comme 2 100 ou 3 500 mg.
 const UI_THOUSANDS = String.raw`(?<![\p{L}\d.,])\d{1,3}(?:[ \u00a0]\d{3})+(?=\s*(?:ui|iu|u|unites?)(?![\p{L}]))`;
 const DECIMAL = String.raw`\d+(?:[.,]\d+)?`;
 const UNIT = String.raw`mg|g|grammes?|ml|l|ui|iu|u|µg|μg|ug|mcg|microgrammes?|unites?|pour cent|%`;
-// « /ml » sans volume forme une concentration ; un volume écrit (« /5 ml », « /1 ml »)
-// reste une quantité distincte.
 const DOSAGE_TOKEN_RE = new RegExp(
   String.raw`(${UI_THOUSANDS}|${DECIMAL})\s*(${UNIT})(?![\p{L}])(?:\s*\/\s*(ml|l)(?![\p{L}\d]))?`,
   'giu'
 );
 
-/**
- * Lit les quantités d'une chaîne telles qu'écrites, converties en mg, ml, ui ou %.
- * Une concentration par ml garde son unité composée (`mg/ml`) ; un volume écrit
- * (`250 mg/5 ml`) donne deux quantités indépendantes. Retourne [] si rien d'exploitable.
- */
-function parseDosageTokens(value) {
+function parseDosageTokens(value: unknown): DosageToken[] {
   const text = normalizeSearchText(String(value ?? ''));
   if (!text) return [];
 
-  const tokens = [];
+  const tokens: DosageToken[] = [];
   for (const match of text.matchAll(DOSAGE_TOKEN_RE)) {
     const amount = Number.parseFloat(match[1].replace(/[\s\u00a0]/g, '').replace(',', '.'));
     const unit = UNITS[match[2].normalize('NFD').replace(/[\u0300-\u036f]/g, '')];
@@ -62,15 +74,15 @@ function parseDosageTokens(value) {
   return tokens;
 }
 
-/**
- * Compte les quantités demandées retrouvées dans le candidat, chaque quantité
- * du candidat ne servant qu'une fois. `extra` compte les quantités du candidat
- * non demandées.
- */
-function matchDosageTokens(requested, candidate, { toleranceRatio = 0.02 } = {}) {
-  const used = new Set();
+function matchDosageTokens(
+  requested: DosageToken[],
+  candidate: DosageToken[],
+  { toleranceRatio = 0.02 }: { toleranceRatio?: number } = {}
+): { matched: number; extra: number } {
+  const used = new Set<number>();
   let matched = 0;
-  for (const req of requested) {
+  for (let r = 0; r < requested.length; r++) {
+    const req = requested[r];
     const index = candidate.findIndex((cand, i) =>
       !used.has(i) &&
       cand.unit === req.unit &&
@@ -84,7 +96,7 @@ function matchDosageTokens(requested, candidate, { toleranceRatio = 0.02 } = {})
   return { matched, extra: candidate.length - matched };
 }
 
-function tokenSet(value) {
+function tokenSet(value: unknown): Set<string> {
   return new Set(
     normalizeSearchText(value)
       .split(/[\s/;,+()-]+/u)
@@ -93,7 +105,7 @@ function tokenSet(value) {
   );
 }
 
-function textOverlapScore(needle, haystack) {
+function textOverlapScore(needle: unknown, haystack: unknown): number {
   const n = normalizeSearchText(needle);
   const h = normalizeSearchText(haystack);
   if (!n || !h) return 0;
@@ -108,35 +120,23 @@ function textOverlapScore(needle, haystack) {
   return hits / needleTokens.size;
 }
 
-function hasStructuredCriteria(criteria) {
+function hasStructuredCriteria(criteria?: SearchCriteria | null): boolean {
   return Boolean(criteria && (criteria.dosage || criteria.forme || criteria.voie));
 }
 
-/**
- * Le dosage est lu uniquement dans la dénomination / nom. Le champ
- * `compositions.dosage` est volontairement ignoré (dilutions homéo, sels FT,
- * dosages par substance) — le dosage pertinent pour l'agent vit dans la dénomination.
- */
-function getStructuredDenomination(hit) {
-  return hit.denomination || hit.nom || '';
+function getStructuredDenomination(hit: Record<string, unknown>): string {
+  return String(hit.denomination || hit.nom || '');
 }
 
-function getStructuredForme(hit) {
-  return hit.forme_pharma || hit.forme_pharmaceutique || '';
+function getStructuredForme(hit: Record<string, unknown>): string {
+  return String(hit.forme_pharma || hit.forme_pharmaceutique || '');
 }
 
-/**
- * Score non destructif selon dosage/forme/voie. Ne filtre jamais les candidats ;
- * ne sert qu'à réordonner à l'intérieur d'un même niveau de `match_quality`.
- * Le boost de dosage est proportionnel aux quantités retrouvées ;
- * `criteria_match.dosage` exige qu'elles le soient toutes. `dosage_extra` sert
- * à départager deux boosts égaux et vaut null sans quantité retrouvée.
- */
-function scoreStructuredCriteria(hit, criteria = {}) {
+function scoreStructuredCriteria(hit: Record<string, unknown>, criteria: SearchCriteria = {}): CriteriaScoreResult {
   const { dosage = null, forme = null, voie = null } = criteria;
-  const match = { dosage: false, forme: false, voie: false };
+  const match: CriteriaMatchFlags = { dosage: false, forme: false, voie: false };
   let boost = 0;
-  let dosageExtra = null;
+  let dosageExtra: number | null = null;
 
   if (dosage) {
     const requested = parseDosageTokens(dosage);
@@ -172,13 +172,13 @@ function scoreStructuredCriteria(hit, criteria = {}) {
   return { boost, criteria_match: match, dosage_extra: dosageExtra };
 }
 
-/**
- * Ordre lexicographique, donc transitif : qualité, boost, puis le moins de
- * quantités non demandées (`_dosageExtra`). La qualité reste prioritaire pour
- * qu'un match faible ne passe jamais devant un match fort. À égalité,
- * l'appelant garde l'ordre initial.
- */
-function compareByQualityThenBoost(a, b) {
+interface RankableItem {
+  match_quality: string;
+  criteria_boost?: number;
+  _dosageExtra?: number | null;
+}
+
+function compareByQualityThenBoost(a: RankableItem, b: RankableItem): number {
   const rankA = MATCH_QUALITY_RANK[a.match_quality] || 0;
   const rankB = MATCH_QUALITY_RANK[b.match_quality] || 0;
   if (rankB !== rankA) return rankB - rankA;
@@ -191,7 +191,10 @@ function compareByQualityThenBoost(a, b) {
   return extraA < extraB ? -1 : 1;
 }
 
-function rerankWithStructuredCriteria(results, criteria = {}) {
+function rerankWithStructuredCriteria<T extends Record<string, unknown> & RankableItem>(
+  results: T[],
+  criteria: SearchCriteria = {}
+): T[] {
   if (!hasStructuredCriteria(criteria)) {
     return results;
   }
@@ -207,10 +210,10 @@ function rerankWithStructuredCriteria(results, criteria = {}) {
     return a._index - b._index;
   });
 
-  return scored.map(({ _index, _dosageExtra, ...hit }) => hit);
+  return scored.map(({ _index, _dosageExtra, ...hit }) => hit as unknown as T);
 }
 
-module.exports = {
+export {
   parseDosageTokens,
   matchDosageTokens,
   textOverlapScore,

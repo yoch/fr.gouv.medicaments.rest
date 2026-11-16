@@ -1,18 +1,32 @@
-const { AND } = require('@yoch/frozenminisearch');
+import { AND } from '@yoch/frozenminisearch';
 
-const MATCH_QUALITY = ['fuzzy', 'prefix', 'exact'];
+export type MatchQuality = 'fuzzy' | 'prefix' | 'exact';
+export type MatchVia = 'cis' | 'num' | 'denomination' | 'presentation' | 'composition';
+export type MatchPriority = 0 | 1 | 2;
+
+export interface MatchClassifierOptions {
+  idValue?: string;
+  codeValues?: Array<string | number>;
+}
+
+export type MatchPriorityClassifier = (
+  primaryValue: unknown,
+  idValueOrOptions?: unknown,
+  codeValuesParam?: Array<string | number>
+) => MatchPriority;
+
+const MATCH_QUALITY: readonly MatchQuality[] = ['fuzzy', 'prefix', 'exact'];
 const SPACE_OR_PUNCTUATION = /[\s\p{P}]+/u;
-
 const DIACRITICS_REGEX = /[\u0300-\u036f]/g;
 
-function fullNormalizeSearchText(str) {
+function fullNormalizeSearchText(str: string): string {
   return str
     .normalize('NFD')
     .replace(DIACRITICS_REGEX, '')
     .toLowerCase();
 }
 
-function normalizeSearchText(value) {
+function normalizeSearchText(value: unknown): string {
   if (value == null) return '';
   const str = typeof value === 'string' ? value : String(value);
   let hasUpper = false;
@@ -24,11 +38,11 @@ function normalizeSearchText(value) {
   return hasUpper ? str.toLowerCase() : str;
 }
 
-function tokenizeSearchText(value) {
+function tokenizeSearchText(value: unknown): string[] {
   return String(value ?? '').split(SPACE_OR_PUNCTUATION).filter(Boolean);
 }
 
-function queryTerms(query) {
+function queryTerms(query: unknown): string[] {
   return tokenizeSearchText(query).map((term) => normalizeSearchText(term)).filter(Boolean);
 }
 
@@ -42,7 +56,7 @@ const UNKNOWN = 0xfffe;
  * marque combinante conservée que NFD peut réordonner, surrogate) ou fait
  * plusieurs caractères. Un texte UNFOLDABLE passe par la normalisation complète.
  */
-function computeFold(code) {
+function computeFold(code: number): number {
   const folded = normalizeSearchText(String.fromCharCode(code));
   if (folded.length === 0) return DROPPED;
   if (
@@ -62,7 +76,7 @@ function computeFold(code) {
 // autres fonctions ne reçoivent que des textes déjà acceptés par isFoldable.
 const FOLD = new Uint16Array(0x10000).fill(UNKNOWN);
 
-function isFoldable(text) {
+function isFoldable(text: string): boolean {
   for (let i = 0; i < text.length; i++) {
     const code = text.charCodeAt(i);
     let folded = FOLD[code];
@@ -72,7 +86,7 @@ function isFoldable(text) {
   return true;
 }
 
-function foldedLength(text) {
+function foldedLength(text: string): number {
   let length = 0;
   for (let i = 0; i < text.length; i++) {
     if (FOLD[text.charCodeAt(i)] !== DROPPED) length++;
@@ -81,7 +95,7 @@ function foldedLength(text) {
 }
 
 /** Index qui suit la correspondance de `pattern` (normalisé) dans `text` replié à partir de `start`, sinon -1. */
-function matchFoldedAt(text, start, pattern) {
+function matchFoldedAt(text: string, start: number, pattern: string): number {
   let i = start;
   for (let j = 0; j < pattern.length; i++) {
     if (i >= text.length) return -1;
@@ -93,11 +107,11 @@ function matchFoldedAt(text, start, pattern) {
   return i;
 }
 
-function isWordCode(code) {
+function isWordCode(code: number): boolean {
   return (code >= 0x61 && code <= 0x7a) || (code >= 0x30 && code <= 0x39);
 }
 
-function foldedBefore(text, index) {
+function foldedBefore(text: string, index: number): number {
   for (let i = index - 1; i >= 0; i--) {
     const folded = FOLD[text.charCodeAt(i)];
     if (folded !== DROPPED) return folded;
@@ -105,7 +119,7 @@ function foldedBefore(text, index) {
   return -1;
 }
 
-function foldedFrom(text, index) {
+function foldedFrom(text: string, index: number): number {
   for (let i = index; i < text.length; i++) {
     const folded = FOLD[text.charCodeAt(i)];
     if (folded !== DROPPED) return folded;
@@ -113,7 +127,7 @@ function foldedFrom(text, index) {
   return -1;
 }
 
-function containsFolded(text, term, wholeWord) {
+function containsFolded(text: string, term: string, wholeWord: boolean): boolean {
   for (let i = 0; i < text.length; i++) {
     if (FOLD[text.charCodeAt(i)] === DROPPED) continue;
     const end = matchFoldedAt(text, i, term);
@@ -125,7 +139,7 @@ function containsFolded(text, term, wholeWord) {
   return false;
 }
 
-function hasNormalizedWholeWord(haystack, term) {
+function hasNormalizedWholeWord(haystack: string, term: string): boolean {
   let idx = 0;
   while ((idx = haystack.indexOf(term, idx)) !== -1) {
     const prev = idx > 0 ? haystack.charCodeAt(idx - 1) : -1;
@@ -136,7 +150,7 @@ function hasNormalizedWholeWord(haystack, term) {
   return false;
 }
 
-function codeEqualsQuery(codeValue, normalizedQuery) {
+function codeEqualsQuery(codeValue: string | number, normalizedQuery: string): boolean {
   const code = String(codeValue);
   if (!isFoldable(code)) return normalizeSearchText(code) === normalizedQuery;
   return foldedLength(code) === normalizedQuery.length && matchFoldedAt(code, 0, normalizedQuery) >= 0;
@@ -153,17 +167,21 @@ function codeEqualsQuery(codeValue, normalizedQuery) {
  * La requête est normalisée une seule fois. Les libellés sont comparés repliés,
  * sans créer de chaîne normalisée par candidat.
  */
-function createMatchPriorityClassifier(query) {
+function createMatchPriorityClassifier(query: unknown): MatchPriorityClassifier {
   const normalizedQuery = normalizeSearchText(query);
   const terms = queryTerms(query);
 
-  function classifyNormalized(primaryValue, idValue, codeValues) {
+  function classifyNormalized(
+    primaryValue: unknown,
+    idValue: unknown,
+    codeValues: Array<string | number>
+  ): MatchPriority {
     const value = normalizeSearchText(primaryValue);
     const normalizedId = normalizeSearchText(idValue);
 
     if (value === normalizedQuery || normalizedId === normalizedQuery) return 2;
-    for (const codeValue of codeValues) {
-      if (normalizeSearchText(codeValue) === normalizedQuery) return 2;
+    for (let i = 0; i < codeValues.length; i++) {
+      if (normalizeSearchText(codeValues[i]) === normalizedQuery) return 2;
     }
     if (value.startsWith(normalizedQuery)) return 1;
 
@@ -188,17 +206,21 @@ function createMatchPriorityClassifier(query) {
     return 0;
   }
 
-  return (primaryValue, idValueOrOptions, codeValuesParam) => {
+  return (
+    primaryValue: unknown,
+    idValueOrOptions?: unknown,
+    codeValuesParam?: Array<string | number>
+  ): MatchPriority => {
     if (!terms.length) return 0;
 
-    let idValue = '';
-    let codeValues = codeValuesParam;
+    let idValue: unknown = '';
+    let codeValues: Array<string | number> = codeValuesParam || [];
     if (typeof idValueOrOptions === 'object' && idValueOrOptions !== null) {
-      idValue = idValueOrOptions.idValue || '';
-      codeValues = idValueOrOptions.codeValues || [];
+      const opts = idValueOrOptions as MatchClassifierOptions;
+      idValue = opts.idValue || '';
+      codeValues = opts.codeValues || [];
     } else {
       idValue = idValueOrOptions || '';
-      if (!codeValues) codeValues = [];
     }
 
     const value = String(primaryValue ?? '');
@@ -210,16 +232,16 @@ function createMatchPriorityClassifier(query) {
     const queryLength = normalizedQuery.length;
     if (valueLength === queryLength && matchFoldedAt(value, 0, normalizedQuery) >= 0) return 2;
     if (idLength === queryLength && matchFoldedAt(id, 0, normalizedQuery) >= 0) return 2;
-    for (const codeValue of codeValues) {
-      if (codeEqualsQuery(codeValue, normalizedQuery)) return 2;
+    for (let i = 0; i < codeValues.length; i++) {
+      if (codeEqualsQuery(codeValues[i], normalizedQuery)) return 2;
     }
     if (matchFoldedAt(value, 0, normalizedQuery) >= 0) return 1;
 
     const haystack = valueLength > 0 ? value : id;
     if (valueLength === 0 && idLength === 0) return 0;
 
-    for (const term of terms) {
-      if (!containsFolded(haystack, term, false)) return 0;
+    for (let i = 0; i < terms.length; i++) {
+      if (!containsFolded(haystack, terms[i], false)) return 0;
     }
     let allWholeWords = true;
     for (let k = 0; k < terms.length && allWholeWords; k++) {
@@ -231,30 +253,36 @@ function createMatchPriorityClassifier(query) {
   };
 }
 
-function matchQualityFromPriority(priority) {
+function matchQualityFromPriority(priority: MatchPriority): MatchQuality {
   return MATCH_QUALITY[priority];
 }
 
-function isStrongMatchQuality(matchQuality) {
+function isStrongMatchQuality(matchQuality: string): boolean {
   return matchQuality === 'exact' || matchQuality === 'prefix';
 }
 
 const miniSearchOptions = {
-  tokenize: (text) => tokenizeSearchText(text),
-  processTerm: (term) => normalizeSearchText(term),
+  tokenize: (text: string): string[] => tokenizeSearchText(text),
+  processTerm: (term: string): string => normalizeSearchText(term),
   searchOptions: {
-    tokenize: (text) => tokenizeSearchText(text),
-    processTerm: (term) => normalizeSearchText(term),
+    tokenize: (text: string): string[] => tokenizeSearchText(text),
+    processTerm: (term: string): string => normalizeSearchText(term),
     combineWith: AND,
-    prefix: (term) => !/^\d+$/.test(term),
-    fuzzy: (term) => (/^\d/.test(term) ? false : 0.2)
+    prefix: (term: string): boolean => !/^\d+$/.test(term),
+    fuzzy: (term: string): false | number => (/^\d/.test(term) ? false : 0.2)
   }
 };
 
-const MATCH_QUALITY_RANK = { exact: 3, prefix: 2, fuzzy: 1 };
-const MATCH_VIA_RANK = { cis: 4, num: 4, denomination: 3, presentation: 2, composition: 1 };
+const MATCH_QUALITY_RANK: Record<string, number> = { exact: 3, prefix: 2, fuzzy: 1 };
+const MATCH_VIA_RANK: Record<string, number> = {
+  cis: 4,
+  num: 4,
+  denomination: 3,
+  presentation: 2,
+  composition: 1
+};
 
-module.exports = {
+export {
   miniSearchOptions,
   normalizeSearchText,
   createMatchPriorityClassifier,

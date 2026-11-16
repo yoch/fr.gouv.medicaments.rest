@@ -1,7 +1,7 @@
 'use strict';
 
-const { resolveBdpmCisKeys } = require('../src/services/searchOrchestrator');
-const { loadData } = require('../src/services/dataLoader');
+const { resolveBdpmCisKeys } = require('../src/services/searchOrchestrator.mts');
+const { loadData } = require('../src/services/dataLoader.mts');
 const { describeSlow } = require('./helpers/slowTests');
 const { DOLIPRANE_CIS, DOLIPRANE_CIP13 } = require('./fixtures/cis-cip-samples');
 

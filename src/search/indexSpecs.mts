@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Spécifications d'index FrozenMiniSearch unifiées pour BDPM et vétérinaire.
  *
@@ -14,9 +12,18 @@
  * fonctions de recherche (primaryField / idField).
  */
 
-const { presentationIndexFields, presentationIndexBoost } = require('../utils/corpusLightProfile');
+import { presentationIndexFields, presentationIndexBoost } from '../utils/corpusLightProfile.mts';
 
-const BDPM_INDEX_SPECS = {
+export interface IndexSpec {
+  file?: string;
+  fields: string[];
+  boost?: Record<string, number>;
+  primaryField: string;
+  idField: string | null;
+  codeFields?: string[];
+}
+
+const BDPM_INDEX_SPECS: Record<string, IndexSpec> = {
   specialites: {
     file: 'CIS_bdpm.txt',
     fields: ['cis', 'denomination', 'forme_pharma', 'titulaire'],
@@ -87,7 +94,7 @@ const BDPM_INDEX_SPECS = {
   }
 };
 
-const VET_INDEX_SPECS = {
+const VET_INDEX_SPECS: Record<string, IndexSpec> = {
   medicaments: {
     fields: ['nom', 'num'],
     boost: { nom: 3, num: 2 },
@@ -102,4 +109,6 @@ const VET_INDEX_SPECS = {
   }
 };
 
-module.exports = { BDPM_INDEX_SPECS, VET_INDEX_SPECS };
+export {
+BDPM_INDEX_SPECS, VET_INDEX_SPECS
+};

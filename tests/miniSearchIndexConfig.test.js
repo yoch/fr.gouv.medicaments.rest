@@ -1,5 +1,5 @@
 const { FrozenMiniSearch } = require('@yoch/frozenminisearch');
-const { miniSearchIndexConfig } = require('../src/utils/miniSearchIndexConfig');
+const { miniSearchIndexConfig } = require('../src/utils/miniSearchIndexConfig.mts');
 
 test('les poids configurés favorisent réellement la dénomination dans les scores', () => {
   const fields = ['denomination', 'titulaire'];

@@ -53,7 +53,7 @@ describe('disponibiliteQuery', () => {
       normalizeAnsmUrl: () => ''
     }));
     const { parseDisponibiliteFilters: parse } = require('../src/utils/disponibiliteQuery');
-    const { selectRuptureIndices } = require('../src/services/bdpm/disponibiliteService');
+    const { selectRuptureIndices } = require('../src/services/bdpm/disponibiliteService.mts');
     const filters = parse({ lien_ansm: 'https://ansm.sante.fr/x' });
     expect(filters.lienFilterInvalid).toBe(true);
     expect(filters.hasExactFilters).toBe(true);

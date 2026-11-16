@@ -8,10 +8,10 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const config = require('../../src/config');
-const { loadData } = require('../../src/services/dataLoader');
-const { executeHybridSearch } = require('../../src/services/searchOrchestrator');
-const { normalizeSearchText, MATCH_QUALITY_RANK } = require('../../src/utils/searchRanking');
-const { rerankWithStructuredCriteria } = require('../../src/utils/structuredSearchCriteria');
+const { loadData } = require('../../src/services/dataLoader.mts');
+const { executeHybridSearch } = require('../../src/services/searchOrchestrator.mts');
+const { normalizeSearchText, MATCH_QUALITY_RANK } = require('../../src/utils/searchRanking.mts');
+const { rerankWithStructuredCriteria } = require('../../src/utils/structuredSearchCriteria.mts');
 
 const re = (pattern) => (hit) => pattern.test(hit.denomination);
 // [catégorie, q, dosage, pertinence définie à la main sur la dénomination]

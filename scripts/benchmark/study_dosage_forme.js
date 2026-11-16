@@ -8,21 +8,21 @@
 
 const fs = require('fs');
 const path = require('path');
-const state = require('../../src/services/bdpm/state');
+const { state } = require('../../src/services/bdpm/state.mts');
 const {
   loadData,
   search,
   getSpecialiteByCis,
   getRelatedByCis,
   HYDRATE_RELATED_LIMIT
-} = require('../../src/services/dataLoader');
-const { executeHybridSearch } = require('../../src/services/searchOrchestrator');
-const { rowCount, materializeRange } = require('../../src/utils/corpusStore');
-const { normalizeSearchText } = require('../../src/utils/searchRanking');
+} = require('../../src/services/dataLoader.mts');
+const { executeHybridSearch } = require('../../src/services/searchOrchestrator.mts');
+const { rowCount, materializeRange } = require('../../src/utils/corpusStore.mts');
+const { normalizeSearchText } = require('../../src/utils/searchRanking.mts');
 const {
   parseDosageTokens,
   rerankWithStructuredCriteria
-} = require('../../src/utils/structuredSearchCriteria');
+} = require('../../src/utils/structuredSearchCriteria.mts');
 
 const REPORT_EXAMPLES = [
   {

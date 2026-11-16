@@ -1,6 +1,4 @@
-'use strict';
-
-const config = require('../config');
+import config from '../config.js';
 
 /**
  * Profil corpus allégé : ne pas charger en RAM certains champs peu utiles aux agents —
@@ -33,8 +31,8 @@ function presentationIndexBoost() {
   return { libelle: 3, indications: 2, cis: 2, cip7: 1.5, cip13: 1.5 };
 }
 
-module.exports = {
-  isCorpusLightProfile,
+export {
+isCorpusLightProfile,
   omitStoredFieldsFor,
   presentationIndexFields,
   presentationIndexBoost,

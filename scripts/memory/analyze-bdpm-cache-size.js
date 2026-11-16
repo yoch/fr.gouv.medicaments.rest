@@ -43,8 +43,8 @@ async function main() {
   console.log('=== Fichiers BDPM sur disque (Mo) ===');
   console.log(JSON.stringify(files, null, 2));
 
-  const { loadData, getBdpmCorpusStats, getBdpmSearchIndexes } = require('../../src/services/dataLoader');
-  const { rowCount } = require('../../src/utils/corpusStore');
+  const { loadData, getBdpmCorpusStats, getBdpmSearchIndexes } = require('../../src/services/dataLoader.mts');
+  const { rowCount } = require('../../src/utils/corpusStore.mts');
 
   if (typeof global.gc === 'function') global.gc();
   const memBefore = process.memoryUsage();

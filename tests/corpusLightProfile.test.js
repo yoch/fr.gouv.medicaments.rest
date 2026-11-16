@@ -12,7 +12,7 @@ const {
   isCorpusLightProfile,
   presentationIndexFields,
   omitStoredFieldsFor
-} = require('../src/utils/corpusLightProfile');
+} = require('../src/utils/corpusLightProfile.mts');
 
 describe('corpusLightProfile', () => {
   const env = { ...process.env };
@@ -25,7 +25,7 @@ describe('corpusLightProfile', () => {
   function reloadModules() {
     jest.resetModules();
     return {
-      light: require('../src/utils/corpusLightProfile'),
+      light: require('../src/utils/corpusLightProfile.mts'),
       Presentation: require('../src/models/bdpm').Presentation,
       Composition: require('../src/models/bdpm').Composition,
       MedicamentVet: require('../src/models/vet').MedicamentVet,

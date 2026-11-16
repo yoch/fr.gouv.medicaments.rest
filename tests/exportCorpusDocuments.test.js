@@ -3,9 +3,9 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { exportCorpusDocuments } = require('../src/utils/exportCorpusDocuments');
-const { buildIndexDocument } = require('../src/utils/corpusStore');
-const { miniSearchIndexConfig } = require('../src/utils/miniSearchIndexConfig');
+const { exportCorpusDocuments } = require('../src/utils/exportCorpusDocuments.mts');
+const { buildIndexDocument } = require('../src/utils/corpusStore.mts');
+const { miniSearchIndexConfig } = require('../src/utils/miniSearchIndexConfig.mts');
 const { FrozenMiniSearch } = require('@yoch/frozenminisearch');
 
 describe('exportCorpusDocuments', () => {

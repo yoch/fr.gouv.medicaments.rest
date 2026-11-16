@@ -25,9 +25,9 @@ async function runCase(name) {
       process.env.VET_PRODUCTS_FILE = 'products.xml';
       process.env.VET_DICT_FILE = 'dict.xml';
       fs.writeFileSync(path.join(temp, 'dict.xml'), '<root/>');
-      const { loadVetData } = require('../../src/services/vetDataLoader');
+      const { loadVetData } = require('../../src/services/vetDataLoader.mts');
       const { internPoolSize, clearInternPool } = require('../../src/utils/stringPool');
-      const state = require('../../src/services/vet/state');
+      const { state } = require('../../src/services/vet/state.mts');
       result.cycles = [];
       for (let cycle = 0; cycle < 3; cycle++) {
         let xml = '<root>\n';
@@ -84,7 +84,7 @@ async function runCase(name) {
       source = new PassThrough();
       fs.createReadStream = () => source;
       let status = 'pending';
-      require('../../src/services/dataLoader').loadData().then(
+      require('../../src/services/dataLoader.mts').loadData().then(
         () => { status = 'resolved'; }, error => { status = `rejected: ${error.message}`; });
       await delay(50);
       source.destroy(new Error('AUDIT_CSV_READ_FAILURE'));
@@ -113,7 +113,7 @@ async function runCase(name) {
         fs.openSync = originalOpen; fs.readSync = originalRead; fs.closeSync = originalClose;
         for (const fd of opened) if (!closed.includes(fd)) originalClose(fd);
       });
-      await require('../../src/services/vetDataLoader').loadVetData();
+      await require('../../src/services/vetDataLoader.mts').loadVetData();
       Object.assign(result, { header_fds_opened: opened.length, header_fds_closed: opened.filter(fd => closed.includes(fd)).length });
     } else if (name === 'refresh-overlap') {
       let bdpmCalls = 0;
@@ -130,8 +130,8 @@ async function runCase(name) {
         });
       } });
       replace('../../src/services/vetDataDownloader', { downloadVetDataIfNeeded: async () => ({ changed: false }) });
-      replace('../../src/services/dataLoader', { loadData: async () => {} });
-      replace('../../src/services/vetDataLoader', { loadVetData: async () => {} });
+      replace('../../src/services/dataLoader.mts', { loadData: async () => {} });
+      replace('../../src/services/vetDataLoader.mts', { loadVetData: async () => {} });
       replace('../../src/app', { createApp: () => ({ listen() {
         const server = new (require('node:events').EventEmitter)();
         server.listening = true;

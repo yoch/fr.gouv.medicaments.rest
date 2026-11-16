@@ -7,7 +7,7 @@
  */
 'use strict';
 
-const { loadVetData } = require('../../src/services/vetDataLoader');
+const { loadVetData } = require('../../src/services/vetDataLoader.mts');
 
 let rssPeak = 0;
 let heapPeak = 0;

@@ -1,7 +1,7 @@
 const request = require('supertest');
 const express = require('express');
-const medicamentRoutes = require('../src/routes/medicaments');
-const { loadData } = require('../src/services/dataLoader');
+const medicamentRoutes = require('../src/routes/medicaments/index.mts').default;
+const { loadData } = require('../src/services/dataLoader.mts');
 const { describeSlow } = require('./helpers/slowTests');
 
 const app = express();

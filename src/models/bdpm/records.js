@@ -3,7 +3,7 @@
 const { BDPM_SCHEMAS } = require('../../utils/corpusSchemas');
 const { defineCorpusRecord } = require('../defineCorpusRecord');
 const { bdpmExtraitUrl } = require('./constants');
-const { omitStoredFieldsFor } = require('../../utils/corpusLightProfile');
+const { omitStoredFieldsFor } = require('../../utils/corpusLightProfile.mts');
 const { lowCardinalityFieldsFor } = require('../../utils/bdpmInterning');
 
 const Specialite = defineCorpusRecord('Specialite', {

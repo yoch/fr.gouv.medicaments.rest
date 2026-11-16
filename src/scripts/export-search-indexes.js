@@ -7,8 +7,8 @@
  *   SEARCH_INDEX_OUT_DIR=data/search-indexes SKIP_VET=1 node src/scripts/export-search-indexes.js
  */
 
-const { loadData, exportBdpmSearchIndexes } = require('../services/dataLoader');
-const { loadVetData, exportVetSearchIndexes } = require('../services/vetDataLoader');
+const { loadData, exportBdpmSearchIndexes } = require('../services/dataLoader.mts');
+const { loadVetData, exportVetSearchIndexes } = require('../services/vetDataLoader.mts');
 const config = require('../config');
 
 const OUT_DIR = config.searchIndexOutDir;
