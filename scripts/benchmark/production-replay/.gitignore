@@ -1,0 +1,8 @@
+private/
+*.jsonl
+*.jsonl.gz
+*.tsv
+.env
+__pycache__/
+*.pyc
+!examples/*.jsonl

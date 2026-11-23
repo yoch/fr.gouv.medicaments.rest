@@ -18,6 +18,15 @@ Utile pour vérifier qu'un changement de ranking dans `@yoch/frozenminisearch`
 ou dans `src/utils/searchRanking.js` ne régresse pas par rapport au comportement
 MiniSearch canonique.
 
+## Évaluation de la qualité de recherche (B0 / B1 / B2)
+
+Deux bancs complémentaires, qui rejouent un checkout figé (`--repo`, `--expected-sha`) sur le corpus local :
+
+- `production-replay/` — appels d'outil réels rejoués, notés à l'aveugle par un juge LLM.
+  Code et tests synthétiques seulement : les données de production restent hors dépôt.
+- `curated-suite/` — 108 cas à réponse connue, notation déterministe sans LLM
+  (non-régression par famille de requêtes).
+
 ## Autres scripts
 
 - `vet-xml-parsers.js` — compare les parsers XML vétérinaires (`fast-xml-parser`,
