@@ -2,7 +2,9 @@ jest.mock('../src/services/dataLoader', () => {
   const rows = {
     '10000001': { cis: '10000001', denomination: 'GALIUM APARINE', match_quality: 'fuzzy' },
     '90000001': { cis: '90000001', denomination: 'ASPIRINE', match_quality: 'exact' },
-    '90000002': { cis: '90000002', denomination: 'ASPIRINE 1000 mg', match_quality: 'prefix' }
+    '90000002': { cis: '90000002', denomination: 'ASPIRINE 1000 mg', match_quality: 'prefix' },
+    '90000003': { cis: '90000003', denomination: 'ASPIRINE', match_quality: 'exact' },
+    '90000004': { cis: '90000004', denomination: 'ASPIRINE', match_quality: 'exact' }
   };
   return {
     searchKeyMatches: type => type === 'specialites' ? Object.values(rows) : [],
@@ -44,4 +46,16 @@ test.each(['auto', 'human', 'veterinary', 'mixed'])('classe avant pagination pou
     // Le chemin paginé n'hydrate pas le boost interne, absent des réponses HTTP.
     expect(paged).toEqual(full.map(({ criteria_boost, ...hit }) => hit));
   }
+});
+
+
+test('le tri borné conserve les égalités à la frontière de page', () => {
+  expect(executeHybridSearchPage('aspirine', 'auto', 2, 1)).toMatchObject({
+    total: 5,
+    results: [{ cis: '90000003', match_quality: 'exact' }]
+  });
+  expect(executeHybridSearchPage('aspirine', 'auto', 9, 1)).toMatchObject({
+    total: 5,
+    results: []
+  });
 });
