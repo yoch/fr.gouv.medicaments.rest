@@ -127,10 +127,8 @@ function mapRowToDisponibiliteAlert(row, medicineName) {
 }
 
 function compareDisponibiliteRowsByMajDesc(a, b) {
-  const da = parseBdpmDate(a.date_mise_a_jour);
-  const db = parseBdpmDate(b.date_mise_a_jour);
-  const ta = da ? da.getTime() : 0;
-  const tb = db ? db.getTime() : 0;
+  const ta = a._dateMiseAJourMs ?? parseBdpmDate(a.date_mise_a_jour)?.getTime() ?? 0;
+  const tb = b._dateMiseAJourMs ?? parseBdpmDate(b.date_mise_a_jour)?.getTime() ?? 0;
   if (tb !== ta) return tb - ta;
   return String(a.cis || '').localeCompare(String(b.cis || ''));
 }
