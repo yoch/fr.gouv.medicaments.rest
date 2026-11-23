@@ -197,13 +197,50 @@ function sortMergedResults(results) {
   });
 }
 
-function sortResultRefs(refs) {
-  return [...refs].sort((a, b) => {
-    const rankA = MATCH_QUALITY_RANK[a.match_quality] || 0;
-    const rankB = MATCH_QUALITY_RANK[b.match_quality] || 0;
-    if (rankB !== rankA) return rankB - rankA;
-    return a.label.localeCompare(b.label, 'fr');
-  });
+function compareResultRefs(a, b) {
+  const rankA = MATCH_QUALITY_RANK[a.match_quality] || 0;
+  const rankB = MATCH_QUALITY_RANK[b.match_quality] || 0;
+  if (rankB !== rankA) return rankB - rankA;
+  return a.label.localeCompare(b.label, 'fr');
+}
+
+function selectResultPage(refs, page, limit, criteria) {
+  const { offset, safeLimit } = parseListPaging(page, limit);
+  if (offset >= refs.length) return [];
+  const end = Math.min(offset + safeLimit, refs.length);
+  if (hasStructuredCriteria(criteria) || end * 2 >= refs.length) {
+    const sorted = [...refs].sort(compareResultRefs);
+    return applyCriteriaToRefs(sorted, criteria).slice(offset, end);
+  }
+
+  // Tas max des indices retenus. L'indice départage les égalités comme le tri stable.
+  const compare = (a, b) => compareResultRefs(refs[a], refs[b]) || a - b;
+  const heap = new Uint32Array(end);
+  for (let i = 0; i < end; i++) heap[i] = i;
+
+  function siftDown(start) {
+    const kept = heap[start];
+    let position = start;
+    let child = position * 2 + 1;
+    while (child < end) {
+      if (child + 1 < end && compare(heap[child], heap[child + 1]) < 0) child++;
+      if (compare(kept, heap[child]) >= 0) break;
+      heap[position] = heap[child];
+      position = child;
+      child = position * 2 + 1;
+    }
+    heap[position] = kept;
+  }
+
+  for (let i = Math.floor(end / 2) - 1; i >= 0; i--) siftDown(i);
+  for (let i = end; i < refs.length; i++) {
+    if (compare(i, heap[0]) >= 0) continue;
+    heap[0] = i;
+    siftDown(0);
+  }
+
+  heap.sort(compare);
+  return Array.from(heap.subarray(offset), index => refs[index]);
 }
 
 function bdpmRefs(matches) {
@@ -370,11 +407,9 @@ function executeHybridSearchPage(q, source, page = 1, limit = 50, criteria = {})
   const bdpmStrong =
     refs.length > 0 && refs.some((r) => isStrongMatchQuality(r.match_quality));
   if (plan.merge === 'auto' && bdpmStrong) {
-    const finalRefs = applyCriteriaToRefs(sortResultRefs(refs), criteria);
-    const { offset, safeLimit } = parseListPaging(page, limit);
-    const pageRefs = finalRefs.slice(offset, offset + safeLimit);
+    const pageRefs = selectResultPage(refs, page, limit, criteria);
     return {
-      total: finalRefs.length,
+      total: refs.length,
       results: pageRefs.map((ref) => hydrateResultRef(ref, matchesBySource)),
       search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
     };
@@ -396,11 +431,9 @@ function executeHybridSearchPage(q, source, page = 1, limit = 50, criteria = {})
     refs = vetResultRefs.length > 0 ? vetResultRefs : refs;
   }
 
-  const finalRefs = applyCriteriaToRefs(sortResultRefs(refs), criteria);
-  const { offset, safeLimit } = parseListPaging(page, limit);
-  const pageRefs = finalRefs.slice(offset, offset + safeLimit);
+  const pageRefs = selectResultPage(refs, page, limit, criteria);
   return {
-    total: finalRefs.length,
+    total: refs.length,
     results: pageRefs.map((ref) => hydrateResultRef(ref, matchesBySource)),
     search: buildSearchMeta({ q, sourceMode, queried, withResults, explicitSource })
   };
