@@ -43,7 +43,7 @@ const { FROM_CSV, bdpmExtraitUrl, Substance } = require('../models/bdpm');
 const { BDPM_INDEX_SPECS } = require('../search/indexSpecs');
 const { normalizeAnsmUrl } = require('../utils/ansmUrl');
 const { cleanText } = require('../utils/textCleanup');
-const { buildDisponibiliteAlertId } = require('../utils/disponibiliteQuery');
+const { buildDisponibiliteAlertId, parseBdpmDate } = require('../utils/disponibiliteQuery');
 const config = require('../config');
 const state = require('./bdpm/state');
 const { exportBdpmSearchIndexes, exportBdpmCorpusDocuments } = require('./bdpm/exportApi');
@@ -123,9 +123,11 @@ function buildCisIndexes() {
   const rupturesByAlertId = new Map();
   const rupturesRows = corpus.ruptures;
   for (let i = 0; i < rupturesRows.length; i++) {
-    const normalized = normalizeAnsmUrl(rupturesRows[i].lien_ansm);
+    const row = rupturesRows[i];
+    const normalized = normalizeAnsmUrl(row.lien_ansm);
     if (normalized) appendToKeyList(rupturesByLienAnsm, normalized, i);
-    rupturesByAlertId.set(buildDisponibiliteAlertId(rupturesRows[i]), i);
+    rupturesByAlertId.set(buildDisponibiliteAlertId(row), i);
+    row._dateMiseAJourMs = parseBdpmDate(row.date_mise_a_jour)?.getTime() ?? 0;
   }
 
   state.cisIndexes = {
