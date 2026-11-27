@@ -31,6 +31,7 @@
 
 const { spawnSync } = require('child_process');
 const fs = require('fs');
+const { createRequire } = require('module');
 const path = require('path');
 
 const root = path.join(__dirname, '..', '..');
@@ -58,10 +59,11 @@ const SWAGGER_ASSETS = [
   'favicon-16x16.png',
   'favicon-32x32.png'
 ];
-// swagger-ui-dist est une dépendance de swagger-ui-express : le résoudre depuis lui.
-const swaggerDir = require(
-  require.resolve('swagger-ui-dist', { paths: [path.dirname(require.resolve('swagger-ui-express'))] })
-).getAbsoluteFSPath();
+// Le dossier que swagger-ui-express sert réellement : il le lit avec
+// require('swagger-ui-dist/absolute-path'), résolu depuis son propre module (swagger-ui-dist
+// n'est pas une dépendance directe du projet).
+const requireFromSwaggerUiExpress = createRequire(require.resolve('swagger-ui-express'));
+const swaggerDir = requireFromSwaggerUiExpress('swagger-ui-dist/absolute-path')();
 const assets = ['public', ...SWAGGER_ASSETS.map((file) => path.join(swaggerDir, file))].map(
   (asset) => path.relative(root, path.resolve(root, asset))
 );
@@ -86,11 +88,27 @@ const args = [
   outfile,
   `--metafile=${metafile}`
 ];
-const build = spawnSync('bun', args, { cwd: root, stdio: 'inherit' });
+// NODE_ENV=production aussi dans l'environnement de Bun : le --define le fixe déjà, ceci
+// évite qu'un NODE_ENV=development exporté dans le shell de build ne prête à confusion.
+const build = spawnSync('bun', args, {
+  cwd: root,
+  encoding: 'utf8',
+  env: { ...process.env, NODE_ENV: 'production' },
+  maxBuffer: 64 * 1024 * 1024
+});
+const output = `${build.stdout || ''}${build.stderr || ''}`;
+process.stdout.write(output);
 if (build.status !== 0) fail(`bun ${args.join(' ')} a échoué (code ${build.status})`);
 
 const inputs = Object.keys(JSON.parse(fs.readFileSync(metafile, 'utf8')).inputs);
 const library = inputs.filter((input) => input.includes('@yoch/frozenminisearch/'));
+// Résolue ne veut pas dire typée : sur une erreur de type dans la source, Bun la compile
+// sans ses types, en le signalant (même critère que make test-aot dans minisearch).
+if (/compiled without (its|their) types|index\.aot\.ts:\d+:\d+/.test(output)) {
+  const message = 'Bun signale un diagnostic dans la source typée de FrozenMiniSearch ou la compile sans ses types';
+  if (requireAot) fail(message);
+  console.warn(`build:aot: attention : ${message}`);
+}
 if (!library.some((input) => input.endsWith(aotSource))) {
   const message =
     `FrozenMiniSearch compilé depuis ${library.join(', ') || '?'} et non depuis la source typée ` +
