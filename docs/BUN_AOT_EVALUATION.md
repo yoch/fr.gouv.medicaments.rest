@@ -1,5 +1,8 @@
 # Évaluation de Bun `--compile --aot` pour le serveur complet
 
+> Mesures historiques (Bun 1.4.4-canary). Construction, vérification, déploiement et état
+> sur les versions récentes : [BUN_AOT.md](BUN_AOT.md).
+
 Évaluation locale, branche `perf/bun-aot` (base `v1.7.2`), Bun `1.4.4-canary`,
 Node 24.18, i7-3770 (4 cœurs / 8 threads), jeu de données BDPM + ANMV du
 29 octobre 2026. Charge générée par `scripts/benchmark/http-load.js` (8 connexions
