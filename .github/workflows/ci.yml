@@ -93,6 +93,48 @@ jobs:
           npm run generate:openapi
           git diff --exit-code src/openapi.generated.json
 
+  # Exécutable Bun --compile --aot (docs/BUN_AOT.md). Non bloquant tant que --aot est
+  # expérimental : un écart de Bun canary ne doit pas bloquer une fusion. Sans corpus sur
+  # ubuntu-latest, on vérifie le build et le refus de démarrer sans DATA_DIR ; la
+  # comparaison complète avec Node (npm run smoke:aot) se lance avec les données.
+  aot-build:
+    name: Bun AOT executable (build, non bloquant)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          # Vérifié sur 1.4.6-canary ; épingler la première version stable qui inclut --aot.
+          bun-version: canary
+
+      - name: Install dependencies cleanly from lockfile
+        run: npm ci
+
+      - name: Build the executable
+        run: npm run build:aot
+
+      - name: Refuse to start without DATA_DIR
+        run: |
+          set +e
+          output=$(env -u DATA_DIR ./dist/medicaments-api 2>&1)
+          status=$?
+          set -e
+          echo "$output"
+          if [ "$status" -eq 0 ] || ! echo "$output" | grep -q 'DATA_DIR est obligatoire'; then
+            echo "The executable should exit with the DATA_DIR error" >&2
+            exit 1
+          fi
+
   # Job manuel hors CI standard (ubuntu-latest ne contient pas les fichiers bruts BDPM/ANMV
   # non versionnés). À lancer sur un runner self-hosted équipé du corpus, ou localement via :
   #   DATA_DIR=... VET_DATA_DIR=... VET_RCP_EQUIVALENCE_XML=... npm run test:all

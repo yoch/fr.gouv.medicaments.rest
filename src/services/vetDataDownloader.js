@@ -36,12 +36,29 @@ const HTTP_HEADERS = {
 };
 
 async function ensure7zipExecutable() {
-  const bin = sevenBin.path7za;
-  if (!fs.existsSync(bin)) {
-    throw new Error(`Binaire 7za introuvable: ${bin}`);
+  const configured = config.sevenZipPath;
+  if (!configured) {
+    const bin = sevenBin.path7za;
+    if (!fs.existsSync(bin)) {
+      throw new Error(`Binaire 7za introuvable: ${bin}`);
+    }
+    // Le binaire livré par 7zip-bin perd parfois son bit x à l'installation.
+    await fs.chmod(bin, 0o755);
+    return bin;
   }
-  await fs.chmod(bin, 0o755);
-  return bin;
+  // Chemin configuré (SEVEN_ZIP_PATH, ou 7za à côté de l'exécutable compilé) : utilisé tel
+  // quel, éventuellement en lecture seule, donc seulement vérifié.
+  if (!path.isAbsolute(configured)) {
+    throw new Error(`SEVEN_ZIP_PATH doit être un chemin absolu: ${configured}`);
+  }
+  try {
+    await fs.access(configured, fs.constants.X_OK);
+  } catch {
+    throw new Error(
+      `Binaire 7za introuvable ou non exécutable: ${configured} (SEVEN_ZIP_PATH, ou 7za à côté de l'exécutable compilé)`
+    );
+  }
+  return configured;
 }
 
 async function extractArchive(archivePath, destDir) {
@@ -92,6 +109,10 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
       return { changed: false };
     }
 
+    // Vérifier 7za avant de télécharger : une archive enregistrée sans être extraite
+    // aurait un hash à jour et ne serait plus jamais extraite.
+    if (extract) await ensure7zipExecutable();
+
     const fileHash = await downloadFile(url, tempPath, {
       headers: HTTP_HEADERS,
       timeoutMs: 120000
@@ -108,6 +129,14 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
     }
 
     await fs.move(tempPath, finalPath, { overwrite: true });
+
+    // Extraire avant d'enregistrer le hash : si l'extraction échoue, le cycle suivant
+    // voit un hash différent et recommence au lieu de garder l'ancien XML.
+    if (extract) {
+      await extractArchive(finalPath, VET_DATA_DIR);
+      console.log(`✓ Archive vétérinaire extraite dans ${VET_DATA_DIR}`);
+    }
+
     metadata[filename] = {
       downloadedAt: new Date().toISOString(),
       checkedAt: new Date().toISOString(),
@@ -117,11 +146,6 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
     };
     await saveJsonMeta(META_FILE, metadata, VET_DATA_DIR);
     console.log(`✓ ${filename} (vétérinaire) mis à jour`);
-
-    if (extract) {
-      await extractArchive(finalPath, VET_DATA_DIR);
-      console.log(`✓ Archive vétérinaire extraite dans ${VET_DATA_DIR}`);
-    }
 
     return { changed: true };
   } catch (error) {

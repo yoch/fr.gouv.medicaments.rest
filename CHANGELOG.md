@@ -7,6 +7,15 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
 ## [Non publié]
 
+### Ajouté
+
+- Exécutable autonome compilé avec Bun `--compile --aot` (expérimental, le chemin Node ne change pas) : `npm run build:aot` produit `dist/medicaments-api` et `dist/7za`, `npm run smoke:aot` compare ses réponses à celles de `node src/server.js` sur les mêmes données. Déploiement par l'unité systemd `deploy/medicaments-api.service` (recommandé) ou par `ecosystem.aot.config.js` (PM2). Voir `docs/BUN_AOT.md`.
+- Variable d'environnement `SEVEN_ZIP_PATH` : binaire `7za` à utiliser pour extraire l'archive vétérinaire (défaut : celui de `7zip-bin` sous Node, celui posé à côté de l'exécutable compilé).
+
+### Modifié
+
+- Dans l'exécutable compilé, `DATA_DIR` est obligatoire : le défaut `<dépôt>/data` désignerait le dossier de la machine de build.
+
 ## [1.8.0] - 2026-11-16
 
 ### Ajouté
