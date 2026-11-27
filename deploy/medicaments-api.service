@@ -1,0 +1,66 @@
+# Unité systemd pour l'exécutable compilé (npm run build:aot).
+# Voir docs/BUN_AOT.md, « Déploiement ».
+#
+# Installation (exemple) :
+#   sudo useradd --system --home /srv/medicaments --shell /usr/sbin/nologin medicaments
+#   sudo install -d -o medicaments -g medicaments /srv/medicaments/data /srv/medicaments/data/veterinaires
+#   sudo install -D -m 0755 dist/medicaments-api /opt/medicaments-api/medicaments-api
+#   sudo install -D -m 0755 dist/7za /opt/medicaments-api/7za
+#   sudo install -D -m 0640 -g medicaments deploy/medicaments-api.env.example /etc/medicaments-api.env
+#   sudo cp deploy/medicaments-api.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now medicaments-api
+#   curl -sS http://127.0.0.1:3100/health
+
+[Unit]
+Description=API des médicaments (exécutable Bun AOT)
+After=network-online.target
+Wants=network-online.target
+# 5 redémarrages en 60 s au plus : au-delà, l'unité reste en échec.
+StartLimitIntervalSec=60s
+StartLimitBurst=5
+
+[Service]
+Type=exec
+User=medicaments
+Group=medicaments
+WorkingDirectory=/srv/medicaments
+ExecStart=/opt/medicaments-api/medicaments-api
+# Les variables de ce fichier priment sur un éventuel .env du WorkingDirectory
+# (chargé par l'exécutable, sans écraser les variables déjà définies).
+EnvironmentFile=/etc/medicaments-api.env
+
+# RELOAD_STRATEGY=restart : le processus sort (code 0) après une mise à jour des données.
+# Restart=always le relance dans ce cas comme après un plantage ; `systemctl stop` l'arrête.
+Restart=always
+RestartSec=2s
+KillSignal=SIGTERM
+TimeoutStopSec=30s
+
+# Le chargement BDPM (~20 s) précède l'écoute du port : pas de Type=notify, et Apache
+# renvoie une erreur pendant chaque redémarrage, comme avec PM2.
+
+# Journal : `journalctl -u medicaments-api` (rotation par journald).
+StandardOutput=journal
+StandardError=journal
+
+# Mémoire : RSS mesurée ~210-310 Mo au repos et après chargement vétérinaire, pic ~400 Mo
+# sous charge (docs/BUN_AOT_EVALUATION.md). À ajuster sur la machine cible.
+# Ne pas poser LimitAS : l'exécutable AOT réserve ~38 Go d'adresses virtuelles.
+MemoryHigh=600M
+MemoryMax=900M
+
+# Durcissement : seul le dossier des données est accessible en écriture.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+ReadWritePaths=/srv/medicaments/data
+
+[Install]
+WantedBy=multi-user.target
