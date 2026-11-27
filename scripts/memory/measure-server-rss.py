@@ -6,12 +6,18 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 OUT = os.environ.get('MEM_OUT', '/tmp/server-rss')
 os.makedirs(OUT, exist_ok=True)
 PORT = 3230
+# Exécutables compilés : chemins par variable d'environnement (MEM_BIN_<VARIANTE>, tirets
+# en soulignés). Seul `aot` a un défaut : la sortie de `npm run build:aot`.
+def binary(name, default=None):
+    return os.environ.get('MEM_BIN_' + name.upper().replace('-', '_'), default)
+
 VARIANTS = {
     'node':       ['node', 'src/server.js'],
-    'jit':        ['/tmp/opencode/server-noaot'],
-    'aot-npm':    ['/tmp/opencode/server-aot'],
-    'aot-lib':    ['/tmp/opencode/server-aot-lib'],
-    'aot-lib-trim': ['/tmp/opencode/server-aot-lib-trim'],
+    'aot':        [binary('aot', os.path.join(ROOT, 'dist', 'medicaments-api'))],
+    'jit':        [binary('jit')],
+    'aot-npm':    [binary('aot-npm')],
+    'aot-lib':    [binary('aot-lib')],
+    'aot-lib-trim': [binary('aot-lib-trim')],
 }
 PATHS = ','.join([
     '/health',
@@ -70,7 +76,8 @@ def sample_for(pid, seconds, step=0.25):
 
 
 def run(name):
-    env = dict(os.environ, PORT=str(PORT), NODE_ENV='test', ENABLE_RATE_LIMIT='false',
+    # Les exécutables compilés figent NODE_ENV=production au build : même valeur pour Node.
+    env = dict(os.environ, PORT=str(PORT), NODE_ENV='production', ENABLE_RATE_LIMIT='false',
                VET_LOAD_DEFERRED='false', VET_LOAD_DELAY_MS='0',
                BDPM_CHECK_INTERVAL_HOURS='596', VET_CHECK_INTERVAL_HOURS='596',
                DATA_DIR=f'{ROOT}/data', VET_DATA_DIR=f'{ROOT}/data/veterinaires')
@@ -121,6 +128,8 @@ def run(name):
     print(json.dumps(res), flush=True)
 
 
-for n in (sys.argv[1:] or list(VARIANTS)):
+for n in (sys.argv[1:] or [name for name, cmd in VARIANTS.items() if cmd[0]]):
+    if not VARIANTS[n][0]:
+        sys.exit(f'{n}: définir MEM_BIN_{n.upper().replace("-", "_")}')
     run(n)
     time.sleep(3)

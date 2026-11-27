@@ -37,18 +37,28 @@ const HTTP_HEADERS = {
 
 async function ensure7zipExecutable() {
   const configured = config.sevenZipPath;
-  const bin = configured || sevenBin.path7za;
-  if (!fs.existsSync(bin)) {
+  if (!configured) {
+    const bin = sevenBin.path7za;
+    if (!fs.existsSync(bin)) {
+      throw new Error(`Binaire 7za introuvable: ${bin}`);
+    }
+    // Le binaire livré par 7zip-bin perd parfois son bit x à l'installation.
+    await fs.chmod(bin, 0o755);
+    return bin;
+  }
+  // Chemin configuré (SEVEN_ZIP_PATH, ou 7za à côté de l'exécutable compilé) : utilisé tel
+  // quel, éventuellement en lecture seule, donc seulement vérifié.
+  if (!path.isAbsolute(configured)) {
+    throw new Error(`SEVEN_ZIP_PATH doit être un chemin absolu: ${configured}`);
+  }
+  try {
+    await fs.access(configured, fs.constants.X_OK);
+  } catch {
     throw new Error(
-      configured
-        ? `Binaire 7za introuvable: ${bin} (SEVEN_ZIP_PATH, ou 7za à côté de l'exécutable compilé)`
-        : `Binaire 7za introuvable: ${bin}`
+      `Binaire 7za introuvable ou non exécutable: ${configured} (SEVEN_ZIP_PATH, ou 7za à côté de l'exécutable compilé)`
     );
   }
-  // Le binaire livré par 7zip-bin perd parfois son bit x à l'installation ; un chemin
-  // configuré est fourni tel quel (éventuellement en lecture seule).
-  if (!configured) await fs.chmod(bin, 0o755);
-  return bin;
+  return configured;
 }
 
 async function extractArchive(archivePath, destDir) {

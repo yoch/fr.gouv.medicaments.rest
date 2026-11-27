@@ -16,6 +16,11 @@
  *   implique --production ; vérifié sur 1.4.6-canary.1+736fe1187). Express et src/config.js
  *   lisent cette constante : le NODE_ENV de l'environnement d'exécution est ignoré.
  *   `--production` donnerait la même valeur mais minifierait aussi le code.
+ * - `--asset` embarque public/ (page d'accueil) et les fichiers de swagger-ui-dist que
+ *   swagger-ui-express sert sous /api-docs/. Dans l'exécutable, `__dirname` et les chemins
+ *   de node_modules restent ceux de la machine de build : sans ces assets, `/` répond 404
+ *   et Swagger UI reçoit sa page HTML à la place de son CSS et de son JS, dès que le
+ *   checkout n'est plus là.
  * - 7za (7zip-bin) est copié à côté de l'exécutable : un binaire embarqué ne peut pas
  *   être lancé avec execFile.
  * - Si @yoch/frozenminisearch expose la condition d'export "aot", `bun build --compile --aot`
@@ -44,6 +49,26 @@ const help = spawnSync('bun', ['build', '--help'], { encoding: 'utf8' });
 if (help.error) fail(`bun introuvable (${help.error.message}) : https://bun.com/docs/installation`);
 if (!/^\s*--aot(?![\w-])/m.test(help.stdout)) fail('cette version de Bun ne propose pas --aot');
 
+// Fichiers lus par swagger-ui-express (serve + setup) ; le reste de swagger-ui-dist
+// (cartes source, bundles ES) ajouterait ~10 Mo.
+const SWAGGER_ASSETS = [
+  'swagger-ui.css',
+  'swagger-ui-bundle.js',
+  'swagger-ui-standalone-preset.js',
+  'favicon-16x16.png',
+  'favicon-32x32.png'
+];
+// swagger-ui-dist est une dépendance de swagger-ui-express : le résoudre depuis lui.
+const swaggerDir = require(
+  require.resolve('swagger-ui-dist', { paths: [path.dirname(require.resolve('swagger-ui-express'))] })
+).getAbsoluteFSPath();
+const assets = ['public', ...SWAGGER_ASSETS.map((file) => path.join(swaggerDir, file))].map(
+  (asset) => path.relative(root, path.resolve(root, asset))
+);
+for (const asset of assets) {
+  if (!fs.existsSync(path.join(root, asset))) fail(`asset introuvable : ${asset}`);
+}
+
 fs.mkdirSync(outDir, { recursive: true });
 const args = [
   'build',
@@ -51,6 +76,7 @@ const args = [
   '--aot',
   '--trim',
   '--trim-locales=fr',
+  ...assets.flatMap((asset) => ['--asset', asset]),
   '--define',
   'process.env.MEDICAMENTS_STANDALONE="1"',
   '--define',

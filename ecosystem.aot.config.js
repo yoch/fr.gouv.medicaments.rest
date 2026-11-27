@@ -33,7 +33,7 @@ const path = require('path');
 // masquerait celle de .env.
 const dotenvPath = path.join(__dirname, '.env');
 const dotenvSetsDataDir =
-  fs.existsSync(dotenvPath) && /^\s*DATA_DIR\s*=/m.test(fs.readFileSync(dotenvPath, 'utf8'));
+  fs.existsSync(dotenvPath) && /^\s*(?:export\s+)?DATA_DIR\s*=\s*\S/m.test(fs.readFileSync(dotenvPath, 'utf8'));
 const dataDirEnv =
   (process.env.DATA_DIR || dotenvSetsDataDir) ? {} : { DATA_DIR: path.join(__dirname, 'data') };
 

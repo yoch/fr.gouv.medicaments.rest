@@ -21,6 +21,8 @@ npm run build:aot -- --require-aot # échoue si FrozenMiniSearch n'est pas compi
 
 Le script vérifie dans le metafile que `@yoch/frozenminisearch` est compilé depuis `dist/aot/index.aot.ts`. Cette source typée est publiée derrière la condition d'export `"aot"`, que `bun build --compile --aot` choisit seul, aussi pour `require` : `--conditions=aot` n'est plus nécessaire. Avec une version du paquet sans cette condition, le build passe mais compile le JavaScript non typé de la bibliothèque, ce qui rend la recherche plus lente (−45 à −55 % mesurés dans l'évaluation). Le script affiche alors un avertissement, et `--require-aot` en fait une erreur.
 
+`--asset` embarque `public/` (la page d'accueil) et les cinq fichiers de `swagger-ui-dist` que sert `/api-docs/` (CSS, bundles, favicons, ~2 Mo). Dans l'exécutable, `__dirname` et les chemins de `node_modules` restent ceux de la machine de build. Sans ces assets, une fois le checkout absent, `/` répond 404 et Swagger UI reçoit sa page HTML à la place de son CSS et de son JS. L'exécutable fait 74,5 Mo.
+
 `7za` (de `7zip-bin`) est copié à côté de l'exécutable. Un binaire embarqué ne peut pas être lancé avec `execFile`.
 
 ## Vérifier
@@ -29,9 +31,11 @@ Le script vérifie dans le metafile que `@yoch/frozenminisearch` est compilé de
 DATA_DIR=/chemin/data VET_DATA_DIR=/chemin/data/veterinaires npm run smoke:aot
 ```
 
-`scripts/aot/smoke.js` démarre l'exécutable et `node src/server.js` sur deux ports libres, avec les mêmes données. Il compare ensuite statut et corps sur 15 chemins : `/`, Swagger, `/health`, `/config`, recherches exacte, floue, accentuée et par CIP, disponibilités, vétérinaire, erreurs 400 et 404. Les horodatages, la mémoire et l'uptime sont ignorés. Utilise une copie récente des données : les deux serveurs partagent `DATA_DIR`, et l'intervalle maximal (596 h) n'évite un téléchargement que si les données ont moins de 25 jours.
+`scripts/aot/smoke.js` démarre l'exécutable et `node src/server.js` sur deux ports libres. Chaque serveur reçoit sa propre copie des données (`DATA_DIR` n'est jamais modifié) et un répertoire courant vide, pour qu'aucun `.env` ne s'applique. Le script compare ensuite statut et corps sur 16 chemins : `/`, Swagger et son CSS, `/health`, `/config`, recherches exacte, floue, accentuée et par CIP, disponibilités, vétérinaire, erreurs 400 et 404. Les horodatages du moment, la mémoire et l'uptime sont ignorés. Avec des données de plus de 25 jours, chaque serveur les télécharge à nouveau dans sa copie : l'intervalle maximal est de 596 h.
 
-Résultat sur `736fe1187` avec les données du 15/11/2026 : **15 chemins identiques à Node**, et la lib est bien compilée depuis la source typée.
+Résultat sur `736fe1187` avec les données du 15/11/2026 : **16 chemins identiques à Node**, et la lib est bien compilée depuis la source typée.
+
+Lancé depuis le checkout de build, le smoke test ne voit pas un asset manquant, puisque les chemins embarqués existent aussi sur le disque. Pour vérifier l'exécutable tel qu'il sera déployé : copier le dépôt (`git ls-files` et `node_modules`), y lancer `npm run build:aot`, sortir `dist/medicaments-api` et `dist/7za`, supprimer la copie, puis démarrer l'exécutable et interroger `/`, `/api-docs/swagger-ui.css` et une recherche. C'est ainsi qu'a été vérifiée la version actuelle.
 
 - Le binaire est prêt en ~19 s, chargement BDPM compris.
 - Il s'arrête sur SIGTERM.
@@ -40,7 +44,7 @@ Résultat sur `736fe1187` avec les données du 15/11/2026 : **15 chemins identiq
 ## Ce que l'exécutable demande à l'hôte
 
 - **Données** : `DATA_DIR` et `VET_DATA_DIR` sont des chemins absolus, accessibles en écriture (téléchargements, `meta.json`). Dans un exécutable `--aot`, `__dirname` reste le dossier source de la machine de build. Le défaut `<dépôt>/data` pointerait donc en silence vers ce checkout : l'exécutable refuse de démarrer sans `DATA_DIR`.
-- **7za** : à côté de l'exécutable (`dist/7za`), ou indiqué par `SEVEN_ZIP_PATH`. Il n'est utilisé que pour extraire l'archive vétérinaire après un téléchargement.
+- **7za** : à côté de l'exécutable (`dist/7za`), ou à un chemin absolu indiqué par `SEVEN_ZIP_PATH`. Il doit être exécutable : il n'est pas modifié. Il ne sert qu'à extraire l'archive vétérinaire après un téléchargement.
 - **`file` et `iconv`** : sur le `PATH`, comme sous Node (`src/services/dataDownloader.js`).
 - **Configuration** : variables d'environnement, ou `.env` du répertoire courant. L'exécutable charge ce `.env` sans écraser les variables déjà définies. `--env-file` n'existe pas pour l'exécutable.
 - **Mémoire virtuelle** : ~38 Go d'adresses réservées. Ne pas poser `ulimit -v` ni `LimitAS`.
@@ -87,7 +91,7 @@ Retour arrière : `sudo systemctl disable --now medicaments-api`, puis `pm2 star
 - **Rang de FrozenMiniSearch :** sa première cause n'arrive qu'au rang 840. Compilée depuis sa source typée, la bibliothèque n'est plus un poste du rapport.
 - **Accès typés :** 20,6 % des accès aux propriétés du serveur sont une simple lecture, contre 30,8 % dans l'évaluation. Côté dépendances : 2 726 libres, 3 005 testés, 7 462 par nom.
 - **Code du serveur :** les premières causes viennent de `src/` et sont des `exposed-variable` au niveau module, c'est-à-dire des exports CommonJS, sans type. Les traiter demande de migrer en modules ES typés (essai sur `experiment/bun-aot`). C'est hors du périmètre de ce déploiement, et sans gain mesuré sur le chemin d'une requête dans l'évaluation.
-- **`--trim` :** il ne retire que ~14 Mo (86,3 → 72,3 Mo ; 160,5 Mo en `--no-aot`). `graceful-fs`, chargé par `fs-extra`, lit `global[gracefulQueue]` (une clé symbole calculée) et appelle `eval`. Le compilateur garde donc l'interpréteur, l'inspecteur, les profileurs, `Bun.build`, `Bun.$`, etc. Piste de suivi : remplacer `fs-extra` par `node:fs` dans les trois modules qui l'importent. Le gain ne porterait que sur la taille du fichier. Sur un build antérieur, `--trim` avait donné 54,5 Mo.
+- **`--trim` :** il ne retire que ~14 Mo (86,3 → 72,3 Mo sans les assets, 74,5 Mo avec ; 160,5 Mo en `--no-aot`). `graceful-fs`, chargé par `fs-extra`, lit `global[gracefulQueue]` (une clé symbole calculée) et appelle `eval`. Le compilateur garde donc l'interpréteur, l'inspecteur, les profileurs, `Bun.build`, `Bun.$`, etc. Piste de suivi : remplacer `fs-extra` par `node:fs` dans les trois modules qui l'importent. Le gain ne porterait que sur la taille du fichier. Sur un build antérieur, `--trim` avait donné 54,5 Mo.
 - **`Intl` :** `--explain=trim` ne l'attribue plus à FrozenMiniSearch. `--trim-locales=fr` reste nécessaire pour `localeCompare(…, 'fr')`.
 
 ## Bugs Bun connus et mitigations

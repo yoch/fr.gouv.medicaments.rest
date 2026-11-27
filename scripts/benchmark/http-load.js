@@ -104,6 +104,17 @@ function createClient(opts) {
               elapsedMs: Number(process.hrtime.bigint() - started) / 1e6
             });
           });
+          // Connexion coupée en plein corps (redémarrage, délai) : 'end' ne vient jamais.
+          res.on('close', () => {
+            if (res.complete) return;
+            resolve({
+              ok: false,
+              status: res.statusCode,
+              bytes,
+              elapsedMs: Number(process.hrtime.bigint() - started) / 1e6,
+              error: 'response aborted'
+            });
+          });
         }
       );
       req.setTimeout(opts.timeoutMs, () => req.destroy(new Error('timeout')));

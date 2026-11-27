@@ -6,15 +6,22 @@
  *
  *   DATA_DIR=/chemin/data [VET_DATA_DIR=…] npm run smoke:aot
  *
- * Les deux serveurs démarrent sur des ports libres, avec des intervalles de
- * rafraîchissement maximaux (pas de téléchargement si les données sont récentes), puis
- * chaque chemin doit donner le même statut et le même corps. Les champs qui dépendent de
- * l'instant ou du processus (horodatages, mémoire, uptime) sont ignorés.
+ * Chaque serveur reçoit sa propre copie des données (DATA_DIR n'est jamais modifié) et un
+ * répertoire courant vide (aucun .env ne s'applique), avec des intervalles de
+ * rafraîchissement maximaux : pas de téléchargement si les données ont moins de 25 jours.
+ * Chaque chemin doit ensuite donner le même statut et le même corps. Les champs qui
+ * dépendent de l'instant ou du processus (horodatages, mémoire, uptime) sont ignorés.
+ *
+ * Lancé depuis le checkout de build, le test ne voit pas un asset manquant (les chemins
+ * embarqués existent aussi sur le disque) : voir docs/BUN_AOT.md pour la vérification
+ * sans checkout.
  * Variables : AOT_BINARY (défaut dist/medicaments-api), SMOKE_TIMEOUT_MS (défaut 120000).
  */
 
 const { spawn } = require('child_process');
+const fs = require('fs');
 const net = require('net');
+const os = require('os');
 const path = require('path');
 
 const root = path.join(__dirname, '..', '..');
@@ -24,6 +31,7 @@ const timeoutMs = Number(process.env.SMOKE_TIMEOUT_MS) || 120000;
 const PATHS = [
   '/',
   '/api-docs/',
+  '/api-docs/swagger-ui.css',
   '/api-docs.json',
   '/health',
   '/config',
@@ -56,9 +64,24 @@ function freePort() {
   });
 }
 
-function start(label, command, args, port) {
+function copyData(work, name) {
+  const dataDir = path.join(work, name, 'data');
+  fs.cpSync(process.env.DATA_DIR, dataDir, { recursive: true, preserveTimestamps: true });
+  let vetDataDir = path.join(dataDir, 'veterinaires');
+  if (process.env.VET_DATA_DIR) {
+    vetDataDir = path.join(work, name, 'veterinaires');
+    fs.cpSync(process.env.VET_DATA_DIR, vetDataDir, { recursive: true, preserveTimestamps: true });
+  }
+  const cwd = path.join(work, name, 'cwd');
+  fs.mkdirSync(cwd, { recursive: true });
+  return { cwd, dataDir, vetDataDir };
+}
+
+function start(label, command, args, port, { cwd, dataDir, vetDataDir }) {
   const env = {
     ...process.env,
+    DATA_DIR: dataDir,
+    VET_DATA_DIR: vetDataDir,
     PORT: String(port),
     NODE_ENV: 'production',
     RELOAD_STRATEGY: 'in-process',
@@ -67,16 +90,19 @@ function start(label, command, args, port) {
     VET_LOAD_DEFERRED: 'false',
     ENABLE_RATE_LIMIT: 'false'
   };
-  const child = spawn(command, args, { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'] });
+  const child = spawn(command, args, { cwd, env, stdio: ['ignore', 'pipe', 'pipe'] });
+  const server = { label, child, port, error: null, log: () => log };
   let log = '';
+  child.on('error', (error) => { server.error = error; });
   child.stdout.on('data', (chunk) => { log += chunk; });
   child.stderr.on('data', (chunk) => { log += chunk; });
-  return { label, child, port, log: () => log };
+  return server;
 }
 
 async function waitReady(server) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
+    if (server.error) throw new Error(`${server.label} : ${server.error.message}`);
     if (server.child.exitCode !== null) {
       throw new Error(`${server.label} s'est arrêté (code ${server.child.exitCode})\n${server.log()}`);
     }
@@ -124,12 +150,15 @@ async function fetchNormalized(port, urlPath) {
 }
 
 async function main() {
-  const [aotPort, nodePort] = [await freePort(), await freePort()];
-  const servers = [
-    start('exécutable AOT', binary, [], aotPort),
-    start('Node', process.execPath, ['src/server.js'], nodePort)
-  ];
+  if (!fs.existsSync(binary)) throw new Error(`${binary} introuvable : lancer npm run build:aot`);
+  const work = fs.mkdtempSync(path.join(os.tmpdir(), 'medicaments-smoke-aot-'));
+  const servers = [];
   try {
+    const [aotPort, nodePort] = [await freePort(), await freePort()];
+    servers.push(start('exécutable AOT', binary, [], aotPort, copyData(work, 'aot')));
+    servers.push(
+      start('Node', process.execPath, [path.join(root, 'src', 'server.js')], nodePort, copyData(work, 'node'))
+    );
     await Promise.all(servers.map(waitReady));
     let failures = 0;
     for (const urlPath of PATHS) {
@@ -153,8 +182,17 @@ async function main() {
     if (failures > 0) throw new Error(`${failures} chemin(s) diffèrent entre l'exécutable et Node`);
     console.log(`smoke:aot: ${PATHS.length} chemins identiques à Node`);
   } finally {
-    for (const { child } of servers) child.kill('SIGTERM');
+    await Promise.all(servers.map(stop));
+    fs.rmSync(work, { recursive: true, force: true });
   }
+}
+
+function stop({ child }) {
+  if (child.exitCode !== null || child.signalCode !== null || child.pid === undefined) return;
+  return new Promise((resolve) => {
+    child.once('exit', resolve);
+    child.kill('SIGTERM');
+  });
 }
 
 main().catch((error) => {
