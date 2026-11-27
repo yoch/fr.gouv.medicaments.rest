@@ -36,11 +36,18 @@ const HTTP_HEADERS = {
 };
 
 async function ensure7zipExecutable() {
-  const bin = sevenBin.path7za;
+  const configured = config.sevenZipPath;
+  const bin = configured || sevenBin.path7za;
   if (!fs.existsSync(bin)) {
-    throw new Error(`Binaire 7za introuvable: ${bin}`);
+    throw new Error(
+      configured
+        ? `Binaire 7za introuvable: ${bin} (SEVEN_ZIP_PATH, ou 7za à côté de l'exécutable compilé)`
+        : `Binaire 7za introuvable: ${bin}`
+    );
   }
-  await fs.chmod(bin, 0o755);
+  // Le binaire livré par 7zip-bin perd parfois son bit x à l'installation ; un chemin
+  // configuré est fourni tel quel (éventuellement en lecture seule).
+  if (!configured) await fs.chmod(bin, 0o755);
   return bin;
 }
 

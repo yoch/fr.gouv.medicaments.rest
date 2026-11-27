@@ -36,8 +36,26 @@ function parseSearchWarmupMode(raw) {
   return accepted.has(value) ? value : 'legacy';
 }
 
+// Remplacé par "1" à la compilation (`npm run build:aot`, `--define`). Sous Node, la
+// variable d'environnement du même nom n'est normalement pas définie.
+const STANDALONE = process.env.MEDICAMENTS_STANDALONE === '1';
+
+// Dans un exécutable compilé, `__dirname` désigne le dossier source de la machine de
+// build : un défaut relatif à `__dirname` pointerait en silence vers ce checkout.
+if (STANDALONE && !process.env.DATA_DIR) {
+  throw new Error(
+    'DATA_DIR est obligatoire pour l\'exécutable compilé (chemin absolu du dossier des données BDPM)'
+  );
+}
+
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../data');
 const VET_DATA_DIR = process.env.VET_DATA_DIR || path.join(DATA_DIR, 'veterinaires');
+
+// Binaire 7za d'extraction de l'archive vétérinaire. null = celui de `7zip-bin` (node_modules).
+// L'exécutable compilé cherche par défaut un `7za` posé à côté de lui (copié par build:aot).
+const SEVEN_ZIP_PATH =
+  process.env.SEVEN_ZIP_PATH ||
+  (STANDALONE ? path.join(path.dirname(process.execPath), '7za') : null);
 
 const config = Object.freeze({
   // Serveur
@@ -74,6 +92,10 @@ const config = Object.freeze({
   // Intervalles de rafraîchissement
   bdpmCheckIntervalHours: parseIntervalHours(process.env.BDPM_CHECK_INTERVAL_HOURS, 72),
   vetCheckIntervalHours: parseIntervalHours(process.env.VET_CHECK_INTERVAL_HOURS, 72),
+
+  // Exécutable compilé (Bun --compile --aot)
+  standalone: STANDALONE,
+  sevenZipPath: SEVEN_ZIP_PATH,
 
   // Chemins données
   dataDir: DATA_DIR,
