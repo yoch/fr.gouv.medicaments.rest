@@ -15,6 +15,7 @@ charge mixte n'est pas épinglée.
 | `--aot` avec le paquet npm actuel | Plus lent que le JIT sur la recherche (−45 à −55 %), plus rapide ailleurs. |
 | `--aot` avec une bibliothèque FrozenMiniSearch compilée en AOT | Au niveau du JIT ou meilleur partout (jusqu'à +25 % sur la recherche floue), −6 % sur `paracetamol`. |
 | `--aot --trim --trim-locales=fr` | 88 → 64 Mo, réponses identiques à Node, débit inchangé. |
+| Spec OpenAPI pré-générée + `fetch` à la place d'`axios` | 88 → 77 Mo (64 → 55 Mo avec `--trim`), 484 → 264 modules ; mémoire inchangée ; corrige une spec vide hors de la racine du dépôt. |
 | Mémoire résidente après charge | AOT bibliothèque 208 Mo, JIT 245 Mo, Node 351 Mo (pic sous charge ≈ 395 Mo en AOT et en JIT). |
 
 ## 1. Pourquoi l'analyse `--trim` voit des locales
@@ -169,8 +170,12 @@ Node** (métadonnées exclues), ordre alphabétique français compris. Débit sa
   `vet/loadPipeline.js` (79), `searchOrchestrator.js` (72) et `dataLoader.js`
   (62), surtout des allocations d'objets qui s'échappent : structurel (résultats
   JSON), pas corrigeable sans réécriture.
-- `--aot-log-type-mismatches` : aucun type incompatible rapporté à la
-  compilation du serveur.
+- `--aot-log-type-mismatches` : ce journal est écrit **à l'exécution**
+  (`BUN_AOT_TYPE_MISMATCH_LOG`), pas à la compilation. Sur 17 routes (14 484 requêtes,
+  dont erreurs 400/404), il contient 55 lignes et 1 342 occurrences, toutes
+  `action: continued` (chemin lent, comportement inchangé) : **aucune dans notre
+  code ni dans FrozenMiniSearch**. 1 111 viennent de `csv-parse` (`CsvError`, au
+  chargement des données) et 231 des internes du runtime (flux, sockets).
 - Les avertissements `TS100058` de `xmlchars` (`new RegExp` dynamiques, exécutées
   par l'interpréteur) n'empêchent pas le build ; ces expressions ne sont
   utilisées que par le parseur XML vétérinaire.
@@ -179,18 +184,82 @@ Node** (métadonnées exclues), ordre alphabétique français compris. Débit sa
   déploiement (`import … with { type: 'file' }` ou assets embarqués).
 - Les répertoires de données ne sont pas embarqués : `DATA_DIR` et
   `VET_DATA_DIR` doivent être fournis (support ajouté dans `7edaae2`).
+- Le build signale 4 affectations de `graceful-fs` et `once` qui lèveraient une
+  erreur si elles s'exécutaient (`TS100014`, objets natifs en lecture seule). Elles
+  ne s'exécutent pas : un binaire AOT télécharge, suit une redirection, décompresse
+  du gzip, rejette un 404 et applique le délai d'inactivité exactement comme Node
+  (banc `dl-probe` : 9 vérifications identiques).
 - `--disallow-code-generation-from-strings` n'a pas été évalué en production : il
   n'est pas nécessaire pour le gain et pourrait casser une dépendance utilisant
   `new Function` (non vérifié).
 
-## 5. Recommandations
+## 5. Alléger le binaire : spec OpenAPI pré-générée et `fetch`
+
+Deux dépendances n'ont aucune place dans le binaire :
+
+- `swagger-jsdoc` (et `ajv`, `yaml`, `json-schema-ref-parser`, `doctrine`, `glob`…)
+  ne sert qu'à produire un JSON au démarrage. La spec est désormais générée par
+  `npm run generate:openapi` (`src/openapi.generated.json`, identique octet pour
+  octet à l'ancienne sortie : 18 chemins), et un test vérifie qu'elle est à jour.
+  Cela corrige aussi un défaut latent : `swagger-jsdoc` lisait `./src/routes/**`
+  sur le disque, donc un binaire lancé hors de la racine du dépôt servait une spec
+  **sans aucun chemin**.
+- `axios` n'était utilisé que pour les téléchargements ; il est remplacé par
+  `fetch` (`src/utils/httpStatusError.js`, `syncHelpers.js`, `remoteFileProbe.js`).
+
+| | Avant | Après |
+| --- | ---: | ---: |
+| Modules embarqués | 484 | **264** |
+| Binaire `--aot` | 88,3 Mo | **76,8 Mo** |
+| Binaire `--aot --trim --trim-locales=fr` | 63,9 Mo | **54,5 Mo** |
+| Optimisations ratées (`missed-optimizations`) | 15 738 | **7 170** |
+| Avertissements `TS100058` (regex dynamiques) | 30 | **2** |
+
+Mémoire et démarrage ne changent pas de façon mesurable (même protocole, témoin
+relancé dans la même session) : repos après charge 211 → 219 Mo (bruit ±8 Mo),
+mémoire de fichiers −6 Mo, prêt en 11 s dans les deux cas. Le gain est sur la
+taille du binaire, pas sur le RSS.
+
+Compatibilité : Node n'applique plus `HTTP_PROXY`/`HTTPS_PROXY` aux téléchargements
+(`fetch` ne les lit qu'avec `NODE_USE_ENV_PROXY=1`, Node 24+).
+
+## 6. Ce qui reste à typer
+
+`bun compile --explain` (le rapport principal, distinct de `missed-optimizations`)
+classe 4 859 causes. Il conclut que **30,8 % des accès aux propriétés de notre code
+sont une simple lecture** (473 libres, 579 testés, 481 par nom, sur 1 533), contre
+21,2 % dans les dépendances et 45,2 % dans FrozenMiniSearch.
+
+- **Serveur (`src/`)** : 18 entrées parmi les 20 premières, pour 7 % de temps
+  estimé en opérations non typées, dont environ 6 % dans le chargement des données
+  vétérinaires (`vet/loadPipeline.js`, `vetXmlParser.js`, `defineCorpusRecord.js`),
+  qui ne s'exécute qu'au démarrage. Sur le chemin d'une requête : `mergeSearchHits`
+  (0,3 %), `routes/medicaments/index.js` (0,1 %), `miniSearchIndexConfig` (0,1 %).
+  Rien à gagner ici.
+- **FrozenMiniSearch** : c'est le seul reste significatif. Premier maillon,
+  `scoring.ts` `combineResults` : `results.reduce(combinator)` confie notre
+  fonction au `reduce` natif (estimé à 33,5 %). Remplacé par une boucle dans une
+  copie de travail : l'entrée disparaît, mais une autre, masquée derrière
+  (`estimateMaxPostingLengthForQuery`, 38,8 %), prend sa place, et le banc ne
+  bouge pas (écarts dans le bruit). Le rapport le dit : 231 sites « restent non
+  typés tant que d'autres entrées ne sont pas corrigées ». C'est donc une chaîne
+  à remonter maillon par maillon, avec des gains à mesurer à chaque étape, et non
+  un correctif unique.
+- **Dépendances** : la première cause du serveur (14,2 %, `builtin-result`,
+  1 105 sites) est surtout dans les dépendances (`get-intrinsic`, `qs`, `csv-parse`)
+  et dans des types déclarés sans être vérifiés. On ne peut rien y corriger.
+
+Les pourcentages sont des estimations statiques (« selon la fréquence d'exécution
+attendue »), pas des mesures : seule la mesure en charge fait foi.
+
+## 7. Recommandations
 
 1. **Ne pas livrer `--aot` avec le paquet npm actuel** : il est plus lent que le
    JIT sur la recherche, qui est le cœur de l'API.
 2. Publier `@yoch/frozenminisearch` avec la condition `"aot"` (sortie de
    `bun compile --library`), puis compiler le serveur avec
    `--conditions=aot --trim --trim-locales=fr`.
-3. Gain mesuré face au JIT : +13 % de débit en charge mixte, binaire 137 → 64 Mo,
+3. Gain mesuré face au JIT : +13 % de débit en charge mixte, binaire 137 → 55 Mo (avec les dépendances allégées),
    RSS après charge −15 % (208 contre 245 Mo) ; face à Node : +66 % de débit.
 4. Avant déploiement : embarquer `public/`, valider la suite `npm run test:integration`
    contre le binaire, et rejouer les mesures sur la machine cible (l'écart
