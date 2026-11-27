@@ -6,6 +6,9 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 OUT = os.environ.get('MEM_OUT', '/tmp/server-rss')
 os.makedirs(OUT, exist_ok=True)
 PORT = 3230
+# Données lues (et éventuellement re-téléchargées) en place : passer une copie au besoin.
+DATA_DIR = os.environ.get('DATA_DIR', os.path.join(ROOT, 'data'))
+VET_DATA_DIR = os.environ.get('VET_DATA_DIR', os.path.join(DATA_DIR, 'veterinaires'))
 # Exécutables compilés : chemins par variable d'environnement (MEM_BIN_<VARIANTE>, tirets
 # en soulignés). Seul `aot` a un défaut : la sortie de `npm run build:aot`.
 def binary(name, default=None):
@@ -80,7 +83,7 @@ def run(name):
     env = dict(os.environ, PORT=str(PORT), NODE_ENV='production', ENABLE_RATE_LIMIT='false',
                VET_LOAD_DEFERRED='false', VET_LOAD_DELAY_MS='0',
                BDPM_CHECK_INTERVAL_HOURS='596', VET_CHECK_INTERVAL_HOURS='596',
-               DATA_DIR=f'{ROOT}/data', VET_DATA_DIR=f'{ROOT}/data/veterinaires')
+               DATA_DIR=DATA_DIR, VET_DATA_DIR=VET_DATA_DIR)
     log = open(f'{OUT}/{name}.log', 'w')
     t0 = time.time()
     proc = subprocess.Popen(VARIANTS[name], cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)

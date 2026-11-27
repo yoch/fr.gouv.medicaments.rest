@@ -103,8 +103,9 @@ async function waitReady(server) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     if (server.error) throw new Error(`${server.label} : ${server.error.message}`);
-    if (server.child.exitCode !== null) {
-      throw new Error(`${server.label} s'est arrêté (code ${server.child.exitCode})\n${server.log()}`);
+    if (server.child.exitCode !== null || server.child.signalCode !== null) {
+      const how = server.child.signalCode ? `signal ${server.child.signalCode}` : `code ${server.child.exitCode}`;
+      throw new Error(`${server.label} s'est arrêté (${how})\n${server.log()}`);
     }
     try {
       const response = await fetch(`http://127.0.0.1:${server.port}/health`);
@@ -154,7 +155,9 @@ async function main() {
   const work = fs.mkdtempSync(path.join(os.tmpdir(), 'medicaments-smoke-aot-'));
   const servers = [];
   try {
-    const [aotPort, nodePort] = [await freePort(), await freePort()];
+    const aotPort = await freePort();
+    let nodePort = await freePort();
+    while (nodePort === aotPort) nodePort = await freePort();
     servers.push(start('exécutable AOT', binary, [], aotPort, copyData(work, 'aot')));
     servers.push(
       start('Node', process.execPath, [path.join(root, 'src', 'server.js')], nodePort, copyData(work, 'node'))

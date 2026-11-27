@@ -44,7 +44,7 @@ Lancé depuis le checkout de build, le smoke test ne voit pas un asset manquant,
 ## Ce que l'exécutable demande à l'hôte
 
 - **Données** : `DATA_DIR` et `VET_DATA_DIR` sont des chemins absolus, accessibles en écriture (téléchargements, `meta.json`). Dans un exécutable `--aot`, `__dirname` reste le dossier source de la machine de build. Le défaut `<dépôt>/data` pointerait donc en silence vers ce checkout : l'exécutable refuse de démarrer sans `DATA_DIR`.
-- **7za** : à côté de l'exécutable (`dist/7za`), ou à un chemin absolu indiqué par `SEVEN_ZIP_PATH`. Il doit être exécutable : il n'est pas modifié. Il ne sert qu'à extraire l'archive vétérinaire après un téléchargement.
+- **7za** : à côté de l'exécutable (`dist/7za`), ou à un chemin absolu indiqué par `SEVEN_ZIP_PATH`. Il doit être exécutable : il n'est pas modifié. Il ne sert qu'à extraire l'archive vétérinaire après un téléchargement. Il est vérifié avant ce téléchargement : s'il manque, l'archive n'est ni téléchargée ni enregistrée, et l'erreur revient dans le journal à chaque cycle, au lieu de laisser une archive à jour jamais extraite.
 - **`file` et `iconv`** : sur le `PATH`, comme sous Node (`src/services/dataDownloader.js`).
 - **Configuration** : variables d'environnement, ou `.env` du répertoire courant. L'exécutable charge ce `.env` sans écraser les variables déjà définies. `--env-file` n'existe pas pour l'exécutable.
 - **Mémoire virtuelle** : ~38 Go d'adresses réservées. Ne pas poser `ulimit -v` ni `LimitAS`.
@@ -110,6 +110,6 @@ Les issues ci-dessous ont été rapportées depuis `@yoch/frozenminisearch` ; le
 
 ## Avant la mise en production
 
-- Monter `@yoch/frozenminisearch` vers la version qui publie la condition `"aot"`, puis utiliser `--require-aot`.
+- Monter `@yoch/frozenminisearch` vers la version qui publie la condition `"aot"`, puis utiliser `--require-aot`. La 1.13.0 publiée sur npm ne l'a pas ; cette branche a été validée avec un tarball local de yoch/frozenminisearch#31 installé sans `--save`.
 - Rejouer `npm run test:integration` et les mesures de l'évaluation sur la machine cible.
 - Exercer une vraie mise à jour des données vétérinaires (téléchargement, puis extraction par `7za`) avec l'exécutable.

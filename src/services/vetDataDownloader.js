@@ -109,6 +109,10 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
       return { changed: false };
     }
 
+    // Vérifier 7za avant de télécharger : une archive enregistrée sans être extraite
+    // aurait un hash à jour et ne serait plus jamais extraite.
+    if (extract) await ensure7zipExecutable();
+
     const fileHash = await downloadFile(url, tempPath, {
       headers: HTTP_HEADERS,
       timeoutMs: 120000
@@ -125,6 +129,14 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
     }
 
     await fs.move(tempPath, finalPath, { overwrite: true });
+
+    // Extraire avant d'enregistrer le hash : si l'extraction échoue, le cycle suivant
+    // voit un hash différent et recommence au lieu de garder l'ancien XML.
+    if (extract) {
+      await extractArchive(finalPath, VET_DATA_DIR);
+      console.log(`✓ Archive vétérinaire extraite dans ${VET_DATA_DIR}`);
+    }
+
     metadata[filename] = {
       downloadedAt: new Date().toISOString(),
       checkedAt: new Date().toISOString(),
@@ -134,11 +146,6 @@ async function processRemoteFile({ filename, url, metadata, extract = false }) {
     };
     await saveJsonMeta(META_FILE, metadata, VET_DATA_DIR);
     console.log(`✓ ${filename} (vétérinaire) mis à jour`);
-
-    if (extract) {
-      await extractArchive(finalPath, VET_DATA_DIR);
-      console.log(`✓ Archive vétérinaire extraite dans ${VET_DATA_DIR}`);
-    }
 
     return { changed: true };
   } catch (error) {

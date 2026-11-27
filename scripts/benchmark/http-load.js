@@ -64,6 +64,7 @@ function parseArgs(argv) {
   if (!Number.isFinite(opts.concurrency) || opts.concurrency < 1) throw new Error('concurrency invalide');
   if (!Number.isFinite(opts.durationS) || opts.durationS < 1) throw new Error('duration invalide');
   if (!Number.isFinite(opts.warmupS) || opts.warmupS < 0) throw new Error('warmup invalide');
+  if (!Number.isFinite(opts.timeoutMs) || opts.timeoutMs < 1) throw new Error('timeout invalide');
   if (opts.paths.length === 0) throw new Error('aucun chemin à charger');
 
   return opts;
